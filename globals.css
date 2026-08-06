@@ -1,0 +1,131 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-display), ui-serif, Georgia, serif;
+
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+
+  --color-honey: var(--honey);
+  --color-honey-foreground: var(--honey-foreground);
+  --color-body-pillar: var(--pillar-body);
+  --color-identity-pillar: var(--pillar-identity);
+  --color-mindset-pillar: var(--pillar-mindset);
+  --color-faith-pillar: var(--pillar-faith);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+}
+
+:root {
+  color-scheme: light;
+  /* Warm cream / honey palette */
+  --background: oklch(0.982 0.012 85);
+  --foreground: oklch(0.28 0.03 60);
+  --card: oklch(0.995 0.006 90);
+  --card-foreground: oklch(0.28 0.03 60);
+  --popover: oklch(0.995 0.006 90);
+  --popover-foreground: oklch(0.28 0.03 60);
+  --primary: oklch(0.72 0.14 65);
+  --primary-foreground: oklch(0.99 0.01 90);
+  --secondary: oklch(0.94 0.03 80);
+  --secondary-foreground: oklch(0.35 0.04 60);
+  --muted: oklch(0.95 0.02 82);
+  --muted-foreground: oklch(0.52 0.03 65);
+  --accent: oklch(0.9 0.05 75);
+  --accent-foreground: oklch(0.3 0.04 60);
+  --destructive: oklch(0.577 0.18 27);
+  --border: oklch(0.9 0.025 78);
+  --input: oklch(0.9 0.025 78);
+  --ring: oklch(0.72 0.14 65);
+
+  --honey: oklch(0.78 0.15 75);
+  --honey-foreground: oklch(0.28 0.05 60);
+
+  --pillar-body: oklch(0.68 0.12 25);
+  --pillar-identity: oklch(0.72 0.13 65);
+  --pillar-mindset: oklch(0.62 0.09 145);
+  --pillar-faith: oklch(0.58 0.11 285);
+
+  --chart-1: oklch(0.72 0.14 65);
+  --chart-2: oklch(0.68 0.12 25);
+  --chart-3: oklch(0.62 0.09 145);
+  --chart-4: oklch(0.58 0.11 285);
+  --chart-5: oklch(0.52 0.03 65);
+  --radius: 0.75rem;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: oklch(0.22 0.02 60);
+  --foreground: oklch(0.95 0.02 85);
+  --card: oklch(0.27 0.025 62);
+  --card-foreground: oklch(0.95 0.02 85);
+  --popover: oklch(0.27 0.025 62);
+  --popover-foreground: oklch(0.95 0.02 85);
+  --primary: oklch(0.78 0.15 75);
+  --primary-foreground: oklch(0.24 0.03 60);
+  --secondary: oklch(0.32 0.03 62);
+  --secondary-foreground: oklch(0.95 0.02 85);
+  --muted: oklch(0.32 0.03 62);
+  --muted-foreground: oklch(0.72 0.03 78);
+  --accent: oklch(0.38 0.05 68);
+  --accent-foreground: oklch(0.95 0.02 85);
+  --destructive: oklch(0.7 0.19 22);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.78 0.15 75);
+
+  --honey: oklch(0.8 0.16 78);
+  --honey-foreground: oklch(0.24 0.04 60);
+
+  --pillar-body: oklch(0.72 0.13 28);
+  --pillar-identity: oklch(0.78 0.14 68);
+  --pillar-mindset: oklch(0.68 0.1 148);
+  --pillar-faith: oklch(0.66 0.12 288);
+
+  --chart-1: oklch(0.78 0.15 75);
+  --chart-2: oklch(0.72 0.13 28);
+  --chart-3: oklch(0.68 0.1 148);
+  --chart-4: oklch(0.66 0.12 288);
+  --chart-5: oklch(0.72 0.03 78);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Honeycomb hexagon shape used in the nav */
+.hex-clip {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}

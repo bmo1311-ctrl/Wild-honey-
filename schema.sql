@@ -1,0 +1,278 @@
+-- Wild Honey Circle — Supabase schema
+-- Run this once in your Supabase project's SQL Editor (Project → SQL Editor → New query).
+-- Safe to re-run: uses "if not exists" / "or replace" throughout.
+
+-- ============================================================
+-- TABLES
+-- ============================================================
+
+create table if not exists profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  name text not null default 'honey',
+  email text,
+  avatar_color text not null default 'honey',
+  membership_tier text not null default 'free' check (membership_tier in ('free','circle','inner-circle')),
+  is_admin boolean not null default false,
+  streak_count integer not null default 0,
+  last_active_date date,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists prompts (
+  id uuid primary key default gen_random_uuid(),
+  pillar text not null check (pillar in ('Body','Identity','Mindset','Faith')),
+  text text not null,
+  date_scheduled date not null,
+  is_premium boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create unique index if not exists prompts_date_scheduled_idx on prompts(date_scheduled);
+
+create table if not exists journal_entries (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references profiles(id) on delete cascade,
+  prompt_id uuid references prompts(id) on delete set null,
+  text text not null,
+  visibility text not null default 'private' check (visibility in ('private','circle')),
+  created_at timestamptz not null default now()
+);
+create index if not exists journal_entries_user_idx on journal_entries(user_id);
+create index if not exists journal_entries_visibility_idx on journal_entries(visibility);
+
+create table if not exists reactions (
+  id uuid primary key default gen_random_uuid(),
+  entry_id uuid not null references journal_entries(id) on delete cascade,
+  user_id uuid not null references profiles(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  unique (entry_id, user_id)
+);
+
+create table if not exists comments (
+  id uuid primary key default gen_random_uuid(),
+  entry_id uuid not null references journal_entries(id) on delete cascade,
+  user_id uuid not null references profiles(id) on delete cascade,
+  text text not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists comments_entry_idx on comments(entry_id);
+
+create table if not exists products (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  description text not null default '',
+  price_cents integer not null default 0,
+  stripe_price_id text,
+  file_url text,
+  cover_image text,
+  is_published boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists purchases (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references profiles(id) on delete cascade,
+  product_id uuid not null references products(id) on delete cascade,
+  stripe_payment_id text,
+  purchased_at timestamptz not null default now(),
+  unique (user_id, product_id)
+);
+
+create table if not exists memberships (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references profiles(id) on delete cascade,
+  tier text not null check (tier in ('circle','inner-circle')),
+  stripe_subscription_id text,
+  status text not null default 'active',
+  current_period_end timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists retreats (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  location text not null,
+  dates text not null,
+  description text not null default '',
+  price_cents integer not null default 0,
+  spots_total integer not null default 12,
+  spots_taken integer not null default 0,
+  cover_image text,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists retreat_signups (
+  id uuid primary key default gen_random_uuid(),
+  retreat_id uuid not null references retreats(id) on delete cascade,
+  user_id uuid not null references profiles(id) on delete cascade,
+  status text not null default 'waitlist' check (status in ('waitlist','confirmed')),
+  created_at timestamptz not null default now(),
+  unique (retreat_id, user_id)
+);
+
+-- ============================================================
+-- AUTO-CREATE A PROFILE ROW WHEN SOMEONE SIGNS UP
+-- ============================================================
+
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  insert into public.profiles (id, name, email)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
+    new.email
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+-- ============================================================
+-- ROW LEVEL SECURITY
+-- ============================================================
+
+alter table profiles enable row level security;
+alter table prompts enable row level security;
+alter table journal_entries enable row level security;
+alter table reactions enable row level security;
+alter table comments enable row level security;
+alter table products enable row level security;
+alter table purchases enable row level security;
+alter table memberships enable row level security;
+alter table retreats enable row level security;
+alter table retreat_signups enable row level security;
+
+-- profiles: everyone signed in can read names/avatars (needed for the circle feed);
+-- you can only edit your own row.
+drop policy if exists "profiles are viewable by authenticated users" on profiles;
+create policy "profiles are viewable by authenticated users"
+  on profiles for select
+  using (auth.role() = 'authenticated');
+
+drop policy if exists "users can update own profile" on profiles;
+create policy "users can update own profile"
+  on profiles for update
+  using (auth.uid() = id);
+
+-- prompts: readable by everyone signed in
+drop policy if exists "prompts are viewable by authenticated users" on prompts;
+create policy "prompts are viewable by authenticated users"
+  on prompts for select
+  using (auth.role() = 'authenticated');
+
+drop policy if exists "admins can manage prompts" on prompts;
+create policy "admins can manage prompts"
+  on prompts for all
+  using (exists (select 1 from profiles where id = auth.uid() and is_admin))
+  with check (exists (select 1 from profiles where id = auth.uid() and is_admin));
+
+-- journal_entries: you can always see your own; others' entries only if shared to the circle
+drop policy if exists "view own or shared entries" on journal_entries;
+create policy "view own or shared entries"
+  on journal_entries for select
+  using (auth.uid() = user_id or visibility = 'circle');
+
+drop policy if exists "insert own entries" on journal_entries;
+create policy "insert own entries"
+  on journal_entries for insert
+  with check (auth.uid() = user_id);
+
+drop policy if exists "update own entries" on journal_entries;
+create policy "update own entries"
+  on journal_entries for update
+  using (auth.uid() = user_id);
+
+drop policy if exists "delete own entries" on journal_entries;
+create policy "delete own entries"
+  on journal_entries for delete
+  using (auth.uid() = user_id);
+
+-- reactions: viewable by all signed-in users, only own inserts/deletes
+drop policy if exists "view reactions" on reactions;
+create policy "view reactions" on reactions for select using (auth.role() = 'authenticated');
+drop policy if exists "insert own reactions" on reactions;
+create policy "insert own reactions" on reactions for insert with check (auth.uid() = user_id);
+drop policy if exists "delete own reactions" on reactions;
+create policy "delete own reactions" on reactions for delete using (auth.uid() = user_id);
+
+-- comments: viewable by all signed-in users, only own inserts
+drop policy if exists "view comments" on comments;
+create policy "view comments" on comments for select using (auth.role() = 'authenticated');
+drop policy if exists "insert own comments" on comments;
+create policy "insert own comments" on comments for insert with check (auth.uid() = user_id);
+drop policy if exists "delete own comments" on comments;
+create policy "delete own comments" on comments for delete using (auth.uid() = user_id);
+
+-- products: published ones viewable by all signed-in users; admins manage
+drop policy if exists "view published products" on products;
+create policy "view published products"
+  on products for select
+  using (is_published = true or exists (select 1 from profiles where id = auth.uid() and is_admin));
+drop policy if exists "admins manage products" on products;
+create policy "admins manage products"
+  on products for all
+  using (exists (select 1 from profiles where id = auth.uid() and is_admin))
+  with check (exists (select 1 from profiles where id = auth.uid() and is_admin));
+
+-- purchases: only your own; inserts happen server-side via the service role (webhook)
+drop policy if exists "view own purchases" on purchases;
+create policy "view own purchases" on purchases for select using (auth.uid() = user_id);
+
+-- memberships: only your own
+drop policy if exists "view own memberships" on memberships;
+create policy "view own memberships" on memberships for select using (auth.uid() = user_id);
+
+-- retreats: viewable by all signed-in users; admins manage
+drop policy if exists "view retreats" on retreats;
+create policy "view retreats" on retreats for select using (auth.role() = 'authenticated');
+drop policy if exists "admins manage retreats" on retreats;
+create policy "admins manage retreats"
+  on retreats for all
+  using (exists (select 1 from profiles where id = auth.uid() and is_admin))
+  with check (exists (select 1 from profiles where id = auth.uid() and is_admin));
+
+-- retreat_signups: only your own to read; you can insert your own (waitlist signup)
+drop policy if exists "view own signups" on retreat_signups;
+create policy "view own signups" on retreat_signups for select using (auth.uid() = user_id);
+drop policy if exists "insert own signup" on retreat_signups;
+create policy "insert own signup" on retreat_signups for insert with check (auth.uid() = user_id);
+drop policy if exists "admins view all signups" on retreat_signups;
+create policy "admins view all signups"
+  on retreat_signups for select
+  using (exists (select 1 from profiles where id = auth.uid() and is_admin));
+
+-- ============================================================
+-- SEED DATA — 10 prompts across the 4 pillars, 2 products, 1 retreat
+-- Safe to run once. If you re-run the whole file, remove this section
+-- after the first run to avoid duplicate rows (no unique constraint on text).
+-- ============================================================
+
+insert into prompts (pillar, text, date_scheduled, is_premium) values
+  ('Identity', 'what version of you are you still performing for people who don''t even live in your life anymore?', current_date - 9, false),
+  ('Body', 'where in your body do you hold the tension of trying to be enough?', current_date - 8, false),
+  ('Mindset', 'name one belief you inherited that you never actually chose. are you keeping it or handing it back?', current_date - 7, false),
+  ('Faith', 'when was the last time you asked for something out loud instead of just hoping for it quietly?', current_date - 6, true),
+  ('Identity', 'what would you stop apologizing for if you knew no one was going to punish you for it?', current_date - 5, false),
+  ('Body', 'when did you last move your body because it felt good, not because you were trying to fix it?', current_date - 4, false),
+  ('Mindset', 'what''s a thought you''ve had on repeat this week that isn''t actually true, just familiar?', current_date - 3, true),
+  ('Faith', 'where are you white-knuckling control instead of letting yourself be held?', current_date - 2, false),
+  ('Identity', 'if the old version of you saw who you''re becoming, what would surprise her most?', current_date - 1, false),
+  ('Body', 'what does your body need you to stop ignoring?', current_date, false)
+on conflict (date_scheduled) do nothing;
+
+insert into products (title, description, price_cents, cover_image, is_published) values
+  ('Breaking Free From The Old Identity — Module One', 'a guided inner-work journal to name the identity you''re outgrowing and start writing the next one.', 2900, '/products/journal-cover.jpg', true),
+  ('The Wild Honey Workbook', 'prompts and exercises across Body, Identity, Mindset, and Faith to work through at your own pace.', 3900, '/products/workbook-cover.jpg', true)
+on conflict do nothing;
+
+insert into retreats (title, location, dates, description, price_cents, spots_total, spots_taken, cover_image) values
+  ('Wild Honey Retreat — Sedona', 'Altaire Villa, Sedona, AZ', 'Jul 19–23', 'five days of inner work, red rocks, and women doing this alongside you.', 129900, 12, 12, '/retreats/sedona.jpg')
+on conflict do nothing;
