@@ -64,3 +64,16 @@ export function relativeTime(iso: string): string {
   if (days < 7) return `${days}d ago`
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
+
+/** Client-safe: no server imports. Counts the current consecutive-day streak for a habit. */
+export function computeHabitStreak(habitId: string, logs: { habit_id: string; date: string }[]): number {
+  const dates = new Set(logs.filter((l) => l.habit_id === habitId).map((l) => l.date))
+  let streak = 0
+  const cursor = new Date()
+  if (!dates.has(cursor.toISOString().slice(0, 10))) cursor.setDate(cursor.getDate() - 1)
+  while (dates.has(cursor.toISOString().slice(0, 10))) {
+    streak += 1
+    cursor.setDate(cursor.getDate() - 1)
+  }
+  return streak
+}

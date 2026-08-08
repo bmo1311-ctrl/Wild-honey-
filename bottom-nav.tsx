@@ -2,15 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Sun, Users, Archive, ShoppingBag, Tent, User } from 'lucide-react'
+import { Sun, Users, Sparkles, Dumbbell, User, Activity } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const TABS = [
   { href: '/app', label: 'Today', icon: Sun, exact: true },
+  { href: '/app/energy', label: 'Energy', icon: Activity },
   { href: '/app/circle', label: 'Circle', icon: Users },
-  { href: '/app/archive', label: 'Archive', icon: Archive },
-  { href: '/app/shop', label: 'Shop', icon: ShoppingBag },
-  { href: '/app/retreats', label: 'Retreats', icon: Tent },
+  { href: '/app/community', label: 'Community', icon: Sparkles },
+  { href: '/app/workouts', label: 'Workouts', icon: Dumbbell },
   { href: '/app/profile', label: 'You', icon: User },
 ]
 
