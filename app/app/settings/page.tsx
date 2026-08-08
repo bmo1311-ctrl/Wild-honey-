@@ -1,8 +1,9 @@
 import { PrivacySettings } from '@/components/privacy-settings'
-import { getSessionProfile } from '@/lib/data'
+import { BlockedMutedList } from '@/components/blocked-muted-list'
+import { getBlockedUsers, getMutedUsers, getSessionProfile } from '@/lib/data'
 
 export default async function SettingsPage() {
-  const profile = await getSessionProfile()
+  const [profile, blocked, muted] = await Promise.all([getSessionProfile(), getBlockedUsers(), getMutedUsers()])
   if (!profile) return null
 
   return (
@@ -11,6 +12,7 @@ export default async function SettingsPage() {
         <h1 className="font-serif text-3xl font-semibold">Privacy &amp; Notifications</h1>
         <p className="mt-1 text-sm text-muted-foreground text-pretty">control what Wild Honey sends you, download your data, or close your account.</p>
       </div>
+      <BlockedMutedList blocked={blocked} muted={muted} />
       <PrivacySettings
         initialPrefs={profile.notification_prefs ?? {}}
         initialQuietStart={profile.quiet_hours_start}

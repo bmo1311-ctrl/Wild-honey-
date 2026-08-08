@@ -1104,3 +1104,101 @@ export async function adminToggleAdminStatus(userId: string, makeAdmin: boolean)
   revalidatePath('/admin/members')
   return { ok: true }
 }
+
+// ============================================================
+// PHASE 8: COMMUNITY SAFETY
+// ============================================================
+
+export async function toggleBlockUser(userId: string) {
+  const { supabase, user } = await requireUser()
+  if (userId === user.id) return { error: "You can't block yourself." }
+  const { data: existing } = await supabase.from('user_blocks').select('id').eq('blocker_id', user.id).eq('blocked_id', userId).maybeSingle()
+  if (existing) {
+    const { error } = await supabase.from('user_blocks').delete().eq('id', existing.id)
+    if (error) return { error: error.message }
+    return { ok: true, blocked: false }
+  }
+  const { error } = await supabase.from('user_blocks').insert({ blocker_id: user.id, blocked_id: userId })
+  if (error) return { error: error.message }
+  revalidatePath('/app/circle')
+  revalidatePath('/app/community')
+  return { ok: true, blocked: true }
+}
+
+export async function toggleMuteUser(userId: string) {
+  const { supabase, user } = await requireUser()
+  if (userId === user.id) return { error: "You can't mute yourself." }
+  const { data: existing } = await supabase.from('user_mutes').select('id').eq('muter_id', user.id).eq('muted_id', userId).maybeSingle()
+  if (existing) {
+    const { error } = await supabase.from('user_mutes').delete().eq('id', existing.id)
+    if (error) return { error: error.message }
+    return { ok: true, muted: false }
+  }
+  const { error } = await supabase.from('user_mutes').insert({ muter_id: user.id, muted_id: userId })
+  if (error) return { error: error.message }
+  revalidatePath('/app/circle')
+  revalidatePath('/app/community')
+  return { ok: true, muted: true }
+}
+
+export async function unblockUser(blockId: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('user_blocks').delete().eq('id', blockId).eq('blocker_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/settings')
+  return { ok: true }
+}
+
+export async function unmuteUser(muteId: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('user_mutes').delete().eq('id', muteId).eq('muter_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/settings')
+  return { ok: true }
+}
+
+export async function reportContent(input: { contentType: string; contentId: string; reason: string }) {
+  const { supabase, user } = await requireUser()
+  const reason = input.reason.trim()
+  if (!reason) return { error: 'Tell us what the issue is.' }
+  const { error } = await supabase.from('content_reports').insert({
+    reporter_id: user.id,
+    content_type: input.contentType,
+    content_id: input.contentId,
+    reason,
+  })
+  if (error) return { error: error.message }
+  return { ok: true }
+}
+
+const CONTENT_TABLE: Record<string, string> = {
+  journal_entry: 'journal_entries',
+  community_post: 'community_posts',
+  community_comment: 'community_comments',
+  group_post: 'group_posts',
+  group_post_comment: 'group_post_comments',
+  circle_comment: 'comments',
+}
+
+export async function adminReviewReport(reportId: string, status: 'reviewed' | 'dismissed') {
+  const { supabase, user } = await requireAdmin()
+  const { error } = await supabase.from('content_reports').update({ status, reviewed_at: new Date().toISOString(), reviewed_by: user.id }).eq('id', reportId)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/reports')
+  return { ok: true }
+}
+
+export async function adminRemoveReportedContent(reportId: string) {
+  const { supabase, user } = await requireAdmin()
+  const { data: report } = await supabase.from('content_reports').select('content_type, content_id').eq('id', reportId).single()
+  if (!report) return { error: 'Report not found.' }
+  const table = CONTENT_TABLE[report.content_type]
+  if (!table) return { error: 'Unknown content type.' }
+  await supabase.from(table).delete().eq('id', report.content_id)
+  const { error } = await supabase.from('content_reports').update({ status: 'removed', reviewed_at: new Date().toISOString(), reviewed_by: user.id }).eq('id', reportId)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/reports')
+  revalidatePath('/app/circle')
+  revalidatePath('/app/community')
+  return { ok: true }
+}

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import type {
   Checkin,
   CommunityPost,
+  ContentReport,
   EveningReflection,
   ExpertQuestion,
   Group,
@@ -95,11 +96,30 @@ export async function getPromptArchive(): Promise<Prompt[]> {
   return (data as Prompt[]) ?? []
 }
 
+export async function getHiddenAuthorIds(): Promise<Set<string>> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return new Set()
+  const [{ data: blocksIMade }, { data: blocksOnMe }, { data: mutes }] = await Promise.all([
+    supabase.from('user_blocks').select('blocked_id').eq('blocker_id', user.id),
+    supabase.from('user_blocks').select('blocker_id').eq('blocked_id', user.id),
+    supabase.from('user_mutes').select('muted_id').eq('muter_id', user.id),
+  ])
+  const ids = new Set<string>()
+  ;(blocksIMade ?? []).forEach((b) => ids.add(b.blocked_id))
+  ;(blocksOnMe ?? []).forEach((b) => ids.add(b.blocker_id))
+  ;(mutes ?? []).forEach((m) => ids.add(m.muted_id))
+  return ids
+}
+
 export async function getCircleFeed(): Promise<JournalEntry[]> {
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
+  const hidden = await getHiddenAuthorIds()
 
   const { data: entries } = await supabase
     .from('journal_entries')
@@ -109,7 +129,7 @@ export async function getCircleFeed(): Promise<JournalEntry[]> {
     .order('created_at', { ascending: false })
     .limit(60)
 
-  const list = (entries as JournalEntry[]) ?? []
+  const list = ((entries as JournalEntry[]) ?? []).filter((e) => !hidden.has(e.user_id))
   if (list.length === 0) return []
 
   const ids = list.map((e) => e.id)
@@ -156,6 +176,7 @@ export async function getCommunityFeed(): Promise<CommunityPost[]> {
   const {
     data: { user },
   } = await supabase.auth.getUser()
+  const hidden = await getHiddenAuthorIds()
 
   const { data: posts } = await supabase
     .from('community_posts')
@@ -164,7 +185,7 @@ export async function getCommunityFeed(): Promise<CommunityPost[]> {
     .order('created_at', { ascending: false })
     .limit(80)
 
-  const list = (posts as CommunityPost[]) ?? []
+  const list = ((posts as CommunityPost[]) ?? []).filter((p) => !hidden.has(p.user_id))
   if (list.length === 0) return []
 
   const ids = list.map((p) => p.id)
@@ -495,6 +516,7 @@ export async function getGroupPosts(groupId: string): Promise<GroupPost[]> {
   const {
     data: { user },
   } = await supabase.auth.getUser()
+  const hidden = await getHiddenAuthorIds()
 
   const { data: posts } = await supabase
     .from('group_posts')
@@ -502,7 +524,7 @@ export async function getGroupPosts(groupId: string): Promise<GroupPost[]> {
     .eq('group_id', groupId)
     .order('created_at', { ascending: false })
 
-  const list = (posts as GroupPost[]) ?? []
+  const list = ((posts as GroupPost[]) ?? []).filter((p) => !hidden.has(p.user_id))
   if (list.length === 0) return []
 
   const ids = list.map((p) => p.id)
@@ -601,4 +623,36 @@ export async function getReflections(): Promise<TransformationReflection[]> {
   if (!user) return []
   const { data } = await supabase.from('transformation_reflections').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
   return (data as TransformationReflection[]) ?? []
+}
+
+// ---- Community safety ----
+
+export async function getBlockedUsers() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const { data } = await supabase.from('user_blocks').select('id, blocked_id, profile:profiles!user_blocks_blocked_id_fkey(name, avatar_color)').eq('blocker_id', user.id)
+  return data ?? []
+}
+
+export async function getMutedUsers() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const { data } = await supabase.from('user_mutes').select('id, muted_id, profile:profiles!user_mutes_muted_id_fkey(name, avatar_color)').eq('muter_id', user.id)
+  return data ?? []
+}
+
+export async function getReportsForAdmin(): Promise<ContentReport[]> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('content_reports')
+    .select('*, reporter_profile:profiles(name, avatar_color)')
+    .order('status', { ascending: true })
+    .order('created_at', { ascending: false })
+  return (data as ContentReport[]) ?? []
 }

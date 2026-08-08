@@ -9,6 +9,7 @@ import { TierBadge } from '@/components/tier-badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { HoneycombMark } from '@/components/logo'
+import { SafetyMenu } from '@/components/safety-menu'
 import type { Comment, JournalEntry } from '@/lib/types'
 import { PILLAR_META, relativeTime } from '@/lib/pillars'
 import { cn } from '@/lib/utils'
@@ -115,6 +116,7 @@ export function CircleCard({ entry, canPin = false }: { entry: JournalEntry; can
             {pillar}
           </span>
         )}
+        <SafetyMenu authorId={entry.user_id} contentType="journal_entry" contentId={entry.id} />
       </header>
 
       {entry.prompt && (

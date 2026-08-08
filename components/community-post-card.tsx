@@ -9,6 +9,7 @@ import { TierBadge } from '@/components/tier-badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { HoneycombMark } from '@/components/logo'
+import { SafetyMenu } from '@/components/safety-menu'
 import type { CommunityPost } from '@/lib/types'
 import { PILLAR_META, relativeTime } from '@/lib/pillars'
 import { cn } from '@/lib/utils'
@@ -105,6 +106,7 @@ export function CommunityPostCard({ post, canPin }: { post: CommunityPost; canPi
         {post.pillar && (
           <span className={`rounded-full px-2.5 py-1 text-[0.7rem] font-medium ${PILLAR_META[post.pillar].chip}`}>{post.pillar}</span>
         )}
+        <SafetyMenu authorId={post.user_id} contentType="community_post" contentId={post.id} />
       </header>
 
       <p className="mt-3 whitespace-pre-wrap leading-relaxed text-pretty">{post.text}</p>

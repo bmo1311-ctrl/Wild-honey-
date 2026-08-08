@@ -9,6 +9,7 @@ import { TierBadge } from '@/components/tier-badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { HoneycombMark } from '@/components/logo'
+import { SafetyMenu } from '@/components/safety-menu'
 import type { GroupPost } from '@/lib/types'
 import { relativeTime } from '@/lib/pillars'
 import { cn } from '@/lib/utils'
@@ -72,6 +73,7 @@ export function GroupPostCard({ post }: { post: GroupPost }) {
           </div>
           <p className="text-xs text-muted-foreground">{relativeTime(post.created_at)}</p>
         </div>
+        <SafetyMenu authorId={post.user_id} contentType="group_post" contentId={post.id} />
       </header>
 
       <p className="mt-3 whitespace-pre-wrap leading-relaxed text-pretty">{post.text}</p>

@@ -108,6 +108,35 @@ export interface TransformationReflection {
   created_at: string
 }
 
+export interface UserBlock {
+  id: string
+  blocker_id: string
+  blocked_id: string
+  created_at: string
+}
+
+export interface UserMute {
+  id: string
+  muter_id: string
+  muted_id: string
+  created_at: string
+}
+
+export type ContentType = 'journal_entry' | 'community_post' | 'community_comment' | 'group_post' | 'group_post_comment' | 'circle_comment'
+
+export interface ContentReport {
+  id: string
+  reporter_id: string
+  content_type: ContentType
+  content_id: string
+  reason: string
+  status: 'pending' | 'reviewed' | 'dismissed' | 'removed'
+  reviewed_by: string | null
+  reviewed_at: string | null
+  created_at: string
+  reporter_profile?: Pick<Profile, 'name' | 'avatar_color'> | null
+}
+
 export interface Prompt {
   id: string
   pillar: Pillar
