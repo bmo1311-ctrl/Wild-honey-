@@ -31,7 +31,7 @@ export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
 
   // Protect the member app and admin
-  if ((path.startsWith('/app') || path.startsWith('/admin')) && !user) {
+  if ((path.startsWith('/app') || path.startsWith('/admin') || path.startsWith('/onboarding')) && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
     return NextResponse.redirect(url)

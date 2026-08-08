@@ -9,6 +9,7 @@ import { getSessionProfile } from '@/lib/data'
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const profile = await getSessionProfile()
   if (!profile) redirect('/auth/login')
+  if (!profile.onboarding_completed_at) redirect('/onboarding')
 
   return (
     <div className="min-h-dvh bg-background pb-24">

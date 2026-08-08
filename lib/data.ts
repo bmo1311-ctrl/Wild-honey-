@@ -23,6 +23,8 @@ import type {
   Resource,
   Retreat,
   TodayFocus,
+  UserGoal,
+  VitalityCheckin,
   Win,
   Workout,
 } from '@/lib/types'
@@ -289,10 +291,16 @@ export async function getRecentWins(limit = 30): Promise<Win[]> {
 // Rule-based "Today's Focus" engine. No external AI call — just clear,
 // explainable logic over the most recent check-in so it's fast, free, and
 // always available even with zero data.
-export function computeTodayFocus(latest: Checkin | null, recent: Checkin[]): TodayFocus {
+export function computeTodayFocus(
+  latest: Checkin | null,
+  recent: Checkin[],
+  personalize?: { hydrationGoalOz?: number | null; goals?: string[]; faithPreference?: string | null; season?: string | null },
+): TodayFocus {
   const suggestions: string[] = []
   let oneThing = 'take five slow breaths and drink a glass of water before you do anything else.'
   let headline = "here's today's focus."
+  const hydrationGoal = personalize?.hydrationGoalOz ?? 64
+  const goals = personalize?.goals ?? []
 
   if (!latest) {
     return {
@@ -332,10 +340,22 @@ export function computeTodayFocus(latest: Checkin | null, recent: Checkin[]): To
     suggestions.push('keep your normal rhythm', 'a short walk outside', 'check in with your evening reflection tonight')
   }
 
-  if (hydration > 0 && hydration < 40) suggestions.push(`you're at ${hydration}oz so far — aim for at least 64oz today`)
+  if (hydration > 0 && hydration < hydrationGoal) suggestions.push(`you're at ${hydration}oz so far — aim for at least ${hydrationGoal}oz today`)
   if (sunlight === 0) suggestions.push('get outside for natural light, even 10 minutes helps')
   if (movement === 0 && energy > 3) suggestions.push('a short walk counts as movement')
   if (latest.symptoms?.length) suggestions.push(`noticed you logged ${latest.symptoms.join(', ')} — go gentle today`)
+
+  // Personalization from the Honey Profile: goals and faith preference
+  if (goals.includes('stress_reduction') && stress >= 5 && !suggestions.some((s) => s.includes('breath'))) {
+    suggestions.push('you told us stress reduction matters to you — a few minutes of quiet before your next task could help')
+  } else if (goals.includes('better_sleep') && sleep < 7) {
+    suggestions.push('better sleep is one of your goals — tonight is a good night to protect your wind-down routine')
+  } else if (goals.includes('confidence') && energy >= 5) {
+    suggestions.push('you\'re building confidence — do one thing today that scares you a little')
+  }
+  if (personalize?.faithPreference === 'regularly' || personalize?.faithPreference === 'occasionally') {
+    suggestions.push('take a quiet moment for prayer or reflection today')
+  }
 
   const trendEnergy = recent.length >= 3 ? recent.slice(-3).reduce((s, c) => s + (c.energy ?? 5), 0) / 3 : null
   if (trendEnergy !== null) {
@@ -532,4 +552,42 @@ export async function getAllQuestionsForAdmin(): Promise<ExpertQuestion[]> {
     .select('*, profile:profiles(name, avatar_color)')
     .order('created_at', { ascending: false })
   return (data as ExpertQuestion[]) ?? []
+}
+
+// ---- Honey Profile: goals + vitality ----
+
+export async function getMyGoals(): Promise<UserGoal[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const { data } = await supabase.from('user_goals').select('*').eq('user_id', user.id)
+  return (data as UserGoal[]) ?? []
+}
+
+export async function getVitalityHistory(): Promise<VitalityCheckin[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const { data } = await supabase.from('vitality_checkins').select('*').eq('user_id', user.id).order('taken_at', { ascending: true })
+  return (data as VitalityCheckin[]) ?? []
+}
+
+export async function getLatestVitalityCheckin(): Promise<VitalityCheckin | null> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return null
+  const { data } = await supabase
+    .from('vitality_checkins')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('taken_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  return (data as VitalityCheckin) ?? null
 }

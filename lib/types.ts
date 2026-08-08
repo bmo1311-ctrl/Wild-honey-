@@ -2,6 +2,36 @@ export type Pillar = 'Body' | 'Identity' | 'Mindset' | 'Faith'
 export type MembershipTier = 'free' | 'circle' | 'inner-circle' | 'founder'
 export type Visibility = 'private' | 'circle'
 
+export type Season =
+  | 'rebuilding'
+  | 'growing'
+  | 'healing'
+  | 'motherhood'
+  | 'entrepreneurship'
+  | 'career_expansion'
+  | 'transition'
+  | 'deepening_faith'
+  | 'finding_balance'
+  | 'becoming_healthiest'
+
+export type FaithPreference = 'regularly' | 'occasionally' | 'when_i_choose' | 'not_now'
+
+export type CommunicationStyle = 'gentle' | 'direct' | 'inspirational' | 'educational' | 'reminders' | 'deep_dives'
+
+export type Goal =
+  | 'more_energy'
+  | 'better_sleep'
+  | 'stress_reduction'
+  | 'strength'
+  | 'nourishment'
+  | 'womens_health_education'
+  | 'confidence'
+  | 'spiritual_growth'
+  | 'emotional_wellness'
+  | 'better_routines'
+  | 'community'
+  | 'joy'
+
 export interface Profile {
   id: string
   name: string
@@ -12,6 +42,43 @@ export interface Profile {
   streak_count: number
   last_active_date: string | null
   created_at: string
+  birthday: string | null
+  age_range: string | null
+  timezone: string | null
+  season: Season | null
+  faith_preference: FaithPreference | null
+  communication_style: CommunicationStyle | null
+  wake_time: string | null
+  bedtime: string | null
+  movement_preference: string | null
+  hydration_goal_oz: number | null
+  caffeine: string | null
+  foods_avoided: string | null
+  allergies: string | null
+  onboarding_completed_at: string | null
+}
+
+export interface UserGoal {
+  id: string
+  user_id: string
+  goal: Goal
+  created_at: string
+}
+
+export interface VitalityCheckin {
+  id: string
+  user_id: string
+  energy: number | null
+  mood: number | null
+  stress: number | null
+  sleep: number | null
+  confidence: number | null
+  motivation: number | null
+  mental_clarity: number | null
+  physical_strength: number | null
+  label: 'baseline' | 'checkpoint'
+  note: string | null
+  taken_at: string
 }
 
 export interface Prompt {

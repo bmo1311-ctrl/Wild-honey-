@@ -2,16 +2,19 @@ import Link from 'next/link'
 import { Flame, LogOut, ShoppingBag, Tent, Archive, ChevronRight, ClipboardList, Refrigerator, BookMarked, Users, HelpCircle } from 'lucide-react'
 import { signOut } from '@/app/actions'
 import { ProfileEditor } from '@/components/profile-editor'
+import { HoneyProfileCard } from '@/components/honey-profile-card'
 import { BloomAvatar } from '@/components/bloom-avatar'
 import { TierBadge } from '@/components/tier-badge'
-import { getMyEntries, getSessionProfile } from '@/lib/data'
+import { getMyEntries, getMyGoals, getSessionProfile, getVitalityHistory } from '@/lib/data'
 import { relativeTime } from '@/lib/pillars'
 
 export default async function ProfilePage() {
-  const [profile, entries] = await Promise.all([getSessionProfile(), getMyEntries()])
+  const [profile, entries, goals, vitalityHistory] = await Promise.all([getSessionProfile(), getMyEntries(), getMyGoals(), getVitalityHistory()])
   if (!profile) return null
 
   const shared = entries.filter((e) => e.visibility === 'circle').length
+  const baseline = vitalityHistory.find((v) => v.label === 'baseline') ?? vitalityHistory[0] ?? null
+  const latest = vitalityHistory[vitalityHistory.length - 1] ?? null
 
   return (
     <div className="flex flex-col gap-6">
@@ -53,6 +56,8 @@ export default async function ProfilePage() {
       )}
 
       <ProfileEditor name={profile.name} avatarColor={profile.avatar_color} />
+
+      <HoneyProfileCard profile={profile} goals={goals.map((g) => g.goal)} baseline={baseline} latest={latest} />
 
       <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
         <Link href="/app/shop" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">

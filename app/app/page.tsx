@@ -7,6 +7,7 @@ import { EveningReflectionCard } from '@/components/evening-reflection-card'
 import {
   computeTodayFocus,
   getMyEntryForPrompt,
+  getMyGoals,
   getRecentCheckins,
   getSessionProfile,
   getTodayCheckin,
@@ -15,18 +16,25 @@ import {
   getTodayPrompt,
 } from '@/lib/data'
 import { PILLAR_META } from '@/lib/pillars'
+import { SEASON_META } from '@/lib/honey-profile'
 
 export default async function TodayPage() {
-  const [profile, prompt, todayCheckin, recentCheckins, morningReset, eveningReflection] = await Promise.all([
+  const [profile, prompt, todayCheckin, recentCheckins, morningReset, eveningReflection, goals] = await Promise.all([
     getSessionProfile(),
     getTodayPrompt(),
     getTodayCheckin(),
     getRecentCheckins(7),
     getTodayMorningReset(),
     getTodayEveningReflection(),
+    getMyGoals(),
   ])
   const existing = prompt ? await getMyEntryForPrompt(prompt.id) : null
-  const focus = computeTodayFocus(todayCheckin, recentCheckins)
+  const focus = computeTodayFocus(todayCheckin, recentCheckins, {
+    hydrationGoalOz: profile?.hydration_goal_oz,
+    goals: goals.map((g) => g.goal),
+    faithPreference: profile?.faith_preference,
+    season: profile?.season,
+  })
 
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -35,6 +43,7 @@ export default async function TodayPage() {
   })
 
   const locked = prompt?.is_premium && profile?.membership_tier === 'free'
+  const seasonLabel = profile?.season ? SEASON_META[profile.season].label : null
 
   return (
     <div className="flex flex-col gap-6">
@@ -44,6 +53,7 @@ export default async function TodayPage() {
           <h1 className="font-serif text-3xl font-semibold text-balance">
             Good morning, {profile?.name}
           </h1>
+          {seasonLabel && <p className="mt-0.5 text-xs text-muted-foreground">a season of {seasonLabel}</p>}
         </div>
         <div className="flex flex-col items-center rounded-2xl bg-card px-4 py-3 ring-1 ring-border">
           <span className="flex items-center gap-1 font-serif text-2xl font-semibold text-honey">

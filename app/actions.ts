@@ -582,6 +582,153 @@ export async function adminAddResource(input: { title: string; description?: str
 }
 
 // ============================================================
+// PHASE 5: ONBOARDING + HONEY PROFILE
+// ============================================================
+
+export async function completeOnboarding(input: {
+  name: string
+  ageRange?: string
+  season?: string
+  goals: string[]
+  vitality: Record<string, number>
+  wakeTime?: string
+  bedtime?: string
+  movementPreference?: string
+  hydrationGoalOz?: number
+  caffeine?: string
+  foodsAvoided?: string
+  allergies?: string
+  communicationStyle?: string
+  faithPreference?: string
+}) {
+  const { supabase, user } = await requireUser()
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+  const { error: profileError } = await supabase
+    .from('profiles')
+    .update({
+      name: input.name.trim() || undefined,
+      age_range: input.ageRange || null,
+      season: input.season || null,
+      wake_time: input.wakeTime?.trim() || null,
+      bedtime: input.bedtime?.trim() || null,
+      movement_preference: input.movementPreference || null,
+      hydration_goal_oz: input.hydrationGoalOz ?? null,
+      caffeine: input.caffeine || null,
+      foods_avoided: input.foodsAvoided?.trim() || null,
+      allergies: input.allergies?.trim() || null,
+      communication_style: input.communicationStyle || null,
+      faith_preference: input.faithPreference || null,
+      timezone,
+      onboarding_completed_at: new Date().toISOString(),
+    })
+    .eq('id', user.id)
+  if (profileError) return { error: profileError.message }
+
+  if (input.goals.length > 0) {
+    const rows = input.goals.map((goal) => ({ user_id: user.id, goal }))
+    const { error: goalsError } = await supabase.from('user_goals').upsert(rows, { onConflict: 'user_id,goal' })
+    if (goalsError) return { error: goalsError.message }
+  }
+
+  const v = input.vitality
+  const { error: vitalityError } = await supabase.from('vitality_checkins').insert({
+    user_id: user.id,
+    energy: v.energy ?? null,
+    mood: v.mood ?? null,
+    stress: v.stress ?? null,
+    sleep: v.sleep ?? null,
+    confidence: v.confidence ?? null,
+    motivation: v.motivation ?? null,
+    mental_clarity: v.mental_clarity ?? null,
+    physical_strength: v.physical_strength ?? null,
+    label: 'baseline',
+  })
+  if (vitalityError) return { error: vitalityError.message }
+
+  revalidatePath('/app')
+  revalidatePath('/app/profile')
+  return { ok: true }
+}
+
+export async function skipOnboarding() {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('profiles').update({ onboarding_completed_at: new Date().toISOString() }).eq('id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app')
+  return { ok: true }
+}
+
+export async function updateGoals(goals: string[]) {
+  const { supabase, user } = await requireUser()
+  const { error: delError } = await supabase.from('user_goals').delete().eq('user_id', user.id)
+  if (delError) return { error: delError.message }
+  if (goals.length > 0) {
+    const rows = goals.map((goal) => ({ user_id: user.id, goal }))
+    const { error } = await supabase.from('user_goals').insert(rows)
+    if (error) return { error: error.message }
+  }
+  revalidatePath('/app/profile')
+  return { ok: true }
+}
+
+export async function updateHoneyProfile(input: {
+  season?: string
+  faithPreference?: string
+  communicationStyle?: string
+  ageRange?: string
+  wakeTime?: string
+  bedtime?: string
+  movementPreference?: string
+  hydrationGoalOz?: number
+  caffeine?: string
+  foodsAvoided?: string
+  allergies?: string
+}) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      season: input.season || null,
+      faith_preference: input.faithPreference || null,
+      communication_style: input.communicationStyle || null,
+      age_range: input.ageRange || null,
+      wake_time: input.wakeTime?.trim() || null,
+      bedtime: input.bedtime?.trim() || null,
+      movement_preference: input.movementPreference || null,
+      hydration_goal_oz: input.hydrationGoalOz ?? null,
+      caffeine: input.caffeine || null,
+      foods_avoided: input.foodsAvoided?.trim() || null,
+      allergies: input.allergies?.trim() || null,
+    })
+    .eq('id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/profile')
+  revalidatePath('/app')
+  return { ok: true }
+}
+
+export async function addVitalityCheckin(vitality: Record<string, number>, note?: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('vitality_checkins').insert({
+    user_id: user.id,
+    energy: vitality.energy ?? null,
+    mood: vitality.mood ?? null,
+    stress: vitality.stress ?? null,
+    sleep: vitality.sleep ?? null,
+    confidence: vitality.confidence ?? null,
+    motivation: vitality.motivation ?? null,
+    mental_clarity: vitality.mental_clarity ?? null,
+    physical_strength: vitality.physical_strength ?? null,
+    label: 'checkpoint',
+    note: note?.trim() || null,
+  })
+  if (error) return { error: error.message }
+  revalidatePath('/app/profile')
+  return { ok: true }
+}
+
+// ============================================================
 // PHASE 4: PRIVATE GROUPS + RETREAT INTEGRATION + ASK AN EXPERT
 // ============================================================
 
