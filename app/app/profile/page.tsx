@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Flame, LogOut, ShoppingBag, Tent, Archive, ChevronRight, ClipboardList, Refrigerator, BookMarked, Users, HelpCircle, TrendingUp, ShieldCheck, Heart } from 'lucide-react'
+import { Flame, LogOut, ShoppingBag, Tent, Archive, ChevronRight, ClipboardList, Refrigerator, BookMarked, Users, HelpCircle, TrendingUp, ShieldCheck, Heart, ChefHat, Trophy } from 'lucide-react'
 import { signOut } from '@/app/actions'
 import { ProfileEditor } from '@/components/profile-editor'
 import { HoneyProfileCard } from '@/components/honey-profile-card'
@@ -98,6 +98,16 @@ export default async function ProfilePage() {
         <Link href="/app/progress" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
           <span className="flex-1 text-sm font-medium">Progress</span>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </Link>
+        <Link href="/app/recipes" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+          <ChefHat className="h-4 w-4 text-muted-foreground" />
+          <span className="flex-1 text-sm font-medium">Recipes</span>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </Link>
+        <Link href="/app/challenges" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+          <Trophy className="h-4 w-4 text-muted-foreground" />
+          <span className="flex-1 text-sm font-medium">Challenges</span>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </Link>
         <Link href="/app/settings" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">

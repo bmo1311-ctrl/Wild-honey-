@@ -3,6 +3,7 @@ import type {
   Checkin,
   CommunityPost,
   ContentReport,
+  Challenge,
   EveningReflection,
   ExpertQuestion,
   Group,
@@ -21,6 +22,7 @@ import type {
   ProtocolDayCompletion,
   ProtocolEnrollment,
   Prompt,
+  Recipe,
   Resource,
   Retreat,
   TodayFocus,
@@ -655,4 +657,68 @@ export async function getReportsForAdmin(): Promise<ContentReport[]> {
     .order('status', { ascending: true })
     .order('created_at', { ascending: false })
   return (data as ContentReport[]) ?? []
+}
+
+// ---- Recipes ----
+
+export async function getRecipes(): Promise<Recipe[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const { data } = await supabase.from('recipes').select('*').order('created_at', { ascending: false })
+  const recipes = (data as Recipe[]) ?? []
+  if (!user) return recipes
+  const { data: saved } = await supabase.from('saved_recipes').select('recipe_id').eq('user_id', user.id)
+  const savedIds = new Set((saved ?? []).map((s) => s.recipe_id))
+  return recipes.map((r) => ({ ...r, saved: savedIds.has(r.id) }))
+}
+
+// ---- Challenges ----
+
+export async function getChallenges(): Promise<Challenge[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const { data: challenges } = await supabase.from('challenges').select('*').eq('is_active', true).order('created_at', { ascending: false })
+  const list = (challenges as Challenge[]) ?? []
+  if (list.length === 0) return []
+
+  const ids = list.map((c) => c.id)
+  const [{ data: allParticipants }, { data: myParticipation }, { data: myCheckins }] = await Promise.all([
+    supabase.from('challenge_participants').select('challenge_id').in('challenge_id', ids),
+    user ? supabase.from('challenge_participants').select('challenge_id').eq('user_id', user.id).in('challenge_id', ids) : Promise.resolve({ data: [] }),
+    user ? supabase.from('challenge_checkins').select('challenge_id').eq('user_id', user.id).in('challenge_id', ids) : Promise.resolve({ data: [] }),
+  ])
+
+  const joinedIds = new Set((myParticipation ?? []).map((p: any) => p.challenge_id))
+  const countByChallenge = new Map<string, number>()
+  ;(allParticipants ?? []).forEach((p) => countByChallenge.set(p.challenge_id, (countByChallenge.get(p.challenge_id) ?? 0) + 1))
+  const completedByChallenge = new Map<string, number>()
+  ;(myCheckins ?? []).forEach((c: any) => completedByChallenge.set(c.challenge_id, (completedByChallenge.get(c.challenge_id) ?? 0) + 1))
+
+  return list.map((c) => ({
+    ...c,
+    joined: joinedIds.has(c.id),
+    participant_count: countByChallenge.get(c.id) ?? 0,
+    days_completed: completedByChallenge.get(c.id) ?? 0,
+  }))
+}
+
+export async function getMyActiveChallenge(): Promise<Challenge | null> {
+  const challenges = await getChallenges()
+  return challenges.find((c) => c.joined) ?? null
+}
+
+export async function getAllChallengesForAdmin(): Promise<Challenge[]> {
+  const supabase = await createClient()
+  const { data: challenges } = await supabase.from('challenges').select('*').order('created_at', { ascending: false })
+  const list = (challenges as Challenge[]) ?? []
+  if (list.length === 0) return []
+  const ids = list.map((c) => c.id)
+  const { data: participants } = await supabase.from('challenge_participants').select('challenge_id').in('challenge_id', ids)
+  const countByChallenge = new Map<string, number>()
+  ;(participants ?? []).forEach((p) => countByChallenge.set(p.challenge_id, (countByChallenge.get(p.challenge_id) ?? 0) + 1))
+  return list.map((c) => ({ ...c, participant_count: countByChallenge.get(c.id) ?? 0 }))
 }

@@ -11,6 +11,8 @@ const LINKS = [
   { href: '/admin/products', label: 'Products' },
   { href: '/admin/retreats', label: 'Retreats' },
   { href: '/admin/workouts', label: 'Workouts' },
+  { href: '/admin/recipes', label: 'Recipes' },
+  { href: '/admin/challenges', label: 'Challenges' },
   { href: '/admin/resources', label: 'Resources' },
   { href: '/admin/questions', label: 'Questions' },
   { href: '/admin/reports', label: 'Reports' },

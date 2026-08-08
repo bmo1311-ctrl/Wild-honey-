@@ -95,6 +95,41 @@ export interface VitalityCheckin {
   taken_at: string
 }
 
+export interface Recipe {
+  id: string
+  title: string
+  description: string | null
+  ingredients: string
+  instructions: string
+  pillar: Pillar | null
+  prep_minutes: number | null
+  image_url: string | null
+  is_premium: boolean
+  created_at: string
+  saved?: boolean
+}
+
+export interface Challenge {
+  id: string
+  title: string
+  description: string | null
+  pillar: Pillar | null
+  length_days: number
+  is_active: boolean
+  created_at: string
+  joined?: boolean
+  days_completed?: number
+  participant_count?: number
+}
+
+export interface ChallengeCheckin {
+  id: string
+  challenge_id: string
+  user_id: string
+  date: string
+  created_at: string
+}
+
 export type Milestone = '30_day' | '60_day' | '90_day' | 'custom'
 
 export interface TransformationReflection {

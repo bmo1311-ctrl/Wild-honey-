@@ -1218,3 +1218,116 @@ export async function adminRemoveReportedContent(reportId: string) {
   revalidatePath('/app/community')
   return { ok: true }
 }
+
+// ============================================================
+// PHASE 10: RECIPES + CHALLENGES
+// ============================================================
+
+export async function toggleSavedRecipe(recipeId: string) {
+  const { supabase, user } = await requireUser()
+  const { data: existing } = await supabase.from('saved_recipes').select('id').eq('recipe_id', recipeId).eq('user_id', user.id).maybeSingle()
+  if (existing) {
+    const { error } = await supabase.from('saved_recipes').delete().eq('id', existing.id)
+    if (error) return { error: error.message }
+    revalidatePath('/app/recipes')
+    return { ok: true, saved: false }
+  }
+  const { error } = await supabase.from('saved_recipes').insert({ user_id: user.id, recipe_id: recipeId })
+  if (error) return { error: error.message }
+  revalidatePath('/app/recipes')
+  return { ok: true, saved: true }
+}
+
+export async function adminAddRecipe(input: {
+  title: string
+  description?: string
+  ingredients: string
+  instructions: string
+  pillar?: string
+  prepMinutes?: number
+  imageUrl?: string
+  isPremium: boolean
+}) {
+  const { supabase } = await requireAdmin()
+  const title = input.title.trim()
+  if (!title) return { error: 'Give the recipe a title first.' }
+  const { error } = await supabase.from('recipes').insert({
+    title,
+    description: input.description?.trim() || null,
+    ingredients: input.ingredients.trim(),
+    instructions: input.instructions.trim(),
+    pillar: input.pillar || null,
+    prep_minutes: input.prepMinutes ?? null,
+    image_url: input.imageUrl || null,
+    is_premium: input.isPremium,
+  })
+  if (error) return { error: error.message }
+  revalidatePath('/app/recipes')
+  revalidatePath('/admin/recipes')
+  return { ok: true }
+}
+
+export async function joinChallenge(challengeId: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('challenge_participants').insert({ challenge_id: challengeId, user_id: user.id })
+  if (error) {
+    if (error.code === '23505') return { error: "You're already in this challenge." }
+    return { error: error.message }
+  }
+  revalidatePath('/app/challenges')
+  revalidatePath('/app')
+  return { ok: true }
+}
+
+export async function leaveChallenge(challengeId: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('challenge_participants').delete().eq('challenge_id', challengeId).eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/challenges')
+  revalidatePath('/app')
+  return { ok: true }
+}
+
+export async function checkInChallenge(challengeId: string) {
+  const { supabase, user } = await requireUser()
+  const today = new Date().toISOString().slice(0, 10)
+  const { data: existing } = await supabase.from('challenge_checkins').select('id').eq('challenge_id', challengeId).eq('user_id', user.id).eq('date', today).maybeSingle()
+  if (existing) {
+    const { error } = await supabase.from('challenge_checkins').delete().eq('id', existing.id)
+    if (error) return { error: error.message }
+    revalidatePath('/app/challenges')
+    revalidatePath('/app')
+    return { ok: true, completed: false }
+  }
+  const { error } = await supabase.from('challenge_checkins').insert({ challenge_id: challengeId, user_id: user.id, date: today })
+  if (error) return { error: error.message }
+  await bumpStreak(user.id)
+  revalidatePath('/app/challenges')
+  revalidatePath('/app')
+  return { ok: true, completed: true }
+}
+
+export async function adminAddChallenge(input: { title: string; description?: string; pillar?: string; lengthDays: number }) {
+  const { supabase } = await requireAdmin()
+  const title = input.title.trim()
+  if (!title) return { error: 'Give the challenge a title first.' }
+  const { error } = await supabase.from('challenges').insert({
+    title,
+    description: input.description?.trim() || null,
+    pillar: input.pillar || null,
+    length_days: input.lengthDays,
+  })
+  if (error) return { error: error.message }
+  revalidatePath('/app/challenges')
+  revalidatePath('/admin/challenges')
+  return { ok: true }
+}
+
+export async function adminToggleChallengeActive(challengeId: string, isActive: boolean) {
+  const { supabase } = await requireAdmin()
+  const { error } = await supabase.from('challenges').update({ is_active: isActive }).eq('id', challengeId)
+  if (error) return { error: error.message }
+  revalidatePath('/app/challenges')
+  revalidatePath('/admin/challenges')
+  return { ok: true }
+}

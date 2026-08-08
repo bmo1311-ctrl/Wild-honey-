@@ -4,8 +4,10 @@ import { JournalComposer } from '@/components/journal-composer'
 import { TodayFocusCard } from '@/components/today-focus-card'
 import { MorningResetCard } from '@/components/morning-reset-card'
 import { EveningReflectionCard } from '@/components/evening-reflection-card'
+import { ActiveChallengeTracker } from '@/components/active-challenge-tracker'
 import {
   computeTodayFocus,
+  getMyActiveChallenge,
   getMyEntryForPrompt,
   getMyGoals,
   getRecentCheckins,
@@ -19,7 +21,7 @@ import { PILLAR_META } from '@/lib/pillars'
 import { SEASON_META } from '@/lib/honey-profile'
 
 export default async function TodayPage() {
-  const [profile, prompt, todayCheckin, recentCheckins, morningReset, eveningReflection, goals] = await Promise.all([
+  const [profile, prompt, todayCheckin, recentCheckins, morningReset, eveningReflection, goals, activeChallenge] = await Promise.all([
     getSessionProfile(),
     getTodayPrompt(),
     getTodayCheckin(),
@@ -27,6 +29,7 @@ export default async function TodayPage() {
     getTodayMorningReset(),
     getTodayEveningReflection(),
     getMyGoals(),
+    getMyActiveChallenge(),
   ])
   const existing = prompt ? await getMyEntryForPrompt(prompt.id) : null
   const focus = computeTodayFocus(todayCheckin, recentCheckins, {
@@ -67,6 +70,7 @@ export default async function TodayPage() {
       </div>
 
       <TodayFocusCard focus={focus} />
+      {activeChallenge && <ActiveChallengeTracker challenge={activeChallenge} compact />}
       <MorningResetCard existing={morningReset} />
       <EveningReflectionCard existing={eveningReflection} />
 
