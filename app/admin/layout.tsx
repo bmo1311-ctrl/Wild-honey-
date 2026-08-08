@@ -6,6 +6,7 @@ import { getSessionProfile } from '@/lib/data'
 
 const LINKS = [
   { href: '/admin', label: 'Overview' },
+  { href: '/admin/analytics', label: 'Analytics' },
   { href: '/admin/members', label: 'Members' },
   { href: '/admin/prompts', label: 'Prompts' },
   { href: '/admin/products', label: 'Products' },

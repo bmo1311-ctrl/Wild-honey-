@@ -724,3 +724,109 @@ export async function getAllChallengesForAdmin(): Promise<Challenge[]> {
 }
 
 // ---- AI companion (deferred — table exists, feature not wired up yet) ----
+
+// ---- Advanced analytics (admin) ----
+
+function weekKey(dateStr: string): string {
+  const d = new Date(dateStr)
+  const day = d.getUTCDay()
+  const monday = new Date(d)
+  monday.setUTCDate(d.getUTCDate() - ((day + 6) % 7))
+  return monday.toISOString().slice(0, 10)
+}
+
+function monthKey(dateStr: string): string {
+  return dateStr.slice(0, 7)
+}
+
+export async function adminGetAnalytics() {
+  const supabase = await createClient()
+
+  const since8Weeks = new Date(Date.now() - 56 * 86400000).toISOString()
+  const since30Days = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10)
+  const since6Months = new Date(Date.now() - 182 * 86400000).toISOString()
+
+  const [
+    { data: profiles },
+    { data: checkins },
+    { data: entries },
+    { data: purchases },
+    { data: retreatSignups },
+    { data: communityPosts },
+    { data: groupPosts },
+    { data: savedRecipes },
+    { data: challengeParticipants },
+    { data: savedResources },
+  ] = await Promise.all([
+    supabase.from('profiles').select('created_at, streak_count'),
+    supabase.from('checkins').select('date').gte('date', since30Days),
+    supabase.from('journal_entries').select('created_at, prompt:prompts(pillar)'),
+    supabase.from('purchases').select('purchased_at, product:products(price_cents)').gte('purchased_at', since6Months),
+    supabase.from('retreat_signups').select('created_at, status, retreat:retreats(price_cents)').eq('status', 'confirmed').gte('created_at', since6Months),
+    supabase.from('community_posts').select('id'),
+    supabase.from('group_posts').select('id'),
+    supabase.from('saved_recipes').select('id'),
+    supabase.from('challenge_participants').select('id'),
+    supabase.from('saved_resources').select('id'),
+  ])
+
+  // signups by week, last 8 weeks
+  const signupsByWeek = new Map<string, number>()
+  ;(profiles ?? [])
+    .filter((p) => p.created_at >= since8Weeks)
+    .forEach((p) => {
+      const k = weekKey(p.created_at)
+      signupsByWeek.set(k, (signupsByWeek.get(k) ?? 0) + 1)
+    })
+
+  // checkins by day, last 30 days
+  const checkinsByDay = new Map<string, number>()
+  ;(checkins ?? []).forEach((c) => {
+    checkinsByDay.set(c.date, (checkinsByDay.get(c.date) ?? 0) + 1)
+  })
+
+  // journal entries by pillar
+  const entriesByPillar = new Map<string, number>()
+  ;(entries ?? []).forEach((e: any) => {
+    const pillar = e.prompt?.pillar ?? 'unassigned'
+    entriesByPillar.set(pillar, (entriesByPillar.get(pillar) ?? 0) + 1)
+  })
+
+  // streak distribution
+  const streakBuckets = { '0': 0, '1-3': 0, '4-7': 0, '8-14': 0, '15-30': 0, '31+': 0 } as Record<string, number>
+  ;(profiles ?? []).forEach((p) => {
+    const s = p.streak_count ?? 0
+    if (s === 0) streakBuckets['0']++
+    else if (s <= 3) streakBuckets['1-3']++
+    else if (s <= 7) streakBuckets['4-7']++
+    else if (s <= 14) streakBuckets['8-14']++
+    else if (s <= 30) streakBuckets['15-30']++
+    else streakBuckets['31+']++
+  })
+
+  // revenue by month, last 6 months (digital purchases + confirmed retreat signups)
+  const revenueByMonth = new Map<string, number>()
+  ;(purchases ?? []).forEach((p: any) => {
+    const k = monthKey(p.purchased_at)
+    revenueByMonth.set(k, (revenueByMonth.get(k) ?? 0) + (p.product?.price_cents ?? 0))
+  })
+  ;(retreatSignups ?? []).forEach((r: any) => {
+    const k = monthKey(r.created_at)
+    revenueByMonth.set(k, (revenueByMonth.get(k) ?? 0) + (r.retreat?.price_cents ?? 0))
+  })
+
+  return {
+    signupsByWeek: Array.from(signupsByWeek.entries()).sort((a, b) => a[0].localeCompare(b[0])).map(([week, count]) => ({ week, count })),
+    checkinsByDay: Array.from(checkinsByDay.entries()).sort((a, b) => a[0].localeCompare(b[0])).map(([date, count]) => ({ date, count })),
+    entriesByPillar: Array.from(entriesByPillar.entries()).map(([pillar, count]) => ({ pillar, count })),
+    streakDistribution: Object.entries(streakBuckets).map(([bucket, count]) => ({ bucket, count })),
+    revenueByMonth: Array.from(revenueByMonth.entries()).sort((a, b) => a[0].localeCompare(b[0])).map(([month, cents]) => ({ month, dollars: cents / 100 })),
+    engagement: {
+      communityPosts: (communityPosts ?? []).length,
+      groupPosts: (groupPosts ?? []).length,
+      savedRecipes: (savedRecipes ?? []).length,
+      challengeJoins: (challengeParticipants ?? []).length,
+      savedResources: (savedResources ?? []).length,
+    },
+  }
+}
