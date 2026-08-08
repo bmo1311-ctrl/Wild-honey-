@@ -56,6 +56,20 @@ export interface Profile {
   foods_avoided: string | null
   allergies: string | null
   onboarding_completed_at: string | null
+  notification_prefs: NotificationPrefs
+  quiet_hours_start: string | null
+  quiet_hours_end: string | null
+  data_consent_at: string | null
+}
+
+export interface NotificationPrefs {
+  morning_checkin?: boolean
+  hydration?: boolean
+  movement?: boolean
+  journal?: boolean
+  evening_reflection?: boolean
+  new_content?: boolean
+  retreat_announcements?: boolean
 }
 
 export interface UserGoal {

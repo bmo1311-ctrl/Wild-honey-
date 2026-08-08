@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
 import type { Comment, Visibility } from '@/lib/types'
 
 async function requireUser() {
@@ -1028,4 +1029,78 @@ export async function adminGetMetrics() {
     totalPurchases: purchases?.length ?? 0,
     entriesThisWeek: entries?.length ?? 0,
   }
+}
+
+// ============================================================
+// PHASE 7: PRIVACY & ACCOUNT CONTROLS + ADMIN MEMBER MANAGEMENT
+// ============================================================
+
+export async function updateNotificationPrefs(input: {
+  prefs: Record<string, boolean>
+  quietHoursStart?: string
+  quietHoursEnd?: string
+}) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      notification_prefs: input.prefs,
+      quiet_hours_start: input.quietHoursStart?.trim() || null,
+      quiet_hours_end: input.quietHoursEnd?.trim() || null,
+    })
+    .eq('id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/settings')
+  return { ok: true }
+}
+
+export async function recordDataConsent() {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('profiles').update({ data_consent_at: new Date().toISOString() }).eq('id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/settings')
+  return { ok: true }
+}
+
+export async function deleteMyAccount() {
+  const { user } = await requireUser()
+  const service = createServiceClient()
+  // Deleting the auth user cascades to `profiles` (and everything that
+  // references it) because profiles.id references auth.users.id on delete cascade.
+  const { error } = await service.auth.admin.deleteUser(user.id)
+  if (error) return { error: error.message }
+  return { ok: true }
+}
+
+async function requireAdminForMembers() {
+  return requireAdmin()
+}
+
+export async function adminGetMembers() {
+  const { supabase } = await requireAdminForMembers()
+  const [{ data: profiles }, { data: signups }] = await Promise.all([
+    supabase.from('profiles').select('*').order('created_at', { ascending: false }),
+    supabase.from('retreat_signups').select('user_id, status'),
+  ])
+  const signupCounts = new Map<string, number>()
+  ;(signups ?? []).forEach((s) => {
+    if (s.status === 'confirmed') signupCounts.set(s.user_id, (signupCounts.get(s.user_id) ?? 0) + 1)
+  })
+  return (profiles ?? []).map((p) => ({ ...p, confirmed_retreats: signupCounts.get(p.id) ?? 0 }))
+}
+
+export async function adminUpdateMemberTier(userId: string, tier: string) {
+  const { supabase } = await requireAdmin()
+  const { error } = await supabase.from('profiles').update({ membership_tier: tier }).eq('id', userId)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/members')
+  return { ok: true }
+}
+
+export async function adminToggleAdminStatus(userId: string, makeAdmin: boolean) {
+  const { supabase } = await requireAdmin()
+  const { error } = await supabase.from('profiles').update({ is_admin: makeAdmin }).eq('id', userId)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/members')
+  return { ok: true }
 }
