@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
+import { oneSignalConfigured, sendPushToUsers } from '@/lib/onesignal'
 import type { Comment, Visibility } from '@/lib/types'
 
 async function requireUser() {
@@ -1005,6 +1006,21 @@ export async function adminAddRetreat(input: {
   if (error) return { error: error.message }
   revalidatePath('/admin/retreats')
   revalidatePath('/app/retreats')
+
+  // Notify members who want retreat announcements — best-effort, never blocks the response.
+  if (oneSignalConfigured()) {
+    const { data: profiles } = await supabase.from('profiles').select('id, notification_prefs')
+    const interestedIds = (profiles ?? [])
+      .filter((p) => (p.notification_prefs as Record<string, boolean> | null)?.retreat_announcements !== false)
+      .map((p) => p.id)
+    sendPushToUsers({
+      externalUserIds: interestedIds,
+      title: 'New retreat announced',
+      message: input.title.trim(),
+      url: '/app/retreats',
+    }).catch(() => {})
+  }
+
   return { ok: true }
 }
 

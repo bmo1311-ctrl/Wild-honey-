@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { Wordmark } from '@/components/logo'
 import { BottomNav } from '@/components/bottom-nav'
 import { BloomAvatar } from '@/components/bloom-avatar'
+import { OneSignalInit } from '@/components/onesignal-init'
 import { getSessionProfile } from '@/lib/data'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -13,6 +14,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-dvh bg-background pb-24">
+      <OneSignalInit externalUserId={profile.id} />
       <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur-sm">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-3">
           <Link href="/app" aria-label="Wild Honey Circle home">
