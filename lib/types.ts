@@ -81,6 +81,19 @@ export interface VitalityCheckin {
   taken_at: string
 }
 
+export type Milestone = '30_day' | '60_day' | '90_day' | 'custom'
+
+export interface TransformationReflection {
+  id: string
+  user_id: string
+  milestone: Milestone
+  q_changed: string | null
+  q_proud: string | null
+  q_different: string | null
+  q_becoming: string | null
+  created_at: string
+}
+
 export interface Prompt {
   id: string
   pillar: Pillar

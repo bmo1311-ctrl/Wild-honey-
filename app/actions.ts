@@ -729,6 +729,31 @@ export async function addVitalityCheckin(vitality: Record<string, number>, note?
 }
 
 // ============================================================
+// PHASE 6: PROGRESS / TRANSFORMATION
+// ============================================================
+
+export async function saveReflection(input: {
+  milestone: string
+  qChanged?: string
+  qProud?: string
+  qDifferent?: string
+  qBecoming?: string
+}) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('transformation_reflections').insert({
+    user_id: user.id,
+    milestone: input.milestone,
+    q_changed: input.qChanged?.trim() || null,
+    q_proud: input.qProud?.trim() || null,
+    q_different: input.qDifferent?.trim() || null,
+    q_becoming: input.qBecoming?.trim() || null,
+  })
+  if (error) return { error: error.message }
+  revalidatePath('/app/progress')
+  return { ok: true }
+}
+
+// ============================================================
 // PHASE 4: PRIVATE GROUPS + RETREAT INTEGRATION + ASK AN EXPERT
 // ============================================================
 

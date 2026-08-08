@@ -23,6 +23,7 @@ import type {
   Resource,
   Retreat,
   TodayFocus,
+  TransformationReflection,
   UserGoal,
   VitalityCheckin,
   Win,
@@ -590,4 +591,14 @@ export async function getLatestVitalityCheckin(): Promise<VitalityCheckin | null
     .limit(1)
     .maybeSingle()
   return (data as VitalityCheckin) ?? null
+}
+
+export async function getReflections(): Promise<TransformationReflection[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const { data } = await supabase.from('transformation_reflections').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
+  return (data as TransformationReflection[]) ?? []
 }
