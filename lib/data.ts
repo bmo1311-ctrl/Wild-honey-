@@ -722,3 +722,5 @@ export async function getAllChallengesForAdmin(): Promise<Challenge[]> {
   ;(participants ?? []).forEach((p) => countByChallenge.set(p.challenge_id, (countByChallenge.get(p.challenge_id) ?? 0) + 1))
   return list.map((c) => ({ ...c, participant_count: countByChallenge.get(c.id) ?? 0 }))
 }
+
+// ---- AI companion (deferred — table exists, feature not wired up yet) ----
