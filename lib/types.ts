@@ -274,6 +274,8 @@ export interface Workout {
   title: string
   description: string
   pillar: Pillar
+  body_group: 'full_body' | 'upper_body' | 'lower_body' | 'core' | 'glutes' | 'arms' | 'back' | 'any'
+  workout_type: 'strength' | 'cardio' | 'stretch' | 'mobility' | 'hiit' | 'yoga' | 'recovery' | 'any'
   video_url: string | null
   instructions: string | null
   image_url: string | null

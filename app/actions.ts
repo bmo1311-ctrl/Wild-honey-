@@ -247,6 +247,8 @@ export async function adminAddWorkout(input: {
   title: string
   description: string
   pillar: string
+  bodyGroup?: string
+  workoutType?: string
   videoUrl?: string
   instructions?: string
   imageUrl?: string
@@ -258,6 +260,8 @@ export async function adminAddWorkout(input: {
     title: input.title.trim(),
     description: input.description.trim(),
     pillar: input.pillar,
+    body_group: input.bodyGroup || 'any',
+    workout_type: input.workoutType || 'any',
     video_url: input.videoUrl || null,
     instructions: input.instructions || null,
     image_url: input.imageUrl || null,

@@ -6,8 +6,7 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 import { Lock, FileText, ShoppingCart, ListPlus } from 'lucide-react'
 import { importGroceryListToBuilder } from '@/app/actions'
-import { PillarRows } from '@/components/pillar-rows'
-import { WorkoutCard } from '@/components/workout-card'
+import { WorkoutFilterBar } from '@/components/workout-filter-bar'
 import type { GroceryList, MealPlan, Workout } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -96,14 +95,7 @@ export function WorkoutsHubTabs({
         <Locked />
       ) : (
         <>
-          {active === 'workouts' && (
-            <PillarRows
-              items={workouts}
-              cardWidthClass="w-[260px]"
-              renderItem={(w) => <WorkoutCard workout={w} />}
-              emptyMessage="no workouts posted yet."
-            />
-          )}
+          {active === 'workouts' && <WorkoutFilterBar workouts={workouts} />}
 
           {active === 'meals' &&
             (mealPlans.length === 0 ? (

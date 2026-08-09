@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { FileText, PlayCircle } from 'lucide-react'
 import type { Workout } from '@/lib/types'
-import { PILLAR_META } from '@/lib/pillars'
 
 export function WorkoutCard({ workout: w }: { workout: Workout }) {
   const [open, setOpen] = useState(false)
@@ -17,8 +16,13 @@ export function WorkoutCard({ workout: w }: { workout: Workout }) {
       <div className="flex flex-1 flex-col gap-2 p-4">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-serif text-base font-semibold leading-snug text-pretty">{w.title}</h3>
-          {w.pillar && (
-            <span className={`shrink-0 rounded-full px-2 py-0.5 text-[0.65rem] font-medium ${PILLAR_META[w.pillar].chip}`}>{w.pillar}</span>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {w.body_group && w.body_group !== 'any' && (
+            <span className="rounded-full bg-secondary px-2 py-0.5 text-[0.65rem] font-medium capitalize text-secondary-foreground">{w.body_group.replace('_', ' ')}</span>
+          )}
+          {w.workout_type && w.workout_type !== 'any' && (
+            <span className="rounded-full bg-honey/15 px-2 py-0.5 text-[0.65rem] font-medium capitalize text-honey">{w.workout_type}</span>
           )}
         </div>
         {w.description && <p className="text-sm text-muted-foreground text-pretty">{w.description}</p>}

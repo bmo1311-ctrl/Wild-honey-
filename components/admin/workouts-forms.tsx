@@ -11,11 +11,15 @@ import { Switch } from '@/components/ui/switch'
 import type { Pillar } from '@/lib/types'
 
 const PILLARS: Pillar[] = ['Body', 'Identity', 'Mindset', 'Faith']
+const BODY_GROUPS = ['any', 'full_body', 'upper_body', 'lower_body', 'core', 'glutes', 'arms', 'back']
+const WORKOUT_TYPES = ['any', 'strength', 'cardio', 'stretch', 'mobility', 'hiit', 'yoga', 'recovery']
 
 export function AddWorkoutForm() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [pillar, setPillar] = useState<Pillar>('Body')
+  const [bodyGroup, setBodyGroup] = useState('any')
+  const [workoutType, setWorkoutType] = useState('any')
   const [videoUrl, setVideoUrl] = useState('')
   const [instructions, setInstructions] = useState('')
   const [imageUrl, setImageUrl] = useState('')
@@ -29,7 +33,7 @@ export function AddWorkoutForm() {
       return
     }
     startTransition(async () => {
-      const res = await adminAddWorkout({ title, description, pillar, videoUrl, instructions, imageUrl, pdfUrl, isPremium })
+      const res = await adminAddWorkout({ title, description, pillar, bodyGroup, workoutType, videoUrl, instructions, imageUrl, pdfUrl, isPremium })
       if (res?.error) {
         toast.error(res.error)
         return
@@ -58,6 +62,26 @@ export function AddWorkoutForm() {
             {PILLARS.map((p) => (
               <option key={p} value={p}>
                 {p}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label>body group</Label>
+          <select value={bodyGroup} onChange={(e) => setBodyGroup(e.target.value)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
+            {BODY_GROUPS.map((b) => (
+              <option key={b} value={b}>
+                {b.replace('_', ' ')}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label>workout type</Label>
+          <select value={workoutType} onChange={(e) => setWorkoutType(e.target.value)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
+            {WORKOUT_TYPES.map((w) => (
+              <option key={w} value={w}>
+                {w}
               </option>
             ))}
           </select>
