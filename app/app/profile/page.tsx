@@ -59,77 +59,104 @@ export default async function ProfilePage() {
 
       <HoneyProfileCard profile={profile} goals={goals.map((g) => g.goal)} baseline={baseline} latest={latest} />
 
-      <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
-        <Link href="/app/shop" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-          <ShoppingBag className="h-4 w-4 text-muted-foreground" />
-          <span className="flex-1 text-sm font-medium">Shop</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </Link>
-        <Link href="/app/retreats" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-          <Tent className="h-4 w-4 text-muted-foreground" />
-          <span className="flex-1 text-sm font-medium">Retreats</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </Link>
-        <Link href="/app/protocols" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-          <ClipboardList className="h-4 w-4 text-muted-foreground" />
-          <span className="flex-1 text-sm font-medium">Protocols</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </Link>
-        <Link href="/app/pantry" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-          <Refrigerator className="h-4 w-4 text-muted-foreground" />
-          <span className="flex-1 text-sm font-medium">Pantry &amp; Grocery</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </Link>
-        <Link href="/app/vault" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-          <BookMarked className="h-4 w-4 text-muted-foreground" />
-          <span className="flex-1 text-sm font-medium">Resource Vault</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </Link>
-        <Link href="/app/groups" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-          <Users className="h-4 w-4 text-muted-foreground" />
-          <span className="flex-1 text-sm font-medium">Groups</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </Link>
-        <Link href="/app/ask" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-          <HelpCircle className="h-4 w-4 text-muted-foreground" />
-          <span className="flex-1 text-sm font-medium">Ask an Expert</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </Link>
-        <Link href="/app/calendar" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-          <CalendarDays className="h-4 w-4 text-muted-foreground" />
-          <span className="flex-1 text-sm font-medium">Calendar</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </Link>
-        <Link href="/app/progress" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-          <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          <span className="flex-1 text-sm font-medium">My Evolution</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </Link>
-        <Link href="/app/recipes" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-          <ChefHat className="h-4 w-4 text-muted-foreground" />
-          <span className="flex-1 text-sm font-medium">Recipes</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </Link>
-        <Link href="/app/challenges" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-          <Trophy className="h-4 w-4 text-muted-foreground" />
-          <span className="flex-1 text-sm font-medium">Challenges</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </Link>
-        <Link href="/app/settings" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-          <ShieldCheck className="h-4 w-4 text-muted-foreground" />
-          <span className="flex-1 text-sm font-medium">Privacy &amp; Notifications</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </Link>
-        <Link href="/app/guidelines" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-          <Heart className="h-4 w-4 text-muted-foreground" />
-          <span className="flex-1 text-sm font-medium">Community Guidelines</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </Link>
-        <Link href="/app/archive" className="flex items-center gap-3 px-4 py-3.5">
-          <Archive className="h-4 w-4 text-muted-foreground" />
-          <span className="flex-1 text-sm font-medium">Archive</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </Link>
+      <div>
+        <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">my journey</p>
+        <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
+          <Link href="/app/progress" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">My Evolution</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+          <Link href="/app/calendar" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+            <CalendarDays className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Calendar</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+          <Link href="/app/challenges" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+            <Trophy className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Challenges</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+          <Link href="/app/archive" className="flex items-center gap-3 px-4 py-3.5">
+            <Archive className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Archive</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+        </div>
+      </div>
+
+      <div>
+        <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">nourish &amp; move</p>
+        <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
+          <Link href="/app/recipes" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+            <ChefHat className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Recipes</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+          <Link href="/app/pantry" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+            <Refrigerator className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Pantry &amp; Grocery</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+          <Link href="/app/protocols" className="flex items-center gap-3 px-4 py-3.5">
+            <ClipboardList className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Protocols</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+        </div>
+      </div>
+
+      <div>
+        <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">connect</p>
+        <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
+          <Link href="/app/groups" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+            <Users className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Groups</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+          <Link href="/app/vault" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+            <BookMarked className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Resource Vault</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+          <Link href="/app/ask" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+            <HelpCircle className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Ask an Expert</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+          <Link href="/app/guidelines" className="flex items-center gap-3 px-4 py-3.5">
+            <Heart className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Community Guidelines</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+        </div>
+      </div>
+
+      <div>
+        <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">retreats &amp; shop</p>
+        <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
+          <Link href="/app/retreats" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+            <Tent className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Retreats</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+          <Link href="/app/shop" className="flex items-center gap-3 px-4 py-3.5">
+            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Shop</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+        </div>
+      </div>
+
+      <div>
+        <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">account</p>
+        <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
+          <Link href="/app/settings" className="flex items-center gap-3 px-4 py-3.5">
+            <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Privacy &amp; Notifications</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+        </div>
       </div>
 
       <div>
