@@ -51,15 +51,69 @@ export async function getSessionProfile(): Promise<Profile | null> {
   return (data as Profile) ?? null
 }
 
+const GOAL_PILLAR: Record<string, 'Body' | 'Identity' | 'Mindset' | 'Faith'> = {
+  more_energy: 'Body',
+  better_sleep: 'Body',
+  strength: 'Body',
+  nourishment: 'Body',
+  womens_health_education: 'Body',
+  confidence: 'Identity',
+  community: 'Identity',
+  joy: 'Identity',
+  stress_reduction: 'Mindset',
+  emotional_wellness: 'Mindset',
+  better_routines: 'Mindset',
+  spiritual_growth: 'Faith',
+}
+
+/**
+ * Picks the best-matching prompt for this member from everything unlocked
+ * so far (date_scheduled <= today), rather than showing everyone the same
+ * one. Prioritizes: prompts matching her top goal-pillar(s), respects her
+ * faith preference (won't lead with Faith content if she opted out), and
+ * skips anything she's already journaled on.
+ */
 export async function getTodayPrompt(): Promise<Prompt | null> {
   const supabase = await createClient()
-  const { data } = await supabase
-    .from('prompts')
-    .select('*')
-    .order('date_scheduled', { ascending: false })
-    .limit(1)
-    .maybeSingle()
-  return (data as Prompt) ?? null
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const today = new Date().toISOString().slice(0, 10)
+  const { data: pool } = await supabase.from('prompts').select('*').lte('date_scheduled', today).order('date_scheduled', { ascending: false })
+  const candidates = (pool as Prompt[]) ?? []
+  if (candidates.length === 0) return null
+  if (!user) return candidates[0]
+
+  const [{ data: goalRows }, { data: profile }, { data: entries }] = await Promise.all([
+    supabase.from('user_goals').select('goal').eq('user_id', user.id),
+    supabase.from('profiles').select('faith_preference').eq('id', user.id).maybeSingle(),
+    supabase.from('journal_entries').select('prompt_id').eq('user_id', user.id).not('prompt_id', 'is', null),
+  ])
+
+  const answeredIds = new Set((entries ?? []).map((e) => e.prompt_id))
+  const unanswered = candidates.filter((p) => !answeredIds.has(p.id))
+  const pool2 = unanswered.length > 0 ? unanswered : candidates // fall back to repeats once caught up
+
+  const pillarCounts = new Map<string, number>()
+  ;(goalRows ?? []).forEach((g) => {
+    const pillar = GOAL_PILLAR[g.goal]
+    if (pillar) pillarCounts.set(pillar, (pillarCounts.get(pillar) ?? 0) + 1)
+  })
+  const topCount = Math.max(0, ...Array.from(pillarCounts.values()))
+  const topPillars = new Set(Array.from(pillarCounts.entries()).filter(([, c]) => c === topCount && topCount > 0).map(([p]) => p))
+
+  const faithOptedOut = profile?.faith_preference === 'not_now' || !profile?.faith_preference
+
+  function score(p: Prompt): number {
+    let s = 0
+    if (p.pillar && topPillars.has(p.pillar)) s += 2
+    if (p.pillar === 'Faith' && faithOptedOut) s -= 3
+    return s
+  }
+
+  const sorted = [...pool2].sort((a, b) => score(b) - score(a))
+  return sorted[0]
 }
 
 export async function getMyEntryForPrompt(promptId: string): Promise<JournalEntry | null> {
