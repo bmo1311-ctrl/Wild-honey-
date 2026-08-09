@@ -2,6 +2,7 @@ import { Flame, Lock } from 'lucide-react'
 import Link from 'next/link'
 import { JournalComposer } from '@/components/journal-composer'
 import { TodayFocusCard } from '@/components/today-focus-card'
+import { ResetPanel } from '@/components/reset-panel'
 import { MorningResetCard } from '@/components/morning-reset-card'
 import { EveningReflectionCard } from '@/components/evening-reflection-card'
 import { ActiveChallengeTracker } from '@/components/active-challenge-tracker'
@@ -69,6 +70,7 @@ export default async function TodayPage() {
         </div>
       </div>
 
+      <ResetPanel />
       <TodayFocusCard focus={focus} />
       {activeChallenge && <ActiveChallengeTracker challenge={activeChallenge} compact />}
       <MorningResetCard existing={morningReset} />

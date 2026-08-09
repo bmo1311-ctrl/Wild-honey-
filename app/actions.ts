@@ -1895,3 +1895,38 @@ export async function updateSeason(season: string) {
   revalidatePath('/app')
   return { ok: true }
 }
+
+// ============================================================
+// RESET EXPERIENCE
+// ============================================================
+
+export async function saveResetReflection(input: {
+  whatHappened?: string
+  needToday?: string
+  nextStep?: string
+  carryingForward?: string
+}) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('transformation_reflections').insert({
+    user_id: user.id,
+    milestone: 'reset',
+    q_changed: input.whatHappened?.trim() || null,
+    q_need_today: input.needToday?.trim() || null,
+    q_next_step: input.nextStep?.trim() || null,
+    q_carrying_forward: input.carryingForward?.trim() || null,
+  })
+  if (error) return { error: error.message }
+  revalidatePath('/app')
+  revalidatePath('/app/progress')
+  return { ok: true }
+}
+
+/** Factual gap count — how many days since her last check-in. Not a pattern, just counting. */
+export async function getCheckinGap() {
+  const { supabase, user } = await requireUser()
+  const { data } = await supabase.from('checkins').select('date').eq('user_id', user.id).order('date', { ascending: false }).limit(1).maybeSingle()
+  if (!data) return { daysSinceLastCheckin: null }
+  const last = new Date(data.date + 'T00:00:00')
+  const days = Math.floor((Date.now() - last.getTime()) / 86400000)
+  return { daysSinceLastCheckin: days }
+}

@@ -179,7 +179,7 @@ export interface ChallengeCheckin {
   created_at: string
 }
 
-export type Milestone = '30_day' | '60_day' | '90_day' | 'custom' | 'year_day'
+export type Milestone = '30_day' | '60_day' | '90_day' | 'custom' | 'year_day' | 'reset'
 
 export interface TransformationReflection {
   id: string
@@ -195,6 +195,8 @@ export interface TransformationReflection {
   q_release: string | null
   q_carrying_forward: string | null
   q_intention: string | null
+  q_need_today: string | null
+  q_next_step: string | null
   wild_honey_year: number | null
   created_at: string
 }
