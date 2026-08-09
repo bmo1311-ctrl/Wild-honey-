@@ -1416,6 +1416,63 @@ export async function adminAddRecipe(input: {
   return { ok: true }
 }
 
+export async function adminUpdateRecipe(
+  recipeId: string,
+  input: {
+    title: string
+    description?: string
+    ingredients: string
+    instructions: string
+    pillar?: string
+    prepMinutes?: number
+    imageUrl?: string
+    videoUrl?: string
+    isPremium: boolean
+    season?: string
+    cyclePhase?: string
+    budgetTier?: string
+    mealType?: string
+    kidFriendly?: boolean
+    proteinG?: number
+    calories?: number
+    carbsG?: number
+    fatG?: number
+    nutritionHighlights?: string
+  },
+) {
+  const { supabase } = await requireAdmin()
+  const title = input.title.trim()
+  if (!title) return { error: 'Give the recipe a title first.' }
+  const { error } = await supabase
+    .from('recipes')
+    .update({
+      title,
+      description: input.description?.trim() || null,
+      ingredients: input.ingredients.trim(),
+      instructions: input.instructions.trim(),
+      pillar: input.pillar || null,
+      prep_minutes: input.prepMinutes ?? null,
+      image_url: input.imageUrl || null,
+      video_url: input.videoUrl || null,
+      is_premium: input.isPremium,
+      season: input.season || 'any',
+      cycle_phase: input.cyclePhase || 'any',
+      budget_tier: input.budgetTier || 'moderate',
+      meal_type: input.mealType || 'any',
+      kid_friendly: input.kidFriendly ?? false,
+      protein_g: input.proteinG ?? null,
+      calories: input.calories ?? null,
+      carbs_g: input.carbsG ?? null,
+      fat_g: input.fatG ?? null,
+      nutrition_highlights: input.nutritionHighlights?.trim() || null,
+    })
+    .eq('id', recipeId)
+  if (error) return { error: error.message }
+  revalidatePath('/app/recipes')
+  revalidatePath('/admin/recipes')
+  return { ok: true }
+}
+
 export async function joinChallenge(challengeId: string) {
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from('challenge_participants').insert({ challenge_id: challengeId, user_id: user.id })
