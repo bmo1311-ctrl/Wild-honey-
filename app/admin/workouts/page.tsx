@@ -1,4 +1,7 @@
 import { AddGroceryListForm, AddMealPlanForm, AddWorkoutForm } from '@/components/admin/workouts-forms'
+import { WorkoutRow } from '@/components/admin/workout-row'
+import { MealPlanRow } from '@/components/admin/meal-plan-row'
+import { GroceryListRow } from '@/components/admin/grocery-list-row'
 import { getGroceryLists, getMealPlans, getWorkouts } from '@/lib/data'
 
 export default async function AdminWorkoutsPage() {
@@ -12,18 +15,24 @@ export default async function AdminWorkoutsPage() {
       </div>
 
       <AddWorkoutForm />
-      <div className="flex flex-col gap-1.5 text-xs text-muted-foreground">
-        {workouts.length} workout{workouts.length === 1 ? '' : 's'} posted
+      <div className="flex flex-col gap-2">
+        {workouts.map((w) => (
+          <WorkoutRow key={w.id} workout={w} />
+        ))}
       </div>
 
       <AddMealPlanForm />
-      <div className="flex flex-col gap-1.5 text-xs text-muted-foreground">
-        {mealPlans.length} meal plan{mealPlans.length === 1 ? '' : 's'} posted
+      <div className="flex flex-col gap-2">
+        {mealPlans.map((m) => (
+          <MealPlanRow key={m.id} mealPlan={m} />
+        ))}
       </div>
 
       <AddGroceryListForm />
-      <div className="flex flex-col gap-1.5 text-xs text-muted-foreground">
-        {groceryLists.length} grocery list{groceryLists.length === 1 ? '' : 's'} posted
+      <div className="flex flex-col gap-2">
+        {groceryLists.map((g) => (
+          <GroceryListRow key={g.id} groceryList={g} />
+        ))}
       </div>
     </div>
   )

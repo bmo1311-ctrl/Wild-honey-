@@ -1,4 +1,5 @@
 import { AddResourceForm } from '@/components/admin/resource-form'
+import { ResourceRow } from '@/components/admin/resource-row'
 import { getResources } from '@/lib/data'
 
 export default async function AdminResourcesPage() {
@@ -8,25 +9,12 @@ export default async function AdminResourcesPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="font-serif text-3xl font-semibold">Resource Vault</h1>
-        <p className="mt-1 text-sm text-muted-foreground">curate articles, videos, and tools members can browse and save.</p>
+        <p className="mt-1 text-sm text-muted-foreground">curate articles, videos, and guides — tap any resource to edit it.</p>
       </div>
-
       <AddResourceForm />
-
       <div className="flex flex-col gap-2">
         {resources.map((r) => (
-          <div key={r.id} className="flex items-center gap-3 rounded-xl bg-card p-3 ring-1 ring-border">
-            {r.image_url && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={r.image_url} alt="" className="h-12 w-16 shrink-0 rounded-md object-cover" />
-            )}
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">{r.title}</p>
-              <p className="text-xs text-muted-foreground">
-                {r.resource_type} {r.pillar ? `· ${r.pillar}` : ''}
-              </p>
-            </div>
-          </div>
+          <ResourceRow key={r.id} resource={r} />
         ))}
       </div>
     </div>

@@ -1,27 +1,27 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import Image from 'next/image'
 import { toast } from 'sonner'
 import { Pencil, Trash2, X } from 'lucide-react'
-import { adminDeleteProduct, adminUpdateProduct } from '@/app/actions'
+import { adminDeleteResource, adminUpdateResource } from '@/app/actions'
 import { ImageUploadField } from '@/components/admin/image-upload-field'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Switch } from '@/components/ui/switch'
-import type { Product } from '@/lib/types'
-import { formatPrice } from '@/lib/pillars'
+import type { Pillar, Resource, ResourceType } from '@/lib/types'
 
-export function ProductRow({ product }: { product: Product }) {
+const PILLARS: Pillar[] = ['Body', 'Identity', 'Mindset', 'Faith']
+const TYPES: ResourceType[] = ['article', 'video', 'pdf', 'audio', 'link']
+
+export function ResourceRow({ resource }: { resource: Resource }) {
   const [editing, setEditing] = useState(false)
-  const [title, setTitle] = useState(product.title)
-  const [description, setDescription] = useState(product.description)
-  const [priceDollars, setPriceDollars] = useState((product.price_cents / 100).toString())
-  const [coverImage, setCoverImage] = useState(product.cover_image ?? '')
-  const [fileUrl, setFileUrl] = useState(product.file_url ?? '')
-  const [isPublished, setIsPublished] = useState(product.is_published)
+  const [title, setTitle] = useState(resource.title)
+  const [description, setDescription] = useState(resource.description ?? '')
+  const [url, setUrl] = useState(resource.url ?? '')
+  const [imageUrl, setImageUrl] = useState(resource.image_url ?? '')
+  const [resourceType, setResourceType] = useState<ResourceType>(resource.resource_type)
+  const [pillar, setPillar] = useState<Pillar | ''>(resource.pillar ?? '')
   const [pending, startTransition] = useTransition()
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -31,21 +31,13 @@ export function ProductRow({ product }: { product: Product }) {
       toast.error('Give it a title first.')
       return
     }
-    const cents = Math.round(parseFloat(priceDollars || '0') * 100)
     startTransition(async () => {
-      const res = await adminUpdateProduct(product.id, {
-        title,
-        description,
-        priceCents: cents,
-        coverImage,
-        fileUrl,
-        isPublished,
-      })
+      const res = await adminUpdateResource(resource.id, { title, description, url, imageUrl, resourceType, pillar: pillar || undefined })
       if (res?.error) {
         toast.error(res.error)
         return
       }
-      toast.success('Saved.')
+      toast.success('Resource updated.')
       setEditing(false)
     })
   }
@@ -53,31 +45,31 @@ export function ProductRow({ product }: { product: Product }) {
   function handleDelete() {
     setDeleting(true)
     startTransition(async () => {
-      const res = await adminDeleteProduct(product.id)
+      const res = await adminDeleteResource(resource.id)
       setDeleting(false)
       if (res?.error) {
         toast.error(res.error)
         return
       }
-      toast.success('Product deleted.')
+      toast.success('Resource deleted.')
     })
   }
 
   if (!editing) {
     return (
-      <div className="flex gap-3 rounded-xl bg-card p-3 ring-1 ring-border">
-        {product.cover_image && (
-          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-secondary">
-            <Image src={product.cover_image} alt="" fill className="object-cover" />
-          </div>
+      <div className="flex items-center gap-3 rounded-xl bg-card p-3 ring-1 ring-border">
+        {resource.image_url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={resource.image_url} alt="" className="h-12 w-16 shrink-0 rounded-md object-cover" />
         )}
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium">{product.title}</p>
-          <p className="text-xs text-muted-foreground">{formatPrice(product.price_cents)}</p>
-          <p className="text-xs text-muted-foreground">{product.is_published ? 'published' : 'hidden'}</p>
+          <p className="truncate text-sm font-medium">{resource.title}</p>
+          <p className="text-xs text-muted-foreground">
+            {resource.resource_type} {resource.pillar ? `· ${resource.pillar}` : ''}
+          </p>
         </div>
         {confirmingDelete ? (
-          <div className="flex shrink-0 items-center gap-1.5 self-start">
+          <div className="flex shrink-0 items-center gap-1.5">
             <button type="button" onClick={handleDelete} disabled={deleting} className="rounded-full bg-destructive/10 px-2.5 py-1 text-xs font-medium text-destructive">
               {deleting ? 'deleting…' : 'confirm delete'}
             </button>
@@ -86,21 +78,21 @@ export function ProductRow({ product }: { product: Product }) {
             </button>
           </div>
         ) : (
-          <div className="flex shrink-0 items-center gap-1.5 self-start">
-            <button type="button" onClick={() => setEditing(true)} className="text-muted-foreground">
+          <>
+            <button type="button" onClick={() => setEditing(true)} className="shrink-0 text-muted-foreground">
               <Pencil className="h-4 w-4" />
             </button>
-            <button type="button" onClick={() => setConfirmingDelete(true)} className="text-muted-foreground">
+            <button type="button" onClick={() => setConfirmingDelete(true)} className="shrink-0 text-muted-foreground">
               <Trash2 className="h-4 w-4" />
             </button>
-          </div>
+          </>
         )}
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl bg-card p-4 ring-1 ring-border">
+    <div className="flex flex-col gap-4 rounded-xl bg-card p-4 ring-1 ring-border">
       <div className="flex items-center justify-between">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">editing</p>
         <button type="button" onClick={() => setEditing(false)} className="text-muted-foreground">
@@ -115,23 +107,30 @@ export function ProductRow({ product }: { product: Product }) {
         <Label>description</Label>
         <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} />
       </div>
+      <div className="flex flex-col gap-1.5">
+        <Label>URL</Label>
+        <Input value={url} onChange={(e) => setUrl(e.target.value)} className="h-11" />
+      </div>
       <div className="flex flex-wrap gap-3">
         <div className="flex flex-col gap-1.5">
-          <Label>price (USD)</Label>
-          <Input type="number" step="0.01" value={priceDollars} onChange={(e) => setPriceDollars(e.target.value)} className="h-11 w-28" />
+          <Label>type</Label>
+          <select value={resourceType} onChange={(e) => setResourceType(e.target.value as ResourceType)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
+            {TYPES.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label>published</Label>
-          <div className="flex h-11 items-center">
-            <Switch checked={isPublished} onCheckedChange={setIsPublished} />
-          </div>
+          <Label>pillar</Label>
+          <select value={pillar} onChange={(e) => setPillar(e.target.value as Pillar | '')} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
+            <option value="">none</option>
+            {PILLARS.map((p) => (
+              <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
         </div>
       </div>
-      <div className="flex flex-col gap-1.5">
-        <Label>file URL (what they get after buying)</Label>
-        <Input value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} className="h-11" placeholder="https://..." />
-      </div>
-      <ImageUploadField value={coverImage} onChange={setCoverImage} />
+      <ImageUploadField value={imageUrl} onChange={setImageUrl} />
       <div className="flex gap-2">
         <Button onClick={handleSave} disabled={pending} className="h-10 flex-1">
           {pending ? 'saving…' : 'save changes'}

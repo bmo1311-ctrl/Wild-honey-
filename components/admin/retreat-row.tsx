@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { Pencil, X } from 'lucide-react'
-import { adminUpdateRetreat } from '@/app/actions'
+import { Pencil, Trash2, X } from 'lucide-react'
+import { adminDeleteRetreat, adminUpdateRetreat } from '@/app/actions'
 import { CreateRetreatGroupButton } from '@/components/admin/create-retreat-group-button'
 import { ImageUploadField } from '@/components/admin/image-upload-field'
 import { Button } from '@/components/ui/button'
@@ -23,6 +23,21 @@ export function RetreatRow({ retreat, signups }: { retreat: Retreat; signups: { 
   const [spotsTotal, setSpotsTotal] = useState(retreat.spots_total.toString())
   const [coverImage, setCoverImage] = useState(retreat.cover_image ?? '')
   const [pending, startTransition] = useTransition()
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+  function handleDelete() {
+    setDeleting(true)
+    startTransition(async () => {
+      const res = await adminDeleteRetreat(retreat.id)
+      setDeleting(false)
+      if (res?.error) {
+        toast.error(res.error)
+        return
+      }
+      toast.success('Retreat deleted.')
+    })
+  }
 
   function handleSave() {
     if (!title.trim()) {
@@ -58,9 +73,25 @@ export function RetreatRow({ retreat, signups }: { retreat: Retreat; signups: { 
             <span className="text-xs text-muted-foreground">
               {retreat.spots_taken}/{retreat.spots_total} spots · {formatPrice(retreat.price_cents)}
             </span>
-            <button type="button" onClick={() => setEditing(true)} className="shrink-0 text-muted-foreground">
-              <Pencil className="h-4 w-4" />
-            </button>
+            {confirmingDelete ? (
+              <div className="flex items-center gap-1.5">
+                <button type="button" onClick={handleDelete} disabled={deleting} className="rounded-full bg-destructive/10 px-2.5 py-1 text-xs font-medium text-destructive">
+                  {deleting ? 'deleting…' : `confirm delete${signups.length > 0 ? ` (${signups.length} signups)` : ''}`}
+                </button>
+                <button type="button" onClick={() => setConfirmingDelete(false)} className="text-xs text-muted-foreground">
+                  cancel
+                </button>
+              </div>
+            ) : (
+              <>
+                <button type="button" onClick={() => setEditing(true)} className="shrink-0 text-muted-foreground">
+                  <Pencil className="h-4 w-4" />
+                </button>
+                <button type="button" onClick={() => setConfirmingDelete(true)} className="shrink-0 text-muted-foreground">
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </>
+            )}
           </div>
         </div>
         <div className="mt-3 flex flex-col gap-1.5">

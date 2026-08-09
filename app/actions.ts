@@ -274,6 +274,52 @@ export async function adminAddWorkout(input: {
   return { ok: true }
 }
 
+export async function adminUpdateWorkout(
+  workoutId: string,
+  input: {
+    title: string
+    description: string
+    pillar: string
+    bodyGroup?: string
+    workoutType?: string
+    videoUrl?: string
+    instructions?: string
+    imageUrl?: string
+    pdfUrl?: string
+    isPremium: boolean
+  },
+) {
+  const { supabase } = await requireAdmin()
+  const { error } = await supabase
+    .from('workouts')
+    .update({
+      title: input.title.trim(),
+      description: input.description.trim(),
+      pillar: input.pillar,
+      body_group: input.bodyGroup || 'any',
+      workout_type: input.workoutType || 'any',
+      video_url: input.videoUrl || null,
+      instructions: input.instructions || null,
+      image_url: input.imageUrl || null,
+      pdf_url: input.pdfUrl || null,
+      is_premium: input.isPremium,
+    })
+    .eq('id', workoutId)
+  if (error) return { error: error.message }
+  revalidatePath('/app/workouts')
+  revalidatePath('/admin/workouts')
+  return { ok: true }
+}
+
+export async function adminDeleteWorkout(workoutId: string) {
+  const { supabase } = await requireAdmin()
+  const { error } = await supabase.from('workouts').delete().eq('id', workoutId)
+  if (error) return { error: error.message }
+  revalidatePath('/app/workouts')
+  revalidatePath('/admin/workouts')
+  return { ok: true }
+}
+
 export async function adminAddMealPlan(input: { title: string; description: string; content?: string; fileUrl?: string; isPremium: boolean }) {
   const { supabase } = await requireAdmin()
   const { error } = await supabase.from('meal_plans').insert({
@@ -283,6 +329,24 @@ export async function adminAddMealPlan(input: { title: string; description: stri
     file_url: input.fileUrl || null,
     is_premium: input.isPremium,
   })
+  if (error) return { error: error.message }
+  revalidatePath('/app/workouts')
+  revalidatePath('/admin/workouts')
+  return { ok: true }
+}
+
+export async function adminDeleteMealPlan(id: string) {
+  const { supabase } = await requireAdmin()
+  const { error } = await supabase.from('meal_plans').delete().eq('id', id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/workouts')
+  revalidatePath('/admin/workouts')
+  return { ok: true }
+}
+
+export async function adminDeleteGroceryList(id: string) {
+  const { supabase } = await requireAdmin()
+  const { error } = await supabase.from('grocery_lists').delete().eq('id', id)
   if (error) return { error: error.message }
   revalidatePath('/app/workouts')
   revalidatePath('/admin/workouts')
@@ -650,6 +714,39 @@ export async function adminAddResource(input: { title: string; description?: str
     resource_type: input.resourceType || 'article',
     pillar: input.pillar || null,
   })
+  if (error) return { error: error.message }
+  revalidatePath('/app/vault')
+  revalidatePath('/admin/resources')
+  return { ok: true }
+}
+
+export async function adminUpdateResource(
+  resourceId: string,
+  input: { title: string; description?: string; url?: string; imageUrl?: string; resourceType: string; pillar?: string },
+) {
+  const { supabase } = await requireAdmin()
+  const title = input.title.trim()
+  if (!title) return { error: 'Give the resource a title first.' }
+  const { error } = await supabase
+    .from('resources')
+    .update({
+      title,
+      description: input.description?.trim() || null,
+      url: input.url?.trim() || null,
+      image_url: input.imageUrl?.trim() || null,
+      resource_type: input.resourceType || 'article',
+      pillar: input.pillar || null,
+    })
+    .eq('id', resourceId)
+  if (error) return { error: error.message }
+  revalidatePath('/app/vault')
+  revalidatePath('/admin/resources')
+  return { ok: true }
+}
+
+export async function adminDeleteResource(resourceId: string) {
+  const { supabase } = await requireAdmin()
+  const { error } = await supabase.from('resources').delete().eq('id', resourceId)
   if (error) return { error: error.message }
   revalidatePath('/app/vault')
   revalidatePath('/admin/resources')
@@ -1077,6 +1174,15 @@ export async function adminUpdateProduct(
   return { ok: true }
 }
 
+export async function adminDeleteProduct(productId: string) {
+  const { supabase } = await requireAdmin()
+  const { error } = await supabase.from('products').delete().eq('id', productId)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/products')
+  revalidatePath('/app/shop')
+  return { ok: true }
+}
+
 export async function adminTogglePublished(id: string, isPublished: boolean) {
   const { supabase } = await requireAdmin()
   const { error } = await supabase.from('products').update({ is_published: isPublished }).eq('id', id)
@@ -1151,6 +1257,15 @@ export async function adminUpdateRetreat(
       cover_image: input.coverImage || null,
     })
     .eq('id', retreatId)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/retreats')
+  revalidatePath('/app/retreats')
+  return { ok: true }
+}
+
+export async function adminDeleteRetreat(retreatId: string) {
+  const { supabase } = await requireAdmin()
+  const { error } = await supabase.from('retreats').delete().eq('id', retreatId)
   if (error) return { error: error.message }
   revalidatePath('/admin/retreats')
   revalidatePath('/app/retreats')
@@ -1541,6 +1656,15 @@ export async function adminAddChallenge(input: { title: string; description?: st
 export async function adminToggleChallengeActive(challengeId: string, isActive: boolean) {
   const { supabase } = await requireAdmin()
   const { error } = await supabase.from('challenges').update({ is_active: isActive }).eq('id', challengeId)
+  if (error) return { error: error.message }
+  revalidatePath('/app/challenges')
+  revalidatePath('/admin/challenges')
+  return { ok: true }
+}
+
+export async function adminDeleteChallenge(challengeId: string) {
+  const { supabase } = await requireAdmin()
+  const { error } = await supabase.from('challenges').delete().eq('id', challengeId)
   if (error) return { error: error.message }
   revalidatePath('/app/challenges')
   revalidatePath('/admin/challenges')
