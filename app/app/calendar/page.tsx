@@ -1,9 +1,10 @@
 import { CalendarView } from '@/components/calendar-view'
 import { CommitmentsPanel } from '@/components/commitments-panel'
-import { getMyCommitments } from '@/lib/data'
+import { ExperimentsPanel } from '@/components/experiments-panel'
+import { getMyCommitments, getMyExperiments } from '@/lib/data'
 
 export default async function CalendarPage() {
-  const commitments = await getMyCommitments()
+  const [commitments, experiments] = await Promise.all([getMyCommitments(), getMyExperiments()])
 
   return (
     <div className="flex flex-col gap-6">
@@ -14,6 +15,7 @@ export default async function CalendarPage() {
         </p>
       </div>
       <CommitmentsPanel commitments={commitments} />
+      <ExperimentsPanel experiments={experiments} />
       <CalendarView />
     </div>
   )

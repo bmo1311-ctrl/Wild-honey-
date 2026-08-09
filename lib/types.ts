@@ -75,6 +75,21 @@ export interface Commitment {
   last_reviewed_at: string
 }
 
+export interface PersonalExperiment {
+  id: string
+  user_id: string
+  title: string
+  description: string | null
+  length_days: number
+  start_date: string
+  status: 'active' | 'completed' | 'abandoned'
+  helped: 'yes' | 'somewhat' | 'no' | null
+  reflection_text: string | null
+  reflected_at: string | null
+  created_at: string
+  days_completed?: number
+}
+
 export interface MealLog {
   id: string
   user_id: string

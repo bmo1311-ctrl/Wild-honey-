@@ -1766,3 +1766,74 @@ export async function deleteCommitment(id: string) {
   revalidatePath('/app/calendar')
   return { ok: true }
 }
+
+// ============================================================
+// PERSONAL EXPERIMENTS
+// ============================================================
+
+export async function startExperiment(input: { title: string; description?: string; lengthDays: number }) {
+  const { supabase, user } = await requireUser()
+  const title = input.title.trim()
+  if (!title) return { error: 'Name your experiment first.' }
+  const { error } = await supabase.from('personal_experiments').insert({
+    user_id: user.id,
+    title,
+    description: input.description?.trim() || null,
+    length_days: input.lengthDays,
+    start_date: new Date().toISOString().slice(0, 10),
+  })
+  if (error) return { error: error.message }
+  revalidatePath('/app/calendar')
+  return { ok: true }
+}
+
+export async function checkInExperimentDay(experimentId: string) {
+  const { supabase, user } = await requireUser()
+  const today = new Date().toISOString().slice(0, 10)
+  const { data: existing } = await supabase
+    .from('experiment_checkins')
+    .select('id')
+    .eq('experiment_id', experimentId)
+    .eq('user_id', user.id)
+    .eq('date', today)
+    .maybeSingle()
+  if (existing) return { ok: true, alreadyLogged: true }
+  const { error } = await supabase.from('experiment_checkins').insert({ experiment_id: experimentId, user_id: user.id, date: today })
+  if (error) return { error: error.message }
+  revalidatePath('/app/calendar')
+  return { ok: true }
+}
+
+/** Records the honest answer to "did this actually help you?" — never auto-declared from completion alone. */
+export async function reflectOnExperiment(experimentId: string, helped: 'yes' | 'somewhat' | 'no', reflectionText?: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase
+    .from('personal_experiments')
+    .update({
+      status: 'completed',
+      helped,
+      reflection_text: reflectionText?.trim() || null,
+      reflected_at: new Date().toISOString(),
+    })
+    .eq('id', experimentId)
+    .eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/calendar')
+  return { ok: true }
+}
+
+export async function abandonExperiment(experimentId: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('personal_experiments').update({ status: 'abandoned' }).eq('id', experimentId).eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/calendar')
+  return { ok: true }
+}
+
+export async function deleteExperiment(experimentId: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('personal_experiments').delete().eq('id', experimentId).eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/calendar')
+  return { ok: true }
+}

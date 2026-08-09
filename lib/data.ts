@@ -21,6 +21,7 @@ import type {
   MealPlan,
   MorningReset,
   PantryItem,
+  PersonalExperiment,
   Product,
   Profile,
   ProtocolDayCompletion,
@@ -998,4 +999,24 @@ export async function getMyCommitments(): Promise<Commitment[]> {
   if (!user) return []
   const { data } = await supabase.from('commitments').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
   return (data as Commitment[]) ?? []
+}
+
+// ---- Personal experiments ----
+
+export async function getMyExperiments(): Promise<PersonalExperiment[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const { data: experiments } = await supabase.from('personal_experiments').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
+  const list = (experiments as PersonalExperiment[]) ?? []
+  if (list.length === 0) return []
+
+  const ids = list.map((e) => e.id)
+  const { data: checkins } = await supabase.from('experiment_checkins').select('experiment_id').eq('user_id', user.id).in('experiment_id', ids)
+  const counts = new Map<string, number>()
+  ;(checkins ?? []).forEach((c) => counts.set(c.experiment_id, (counts.get(c.experiment_id) ?? 0) + 1))
+
+  return list.map((e) => ({ ...e, days_completed: counts.get(e.id) ?? 0 }))
 }
