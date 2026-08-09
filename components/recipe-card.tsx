@@ -2,10 +2,20 @@
 
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { Bookmark, Clock, Beef, Wallet, Leaf, PlayCircle, Plus, Flame, ShoppingCart } from 'lucide-react'
+import { Bookmark, Clock, Beef, Wallet, Leaf, PlayCircle, Plus, Flame, ShoppingCart, Utensils, Coffee, Salad, Sandwich, Wine, GlassWater } from 'lucide-react'
 import { importRecipeToGroceryList, logMeal, toggleSavedRecipe } from '@/app/actions'
 import type { Recipe } from '@/lib/types'
+import { PILLAR_META } from '@/lib/pillars'
 import { cn } from '@/lib/utils'
+
+const MEAL_ICON: Record<string, typeof Utensils> = {
+  breakfast: Coffee,
+  lunch: Sandwich,
+  dinner: Utensils,
+  snack: Salad,
+  juice: GlassWater,
+  mocktail: Wine,
+}
 
 const CYCLE_LABEL: Record<string, string> = {
   menstrual: 'menstrual phase',
@@ -65,15 +75,22 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
     })
   }
 
+  const MealIcon = MEAL_ICON[recipe.meal_type] ?? Utensils
+  const placeholderColor = recipe.pillar ? PILLAR_META[recipe.pillar].dot : 'bg-secondary'
+
   return (
     <div className="relative flex h-full flex-col gap-2 rounded-2xl bg-card p-4 ring-1 ring-border">
-      {recipe.image_url && (
+      {recipe.image_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={recipe.image_url}
           alt=""
           className="absolute bottom-3 right-3 h-10 w-10 rounded-full border-2 border-card object-cover shadow-sm"
         />
+      ) : (
+        <div className={cn('absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full border-2 border-card text-white shadow-sm', placeholderColor)}>
+          <MealIcon className="h-4 w-4" />
+        </div>
       )}
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-wrap items-center gap-1.5">
