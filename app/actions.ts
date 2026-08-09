@@ -1308,6 +1308,11 @@ export async function adminAddRecipe(input: {
   prepMinutes?: number
   imageUrl?: string
   isPremium: boolean
+  season?: string
+  cyclePhase?: string
+  budgetTier?: string
+  proteinG?: number
+  nutritionHighlights?: string
 }) {
   const { supabase } = await requireAdmin()
   const title = input.title.trim()
@@ -1321,6 +1326,11 @@ export async function adminAddRecipe(input: {
     prep_minutes: input.prepMinutes ?? null,
     image_url: input.imageUrl || null,
     is_premium: input.isPremium,
+    season: input.season || 'any',
+    cycle_phase: input.cyclePhase || 'any',
+    budget_tier: input.budgetTier || 'moderate',
+    protein_g: input.proteinG ?? null,
+    nutrition_highlights: input.nutritionHighlights?.trim() || null,
   })
   if (error) return { error: error.message }
   revalidatePath('/app/recipes')

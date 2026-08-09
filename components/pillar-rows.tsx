@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 
 type WithPillar = { id: string; pillar: Pillar | null }
 
-function Row<T extends WithPillar>({
+export function Row<T extends WithPillar>({
   label,
   items,
   renderItem,

@@ -5,6 +5,7 @@ import type {
   ContentReport,
   Challenge,
   CircleFeedItem,
+  CyclePhase,
   EveningReflection,
   ExpertQuestion,
   Group,
@@ -691,6 +692,43 @@ export async function getRecipes(): Promise<Recipe[]> {
   const { data: saved } = await supabase.from('saved_recipes').select('recipe_id').eq('user_id', user.id)
   const savedIds = new Set((saved ?? []).map((s) => s.recipe_id))
   return recipes.map((r) => ({ ...r, saved: savedIds.has(r.id) }))
+}
+
+export function getCurrentSeason(): 'spring' | 'summer' | 'fall' | 'winter' {
+  const month = new Date().getMonth() // 0-11
+  if (month >= 2 && month <= 4) return 'spring'
+  if (month >= 5 && month <= 7) return 'summer'
+  if (month >= 8 && month <= 10) return 'fall'
+  return 'winter'
+}
+
+/** Most recent cycle phase the member has logged in a check-in, if any. */
+export async function getCurrentCyclePhase(): Promise<CyclePhase | null> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return null
+  const { data } = await supabase
+    .from('checkins')
+    .select('cycle_phase')
+    .eq('user_id', user.id)
+    .not('cycle_phase', 'is', null)
+    .neq('cycle_phase', 'not_tracked')
+    .order('date', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  return (data?.cycle_phase as CyclePhase) ?? null
+}
+
+/** Recipes matching this week's season and, if tracked, the member's current cycle phase. */
+export async function getRecommendedRecipes(): Promise<Recipe[]> {
+  const [recipes, season, cyclePhase] = await Promise.all([getRecipes(), Promise.resolve(getCurrentSeason()), getCurrentCyclePhase()])
+  return recipes.filter((r) => {
+    const seasonMatch = r.season === 'any' || r.season === season
+    const cycleMatch = !cyclePhase || r.cycle_phase === 'any' || r.cycle_phase === cyclePhase
+    return seasonMatch && cycleMatch
+  })
 }
 
 // ---- Challenges ----
