@@ -19,7 +19,7 @@ export default async function ProfilePage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col items-center gap-3 rounded-2xl bg-card p-6 text-center ring-1 ring-border">
-        <BloomAvatar name={profile.name} color={profile.avatar_color} className="h-16 w-16 text-xl" />
+        <BloomAvatar name={profile.name} color={profile.avatar_color} avatarUrl={profile.avatar_url} className="h-16 w-16 text-xl" />
         <div className="flex flex-col items-center gap-1.5">
           <h1 className="font-serif text-2xl font-semibold">{profile.name}</h1>
           <TierBadge tier={profile.membership_tier} />
@@ -55,7 +55,7 @@ export default async function ProfilePage() {
         </Link>
       )}
 
-      <ProfileEditor name={profile.name} avatarColor={profile.avatar_color} />
+      <ProfileEditor name={profile.name} avatarColor={profile.avatar_color} avatarUrl={profile.avatar_url} />
 
       <HoneyProfileCard profile={profile} goals={goals.map((g) => g.goal)} baseline={baseline} latest={latest} />
 

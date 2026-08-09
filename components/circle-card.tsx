@@ -100,6 +100,7 @@ export function CircleCard({ entry, canPin = false }: { entry: JournalEntry; can
         <BloomAvatar
           name={entry.profile?.name ?? 'H'}
           color={entry.profile?.avatar_color ?? 'honey'}
+          avatarUrl={entry.profile?.avatar_url}
           className="h-10 w-10"
         />
         <div className="min-w-0 flex-1">
@@ -168,6 +169,7 @@ export function CircleCard({ entry, canPin = false }: { entry: JournalEntry; can
               <BloomAvatar
                 name={c.profile?.name ?? 'H'}
                 color={c.profile?.avatar_color ?? 'honey'}
+                avatarUrl={c.profile?.avatar_url}
                 className="h-8 w-8 text-xs"
               />
               <div className={cn('flex-1 rounded-2xl px-3 py-2', (c as any).pinned ? 'bg-primary/10 ring-1 ring-primary/30' : 'bg-secondary/70')}>

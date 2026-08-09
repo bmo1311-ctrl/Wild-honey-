@@ -33,6 +33,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               <BloomAvatar
                 name={profile.name}
                 color={profile.avatar_color}
+                avatarUrl={profile.avatar_url}
                 className="h-9 w-9"
               />
             </Link>

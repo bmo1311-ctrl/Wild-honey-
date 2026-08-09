@@ -115,11 +115,11 @@ export async function getComments(entryId: string): Promise<Comment[]> {
   return (data as Comment[]) ?? []
 }
 
-export async function updateProfile(input: { name: string; avatarColor: string }) {
+export async function updateProfile(input: { name: string; avatarColor: string; avatarUrl?: string | null }) {
   const { supabase, user } = await requireUser()
   const { error } = await supabase
     .from('profiles')
-    .update({ name: input.name.trim() || 'honey', avatar_color: input.avatarColor })
+    .update({ name: input.name.trim() || 'honey', avatar_color: input.avatarColor, avatar_url: input.avatarUrl ?? null })
     .eq('id', user.id)
   if (error) return { error: error.message }
   revalidatePath('/app/profile')
@@ -975,6 +975,35 @@ export async function adminAddProduct(input: {
   return { ok: true }
 }
 
+export async function adminUpdateProduct(
+  productId: string,
+  input: {
+    title: string
+    description: string
+    priceCents: number
+    coverImage?: string
+    fileUrl?: string
+    isPublished: boolean
+  },
+) {
+  const { supabase } = await requireAdmin()
+  const { error } = await supabase
+    .from('products')
+    .update({
+      title: input.title.trim(),
+      description: input.description.trim(),
+      price_cents: input.priceCents,
+      cover_image: input.coverImage || null,
+      file_url: input.fileUrl || null,
+      is_published: input.isPublished,
+    })
+    .eq('id', productId)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/products')
+  revalidatePath('/app/shop')
+  return { ok: true }
+}
+
 export async function adminTogglePublished(id: string, isPublished: boolean) {
   const { supabase } = await requireAdmin()
   const { error } = await supabase.from('products').update({ is_published: isPublished }).eq('id', id)
@@ -1021,6 +1050,37 @@ export async function adminAddRetreat(input: {
     }).catch(() => {})
   }
 
+  return { ok: true }
+}
+
+export async function adminUpdateRetreat(
+  retreatId: string,
+  input: {
+    title: string
+    location: string
+    dates: string
+    description: string
+    priceCents: number
+    spotsTotal: number
+    coverImage?: string
+  },
+) {
+  const { supabase } = await requireAdmin()
+  const { error } = await supabase
+    .from('retreats')
+    .update({
+      title: input.title.trim(),
+      location: input.location.trim(),
+      dates: input.dates.trim(),
+      description: input.description.trim(),
+      price_cents: input.priceCents,
+      spots_total: input.spotsTotal,
+      cover_image: input.coverImage || null,
+    })
+    .eq('id', retreatId)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/retreats')
+  revalidatePath('/app/retreats')
   return { ok: true }
 }
 

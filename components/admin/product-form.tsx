@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { adminAddProduct } from '@/app/actions'
+import { ImageUploadField } from '@/components/admin/image-upload-field'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -64,11 +65,8 @@ export function AddProductForm() {
             className="h-11 w-32"
           />
         </div>
-        <div className="flex flex-1 flex-col gap-1.5">
-          <Label>cover image URL</Label>
-          <Input value={coverImage} onChange={(e) => setCoverImage(e.target.value)} className="h-11" placeholder="/products/your-cover.png" />
-        </div>
       </div>
+      <ImageUploadField value={coverImage} onChange={setCoverImage} />
       <div className="flex flex-col gap-1.5">
         <Label>download file URL</Label>
         <Input

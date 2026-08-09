@@ -4,6 +4,7 @@ import type {
   CommunityPost,
   ContentReport,
   Challenge,
+  CircleFeedItem,
   EveningReflection,
   ExpertQuestion,
   Group,
@@ -125,7 +126,7 @@ export async function getCircleFeed(): Promise<JournalEntry[]> {
 
   const { data: entries } = await supabase
     .from('journal_entries')
-    .select('*, prompt:prompts(*), profile:profiles(name, avatar_color, membership_tier)')
+    .select('*, prompt:prompts(*), profile:profiles(name, avatar_color, avatar_url, membership_tier)')
     .eq('visibility', 'circle')
     .order('pinned', { ascending: false })
     .order('created_at', { ascending: false })
@@ -182,7 +183,7 @@ export async function getCommunityFeed(): Promise<CommunityPost[]> {
 
   const { data: posts } = await supabase
     .from('community_posts')
-    .select('*, profile:profiles(name, avatar_color, membership_tier)')
+    .select('*, profile:profiles(name, avatar_color, avatar_url, membership_tier)')
     .order('pinned', { ascending: false })
     .order('created_at', { ascending: false })
     .limit(80)
@@ -205,6 +206,24 @@ export async function getCommunityFeed(): Promise<CommunityPost[]> {
       comment_count: (comments ?? []).filter((c) => c.post_id === p.id).length,
     }
   })
+}
+
+// Unified feed — journal entries shared to the circle and standalone
+// community posts, interleaved into one chronological (pinned-first) list.
+export async function getUnifiedCircleFeed(): Promise<CircleFeedItem[]> {
+  const [entries, posts] = await Promise.all([getCircleFeed(), getCommunityFeed()])
+
+  const items: CircleFeedItem[] = [
+    ...entries.map((entry) => ({ kind: 'journal' as const, id: entry.id, pinned: Boolean((entry as any).pinned), created_at: entry.created_at, entry })),
+    ...posts.map((post) => ({ kind: 'community' as const, id: post.id, pinned: Boolean(post.pinned), created_at: post.created_at, post })),
+  ]
+
+  items.sort((a, b) => {
+    if (a.pinned !== b.pinned) return a.pinned ? -1 : 1
+    return b.created_at.localeCompare(a.created_at)
+  })
+
+  return items
 }
 
 // ---- Workouts hub ----
@@ -507,7 +526,7 @@ export async function getGroupMembers(groupId: string): Promise<GroupMember[]> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('group_members')
-    .select('*, profile:profiles(name, avatar_color, membership_tier)')
+    .select('*, profile:profiles(name, avatar_color, avatar_url, membership_tier)')
     .eq('group_id', groupId)
     .order('joined_at', { ascending: true })
   return (data as GroupMember[]) ?? []
@@ -522,7 +541,7 @@ export async function getGroupPosts(groupId: string): Promise<GroupPost[]> {
 
   const { data: posts } = await supabase
     .from('group_posts')
-    .select('*, profile:profiles(name, avatar_color, membership_tier)')
+    .select('*, profile:profiles(name, avatar_color, avatar_url, membership_tier)')
     .eq('group_id', groupId)
     .order('created_at', { ascending: false })
 
@@ -574,7 +593,7 @@ export async function getAllQuestionsForAdmin(): Promise<ExpertQuestion[]> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('expert_questions')
-    .select('*, profile:profiles(name, avatar_color)')
+    .select('*, profile:profiles(name, avatar_color, avatar_url)')
     .order('created_at', { ascending: false })
   return (data as ExpertQuestion[]) ?? []
 }
@@ -635,7 +654,7 @@ export async function getBlockedUsers() {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) return []
-  const { data } = await supabase.from('user_blocks').select('id, blocked_id, profile:profiles!user_blocks_blocked_id_fkey(name, avatar_color)').eq('blocker_id', user.id)
+  const { data } = await supabase.from('user_blocks').select('id, blocked_id, profile:profiles!user_blocks_blocked_id_fkey(name, avatar_color, avatar_url)').eq('blocker_id', user.id)
   return data ?? []
 }
 
@@ -645,7 +664,7 @@ export async function getMutedUsers() {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) return []
-  const { data } = await supabase.from('user_mutes').select('id, muted_id, profile:profiles!user_mutes_muted_id_fkey(name, avatar_color)').eq('muter_id', user.id)
+  const { data } = await supabase.from('user_mutes').select('id, muted_id, profile:profiles!user_mutes_muted_id_fkey(name, avatar_color, avatar_url)').eq('muter_id', user.id)
   return data ?? []
 }
 
@@ -653,7 +672,7 @@ export async function getReportsForAdmin(): Promise<ContentReport[]> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('content_reports')
-    .select('*, reporter_profile:profiles(name, avatar_color)')
+    .select('*, reporter_profile:profiles(name, avatar_color, avatar_url)')
     .order('status', { ascending: true })
     .order('created_at', { ascending: false })
   return (data as ContentReport[]) ?? []

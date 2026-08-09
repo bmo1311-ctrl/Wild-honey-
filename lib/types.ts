@@ -37,6 +37,7 @@ export interface Profile {
   name: string
   email: string | null
   avatar_color: string
+  avatar_url: string | null
   membership_tier: MembershipTier
   is_admin: boolean
   streak_count: number
@@ -169,8 +170,12 @@ export interface ContentReport {
   reviewed_by: string | null
   reviewed_at: string | null
   created_at: string
-  reporter_profile?: Pick<Profile, 'name' | 'avatar_color'> | null
+  reporter_profile?: Pick<Profile, 'name' | 'avatar_color' | 'avatar_url'> | null
 }
+
+export type CircleFeedItem =
+  | { kind: 'journal'; id: string; pinned: boolean; created_at: string; entry: JournalEntry }
+  | { kind: 'community'; id: string; pinned: boolean; created_at: string; post: CommunityPost }
 
 export interface Prompt {
   id: string
@@ -189,7 +194,7 @@ export interface JournalEntry {
   visibility: Visibility
   created_at: string
   prompt?: Prompt | null
-  profile?: Pick<Profile, 'name' | 'avatar_color'> | null
+  profile?: Pick<Profile, 'name' | 'avatar_color' | 'avatar_url'> | null
   reaction_count?: number
   comment_count?: number
   reacted_by_me?: boolean
@@ -201,7 +206,7 @@ export interface Comment {
   user_id: string
   text: string
   created_at: string
-  profile?: Pick<Profile, 'name' | 'avatar_color'> | null
+  profile?: Pick<Profile, 'name' | 'avatar_color' | 'avatar_url'> | null
 }
 
 export interface Product {
@@ -225,7 +230,7 @@ export interface CommunityPost {
   pillar: Pillar | null
   pinned: boolean
   created_at: string
-  profile?: Pick<Profile, 'name' | 'avatar_color' | 'membership_tier'> | null
+  profile?: Pick<Profile, 'name' | 'avatar_color' | 'avatar_url' | 'membership_tier'> | null
   reaction_count?: number
   comment_count?: number
   reacted_by_me?: boolean
@@ -238,7 +243,7 @@ export interface CommunityComment {
   text: string
   pinned: boolean
   created_at: string
-  profile?: Pick<Profile, 'name' | 'avatar_color' | 'membership_tier'> | null
+  profile?: Pick<Profile, 'name' | 'avatar_color' | 'avatar_url' | 'membership_tier'> | null
 }
 
 export interface Workout {
@@ -435,7 +440,7 @@ export interface GroupMember {
   user_id: string
   role: 'owner' | 'member'
   joined_at: string
-  profile?: Pick<Profile, 'name' | 'avatar_color' | 'membership_tier'> | null
+  profile?: Pick<Profile, 'name' | 'avatar_color' | 'avatar_url' | 'membership_tier'> | null
 }
 
 export interface GroupPost {
@@ -444,7 +449,7 @@ export interface GroupPost {
   user_id: string
   text: string
   created_at: string
-  profile?: Pick<Profile, 'name' | 'avatar_color' | 'membership_tier'> | null
+  profile?: Pick<Profile, 'name' | 'avatar_color' | 'avatar_url' | 'membership_tier'> | null
   reaction_count?: number
   comment_count?: number
   reacted_by_me?: boolean
@@ -456,7 +461,7 @@ export interface GroupPostComment {
   user_id: string
   text: string
   created_at: string
-  profile?: Pick<Profile, 'name' | 'avatar_color'> | null
+  profile?: Pick<Profile, 'name' | 'avatar_color' | 'avatar_url'> | null
 }
 
 export interface ExpertQuestion {
@@ -468,5 +473,5 @@ export interface ExpertQuestion {
   answered_at: string | null
   is_public: boolean
   created_at: string
-  profile?: Pick<Profile, 'name' | 'avatar_color'> | null
+  profile?: Pick<Profile, 'name' | 'avatar_color' | 'avatar_url'> | null
 }

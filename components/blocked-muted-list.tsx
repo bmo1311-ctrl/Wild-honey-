@@ -34,7 +34,7 @@ export function BlockedMutedList({ blocked, muted }: { blocked: any[]; muted: an
           <p className="text-xs font-medium text-muted-foreground">blocked</p>
           {blocked.map((b) => (
             <div key={b.id} className="flex items-center gap-2.5 rounded-lg bg-secondary/40 px-3 py-2">
-              <BloomAvatar name={b.profile?.name ?? 'H'} color={b.profile?.avatar_color ?? 'honey'} className="h-7 w-7 text-xs" />
+              <BloomAvatar name={b.profile?.name ?? 'H'} color={b.profile?.avatar_color ?? 'honey'} avatarUrl={b.profile?.avatar_url} className="h-7 w-7 text-xs" />
               <span className="flex-1 text-sm">{b.profile?.name ?? 'a member'}</span>
               <button type="button" onClick={() => handleUnblock(b.id)} disabled={pending} className="text-xs font-medium text-honey">
                 unblock
@@ -48,7 +48,7 @@ export function BlockedMutedList({ blocked, muted }: { blocked: any[]; muted: an
           <p className="text-xs font-medium text-muted-foreground">muted</p>
           {muted.map((m) => (
             <div key={m.id} className="flex items-center gap-2.5 rounded-lg bg-secondary/40 px-3 py-2">
-              <BloomAvatar name={m.profile?.name ?? 'H'} color={m.profile?.avatar_color ?? 'honey'} className="h-7 w-7 text-xs" />
+              <BloomAvatar name={m.profile?.name ?? 'H'} color={m.profile?.avatar_color ?? 'honey'} avatarUrl={m.profile?.avatar_url} className="h-7 w-7 text-xs" />
               <span className="flex-1 text-sm">{m.profile?.name ?? 'a member'}</span>
               <button type="button" onClick={() => handleUnmute(m.id)} disabled={pending} className="text-xs font-medium text-honey">
                 unmute

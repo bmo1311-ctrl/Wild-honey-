@@ -65,7 +65,7 @@ export function GroupPostCard({ post }: { post: GroupPost }) {
   return (
     <article className="rounded-2xl bg-card p-5 ring-1 ring-border">
       <header className="flex items-center gap-3">
-        <BloomAvatar name={post.profile?.name ?? 'H'} color={post.profile?.avatar_color ?? 'honey'} className="h-10 w-10" />
+        <BloomAvatar name={post.profile?.name ?? 'H'} color={post.profile?.avatar_color ?? 'honey'} avatarUrl={post.profile?.avatar_url} className="h-10 w-10" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             <p className="font-medium leading-tight">{post.profile?.name ?? 'A member'}</p>
@@ -102,7 +102,7 @@ export function GroupPostCard({ post }: { post: GroupPost }) {
         <div className="mt-4 flex flex-col gap-3">
           {comments.map((c) => (
             <div key={c.id} className="flex items-start gap-2.5">
-              <BloomAvatar name={c.profile?.name ?? 'H'} color={c.profile?.avatar_color ?? 'honey'} className="h-8 w-8 text-xs" />
+              <BloomAvatar name={c.profile?.name ?? 'H'} color={c.profile?.avatar_color ?? 'honey'} avatarUrl={c.profile?.avatar_url} className="h-8 w-8 text-xs" />
               <div className="flex-1 rounded-2xl bg-secondary/70 px-3 py-2">
                 <p className="text-xs font-medium">{c.profile?.name ?? 'A member'}</p>
                 <p className="text-sm leading-snug text-pretty">{c.text}</p>
