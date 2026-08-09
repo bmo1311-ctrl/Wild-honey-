@@ -1837,3 +1837,61 @@ export async function deleteExperiment(experimentId: string) {
   revalidatePath('/app/calendar')
   return { ok: true }
 }
+
+// ============================================================
+// YEAR DAY REFLECTION RITUAL
+// ============================================================
+
+export async function saveYearDayReflection(input: {
+  wildHoneyYear: number
+  qLearned?: string
+  qChanged?: string
+  qProud?: string
+  qOvercame?: string
+  qPatterns?: string
+  qRelease?: string
+  qCarryingForward?: string
+  qBecoming?: string
+  qIntention?: string
+}) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('transformation_reflections').insert({
+    user_id: user.id,
+    milestone: 'year_day',
+    wild_honey_year: input.wildHoneyYear,
+    q_learned: input.qLearned?.trim() || null,
+    q_changed: input.qChanged?.trim() || null,
+    q_proud: input.qProud?.trim() || null,
+    q_overcame: input.qOvercame?.trim() || null,
+    q_patterns: input.qPatterns?.trim() || null,
+    q_release: input.qRelease?.trim() || null,
+    q_carrying_forward: input.qCarryingForward?.trim() || null,
+    q_becoming: input.qBecoming?.trim() || null,
+    q_intention: input.qIntention?.trim() || null,
+  })
+  if (error) return { error: error.message }
+  revalidatePath('/app/calendar')
+  revalidatePath('/app/progress')
+  return { ok: true }
+}
+
+export async function getYearDayReflectionForYear(wildHoneyYear: number) {
+  const { supabase, user } = await requireUser()
+  const { data } = await supabase
+    .from('transformation_reflections')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('milestone', 'year_day')
+    .eq('wild_honey_year', wildHoneyYear)
+    .maybeSingle()
+  return data ?? null
+}
+
+export async function updateSeason(season: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('profiles').update({ season }).eq('id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/calendar')
+  revalidatePath('/app')
+  return { ok: true }
+}

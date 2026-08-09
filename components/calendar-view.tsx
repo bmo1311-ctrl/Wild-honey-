@@ -1,8 +1,10 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ChevronLeft, ChevronRight, Sun } from 'lucide-react'
 import { CalendarDayPanel } from '@/components/calendar-day-panel'
+import { YearDayRitual } from '@/components/year-day-ritual'
+import { getYearDayReflectionForYear } from '@/app/actions'
 import { FIXED_MONTHS, gregorianToFixed, fixedToGregorian, leapDayGregorian, yearDayGregorian, isGregorianLeapYear, toISODate } from '@/lib/fixed-calendar'
 import { cn } from '@/lib/utils'
 
@@ -26,6 +28,13 @@ export function CalendarView() {
   // For Standard mode: 0-11 = gregorian months
   const [cursor, setCursor] = useState(mode === 'wildhoney' ? todayFixed.kind === 'month' ? todayFixed.monthIndex : 13 : today.getUTCMonth())
   const [selected, setSelected] = useState<{ dateISO: string; label: string } | null>(null)
+  const [showYearDayRitual, setShowYearDayRitual] = useState(false)
+  const [yearDayReflection, setYearDayReflection] = useState<any>(undefined)
+
+  function openYearDayRitual() {
+    setShowYearDayRitual(true)
+    getYearDayReflectionForYear(year).then(setYearDayReflection)
+  }
 
   function switchMode(next: Mode) {
     setMode(next)
@@ -127,14 +136,22 @@ export function CalendarView() {
             onBack={() => setCursor(5)}
           />
         ) : mode === 'wildhoney' && cursor === 14 ? (
-          <SpecialDayView
-            title="Year Day"
-            subtitle="reflect · integrate · celebrate · begin again"
-            date={yearDayGregorian(year)}
-            onSelect={selectDay}
-            onBack={() => setCursor(12)}
-            isYearDay
-          />
+          showYearDayRitual ? (
+            yearDayReflection === undefined ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">loading…</p>
+            ) : (
+              <YearDayRitual wildHoneyYear={year} existing={yearDayReflection} />
+            )
+          ) : (
+            <SpecialDayView
+              title="Year Day"
+              subtitle="reflect · integrate · celebrate · begin again"
+              date={yearDayGregorian(year)}
+              onSelect={openYearDayRitual}
+              onBack={() => setCursor(12)}
+              isYearDay
+            />
+          )
         ) : (
           <>
             <div className="flex items-center justify-between">

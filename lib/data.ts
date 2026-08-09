@@ -1020,3 +1020,21 @@ export async function getMyExperiments(): Promise<PersonalExperiment[]> {
 
   return list.map((e) => ({ ...e, days_completed: counts.get(e.id) ?? 0 }))
 }
+
+// ---- Year Day reflection ----
+
+export async function getYearDayReflection(wildHoneyYear: number): Promise<TransformationReflection | null> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return null
+  const { data } = await supabase
+    .from('transformation_reflections')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('milestone', 'year_day')
+    .eq('wild_honey_year', wildHoneyYear)
+    .maybeSingle()
+  return (data as TransformationReflection) ?? null
+}
