@@ -1,10 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import type {
   Checkin,
-  CommunityPost,
-  ContentReport,
   Challenge,
   CircleFeedItem,
+  Commitment,
+  CommunityPost,
+  ContentReport,
   CyclePhase,
   EveningReflection,
   ExpertQuestion,
@@ -985,4 +986,16 @@ export async function getTodayNutrition(): Promise<{
     proteinGoal: profile?.daily_protein_goal_g ?? null,
     loggedMeals,
   }
+}
+
+// ---- Commitments ----
+
+export async function getMyCommitments(): Promise<Commitment[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const { data } = await supabase.from('commitments').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
+  return (data as Commitment[]) ?? []
 }

@@ -65,6 +65,16 @@ export interface Profile {
   daily_protein_goal_g: number | null
 }
 
+export interface Commitment {
+  id: string
+  user_id: string
+  text: string
+  status: 'active' | 'released' | 'replaced' | 'completed'
+  replaced_by_id: string | null
+  created_at: string
+  last_reviewed_at: string
+}
+
 export interface MealLog {
   id: string
   user_id: string

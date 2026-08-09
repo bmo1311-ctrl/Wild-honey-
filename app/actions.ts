@@ -1702,3 +1702,67 @@ export async function updateNutritionGoals(calorieGoal?: number, proteinGoal?: n
   revalidatePath('/app/recipes')
   return { ok: true }
 }
+
+// ============================================================
+// COMMITMENTS
+// ============================================================
+
+export async function addCommitment(text: string) {
+  const { supabase, user } = await requireUser()
+  const trimmed = text.trim()
+  if (!trimmed) return { error: 'Write your commitment first.' }
+  const { error } = await supabase.from('commitments').insert({ user_id: user.id, text: trimmed })
+  if (error) return { error: error.message }
+  revalidatePath('/app/calendar')
+  return { ok: true }
+}
+
+/**
+ * Handles the periodic "are you still committed to this?" check-in.
+ * Never guilt-based — releasing or replacing is just as valid an answer
+ * as continuing.
+ */
+export async function reviewCommitment(id: string, action: 'continue' | 'modify' | 'release' | 'replace', newText?: string) {
+  const { supabase, user } = await requireUser()
+
+  if (action === 'continue') {
+    const { error } = await supabase.from('commitments').update({ last_reviewed_at: new Date().toISOString() }).eq('id', id).eq('user_id', user.id)
+    if (error) return { error: error.message }
+  } else if (action === 'modify') {
+    if (!newText?.trim()) return { error: 'Add the updated wording first.' }
+    const { error } = await supabase
+      .from('commitments')
+      .update({ text: newText.trim(), last_reviewed_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('user_id', user.id)
+    if (error) return { error: error.message }
+  } else if (action === 'release') {
+    const { error } = await supabase.from('commitments').update({ status: 'released', last_reviewed_at: new Date().toISOString() }).eq('id', id).eq('user_id', user.id)
+    if (error) return { error: error.message }
+  } else if (action === 'replace') {
+    if (!newText?.trim()) return { error: 'Write the new commitment first.' }
+    const { data: newRow, error: insertError } = await supabase
+      .from('commitments')
+      .insert({ user_id: user.id, text: newText.trim() })
+      .select('id')
+      .single()
+    if (insertError) return { error: insertError.message }
+    const { error } = await supabase
+      .from('commitments')
+      .update({ status: 'replaced', replaced_by_id: newRow.id, last_reviewed_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('user_id', user.id)
+    if (error) return { error: error.message }
+  }
+
+  revalidatePath('/app/calendar')
+  return { ok: true }
+}
+
+export async function deleteCommitment(id: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('commitments').delete().eq('id', id).eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/calendar')
+  return { ok: true }
+}

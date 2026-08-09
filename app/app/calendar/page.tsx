@@ -1,6 +1,10 @@
 import { CalendarView } from '@/components/calendar-view'
+import { CommitmentsPanel } from '@/components/commitments-panel'
+import { getMyCommitments } from '@/lib/data'
 
-export default function CalendarPage() {
+export default async function CalendarPage() {
+  const commitments = await getMyCommitments()
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -9,6 +13,7 @@ export default function CalendarPage() {
           switch between the standard calendar and Wild Honey's 13-month rhythm — every month exactly 28 days, with Sol as a threshold between June and July.
         </p>
       </div>
+      <CommitmentsPanel commitments={commitments} />
       <CalendarView />
     </div>
   )
