@@ -4,10 +4,11 @@ import { useTransition } from 'react'
 import { useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Lock, PlayCircle, FileText, ShoppingCart, ListPlus } from 'lucide-react'
+import { Lock, FileText, ShoppingCart, ListPlus } from 'lucide-react'
 import { importGroceryListToBuilder } from '@/app/actions'
+import { PillarRows } from '@/components/pillar-rows'
+import { WorkoutCard } from '@/components/workout-card'
 import type { GroceryList, MealPlan, Workout } from '@/lib/types'
-import { PILLAR_META } from '@/lib/pillars'
 import { cn } from '@/lib/utils'
 
 const SECTIONS = [
@@ -95,39 +96,14 @@ export function WorkoutsHubTabs({
         <Locked />
       ) : (
         <>
-          {active === 'workouts' &&
-            (workouts.length === 0 ? (
-              <p className="rounded-2xl bg-card p-6 text-center text-sm text-muted-foreground ring-1 ring-border">no workouts posted yet.</p>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {workouts.map((w) => (
-                  <div key={w.id} className="rounded-2xl bg-card p-4 ring-1 ring-border">
-                    <div className="flex items-center justify-between gap-2">
-                      <h3 className="font-serif text-lg font-semibold text-pretty">{w.title}</h3>
-                      <span className={`shrink-0 rounded-full px-2.5 py-1 text-[0.7rem] font-medium ${PILLAR_META[w.pillar].chip}`}>{w.pillar}</span>
-                    </div>
-                    {w.description && <p className="mt-1 text-sm text-muted-foreground text-pretty">{w.description}</p>}
-                    {w.image_url && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={w.image_url} alt="" className="mt-3 max-h-64 w-full rounded-xl object-cover" />
-                    )}
-                    {w.instructions && <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-pretty">{w.instructions}</p>}
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {w.video_url && (
-                        <a href={w.video_url} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground">
-                          <PlayCircle className="h-3.5 w-3.5" /> watch
-                        </a>
-                      )}
-                      {w.pdf_url && (
-                        <a href={w.pdf_url} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground">
-                          <FileText className="h-3.5 w-3.5" /> download PDF
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ))}
+          {active === 'workouts' && (
+            <PillarRows
+              items={workouts}
+              cardWidthClass="w-[260px]"
+              renderItem={(w) => <WorkoutCard workout={w} />}
+              emptyMessage="no workouts posted yet."
+            />
+          )}
 
           {active === 'meals' &&
             (mealPlans.length === 0 ? (
