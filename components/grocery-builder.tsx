@@ -1,12 +1,89 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { Plus, Check, Trash2 } from 'lucide-react'
-import { addGroceryBuilderItem, clearCheckedGroceryItems, deleteGroceryBuilderItem, toggleGroceryItemChecked } from '@/app/actions'
+import { Plus, Check, Trash2, Pencil } from 'lucide-react'
+import { addGroceryBuilderItem, clearCheckedGroceryItems, deleteGroceryBuilderItem, toggleGroceryItemChecked, updateGroceryBuilderItem } from '@/app/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { GroceryBuilderItem } from '@/lib/types'
 import { cn } from '@/lib/utils'
+
+function EditableItem({ item }: { item: GroceryBuilderItem }) {
+  const [editing, setEditing] = useState(false)
+  const [name, setName] = useState(item.name)
+  const [quantity, setQuantity] = useState(item.quantity ?? '')
+  const [pending, startTransition] = useTransition()
+
+  function handleToggle() {
+    startTransition(async () => {
+      const res = await toggleGroceryItemChecked(item.id)
+      if (res?.error) toast.error(res.error)
+    })
+  }
+
+  function handleDelete() {
+    startTransition(async () => {
+      const res = await deleteGroceryBuilderItem(item.id)
+      if (res?.error) toast.error(res.error)
+    })
+  }
+
+  function handleSave() {
+    if (!name.trim()) {
+      toast.error('Name cannot be empty.')
+      return
+    }
+    startTransition(async () => {
+      const res = await updateGroceryBuilderItem(item.id, { name, quantity })
+      if (res?.error) {
+        toast.error(res.error)
+        return
+      }
+      setEditing(false)
+    })
+  }
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-2 rounded-lg bg-secondary/60 px-3 py-2">
+        <Input value={name} onChange={(e) => setName(e.target.value)} className="h-9 flex-1" placeholder="item name" />
+        <Input value={quantity} onChange={(e) => setQuantity(e.target.value)} className="h-9 w-20" placeholder="qty" />
+        <Button onClick={handleSave} disabled={pending} size="sm" className="h-9 shrink-0">
+          save
+        </Button>
+        <button type="button" onClick={() => setEditing(false)} className="shrink-0 text-xs text-muted-foreground">
+          cancel
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="group flex items-center gap-2 rounded-lg bg-secondary/40 px-3 py-2">
+      <button
+        type="button"
+        onClick={handleToggle}
+        aria-pressed={item.checked}
+        className={cn(
+          'hex-clip flex h-6 w-6 shrink-0 items-center justify-center transition-colors',
+          item.checked ? 'bg-honey text-honey-foreground' : 'bg-background text-muted-foreground ring-1 ring-border',
+        )}
+      >
+        {item.checked && <Check className="h-3.5 w-3.5" />}
+      </button>
+      <div className={cn('min-w-0 flex-1', item.checked && 'text-muted-foreground line-through')}>
+        <span className="text-sm">{item.name}</span>
+        {item.quantity && <span className="ml-1.5 text-xs text-muted-foreground">{item.quantity}</span>}
+      </div>
+      <button type="button" onClick={() => setEditing(true)} className="shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+        <Pencil className="h-3.5 w-3.5" />
+      </button>
+      <button type="button" onClick={handleDelete} className="shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+        <Trash2 className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  )
+}
 
 export function GroceryBuilder({ items }: { items: GroceryBuilderItem[] }) {
   const [name, setName] = useState('')
@@ -28,20 +105,6 @@ export function GroceryBuilder({ items }: { items: GroceryBuilderItem[] }) {
       }
       setName('')
       setQuantity('')
-    })
-  }
-
-  function handleToggle(id: string) {
-    startTransition(async () => {
-      const res = await toggleGroceryItemChecked(id)
-      if (res?.error) toast.error(res.error)
-    })
-  }
-
-  function handleDelete(id: string) {
-    startTransition(async () => {
-      const res = await deleteGroceryBuilderItem(id)
-      if (res?.error) toast.error(res.error)
     })
   }
 
@@ -82,30 +145,11 @@ export function GroceryBuilder({ items }: { items: GroceryBuilderItem[] }) {
       </div>
 
       {items.length === 0 ? (
-        <p className="text-sm text-muted-foreground">nothing on your list yet — add an item above, or import one of the meal-plan grocery lists from Workouts.</p>
+        <p className="text-sm text-muted-foreground">nothing on your list yet — add an item above, import one of the meal-plan grocery lists from Workouts, or add ingredients straight from a recipe.</p>
       ) : (
         <div className="flex flex-col gap-1.5">
           {items.map((item) => (
-            <div key={item.id} className="group flex items-center gap-2 rounded-lg bg-secondary/40 px-3 py-2">
-              <button
-                type="button"
-                onClick={() => handleToggle(item.id)}
-                aria-pressed={item.checked}
-                className={cn(
-                  'hex-clip flex h-6 w-6 shrink-0 items-center justify-center transition-colors',
-                  item.checked ? 'bg-honey text-honey-foreground' : 'bg-background text-muted-foreground ring-1 ring-border',
-                )}
-              >
-                {item.checked && <Check className="h-3.5 w-3.5" />}
-              </button>
-              <div className={cn('min-w-0 flex-1', item.checked && 'text-muted-foreground line-through')}>
-                <span className="text-sm">{item.name}</span>
-                {item.quantity && <span className="ml-1.5 text-xs text-muted-foreground">{item.quantity}</span>}
-              </div>
-              <button type="button" onClick={() => handleDelete(item.id)} className="shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
-            </div>
+            <EditableItem key={item.id} item={item} />
           ))}
         </div>
       )}

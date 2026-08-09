@@ -478,6 +478,18 @@ export async function addPantryItem(input: { name: string; category?: string; qu
   return { ok: true }
 }
 
+export async function updatePantryItem(id: string, input: { name?: string; quantity?: string; category?: string }) {
+  const { supabase, user } = await requireUser()
+  const updates: Record<string, string | null> = {}
+  if (input.name !== undefined) updates.name = input.name.trim() || undefined
+  if (input.quantity !== undefined) updates.quantity = input.quantity.trim() || null
+  if (input.category !== undefined) updates.category = input.category
+  const { error } = await supabase.from('pantry_items').update(updates).eq('id', id).eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/pantry')
+  return { ok: true }
+}
+
 export async function deletePantryItem(itemId: string) {
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from('pantry_items').delete().eq('id', itemId).eq('user_id', user.id)
@@ -505,6 +517,17 @@ export async function addGroceryBuilderItem(input: { name: string; category?: st
     category: input.category || 'other',
     quantity: input.quantity?.trim() || null,
   })
+  if (error) return { error: error.message }
+  revalidatePath('/app/pantry')
+  return { ok: true }
+}
+
+export async function updateGroceryBuilderItem(id: string, input: { name?: string; quantity?: string }) {
+  const { supabase, user } = await requireUser()
+  const updates: Record<string, string | null> = {}
+  if (input.name !== undefined) updates.name = input.name.trim() || undefined
+  if (input.quantity !== undefined) updates.quantity = input.quantity.trim() || null
+  const { error } = await supabase.from('grocery_builder_items').update(updates).eq('id', id).eq('user_id', user.id)
   if (error) return { error: error.message }
   revalidatePath('/app/pantry')
   return { ok: true }

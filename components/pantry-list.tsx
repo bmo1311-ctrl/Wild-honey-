@@ -1,8 +1,8 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { Plus, X, AlertCircle } from 'lucide-react'
-import { addPantryItem, deletePantryItem, toggleRunningLow } from '@/app/actions'
+import { Plus, X, AlertCircle, Pencil } from 'lucide-react'
+import { addPantryItem, deletePantryItem, toggleRunningLow, updatePantryItem } from '@/app/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { PantryCategory, PantryItem } from '@/lib/types'
@@ -18,6 +18,78 @@ const CATEGORIES: { value: PantryCategory; label: string }[] = [
   { value: 'spices', label: 'spices' },
   { value: 'other', label: 'other' },
 ]
+
+function EditablePantryItem({ item }: { item: PantryItem }) {
+  const [editing, setEditing] = useState(false)
+  const [name, setName] = useState(item.name)
+  const [quantity, setQuantity] = useState(item.quantity ?? '')
+  const [pending, startTransition] = useTransition()
+
+  function handleDelete() {
+    startTransition(async () => {
+      const res = await deletePantryItem(item.id)
+      if (res?.error) toast.error(res.error)
+    })
+  }
+
+  function handleToggleLow() {
+    startTransition(async () => {
+      const res = await toggleRunningLow(item.id)
+      if (res?.error) toast.error(res.error)
+    })
+  }
+
+  function handleSave() {
+    if (!name.trim()) {
+      toast.error('Name cannot be empty.')
+      return
+    }
+    startTransition(async () => {
+      const res = await updatePantryItem(item.id, { name, quantity })
+      if (res?.error) {
+        toast.error(res.error)
+        return
+      }
+      setEditing(false)
+    })
+  }
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-2 rounded-lg bg-secondary/60 px-3 py-2">
+        <Input value={name} onChange={(e) => setName(e.target.value)} className="h-9 flex-1" placeholder="item name" />
+        <Input value={quantity} onChange={(e) => setQuantity(e.target.value)} className="h-9 w-24" placeholder="how much" />
+        <Button onClick={handleSave} disabled={pending} size="sm" className="h-9 shrink-0">
+          save
+        </Button>
+        <button type="button" onClick={() => setEditing(false)} className="shrink-0 text-xs text-muted-foreground">
+          cancel
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="group flex items-center gap-2 rounded-lg bg-secondary/40 px-3 py-2">
+      <button type="button" onClick={handleToggleLow} className={cn('shrink-0', item.running_low ? 'text-destructive' : 'text-muted-foreground/40')}>
+        <AlertCircle className="h-3.5 w-3.5" />
+      </button>
+      <button type="button" onClick={() => setEditing(true)} className="min-w-0 flex-1 text-left">
+        <span className="text-sm">{item.name}</span>
+        <span className={cn('ml-1.5 text-xs', item.quantity ? 'text-muted-foreground' : 'text-muted-foreground/50 italic')}>
+          {item.quantity || 'tap to set amount'}
+        </span>
+      </button>
+      {item.running_low && <span className="shrink-0 text-[0.65rem] font-medium uppercase tracking-wide text-destructive">low</span>}
+      <button type="button" onClick={() => setEditing(true)} className="shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+        <Pencil className="h-3.5 w-3.5" />
+      </button>
+      <button type="button" onClick={handleDelete} className="shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+        <X className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  )
+}
 
 export function PantryList({ items }: { items: PantryItem[] }) {
   const [adding, setAdding] = useState(false)
@@ -44,20 +116,6 @@ export function PantryList({ items }: { items: PantryItem[] }) {
     })
   }
 
-  function handleDelete(id: string) {
-    startTransition(async () => {
-      const res = await deletePantryItem(id)
-      if (res?.error) toast.error(res.error)
-    })
-  }
-
-  function handleToggleLow(id: string) {
-    startTransition(async () => {
-      const res = await toggleRunningLow(id)
-      if (res?.error) toast.error(res.error)
-    })
-  }
-
   const grouped = CATEGORIES.map((c) => ({ ...c, items: items.filter((i) => i.category === c.value) })).filter((c) => c.items.length > 0)
 
   return (
@@ -73,7 +131,7 @@ export function PantryList({ items }: { items: PantryItem[] }) {
       {adding && (
         <div className="flex flex-col gap-2 rounded-xl bg-secondary/50 p-3">
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="item, e.g. chicken thighs" className="h-10" />
-          <Input value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder="quantity (optional), e.g. 2 lbs" className="h-10" />
+          <Input value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder="how much you have, e.g. 2 lbs" className="h-10" />
           <div className="flex flex-wrap gap-1.5">
             {CATEGORIES.map((c) => (
               <button
@@ -96,7 +154,7 @@ export function PantryList({ items }: { items: PantryItem[] }) {
       )}
 
       {grouped.length === 0 && !adding ? (
-        <p className="text-sm text-muted-foreground">log what you already have so your grocery list only covers what you need.</p>
+        <p className="text-sm text-muted-foreground">log what you already have so your grocery list only covers what you need — tap any item later to update how much is left.</p>
       ) : (
         <div className="flex flex-col gap-4">
           {grouped.map((g) => (
@@ -104,19 +162,7 @@ export function PantryList({ items }: { items: PantryItem[] }) {
               <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">{g.label}</p>
               <div className="flex flex-col gap-1.5">
                 {g.items.map((item) => (
-                  <div key={item.id} className="group flex items-center gap-2 rounded-lg bg-secondary/40 px-3 py-2">
-                    <button type="button" onClick={() => handleToggleLow(item.id)} className={cn('shrink-0', item.running_low ? 'text-destructive' : 'text-muted-foreground/40')}>
-                      <AlertCircle className="h-3.5 w-3.5" />
-                    </button>
-                    <div className="min-w-0 flex-1">
-                      <span className="text-sm">{item.name}</span>
-                      {item.quantity && <span className="ml-1.5 text-xs text-muted-foreground">{item.quantity}</span>}
-                    </div>
-                    {item.running_low && <span className="shrink-0 text-[0.65rem] font-medium uppercase tracking-wide text-destructive">low</span>}
-                    <button type="button" onClick={() => handleDelete(item.id)} className="shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
+                  <EditablePantryItem key={item.id} item={item} />
                 ))}
               </div>
             </div>
