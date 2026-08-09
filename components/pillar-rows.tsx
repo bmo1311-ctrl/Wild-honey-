@@ -1,12 +1,22 @@
 'use client'
 
-import { useRef, useState, type ReactNode } from 'react'
+import { useMemo, useRef, useState, type ReactNode } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Pillar } from '@/lib/types'
 import { PILLARS } from '@/lib/pillars'
 import { cn } from '@/lib/utils'
 
 type WithPillar = { id: string; pillar: Pillar | null }
+
+/** Fisher-Yates shuffle — doesn't mutate the input. */
+export function shuffle<T>(arr: T[]): T[] {
+  const copy = [...arr]
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[copy[i], copy[j]] = [copy[j], copy[i]]
+  }
+  return copy
+}
 
 export function Row<T extends WithPillar>({
   label,
@@ -86,7 +96,11 @@ export function PillarRows<T extends WithPillar>({
   const [pillarFilter, setPillarFilter] = useState<Pillar | null>(null)
   const [extraOn, setExtraOn] = useState(false)
 
-  const base = extraOn && extraFilter ? items.filter(extraFilter.predicate) : items
+  // Shuffle once per mount (page load), not on every filter click, so the
+  // order doesn't jump around while someone's tapping through pillar chips.
+  const shuffledItems = useMemo(() => shuffle(items), [items])
+
+  const base = extraOn && extraFilter ? shuffledItems.filter(extraFilter.predicate) : shuffledItems
   const visiblePillars = pillarFilter ? [pillarFilter] : PILLARS
   const unassigned = base.filter((i) => !i.pillar)
 

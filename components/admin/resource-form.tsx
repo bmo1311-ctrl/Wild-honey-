@@ -14,7 +14,7 @@ const PILLARS: Pillar[] = ['Body', 'Identity', 'Mindset', 'Faith']
 const TYPES: ResourceType[] = ['article', 'video', 'pdf', 'audio', 'link']
 
 function youtubeThumbnail(url: string): string | null {
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/))([a-zA-Z0-9_-]{11})/)
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|live\/))([a-zA-Z0-9_-]{11})/)
   return match ? `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg` : null
 }
 
