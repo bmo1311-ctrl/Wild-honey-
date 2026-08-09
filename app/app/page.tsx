@@ -1,4 +1,4 @@
-import { Flame, Lock } from 'lucide-react'
+import { Flame, Lock, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { JournalComposer } from '@/components/journal-composer'
 import { TodayFocusCard } from '@/components/today-focus-card'
@@ -6,6 +6,7 @@ import { ResetPanel } from '@/components/reset-panel'
 import { MorningResetCard } from '@/components/morning-reset-card'
 import { EveningReflectionCard } from '@/components/evening-reflection-card'
 import { ActiveChallengeTracker } from '@/components/active-challenge-tracker'
+import { pickSparkLine } from '@/lib/spark-lines'
 import {
   computeTodayFocus,
   getMyActiveChallenge,
@@ -46,8 +47,12 @@ export default async function TodayPage() {
     day: 'numeric',
   })
 
+  const hour = new Date().getHours()
+  const timeGreeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+
   const locked = prompt?.is_premium && profile?.membership_tier === 'free'
   const seasonLabel = profile?.season ? SEASON_META[profile.season].label : null
+  const sparkLine = profile ? pickSparkLine(profile.id, goals.map((g) => g.goal), profile.faith_preference) : null
 
   return (
     <div className="flex flex-col gap-6">
@@ -55,7 +60,7 @@ export default async function TodayPage() {
         <div>
           <p className="text-sm text-muted-foreground">{today}</p>
           <h1 className="font-serif text-3xl font-semibold text-balance">
-            Good morning, {profile?.name}
+            {timeGreeting}, {profile?.name}
           </h1>
           {seasonLabel && <p className="mt-0.5 text-xs text-muted-foreground">a season of {seasonLabel}</p>}
         </div>
@@ -69,6 +74,13 @@ export default async function TodayPage() {
           </span>
         </div>
       </div>
+
+      {sparkLine && (
+        <div className={`flex items-start gap-3 rounded-2xl p-5 ring-1 ${PILLAR_META[sparkLine.pillar].chip} ring-transparent`}>
+          <Sparkles className="mt-0.5 h-4 w-4 shrink-0" />
+          <p className="font-serif text-lg font-medium leading-snug text-pretty">{sparkLine.text}</p>
+        </div>
+      )}
 
       <ResetPanel />
       <TodayFocusCard focus={focus} />
