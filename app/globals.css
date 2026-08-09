@@ -1,0 +1,135 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-display), ui-serif, Georgia, serif;
+
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+
+  --color-honey: var(--honey);
+  --color-honey-foreground: var(--honey-foreground);
+  --color-body-pillar: var(--pillar-body);
+  --color-identity-pillar: var(--pillar-identity);
+  --color-mindset-pillar: var(--pillar-mindset);
+  --color-faith-pillar: var(--pillar-faith);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+}
+
+:root {
+  color-scheme: light;
+  /* Bright Winter palette — cool, clear, high contrast. No warm/muted tones. */
+  --background: oklch(0.99 0.003 240);
+  --foreground: oklch(0.16 0.015 255);
+  --card: oklch(0.995 0.002 240);
+  --card-foreground: oklch(0.16 0.015 255);
+  --popover: oklch(0.995 0.002 240);
+  --popover-foreground: oklch(0.16 0.015 255);
+  --primary: oklch(0.55 0.22 25);
+  --primary-foreground: oklch(0.99 0.003 240);
+  --secondary: oklch(0.95 0.015 235);
+  --secondary-foreground: oklch(0.22 0.03 250);
+  --muted: oklch(0.96 0.008 235);
+  --muted-foreground: oklch(0.45 0.02 250);
+  --accent: oklch(0.85 0.07 225);
+  --accent-foreground: oklch(0.18 0.04 250);
+  --destructive: oklch(0.55 0.22 25);
+  --border: oklch(0.9 0.012 235);
+  --input: oklch(0.9 0.012 235);
+  --ring: oklch(0.55 0.22 25);
+
+  --honey: oklch(0.72 0.1 225);
+  --honey-foreground: oklch(0.16 0.02 250);
+
+  --pillar-body: oklch(0.55 0.15 155);
+  --pillar-identity: oklch(0.55 0.22 25);
+  --pillar-mindset: oklch(0.5 0.18 255);
+  --pillar-faith: oklch(0.5 0.2 335);
+
+  --chart-1: oklch(0.55 0.22 25);
+  --chart-2: oklch(0.55 0.15 155);
+  --chart-3: oklch(0.5 0.18 255);
+  --chart-4: oklch(0.5 0.2 335);
+  --chart-5: oklch(0.45 0.02 250);
+  --radius: 0.6rem;
+
+  --founder: oklch(0.16 0.015 255);
+  --founder-foreground: oklch(0.99 0.003 240);
+}
+
+.dark {
+  color-scheme: dark;
+  /* Bright Winter, dark mode — same cool palette as light mode, just inverted. No warm/beige tones. */
+  --background: oklch(0.16 0.015 255);
+  --foreground: oklch(0.97 0.005 240);
+  --card: oklch(0.21 0.015 255);
+  --card-foreground: oklch(0.97 0.005 240);
+  --popover: oklch(0.21 0.015 255);
+  --popover-foreground: oklch(0.97 0.005 240);
+  --primary: oklch(0.62 0.24 25);
+  --primary-foreground: oklch(0.99 0.003 240);
+  --secondary: oklch(0.26 0.02 250);
+  --secondary-foreground: oklch(0.95 0.01 240);
+  --muted: oklch(0.24 0.015 250);
+  --muted-foreground: oklch(0.72 0.02 245);
+  --accent: oklch(0.32 0.08 225);
+  --accent-foreground: oklch(0.97 0.01 240);
+  --destructive: oklch(0.62 0.24 25);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.62 0.24 25);
+
+  --honey: oklch(0.78 0.12 225);
+  --honey-foreground: oklch(0.16 0.02 250);
+
+  --pillar-body: oklch(0.65 0.16 155);
+  --pillar-identity: oklch(0.62 0.24 25);
+  --pillar-mindset: oklch(0.62 0.18 255);
+  --pillar-faith: oklch(0.62 0.2 335);
+
+  --chart-1: oklch(0.62 0.24 25);
+  --chart-2: oklch(0.65 0.16 155);
+  --chart-3: oklch(0.62 0.18 255);
+  --chart-4: oklch(0.62 0.2 335);
+  --chart-5: oklch(0.72 0.02 245);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Honeycomb hexagon shape used in the nav */
+.hex-clip {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
