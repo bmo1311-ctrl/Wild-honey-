@@ -1473,6 +1473,15 @@ export async function adminUpdateRecipe(
   return { ok: true }
 }
 
+export async function adminDeleteRecipe(recipeId: string) {
+  const { supabase } = await requireAdmin()
+  const { error } = await supabase.from('recipes').delete().eq('id', recipeId)
+  if (error) return { error: error.message }
+  revalidatePath('/app/recipes')
+  revalidatePath('/admin/recipes')
+  return { ok: true }
+}
+
 export async function joinChallenge(challengeId: string) {
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from('challenge_participants').insert({ challenge_id: challengeId, user_id: user.id })

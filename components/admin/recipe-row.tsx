@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { Pencil, X } from 'lucide-react'
-import { adminUpdateRecipe } from '@/app/actions'
+import { Pencil, Trash2, X } from 'lucide-react'
+import { adminDeleteRecipe, adminUpdateRecipe } from '@/app/actions'
 import { ImageUploadField } from '@/components/admin/image-upload-field'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -46,6 +46,8 @@ export function RecipeRow({ recipe }: { recipe: Recipe }) {
   const [fatG, setFatG] = useState(recipe.fat_g?.toString() ?? '')
   const [nutritionHighlights, setNutritionHighlights] = useState(recipe.nutrition_highlights ?? '')
   const [pending, startTransition] = useTransition()
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   function handleVideoChange(next: string) {
     setVideoUrl(next)
@@ -96,6 +98,19 @@ export function RecipeRow({ recipe }: { recipe: Recipe }) {
     })
   }
 
+  function handleDelete() {
+    setDeleting(true)
+    startTransition(async () => {
+      const res = await adminDeleteRecipe(recipe.id)
+      setDeleting(false)
+      if (res?.error) {
+        toast.error(res.error)
+        return
+      }
+      toast.success('Recipe deleted.')
+    })
+  }
+
   if (!editing) {
     return (
       <div className="flex items-center gap-3 rounded-xl bg-card p-3 ring-1 ring-border">
@@ -109,9 +124,25 @@ export function RecipeRow({ recipe }: { recipe: Recipe }) {
             {recipe.pillar ?? 'no pillar'} {recipe.prep_minutes ? `· ${recipe.prep_minutes} min` : ''} {recipe.meal_type && recipe.meal_type !== 'any' ? `· ${recipe.meal_type}` : ''}
           </p>
         </div>
-        <button type="button" onClick={() => setEditing(true)} className="shrink-0 text-muted-foreground">
-          <Pencil className="h-4 w-4" />
-        </button>
+        {confirmingDelete ? (
+          <div className="flex shrink-0 items-center gap-1.5">
+            <button type="button" onClick={handleDelete} disabled={deleting} className="rounded-full bg-destructive/10 px-2.5 py-1 text-xs font-medium text-destructive">
+              {deleting ? 'deleting…' : 'confirm delete'}
+            </button>
+            <button type="button" onClick={() => setConfirmingDelete(false)} className="text-xs text-muted-foreground">
+              cancel
+            </button>
+          </div>
+        ) : (
+          <>
+            <button type="button" onClick={() => setEditing(true)} className="shrink-0 text-muted-foreground">
+              <Pencil className="h-4 w-4" />
+            </button>
+            <button type="button" onClick={() => setConfirmingDelete(true)} className="shrink-0 text-muted-foreground">
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </>
+        )}
       </div>
     )
   }
