@@ -2,10 +2,9 @@
 
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { Bookmark, Clock, Beef, Wallet, Leaf, PlayCircle } from 'lucide-react'
-import { toggleSavedRecipe } from '@/app/actions'
+import { Bookmark, Clock, Beef, Wallet, Leaf, PlayCircle, Plus, Flame } from 'lucide-react'
+import { logMeal, toggleSavedRecipe } from '@/app/actions'
 import type { Recipe } from '@/lib/types'
-import { PILLAR_META } from '@/lib/pillars'
 import { cn } from '@/lib/utils'
 
 const CYCLE_LABEL: Record<string, string> = {
@@ -25,6 +24,7 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
   const [open, setOpen] = useState(false)
   const [saved, setSaved] = useState(Boolean(recipe.saved))
   const [pending, startTransition] = useTransition()
+  const [logging, setLogging] = useState(false)
 
   function handleToggleSave() {
     const next = !saved
@@ -38,11 +38,23 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
     })
   }
 
+  function handleLogMeal() {
+    setLogging(true)
+    startTransition(async () => {
+      const res = await logMeal(recipe.id, 1)
+      setLogging(false)
+      if (res?.error) {
+        toast.error(res.error)
+        return
+      }
+      toast.success(`Logged ${recipe.title}.`)
+    })
+  }
+
   return (
     <div className="flex h-full flex-col gap-2 rounded-2xl bg-card p-4 ring-1 ring-border">
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-wrap items-center gap-1.5">
-          {recipe.pillar && <span className={`rounded-full px-2 py-0.5 text-[0.65rem] font-medium ${PILLAR_META[recipe.pillar].chip}`}>{recipe.pillar}</span>}
           {recipe.cycle_phase && recipe.cycle_phase !== 'any' && (
             <span className="rounded-full bg-honey/15 px-2 py-0.5 text-[0.65rem] font-medium text-honey">{CYCLE_LABEL[recipe.cycle_phase]}</span>
           )}
@@ -71,6 +83,12 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
           <span className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
             {recipe.prep_minutes} min
+          </span>
+        )}
+        {recipe.calories && (
+          <span className="flex items-center gap-1">
+            <Flame className="h-3 w-3" />
+            {recipe.calories} cal
           </span>
         )}
         {recipe.protein_g && (
@@ -112,6 +130,10 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
       <div className="flex items-center gap-3">
         <button type="button" onClick={() => setOpen((o) => !o)} className="text-xs font-medium text-honey">
           {open ? 'show less' : 'view recipe'}
+        </button>
+        <button type="button" onClick={handleLogMeal} disabled={logging} className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+          <Plus className="h-3.5 w-3.5" />
+          {logging ? 'logging…' : 'log it'}
         </button>
         {recipe.video_url && (
           <a

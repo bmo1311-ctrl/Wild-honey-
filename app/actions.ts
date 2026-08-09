@@ -1406,3 +1406,35 @@ export async function adminToggleChallengeActive(challengeId: string, isActive: 
   revalidatePath('/admin/challenges')
   return { ok: true }
 }
+
+// ============================================================
+// NUTRITION TRACKING
+// ============================================================
+
+export async function logMeal(recipeId: string, servings: number = 1) {
+  const { supabase, user } = await requireUser()
+  const today = new Date().toISOString().slice(0, 10)
+  const { error } = await supabase.from('meal_logs').insert({ user_id: user.id, recipe_id: recipeId, servings, date: today })
+  if (error) return { error: error.message }
+  revalidatePath('/app/recipes')
+  return { ok: true }
+}
+
+export async function removeMealLog(logId: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('meal_logs').delete().eq('id', logId).eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/recipes')
+  return { ok: true }
+}
+
+export async function updateNutritionGoals(calorieGoal?: number, proteinGoal?: number) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase
+    .from('profiles')
+    .update({ daily_calorie_goal: calorieGoal ?? null, daily_protein_goal_g: proteinGoal ?? null })
+    .eq('id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/recipes')
+  return { ok: true }
+}

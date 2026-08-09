@@ -61,6 +61,18 @@ export interface Profile {
   quiet_hours_start: string | null
   quiet_hours_end: string | null
   data_consent_at: string | null
+  daily_calorie_goal: number | null
+  daily_protein_goal_g: number | null
+}
+
+export interface MealLog {
+  id: string
+  user_id: string
+  recipe_id: string
+  servings: number
+  date: string
+  created_at: string
+  recipe?: Recipe
 }
 
 export interface NotificationPrefs {
@@ -112,6 +124,9 @@ export interface Recipe {
   budget_tier: 'budget' | 'moderate' | 'splurge'
   meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'juice' | 'mocktail' | 'any'
   protein_g: number | null
+  calories: number | null
+  carbs_g: number | null
+  fat_g: number | null
   nutrition_highlights: string | null
   created_at: string
   saved?: boolean

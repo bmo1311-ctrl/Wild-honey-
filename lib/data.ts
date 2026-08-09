@@ -16,6 +16,7 @@ import type {
   Habit,
   HabitLog,
   JournalEntry,
+  MealLog,
   MealPlan,
   MorningReset,
   PantryItem,
@@ -939,5 +940,49 @@ export async function adminGetAnalytics() {
       challengeJoins: (challengeParticipants ?? []).length,
       savedResources: (savedResources ?? []).length,
     },
+  }
+}
+
+// ---- Nutrition tracking ----
+
+export async function getTodayNutrition(): Promise<{
+  calories: number
+  protein: number
+  carbs: number
+  fat: number
+  calorieGoal: number | null
+  proteinGoal: number | null
+  loggedMeals: MealLog[]
+}> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { calories: 0, protein: 0, carbs: 0, fat: 0, calorieGoal: null, proteinGoal: null, loggedMeals: [] }
+
+  const today = new Date().toISOString().slice(0, 10)
+  const [{ data: logs }, { data: profile }] = await Promise.all([
+    supabase.from('meal_logs').select('*, recipe:recipes(*)').eq('user_id', user.id).eq('date', today).order('created_at', { ascending: true }),
+    supabase.from('profiles').select('daily_calorie_goal, daily_protein_goal_g').eq('id', user.id).maybeSingle(),
+  ])
+
+  const loggedMeals = (logs as MealLog[]) ?? []
+  const totals = loggedMeals.reduce(
+    (acc, log) => {
+      const servings = log.servings || 1
+      acc.calories += (log.recipe?.calories ?? 0) * servings
+      acc.protein += (log.recipe?.protein_g ?? 0) * servings
+      acc.carbs += (log.recipe?.carbs_g ?? 0) * servings
+      acc.fat += (log.recipe?.fat_g ?? 0) * servings
+      return acc
+    },
+    { calories: 0, protein: 0, carbs: 0, fat: 0 },
+  )
+
+  return {
+    ...totals,
+    calorieGoal: profile?.daily_calorie_goal ?? null,
+    proteinGoal: profile?.daily_protein_goal_g ?? null,
+    loggedMeals,
   }
 }
