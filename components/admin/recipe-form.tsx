@@ -15,6 +15,7 @@ const PILLARS: Pillar[] = ['Body', 'Identity', 'Mindset', 'Faith']
 const SEASONS = ['any', 'spring', 'summer', 'fall', 'winter']
 const CYCLE_PHASES = ['any', 'menstrual', 'follicular', 'ovulation', 'luteal']
 const BUDGETS = ['budget', 'moderate', 'splurge']
+const MEAL_TYPES = ['any', 'breakfast', 'lunch', 'dinner', 'snack', 'juice', 'mocktail']
 
 export function AddRecipeForm() {
   const [title, setTitle] = useState('')
@@ -28,6 +29,7 @@ export function AddRecipeForm() {
   const [season, setSeason] = useState('any')
   const [cyclePhase, setCyclePhase] = useState('any')
   const [budgetTier, setBudgetTier] = useState('moderate')
+  const [mealType, setMealType] = useState('any')
   const [proteinG, setProteinG] = useState('')
   const [nutritionHighlights, setNutritionHighlights] = useState('')
   const [pending, startTransition] = useTransition()
@@ -50,6 +52,7 @@ export function AddRecipeForm() {
         season,
         cyclePhase,
         budgetTier,
+        mealType,
         proteinG: proteinG ? parseFloat(proteinG) : undefined,
         nutritionHighlights,
       })
@@ -146,6 +149,16 @@ export function AddRecipeForm() {
             {BUDGETS.map((b) => (
               <option key={b} value={b}>
                 {b}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label>meal type</Label>
+          <select value={mealType} onChange={(e) => setMealType(e.target.value)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
+            {MEAL_TYPES.map((m) => (
+              <option key={m} value={m}>
+                {m}
               </option>
             ))}
           </select>

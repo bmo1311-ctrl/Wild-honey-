@@ -46,6 +46,9 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
           {recipe.cycle_phase && recipe.cycle_phase !== 'any' && (
             <span className="rounded-full bg-honey/15 px-2 py-0.5 text-[0.65rem] font-medium text-honey">{CYCLE_LABEL[recipe.cycle_phase]}</span>
           )}
+          {recipe.meal_type && recipe.meal_type !== 'any' && (
+            <span className="rounded-full bg-secondary px-2 py-0.5 text-[0.65rem] font-medium capitalize text-secondary-foreground">{recipe.meal_type}</span>
+          )}
           {recipe.season && recipe.season !== 'any' && (
             <span className="flex items-center gap-0.5 rounded-full bg-secondary px-2 py-0.5 text-[0.65rem] font-medium text-secondary-foreground">
               <Leaf className="h-2.5 w-2.5" />

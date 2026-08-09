@@ -109,6 +109,7 @@ export interface Recipe {
   season: 'spring' | 'summer' | 'fall' | 'winter' | 'any'
   cycle_phase: CyclePhase | 'any'
   budget_tier: 'budget' | 'moderate' | 'splurge'
+  meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'juice' | 'mocktail' | 'any'
   protein_g: number | null
   nutrition_highlights: string | null
   created_at: string

@@ -1311,6 +1311,7 @@ export async function adminAddRecipe(input: {
   season?: string
   cyclePhase?: string
   budgetTier?: string
+  mealType?: string
   proteinG?: number
   nutritionHighlights?: string
 }) {
@@ -1329,6 +1330,7 @@ export async function adminAddRecipe(input: {
     season: input.season || 'any',
     cycle_phase: input.cyclePhase || 'any',
     budget_tier: input.budgetTier || 'moderate',
+    meal_type: input.mealType || 'any',
     protein_g: input.proteinG ?? null,
     nutrition_highlights: input.nutritionHighlights?.trim() || null,
   })
