@@ -123,6 +123,7 @@ export interface Recipe {
   cycle_phase: CyclePhase | 'any'
   budget_tier: 'budget' | 'moderate' | 'splurge'
   meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'juice' | 'mocktail' | 'any'
+  kid_friendly: boolean
   protein_g: number | null
   calories: number | null
   carbs_g: number | null

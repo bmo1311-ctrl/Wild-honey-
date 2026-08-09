@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Bookmark } from 'lucide-react'
+import { Bookmark, Baby } from 'lucide-react'
 import { RecipeCard } from '@/components/recipe-card'
 import { shuffle } from '@/components/pillar-rows'
 import { cn } from '@/lib/utils'
@@ -70,6 +70,7 @@ export function RecipeFilterBar({ recipes }: { recipes: Recipe[] }) {
   const [budget, setBudget] = useState('')
   const [maxTime, setMaxTime] = useState('')
   const [savedOnly, setSavedOnly] = useState(false)
+  const [kidFriendlyOnly, setKidFriendlyOnly] = useState(false)
 
   // Shuffle once per mount so the order isn't just newest-first.
   const shuffled = useMemo(() => shuffle(recipes), [recipes])
@@ -77,6 +78,7 @@ export function RecipeFilterBar({ recipes }: { recipes: Recipe[] }) {
   const filtered = useMemo(() => {
     return shuffled.filter((r) => {
       if (savedOnly && !r.saved) return false
+      if (kidFriendlyOnly && !r.kid_friendly) return false
       if (mealType && r.meal_type !== mealType && r.meal_type !== 'any') return false
       if (cyclePhase && r.cycle_phase !== cyclePhase && r.cycle_phase !== 'any') return false
       if (season && r.season !== season && r.season !== 'any') return false
@@ -84,9 +86,9 @@ export function RecipeFilterBar({ recipes }: { recipes: Recipe[] }) {
       if (maxTime && r.prep_minutes && r.prep_minutes > parseInt(maxTime, 10)) return false
       return true
     })
-  }, [shuffled, mealType, cyclePhase, season, budget, maxTime, savedOnly])
+  }, [shuffled, mealType, cyclePhase, season, budget, maxTime, savedOnly, kidFriendlyOnly])
 
-  const anyActive = mealType || cyclePhase || season || budget || maxTime || savedOnly
+  const anyActive = mealType || cyclePhase || season || budget || maxTime || savedOnly || kidFriendlyOnly
 
   return (
     <div className="flex flex-col gap-4">
@@ -107,6 +109,17 @@ export function RecipeFilterBar({ recipes }: { recipes: Recipe[] }) {
           <Bookmark className="h-3 w-3" />
           saved
         </button>
+        <button
+          type="button"
+          onClick={() => setKidFriendlyOnly((s) => !s)}
+          className={cn(
+            'flex h-9 items-center gap-1 rounded-full border border-input px-3 text-xs font-medium',
+            kidFriendlyOnly ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-card text-foreground',
+          )}
+        >
+          <Baby className="h-3 w-3" />
+          kid-friendly
+        </button>
         {anyActive && (
           <button
             type="button"
@@ -117,6 +130,7 @@ export function RecipeFilterBar({ recipes }: { recipes: Recipe[] }) {
               setBudget('')
               setMaxTime('')
               setSavedOnly(false)
+              setKidFriendlyOnly(false)
             }}
             className="h-9 rounded-full px-3 text-xs font-medium text-honey"
           >

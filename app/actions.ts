@@ -551,6 +551,22 @@ export async function importGroceryListToBuilder(groceryListId: string) {
   return { ok: true, count: lines.length }
 }
 
+export async function importRecipeToGroceryList(recipeId: string) {
+  const { supabase, user } = await requireUser()
+  const { data: recipe } = await supabase.from('recipes').select('ingredients').eq('id', recipeId).single()
+  if (!recipe?.ingredients) return { error: 'That recipe has no ingredients to import.' }
+  const lines = recipe.ingredients
+    .split('\n')
+    .map((l: string) => l.trim())
+    .filter((l: string) => l.length > 0)
+  if (lines.length === 0) return { error: 'That recipe has no ingredients to import.' }
+  const rows = lines.map((name: string) => ({ user_id: user.id, name, category: 'other' }))
+  const { error } = await supabase.from('grocery_builder_items').insert(rows)
+  if (error) return { error: error.message }
+  revalidatePath('/app/pantry')
+  return { ok: true, count: lines.length }
+}
+
 export async function toggleSavedResource(resourceId: string) {
   const { supabase, user } = await requireUser()
   const { data: existing } = await supabase.from('saved_resources').select('id').eq('resource_id', resourceId).eq('user_id', user.id).maybeSingle()
@@ -1313,6 +1329,7 @@ export async function adminAddRecipe(input: {
   cyclePhase?: string
   budgetTier?: string
   mealType?: string
+  kidFriendly?: boolean
   proteinG?: number
   nutritionHighlights?: string
 }) {
@@ -1333,6 +1350,7 @@ export async function adminAddRecipe(input: {
     cycle_phase: input.cyclePhase || 'any',
     budget_tier: input.budgetTier || 'moderate',
     meal_type: input.mealType || 'any',
+    kid_friendly: input.kidFriendly ?? false,
     protein_g: input.proteinG ?? null,
     nutrition_highlights: input.nutritionHighlights?.trim() || null,
   })

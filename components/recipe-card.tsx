@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { Bookmark, Clock, Beef, Wallet, Leaf, PlayCircle, Plus, Flame } from 'lucide-react'
-import { logMeal, toggleSavedRecipe } from '@/app/actions'
+import { Bookmark, Clock, Beef, Wallet, Leaf, PlayCircle, Plus, Flame, ShoppingCart } from 'lucide-react'
+import { importRecipeToGroceryList, logMeal, toggleSavedRecipe } from '@/app/actions'
 import type { Recipe } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -25,6 +25,7 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
   const [saved, setSaved] = useState(Boolean(recipe.saved))
   const [pending, startTransition] = useTransition()
   const [logging, setLogging] = useState(false)
+  const [importing, setImporting] = useState(false)
 
   function handleToggleSave() {
     const next = !saved
@@ -51,12 +52,36 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
     })
   }
 
+  function handleImportGroceries() {
+    setImporting(true)
+    startTransition(async () => {
+      const res = await importRecipeToGroceryList(recipe.id)
+      setImporting(false)
+      if (res?.error) {
+        toast.error(res.error)
+        return
+      }
+      toast.success(`Added ${res.count} item${res.count === 1 ? '' : 's'} to your grocery list.`)
+    })
+  }
+
   return (
-    <div className="flex h-full flex-col gap-2 rounded-2xl bg-card p-4 ring-1 ring-border">
+    <div className="relative flex h-full flex-col gap-2 rounded-2xl bg-card p-4 ring-1 ring-border">
+      {recipe.image_url && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={recipe.image_url}
+          alt=""
+          className="absolute bottom-3 right-3 h-10 w-10 rounded-full border-2 border-card object-cover shadow-sm"
+        />
+      )}
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-wrap items-center gap-1.5">
           {recipe.cycle_phase && recipe.cycle_phase !== 'any' && (
             <span className="rounded-full bg-honey/15 px-2 py-0.5 text-[0.65rem] font-medium text-honey">{CYCLE_LABEL[recipe.cycle_phase]}</span>
+          )}
+          {recipe.kid_friendly && (
+            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[0.65rem] font-medium text-emerald-800">kid-friendly</span>
           )}
           {recipe.meal_type && recipe.meal_type !== 'any' && (
             <span className="rounded-full bg-secondary px-2 py-0.5 text-[0.65rem] font-medium capitalize text-secondary-foreground">{recipe.meal_type}</span>
@@ -127,13 +152,17 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
           </div>
         </div>
       )}
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <button type="button" onClick={() => setOpen((o) => !o)} className="text-xs font-medium text-honey">
           {open ? 'show less' : 'view recipe'}
         </button>
         <button type="button" onClick={handleLogMeal} disabled={logging} className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
           <Plus className="h-3.5 w-3.5" />
           {logging ? 'logging…' : 'log it'}
+        </button>
+        <button type="button" onClick={handleImportGroceries} disabled={importing} className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+          <ShoppingCart className="h-3.5 w-3.5" />
+          {importing ? 'adding…' : 'add to grocery list'}
         </button>
         {recipe.video_url && (
           <a

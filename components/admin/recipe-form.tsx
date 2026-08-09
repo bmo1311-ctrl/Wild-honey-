@@ -33,6 +33,7 @@ export function AddRecipeForm() {
   const [videoUrl, setVideoUrl] = useState('')
   const [imageTouched, setImageTouched] = useState(false)
   const [isPremium, setIsPremium] = useState(true)
+  const [kidFriendly, setKidFriendly] = useState(false)
   const [season, setSeason] = useState('any')
   const [cyclePhase, setCyclePhase] = useState('any')
   const [budgetTier, setBudgetTier] = useState('moderate')
@@ -70,6 +71,7 @@ export function AddRecipeForm() {
         imageUrl,
         videoUrl,
         isPremium,
+        kidFriendly,
         season,
         cyclePhase,
         budgetTier,
@@ -141,6 +143,12 @@ export function AddRecipeForm() {
           <Label>paid only</Label>
           <div className="flex h-11 items-center">
             <Switch checked={isPremium} onCheckedChange={setIsPremium} />
+          </div>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label>kid-friendly</Label>
+          <div className="flex h-11 items-center">
+            <Switch checked={kidFriendly} onCheckedChange={setKidFriendly} />
           </div>
         </div>
       </div>
