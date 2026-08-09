@@ -533,6 +533,35 @@ export async function updateGroceryBuilderItem(id: string, input: { name?: strin
   return { ok: true }
 }
 
+// ============================================================
+// WILD HONEY CALENDAR
+// ============================================================
+
+export async function getDaySnapshot(dateISO: string) {
+  const { supabase, user } = await requireUser()
+  const dayStart = `${dateISO}T00:00:00.000Z`
+  const dayEnd = `${dateISO}T23:59:59.999Z`
+
+  const [{ data: checkin }, { data: entries }, { data: meals }, { data: habitLogs }] = await Promise.all([
+    supabase.from('checkins').select('*').eq('user_id', user.id).eq('date', dateISO).maybeSingle(),
+    supabase
+      .from('journal_entries')
+      .select('id, text, created_at, prompt:prompts(text, pillar)')
+      .eq('user_id', user.id)
+      .gte('created_at', dayStart)
+      .lte('created_at', dayEnd),
+    supabase.from('meal_logs').select('id, servings, recipe:recipes(title, calories, protein_g)').eq('user_id', user.id).eq('date', dateISO),
+    supabase.from('habit_logs').select('id, habit:habits(title)').eq('user_id', user.id).eq('date', dateISO),
+  ])
+
+  return {
+    checkin: checkin ?? null,
+    entries: entries ?? [],
+    meals: meals ?? [],
+    habitLogs: habitLogs ?? [],
+  }
+}
+
 export async function toggleGroceryItemChecked(itemId: string) {
   const { supabase, user } = await requireUser()
   const { data: item } = await supabase.from('grocery_builder_items').select('checked').eq('id', itemId).eq('user_id', user.id).single()
