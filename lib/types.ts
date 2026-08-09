@@ -105,6 +105,7 @@ export interface Recipe {
   pillar: Pillar | null
   prep_minutes: number | null
   image_url: string | null
+  video_url: string | null
   is_premium: boolean
   season: 'spring' | 'summer' | 'fall' | 'winter' | 'any'
   cycle_phase: CyclePhase | 'any'

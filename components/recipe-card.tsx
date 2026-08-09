@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { Bookmark, Clock, Beef, Wallet, Leaf } from 'lucide-react'
+import { Bookmark, Clock, Beef, Wallet, Leaf, PlayCircle } from 'lucide-react'
 import { toggleSavedRecipe } from '@/app/actions'
 import type { Recipe } from '@/lib/types'
 import { PILLAR_META } from '@/lib/pillars'
@@ -109,9 +109,22 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
           </div>
         </div>
       )}
-      <button type="button" onClick={() => setOpen((o) => !o)} className="self-start text-xs font-medium text-honey">
-        {open ? 'show less' : 'view recipe'}
-      </button>
+      <div className="flex items-center gap-3">
+        <button type="button" onClick={() => setOpen((o) => !o)} className="text-xs font-medium text-honey">
+          {open ? 'show less' : 'view recipe'}
+        </button>
+        {recipe.video_url && (
+          <a
+            href={recipe.video_url}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1 text-xs font-medium text-muted-foreground"
+          >
+            <PlayCircle className="h-3.5 w-3.5" />
+            watch
+          </a>
+        )}
+      </div>
     </div>
   )
 }

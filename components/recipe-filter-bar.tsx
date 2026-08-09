@@ -1,9 +1,10 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { PillarRows } from '@/components/pillar-rows'
-import { RecipeCard } from '@/components/recipe-card'
 import { Bookmark } from 'lucide-react'
+import { RecipeCard } from '@/components/recipe-card'
+import { shuffle } from '@/components/pillar-rows'
+import { cn } from '@/lib/utils'
 import type { Recipe } from '@/lib/types'
 
 const MEAL_TYPES = [
@@ -68,9 +69,14 @@ export function RecipeFilterBar({ recipes }: { recipes: Recipe[] }) {
   const [season, setSeason] = useState('')
   const [budget, setBudget] = useState('')
   const [maxTime, setMaxTime] = useState('')
+  const [savedOnly, setSavedOnly] = useState(false)
+
+  // Shuffle once per mount so the order isn't just newest-first.
+  const shuffled = useMemo(() => shuffle(recipes), [recipes])
 
   const filtered = useMemo(() => {
-    return recipes.filter((r) => {
+    return shuffled.filter((r) => {
+      if (savedOnly && !r.saved) return false
       if (mealType && r.meal_type !== mealType && r.meal_type !== 'any') return false
       if (cyclePhase && r.cycle_phase !== cyclePhase && r.cycle_phase !== 'any') return false
       if (season && r.season !== season && r.season !== 'any') return false
@@ -78,9 +84,9 @@ export function RecipeFilterBar({ recipes }: { recipes: Recipe[] }) {
       if (maxTime && r.prep_minutes && r.prep_minutes > parseInt(maxTime, 10)) return false
       return true
     })
-  }, [recipes, mealType, cyclePhase, season, budget, maxTime])
+  }, [shuffled, mealType, cyclePhase, season, budget, maxTime, savedOnly])
 
-  const anyActive = mealType || cyclePhase || season || budget || maxTime
+  const anyActive = mealType || cyclePhase || season || budget || maxTime || savedOnly
 
   return (
     <div className="flex flex-col gap-4">
@@ -90,6 +96,17 @@ export function RecipeFilterBar({ recipes }: { recipes: Recipe[] }) {
         <Select value={season} onChange={setSeason} options={SEASONS} />
         <Select value={budget} onChange={setBudget} options={BUDGETS} />
         <Select value={maxTime} onChange={setMaxTime} options={TIMES} />
+        <button
+          type="button"
+          onClick={() => setSavedOnly((s) => !s)}
+          className={cn(
+            'flex h-9 items-center gap-1 rounded-full border border-input px-3 text-xs font-medium',
+            savedOnly ? 'bg-honey text-honey-foreground border-honey' : 'bg-card text-foreground',
+          )}
+        >
+          <Bookmark className="h-3 w-3" />
+          saved
+        </button>
         {anyActive && (
           <button
             type="button"
@@ -99,6 +116,7 @@ export function RecipeFilterBar({ recipes }: { recipes: Recipe[] }) {
               setSeason('')
               setBudget('')
               setMaxTime('')
+              setSavedOnly(false)
             }}
             className="h-9 rounded-full px-3 text-xs font-medium text-honey"
           >
@@ -113,17 +131,17 @@ export function RecipeFilterBar({ recipes }: { recipes: Recipe[] }) {
         </p>
       )}
 
-      <PillarRows
-        items={filtered}
-        cardWidthClass="w-[260px]"
-        renderItem={(r) => <RecipeCard recipe={r} />}
-        extraFilter={{
-          label: 'saved',
-          icon: <Bookmark className="h-3 w-3" />,
-          predicate: (r) => Boolean(r.saved),
-        }}
-        emptyMessage={anyActive ? 'nothing matches those filters yet — try loosening one.' : 'nothing here yet — check back soon.'}
-      />
+      {filtered.length === 0 ? (
+        <p className="rounded-2xl bg-card p-6 text-center text-sm text-muted-foreground ring-1 ring-border">
+          {anyActive ? 'nothing matches those filters yet — try loosening one.' : 'nothing here yet — check back soon.'}
+        </p>
+      ) : (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((r) => (
+            <RecipeCard key={r.id} recipe={r} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

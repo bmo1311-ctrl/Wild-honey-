@@ -1307,6 +1307,7 @@ export async function adminAddRecipe(input: {
   pillar?: string
   prepMinutes?: number
   imageUrl?: string
+  videoUrl?: string
   isPremium: boolean
   season?: string
   cyclePhase?: string
@@ -1326,6 +1327,7 @@ export async function adminAddRecipe(input: {
     pillar: input.pillar || null,
     prep_minutes: input.prepMinutes ?? null,
     image_url: input.imageUrl || null,
+    video_url: input.videoUrl || null,
     is_premium: input.isPremium,
     season: input.season || 'any',
     cycle_phase: input.cyclePhase || 'any',

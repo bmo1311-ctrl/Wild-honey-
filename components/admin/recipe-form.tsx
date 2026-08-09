@@ -17,6 +17,11 @@ const CYCLE_PHASES = ['any', 'menstrual', 'follicular', 'ovulation', 'luteal']
 const BUDGETS = ['budget', 'moderate', 'splurge']
 const MEAL_TYPES = ['any', 'breakfast', 'lunch', 'dinner', 'snack', 'juice', 'mocktail']
 
+function youtubeThumbnail(url: string): string | null {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|live\/))([a-zA-Z0-9_-]{11})/)
+  return match ? `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg` : null
+}
+
 export function AddRecipeForm() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -25,6 +30,8 @@ export function AddRecipeForm() {
   const [pillar, setPillar] = useState<Pillar | ''>('Body')
   const [prepMinutes, setPrepMinutes] = useState('')
   const [imageUrl, setImageUrl] = useState('')
+  const [videoUrl, setVideoUrl] = useState('')
+  const [imageTouched, setImageTouched] = useState(false)
   const [isPremium, setIsPremium] = useState(true)
   const [season, setSeason] = useState('any')
   const [cyclePhase, setCyclePhase] = useState('any')
@@ -33,6 +40,19 @@ export function AddRecipeForm() {
   const [proteinG, setProteinG] = useState('')
   const [nutritionHighlights, setNutritionHighlights] = useState('')
   const [pending, startTransition] = useTransition()
+
+  function handleImageChange(next: string) {
+    setImageTouched(true)
+    setImageUrl(next)
+  }
+
+  function handleVideoChange(next: string) {
+    setVideoUrl(next)
+    if (!imageTouched) {
+      const auto = youtubeThumbnail(next)
+      if (auto) setImageUrl(auto)
+    }
+  }
 
   function handleSubmit() {
     if (!title.trim() || !ingredients.trim() || !instructions.trim()) {
@@ -48,6 +68,7 @@ export function AddRecipeForm() {
         pillar: pillar || undefined,
         prepMinutes: prepMinutes ? parseInt(prepMinutes, 10) : undefined,
         imageUrl,
+        videoUrl,
         isPremium,
         season,
         cyclePhase,
@@ -67,6 +88,7 @@ export function AddRecipeForm() {
       setInstructions('')
       setPrepMinutes('')
       setImageUrl('')
+      setVideoUrl('')
       setProteinG('')
       setNutritionHighlights('')
     })
@@ -164,7 +186,12 @@ export function AddRecipeForm() {
           </select>
         </div>
       </div>
-      <ImageUploadField value={imageUrl} onChange={setImageUrl} />
+      <div className="flex flex-col gap-1.5">
+        <Label>video URL (optional)</Label>
+        <Input value={videoUrl} onChange={(e) => handleVideoChange(e.target.value)} className="h-11" placeholder="https://youtube.com/..." />
+        <p className="text-[0.65rem] text-muted-foreground">paste a YouTube link and the thumbnail fills in automatically</p>
+      </div>
+      <ImageUploadField value={imageUrl} onChange={handleImageChange} />
       <Button onClick={handleSubmit} disabled={pending} className="self-start">
         {pending ? 'adding…' : 'add recipe'}
       </Button>
