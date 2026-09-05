@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
-import { addHouseholdMembers, completeOnboarding, saveBodyGoals, skipOnboarding } from '@/app/actions'
+import { addHouseholdMembers, completeOnboarding, saveBodyGoals, saveProfilePage, skipOnboarding } from '@/app/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -20,6 +20,12 @@ import {
   SEASONS,
 } from '@/lib/honey-profile'
 import { ACTIVITY_LEVELS, BODY_GOALS } from '@/lib/goals'
+const COLOUR_SEASONS = [
+  { key: 'winter', label: 'Winter', blurb: 'clear, cool, high contrast' },
+  { key: 'spring', label: 'Spring', blurb: 'light, warm, fresh' },
+  { key: 'summer', label: 'Summer', blurb: 'soft, cool, muted' },
+  { key: 'autumn', label: 'Autumn', blurb: 'deep, warm, rich' },
+] as const
 import { cn } from '@/lib/utils'
 
 const MOVEMENT_OPTIONS = ['walking', 'strength training', 'yoga', 'dance', 'swimming', 'running', 'low-impact', 'not sure yet']
@@ -79,6 +85,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
   const [communicationStyle, setCommunicationStyle] = useState<string | null>(null)
   const [faithPreference, setFaithPreference] = useState<string | null>(null)
   const [children, setChildren] = useState<{ name: string; birthYear: string }[]>([])
+  const [colorSeason, setColorSeason] = useState<string | null>(null)
 
   const step: Step = STEPS[stepIndex]
   const isLast = stepIndex === STEPS.length - 1
@@ -130,6 +137,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
           bodyGoal,
         })
       }
+      if (colorSeason) await saveProfilePage({ colorSeason: colorSeason as 'winter' | 'spring' | 'summer' | 'autumn' })
       if (children.some((c) => c.name.trim())) {
         await addHouseholdMembers(children.map((c) => ({ name: c.name, birthYear: Number(c.birthYear) || null })))
       }
@@ -206,6 +214,18 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                   <Chip key={s} active={season === s} onClick={() => setSeason(season === s ? null : s)}>
                     {SEASON_META[s].label}
                   </Chip>
+                ))}
+              </div>
+            </div>
+            <div className="border-t border-border pt-4">
+              <Label>which colours do you vibe with? the app dresses to match. (optional)</Label>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {COLOUR_SEASONS.map((c) => (
+                  <button key={c.key} type="button" data-palette={c.key} onClick={() => setColorSeason(colorSeason === c.key ? null : c.key)} className={cn('rounded-xl border p-3 text-left', colorSeason === c.key ? 'border-foreground ring-2 ring-foreground/20' : 'border-border')}>
+                    <span className="mb-1.5 flex gap-1"><span className="h-4 w-4 rounded-full bg-primary" /><span className="h-4 w-4 rounded-full bg-honey" /><span className="h-4 w-4 rounded-full bg-accent" /></span>
+                    <span className="block text-sm font-semibold">{c.label}</span>
+                    <span className="block text-[11.5px] text-muted-foreground">{c.blurb}</span>
+                  </button>
                 ))}
               </div>
             </div>

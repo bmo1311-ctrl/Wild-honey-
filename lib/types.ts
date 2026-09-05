@@ -63,6 +63,22 @@ export interface Profile {
   data_consent_at: string | null
   daily_calorie_goal: number | null
   daily_protein_goal_g: number | null
+  bio?: string | null
+  profile_show?: { recipes?: boolean; progress?: boolean; wins?: boolean } | null
+  color_season?: 'winter' | 'spring' | 'summer' | 'autumn' | null
+}
+
+/** The columns of profiles another member is allowed to see. */
+export interface PublicProfile {
+  id: string
+  name: string
+  avatar_color: string
+  avatar_url: string | null
+  membership_tier: string
+  bio: string | null
+  profile_show: { recipes?: boolean; progress?: boolean; wins?: boolean } | null
+  color_season: string | null
+  created_at: string
 }
 
 export interface Commitment {

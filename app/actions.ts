@@ -2460,3 +2460,23 @@ export async function deleteOwnRecipe(id: string) {
   revalidatePath('/app/nutrition')
   return { ok: true }
 }
+
+/** What her page shows, and the palette the app wears for her. */
+export async function saveProfilePage(input: {
+  bio?: string | null
+  show?: { recipes?: boolean; progress?: boolean; wins?: boolean }
+  colorSeason?: 'winter' | 'spring' | 'summer' | 'autumn' | null
+}) {
+  const { supabase, user } = await requireUser()
+  const patch: Record<string, unknown> = {}
+  if (input.bio !== undefined) patch.bio = input.bio?.trim().slice(0, 600) || null
+  if (input.show) patch.profile_show = { recipes: !!input.show.recipes, progress: !!input.show.progress, wins: !!input.show.wins }
+  if (input.colorSeason !== undefined) patch.color_season = input.colorSeason
+  const { error } = await supabase.from('profiles').update(patch).eq('id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app')
+  revalidatePath('/app/profile')
+  revalidatePath('/app/settings')
+  revalidatePath(`/app/members/${user.id}`)
+  return { ok: true }
+}

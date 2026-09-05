@@ -133,3 +133,52 @@
 .hex-clip {
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 }
+
+/*
+ * Personal palettes. The default is Bright Winter. A member who chose another
+ * season gets these overrides on the app wrapper; nothing else in the app
+ * knows about it, because every component reads the same variables.
+ */
+[data-palette='spring'] {
+  --background: oklch(0.99 0.01 85);
+  --card: oklch(1 0.004 85);
+  --primary: oklch(0.63 0.19 38);
+  --primary-foreground: oklch(0.99 0.003 85);
+  --ring: oklch(0.63 0.19 38);
+  --destructive: oklch(0.6 0.2 30);
+  --secondary: oklch(0.95 0.03 90);
+  --accent: oklch(0.88 0.09 140);
+  --accent-foreground: oklch(0.25 0.06 140);
+  --honey: oklch(0.85 0.13 95);
+  --honey-foreground: oklch(0.22 0.05 80);
+  --muted: oklch(0.96 0.015 85);
+  --border: oklch(0.9 0.02 85);
+}
+[data-palette='summer'] {
+  --background: oklch(0.985 0.006 300);
+  --card: oklch(0.995 0.003 300);
+  --primary: oklch(0.58 0.14 325);
+  --primary-foreground: oklch(0.99 0.003 300);
+  --ring: oklch(0.58 0.14 325);
+  --secondary: oklch(0.95 0.015 280);
+  --accent: oklch(0.86 0.06 240);
+  --accent-foreground: oklch(0.24 0.05 250);
+  --honey: oklch(0.78 0.08 250);
+  --honey-foreground: oklch(0.2 0.04 250);
+  --muted: oklch(0.96 0.01 290);
+  --border: oklch(0.9 0.012 290);
+}
+[data-palette='autumn'] {
+  --background: oklch(0.98 0.012 70);
+  --card: oklch(0.995 0.006 70);
+  --primary: oklch(0.55 0.16 45);
+  --primary-foreground: oklch(0.99 0.004 70);
+  --ring: oklch(0.55 0.16 45);
+  --secondary: oklch(0.94 0.03 75);
+  --accent: oklch(0.8 0.09 110);
+  --accent-foreground: oklch(0.24 0.06 110);
+  --honey: oklch(0.72 0.13 75);
+  --honey-foreground: oklch(0.2 0.05 70);
+  --muted: oklch(0.955 0.02 70);
+  --border: oklch(0.89 0.025 70);
+}

@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useState, useTransition } from 'react'
 import { MessageCircle, Pin } from 'lucide-react'
 import { toast } from 'sonner'
@@ -98,7 +99,7 @@ export function CommunityPostCard({ post, canPin }: { post: CommunityPost; canPi
         <BloomAvatar name={post.profile?.name ?? 'H'} color={post.profile?.avatar_color ?? 'honey'} avatarUrl={post.profile?.avatar_url} className="h-10 w-10" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
-            <p className="font-medium leading-tight">{post.profile?.name ?? 'A member'}</p>
+            <Link href={`/app/members/${post.user_id}`} className="font-medium leading-tight underline-offset-[3px] hover:underline">{post.profile?.name ?? 'A member'}</Link>
             <TierBadge tier={post.profile?.membership_tier} />
           </div>
           <p className="text-xs text-muted-foreground">{relativeTime(post.created_at)}</p>

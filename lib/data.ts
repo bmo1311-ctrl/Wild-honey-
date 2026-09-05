@@ -40,7 +40,7 @@ import type {
 import { suggestProtocol } from '@/lib/protocols'
 import { COURSE_SLUG, currentDayFrom, getCourse } from '@/lib/courses'
 import type { CourseEnrollment, CourseWriting } from '@/lib/courses'
-import type { FoodItem, HouseholdMember, LearningItem } from '@/lib/types'
+import type { FoodItem, HouseholdMember, LearningItem, PublicProfile } from '@/lib/types'
 import { sumNutrients, type NutrientMap } from '@/lib/nutrients'
 import type { ContentEvent } from '@/lib/engine'
 
@@ -940,6 +940,34 @@ export async function getContentEvents(limit = 400): Promise<ContentEvent[]> {
       .limit(limit),
   )
   return (data as ContentEvent[]) ?? []
+}
+
+// ---- Member pages ----
+
+/** Another member, through the view that exposes only what she agreed to show. */
+export async function getPublicProfile(id: string): Promise<PublicProfile | null> {
+  const supabase = await createClient()
+  const data = ok(await supabase.from('public_profiles').select('*').eq('id', id).maybeSingle())
+  return (data as PublicProfile) ?? null
+}
+
+export async function getMemberSharedRecipes(userId: string): Promise<Recipe[]> {
+  const supabase = await createClient()
+  const data = ok(await supabase.from('recipes').select('*').eq('user_id', userId).eq('is_public', true).order('created_at', { ascending: false }))
+  return (data as Recipe[]) ?? []
+}
+
+/** Days done and wins are readable only if she switched them on; otherwise these come back empty. */
+export async function getMemberProgressCount(userId: string): Promise<number> {
+  const supabase = await createClient()
+  const { count } = await supabase.from('course_day_progress').select('id', { count: 'exact', head: true }).eq('user_id', userId)
+  return count ?? 0
+}
+
+export async function getMemberWins(userId: string, limit = 5): Promise<Win[]> {
+  const supabase = await createClient()
+  const data = ok(await supabase.from('wins').select('*').eq('user_id', userId).order('date', { ascending: false }).limit(limit))
+  return (data as Win[]) ?? []
 }
 
 // ---- Household + learning ----

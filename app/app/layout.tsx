@@ -13,7 +13,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!profile.onboarding_completed_at) redirect('/onboarding')
 
   return (
-    <div className="min-h-dvh bg-background pb-24">
+    <div className="min-h-dvh bg-background pb-24" data-palette={profile?.color_season ?? undefined}>
       <OneSignalInit externalUserId={profile.id} />
       <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur-sm">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-3">

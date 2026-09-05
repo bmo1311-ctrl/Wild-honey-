@@ -1,4 +1,5 @@
 import { ProfileEditor } from '@/components/profile-editor'
+import { ProfilePageEditor } from '@/components/profile-page-editor'
 import { PrivacySettings } from '@/components/privacy-settings'
 import { BlockedMutedList } from '@/components/blocked-muted-list'
 import { getBlockedUsers, getMutedUsers, getSessionProfile } from '@/lib/data'
@@ -17,6 +18,13 @@ export default async function SettingsPage() {
         <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">name, photo &amp; colour</p>
         <ProfileEditor name={profile.name} avatarColor={profile.avatar_color} avatarUrl={profile.avatar_url} />
       </section>
+      <ProfilePageEditor
+        initial={{
+          bio: profile.bio ?? '',
+          show: { recipes: !!profile.profile_show?.recipes, progress: !!profile.profile_show?.progress, wins: !!profile.profile_show?.wins },
+          colorSeason: profile.color_season ?? null,
+        }}
+      />
       <BlockedMutedList blocked={blocked} muted={muted} />
       <PrivacySettings
         initialPrefs={profile.notification_prefs ?? {}}
