@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import { youTubeEmbed } from '@/lib/youtube'
 
@@ -16,6 +16,8 @@ export function VaultPlayer({
   description?: string
   onClose: () => void
 }) {
+  const [showDescription, setShowDescription] = useState(false)
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -50,7 +52,22 @@ export function VaultPlayer({
         <div className="flex items-start gap-3 p-4">
           <div className="min-w-0 flex-1">
             <h2 className="font-serif text-[19px] font-semibold leading-snug text-pretty">{title}</h2>
-            {description && <p className="mt-1.5 text-[14.5px] leading-[1.45] text-pretty text-muted-foreground">{description}</p>}
+            {/* The blurb is a paragraph. It stays folded away — she came to watch. */}
+            {description && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setShowDescription((v) => !v)}
+                  aria-expanded={showDescription}
+                  className="mt-1 text-[13px] font-medium text-muted-foreground underline underline-offset-[3px]"
+                >
+                  {showDescription ? 'Hide description' : 'What this is about'}
+                </button>
+                {showDescription && (
+                  <p className="mt-2 text-[14.5px] leading-[1.45] text-pretty text-muted-foreground">{description}</p>
+                )}
+              </>
+            )}
           </div>
           <button type="button" onClick={onClose} aria-label="Close" className="rounded-full bg-muted p-2">
             <X className="h-4 w-4" />
