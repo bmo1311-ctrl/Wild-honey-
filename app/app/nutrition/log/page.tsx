@@ -4,6 +4,8 @@ import { FoodLogScreen } from '@/components/food-log-screen'
 import { getCurrentCyclePhase, getFoodItems, getHouseholdMembers, getSessionProfile, getTodayNutrition, getUsualFoods } from '@/lib/data'
 import { applyCycle, phaseFromDates, phaseLabel, type CyclePhaseKey } from '@/lib/cycle'
 import { NutrientRings } from '@/components/nutrient-rings'
+import { NutrientPanel } from '@/components/nutrient-panel'
+import { ageFromBirthYear, driFor, type Sex } from '@/lib/dri'
 import { calculateTargets, effectiveTargets, type ActivityLevel, type BodyGoal } from '@/lib/goals'
 
 /**
@@ -54,6 +56,20 @@ export default async function LogFoodPage({ searchParams }: { searchParams: Prom
       ? (loggedPhase as CyclePhaseKey)
       : phaseFromDates(p?.last_period_start ?? null, p?.cycle_length_days ?? 28)
   const cycled = applyCycle(targets, phase, (p?.cycle_adjustments ?? {}) as Record<string, number>)
+
+  // Whoever is selected gets their own reference intakes. For her, the
+  // calculated macro targets override the generic adult figures.
+  const selected = members.find((m) => (memberId ? m.id === memberId : m.is_self))
+  const selectedAge = memberId
+    ? ageFromBirthYear(selected?.birth_year ?? null)
+    : ageFromBirthYear(p?.birth_year ?? null)
+  const selectedSex: Sex | null = memberId ? ((selected as { sex?: Sex | null })?.sex ?? null) : 'female'
+  const reference = driFor(selectedAge, selectedSex) ?? {}
+  const panelTargets = memberId ? reference : { ...reference, ...cycled.targets }
+
+  const note = memberId
+    ? `General reference intakes for ${selectedAge ? `age ${selectedAge}` : 'this age'}, not a prescription. Children's needs vary with growth and activity — anything specific belongs with their doctor.`
+    : 'Micronutrient figures are general adult reference intakes. Your calorie and protein targets come from your own weight and goal.'
 
   const logged = nutrition.loggedMeals.map((m) => {
     const row = m as typeof m & {
@@ -114,6 +130,8 @@ export default async function LogFoodPage({ searchParams }: { searchParams: Prom
         targets={cycled.targets}
         hasGoals={hasGoals && !memberId}
       />
+
+      <NutrientPanel totals={nutrition.nutrients} targets={panelTargets} note={note} />
 
       <FoodLogScreen
         foods={foods}

@@ -21,7 +21,7 @@ export function HouseholdManager({ members }: { members: HouseholdMember[] }) {
   const [adding, setAdding] = useState(false)
   const [draft, setDraft] = useState({ name: '', birthYear: '' })
   const [editing, setEditing] = useState<string | null>(null)
-  const [edit, setEdit] = useState({ name: '', birthYear: '' })
+  const [edit, setEdit] = useState({ name: '', birthYear: '', sex: '' })
   const [confirming, setConfirming] = useState<string | null>(null)
 
   const field = 'h-11 w-full rounded-xl bg-background px-3 text-base outline-none ring-1 ring-border focus-visible:ring-2 focus-visible:ring-primary/40'
@@ -42,7 +42,7 @@ export function HouseholdManager({ members }: { members: HouseholdMember[] }) {
 
   function saveEdit(id: string) {
     startTransition(async () => {
-      const res = await updateHouseholdMember({ id, name: edit.name, birthYear: Number(edit.birthYear) || null })
+      const res = await updateHouseholdMember({ id, name: edit.name, birthYear: Number(edit.birthYear) || null, sex: edit.sex || null })
       if ('error' in res && res.error) {
         toast.error(res.error)
         return
@@ -74,6 +74,19 @@ export function HouseholdManager({ members }: { members: HouseholdMember[] }) {
               <div className="flex flex-col gap-2">
                 <input value={edit.name} onChange={(e) => setEdit({ ...edit, name: e.target.value })} className={field} placeholder="Name" />
                 <input value={edit.birthYear} onChange={(e) => setEdit({ ...edit, birthYear: e.target.value })} inputMode="numeric" className={field} placeholder="Year born" />
+                <div className="flex gap-2">
+                  {(['female', 'male'] as const).map((sx) => (
+                    <button
+                      key={sx}
+                      type="button"
+                      onClick={() => setEdit({ ...edit, sex: edit.sex === sx ? '' : sx })}
+                      className={cn('h-10 flex-1 rounded-xl text-sm font-medium', edit.sex === sx ? 'bg-mindset-pillar text-white' : 'bg-muted text-muted-foreground')}
+                    >
+                      {sx}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground">optional — iron and calorie needs split from about age nine.</p>
                 <div className="flex gap-2">
                   <button type="button" onClick={() => saveEdit(m.id)} disabled={pending} className="h-10 flex-1 rounded-xl bg-primary text-sm font-bold text-primary-foreground">
                     Save
@@ -111,7 +124,7 @@ export function HouseholdManager({ members }: { members: HouseholdMember[] }) {
                   type="button"
                   onClick={() => {
                     setEditing(m.id)
-                    setEdit({ name: m.name, birthYear: m.birth_year ? String(m.birth_year) : '' })
+                    setEdit({ name: m.name, birthYear: m.birth_year ? String(m.birth_year) : '', sex: (m as { sex?: string | null }).sex ?? '' })
                   }}
                   aria-label={`Edit ${m.name}`}
                   className="shrink-0 p-1.5 text-muted-foreground"

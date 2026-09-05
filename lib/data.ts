@@ -41,6 +41,7 @@ import { suggestProtocol } from '@/lib/protocols'
 import { COURSE_SLUG, currentDayFrom } from '@/lib/courses'
 import type { CourseEnrollment, CourseWriting } from '@/lib/courses'
 import type { FoodItem, HouseholdMember, LearningItem } from '@/lib/types'
+import { sumNutrients, type NutrientMap } from '@/lib/nutrients'
 
 /**
  * Unwraps a Supabase response, throwing on error instead of quietly
@@ -1192,6 +1193,7 @@ export async function getTodayNutrition(memberId?: string | null): Promise<{
   protein: number
   carbs: number
   fat: number
+  nutrients: NutrientMap
   calorieGoal: number | null
   proteinGoal: number | null
   loggedMeals: MealLog[]
@@ -1200,7 +1202,7 @@ export async function getTodayNutrition(memberId?: string | null): Promise<{
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) return { calories: 0, protein: 0, carbs: 0, fat: 0, calorieGoal: null, proteinGoal: null, loggedMeals: [] }
+  if (!user) return { calories: 0, protein: 0, carbs: 0, fat: 0, nutrients: {}, calorieGoal: null, proteinGoal: null, loggedMeals: [] }
 
   const today = new Date().toISOString().slice(0, 10)
   let logQuery = supabase.from('meal_logs').select('*, recipe:recipes(*)').eq('user_id', user.id).eq('date', today)
@@ -1212,20 +1214,41 @@ export async function getTodayNutrition(memberId?: string | null): Promise<{
   ])
 
   const loggedMeals = (logs as MealLog[]) ?? []
+  // Rows written by the food logger carry their own macros, already scaled to
+  // the amount she had. Only fall back to the recipe for older rows that have
+  // no snapshot — before this, anything that was not one of the sixty recipes
+  // counted as zero.
   const totals = loggedMeals.reduce(
     (acc, log) => {
+      const row = log as typeof log & {
+        calories?: number | null
+        protein_g?: number | null
+        carbs_g?: number | null
+        fat_g?: number | null
+      }
       const servings = log.servings || 1
-      acc.calories += (log.recipe?.calories ?? 0) * servings
-      acc.protein += (log.recipe?.protein_g ?? 0) * servings
-      acc.carbs += (log.recipe?.carbs_g ?? 0) * servings
-      acc.fat += (log.recipe?.fat_g ?? 0) * servings
+      acc.calories += row.calories ?? (log.recipe?.calories ?? 0) * servings
+      acc.protein += row.protein_g ?? (log.recipe?.protein_g ?? 0) * servings
+      acc.carbs += row.carbs_g ?? (log.recipe?.carbs_g ?? 0) * servings
+      acc.fat += row.fat_g ?? (log.recipe?.fat_g ?? 0) * servings
       return acc
     },
     { calories: 0, protein: 0, carbs: 0, fat: 0 },
   )
 
+  // Micronutrients live in a jsonb map on each row and were never being added
+  // up at all, so vitamins and minerals always read as nothing.
+  const nutrients = sumNutrients(
+    loggedMeals.map((log) => ((log as typeof log & { nutrients?: NutrientMap }).nutrients ?? {}) as NutrientMap),
+  )
+  nutrients.calories = Math.round(totals.calories * 10) / 10
+  nutrients.protein_g = Math.round(totals.protein * 10) / 10
+  nutrients.carbs_g = Math.round(totals.carbs * 10) / 10
+  nutrients.fat_g = Math.round(totals.fat * 10) / 10
+
   return {
     ...totals,
+    nutrients,
     calorieGoal: profile?.daily_calorie_goal ?? null,
     proteinGoal: profile?.daily_protein_goal_g ?? null,
     loggedMeals,

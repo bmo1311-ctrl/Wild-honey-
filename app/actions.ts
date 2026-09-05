@@ -7,6 +7,7 @@ import { createServiceClient } from '@/lib/supabase/service'
 import { oneSignalConfigured, sendPushToUsers } from '@/lib/onesignal'
 import type { Comment, NotificationPrefs, Visibility } from '@/lib/types'
 import { COURSE_SLUG, toISODate } from '@/lib/courses'
+import { scaleNutrients, type NutrientMap } from '@/lib/nutrients'
 import type { WritingKind } from '@/lib/courses'
 
 async function requireUser() {
@@ -2167,6 +2168,7 @@ export async function logFoods(
     const factor = e.quantity / f.serving_size
     return [
       {
+        nutrients: scaleNutrients((f.nutrients ?? {}) as NutrientMap, factor),
         user_id: user.id,
         food_item_id: f.id,
         custom_name: f.name,
@@ -2330,12 +2332,13 @@ export async function archiveLearningItem(itemId: string) {
   return { ok: true }
 }
 
-export async function updateHouseholdMember(input: { id: string; name?: string; birthYear?: number | null; color?: string }) {
+export async function updateHouseholdMember(input: { id: string; name?: string; birthYear?: number | null; color?: string; sex?: string | null }) {
   const { supabase, user } = await requireUser()
   const patch: Record<string, unknown> = {}
   if (input.name?.trim()) patch.name = input.name.trim()
   if (input.birthYear !== undefined) patch.birth_year = input.birthYear
   if (input.color) patch.color = input.color
+  if (input.sex !== undefined) patch.sex = input.sex || null
   if (Object.keys(patch).length === 0) return { ok: true }
   const { error } = await supabase.from('household_members').update(patch).eq('id', input.id).eq('owner_id', user.id)
   if (error) return { error: error.message }
