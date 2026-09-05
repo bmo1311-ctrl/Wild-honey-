@@ -3,7 +3,7 @@
 import { useMemo, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { Check, Plus, Search, Trash2, X } from 'lucide-react'
-import { deleteMealLog, logFood, saveFoodItem } from '@/app/actions'
+import { deleteMealLog, logFood, logFoods, saveFoodItem } from '@/app/actions'
 import type { FoodItem } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -21,7 +21,15 @@ interface LoggedRow {
  * entries — 300ml of milk and a 30g scoop — and both scale from the serving
  * size on the food, so nothing has to be worked out by hand.
  */
-export function FoodLogger({ foods, logged }: { foods: FoodItem[]; logged: LoggedRow[] }) {
+export interface UsualFood {
+  food: FoodItem
+  lastQuantity: number
+  unit: string
+  timesLogged: number
+}
+
+export function FoodLogger({ foods, logged, usual }: { foods: FoodItem[]; logged: LoggedRow[]; usual: UsualFood[] }) {
+  const [multi, setMulti] = useState<Record<string, number>>({})
   const [q, setQ] = useState('')
   const [picked, setPicked] = useState<FoodItem | null>(null)
   const [amount, setAmount] = useState('')
@@ -118,6 +126,41 @@ export function FoodLogger({ foods, logged }: { foods: FoodItem[]; logged: Logge
     })
   }
 
+  function quickLog(u: UsualFood) {
+    startTransition(async () => {
+      const res = await logFoods([{ foodItemId: u.food.id, quantity: u.lastQuantity }])
+      if ('error' in res && res.error) {
+        toast.error(res.error)
+        return
+      }
+      toast.success(`${u.food.name} logged`)
+    })
+  }
+
+  function toggleMulti(u: UsualFood) {
+    setMulti((m) => {
+      const next = { ...m }
+      if (next[u.food.id]) delete next[u.food.id]
+      else next[u.food.id] = u.lastQuantity
+      return next
+    })
+  }
+
+  function logSelected() {
+    const entries = Object.entries(multi).map(([foodItemId, quantity]) => ({ foodItemId, quantity }))
+    startTransition(async () => {
+      const res = await logFoods(entries)
+      if ('error' in res && res.error) {
+        toast.error(res.error)
+        return
+      }
+      toast.success(`${entries.length} logged`)
+      setMulti({})
+    })
+  }
+
+  const selectedCount = Object.keys(multi).length
+
   function remove(id: string) {
     startTransition(async () => {
       const res = await deleteMealLog(id)
@@ -129,6 +172,51 @@ export function FoodLogger({ foods, logged }: { foods: FoodItem[]; logged: Logge
 
   return (
     <div className="flex flex-col gap-4">
+      {usual.length > 0 && (
+        <section>
+          <div className="mb-2 flex items-baseline justify-between">
+            <h2 className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">Your usual</h2>
+            <span className="text-xs text-muted-foreground">tap to log · hold to build a meal</span>
+          </div>
+          <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
+            {usual.map((u) => {
+              const picked = Boolean(multi[u.food.id])
+              return (
+                <button
+                  key={u.food.id}
+                  type="button"
+                  disabled={pending}
+                  onClick={() => (selectedCount > 0 ? toggleMulti(u) : quickLog(u))}
+                  onContextMenu={(e) => {
+                    e.preventDefault()
+                    toggleMulti(u)
+                  }}
+                  className={cn(
+                    'shrink-0 rounded-2xl border px-3.5 py-2.5 text-left transition-colors disabled:opacity-50',
+                    picked ? 'border-transparent bg-mindset-pillar text-white' : 'border-border bg-card',
+                  )}
+                >
+                  <span className="block text-[14px] font-semibold">{u.food.name}</span>
+                  <span className={cn('block text-[12px]', picked ? 'text-white/80' : 'text-muted-foreground')}>
+                    {u.lastQuantity}{u.unit} · {Math.round((u.food.calories * u.lastQuantity) / u.food.serving_size)} cal
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+          {selectedCount > 0 && (
+            <button
+              type="button"
+              onClick={logSelected}
+              disabled={pending}
+              className="mt-2 h-[52px] w-full rounded-2xl bg-primary text-[17px] font-bold text-primary-foreground disabled:opacity-50"
+            >
+              Log {selectedCount} {selectedCount === 1 ? 'item' : 'items'} together
+            </button>
+          )}
+        </section>
+      )}
+
       {logged.length > 0 && (
         <ul className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card">
           {logged.map((l, i) => (

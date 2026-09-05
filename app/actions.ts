@@ -2138,3 +2138,48 @@ export async function deleteMealLog(id: string) {
 function round1(n: number): number {
   return Math.round((Number.isFinite(n) ? n : 0) * 10) / 10
 }
+
+/** Log several foods in one go — a shake is milk plus a scoop, not two trips. */
+export async function logFoods(
+  entries: { foodItemId: string; quantity: number }[],
+  mealSlot?: string,
+) {
+  const { supabase, user } = await requireUser()
+  if (entries.length === 0) return { error: 'Nothing selected.' }
+
+  const ids = entries.map((e) => e.foodItemId)
+  const { data: foods, error: readError } = await supabase.from('food_items').select('*').in('id', ids)
+  if (readError) return { error: readError.message }
+  const byId = new Map((foods ?? []).map((f) => [f.id as string, f]))
+
+  const rows = entries.flatMap((e) => {
+    const f = byId.get(e.foodItemId)
+    if (!f || !(f.serving_size > 0) || !(e.quantity > 0)) return []
+    const factor = e.quantity / f.serving_size
+    return [
+      {
+        user_id: user.id,
+        food_item_id: f.id,
+        custom_name: f.name,
+        quantity: e.quantity,
+        unit: f.serving_unit,
+        calories: round1(f.calories * factor),
+        protein_g: round1(f.protein_g * factor),
+        carbs_g: round1(f.carbs_g * factor),
+        fat_g: round1(f.fat_g * factor),
+        meal_slot: mealSlot ?? null,
+        date: toISODate(),
+        servings: 1,
+      },
+    ]
+  })
+  if (rows.length === 0) return { error: 'Nothing to log.' }
+
+  const { error } = await supabase.from('meal_logs').insert(rows)
+  if (error) return { error: error.message }
+  await bumpStreak(user.id)
+  revalidatePath('/app/nutrition')
+  revalidatePath('/app/nutrition/log')
+  revalidatePath('/app')
+  return { ok: true, count: rows.length }
+}

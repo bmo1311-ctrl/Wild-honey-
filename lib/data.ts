@@ -875,6 +875,54 @@ export async function getFoodItems(): Promise<FoodItem[]> {
   return [...all.filter((f) => f.user_id === user.id), ...all.filter((f) => f.user_id !== user.id)]
 }
 
+/**
+ * The foods she actually logs, most-used first, each remembering the amount
+ * she last had. One tap re-logs it at that amount — the common case costs one
+ * interaction rather than five.
+ */
+export async function getUsualFoods(limit = 8): Promise<
+  { food: FoodItem; lastQuantity: number; unit: string; timesLogged: number }[]
+> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const data = ok(
+    await supabase
+      .from('meal_logs')
+      .select('food_item_id, quantity, unit, created_at, food:food_items(*)')
+      .eq('user_id', user.id)
+      .not('food_item_id', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(200),
+  )
+  const rows = (data as unknown as {
+    food_item_id: string
+    quantity: number | null
+    unit: string | null
+    food: FoodItem | null
+  }[]) ?? []
+
+  const seen = new Map<string, { food: FoodItem; lastQuantity: number; unit: string; timesLogged: number }>()
+  for (const r of rows) {
+    if (!r.food) continue
+    const existing = seen.get(r.food_item_id)
+    if (existing) {
+      existing.timesLogged += 1
+      continue
+    }
+    seen.set(r.food_item_id, {
+      food: r.food,
+      lastQuantity: r.quantity ?? r.food.serving_size,
+      unit: r.unit ?? r.food.serving_unit,
+      timesLogged: 1,
+    })
+  }
+  return [...seen.values()].sort((a, b) => b.timesLogged - a.timesLogged).slice(0, limit)
+}
+
 // ---- Strong and Surrendered (the course) ----
 
 /** The member's enrollment, or null if she hasn't started. */

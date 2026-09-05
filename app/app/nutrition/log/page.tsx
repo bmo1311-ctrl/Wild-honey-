@@ -1,14 +1,14 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { FoodLogger } from '@/components/food-logger'
-import { getFoodItems, getTodayNutrition } from '@/lib/data'
+import { getFoodItems, getTodayNutrition, getUsualFoods } from '@/lib/data'
 
 /**
  * One job: log what she ate. No recipes, no browsing — she tapped "log what
  * you ate" and this is that, and only that.
  */
 export default async function LogFoodPage() {
-  const [foods, nutrition] = await Promise.all([getFoodItems(), getTodayNutrition()])
+  const [foods, nutrition, usual] = await Promise.all([getFoodItems(), getTodayNutrition(), getUsualFoods()])
 
   const logged = nutrition.loggedMeals.map((m) => {
     const row = m as typeof m & {
@@ -55,7 +55,7 @@ export default async function LogFoodPage() {
         ))}
       </div>
 
-      <FoodLogger foods={foods} logged={logged} />
+      <FoodLogger foods={foods} logged={logged} usual={usual} />
 
       <Link href="/app/nutrition" className="text-center text-sm font-medium text-mindset-pillar underline underline-offset-[3px]">
         Browse recipes instead
