@@ -906,6 +906,24 @@ export async function getWritings(dayNumber?: number): Promise<CourseWriting[]> 
   return (data as CourseWriting[]) ?? []
 }
 
+/** Day progress with its dates, for streaks and milestones. */
+export async function getDayProgress(): Promise<{ day_number: number; completed_at: string }[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const data = ok(
+    await supabase
+      .from('course_day_progress')
+      .select('day_number, completed_at')
+      .eq('user_id', user.id)
+      .eq('course_slug', COURSE_SLUG)
+      .order('day_number', { ascending: true }),
+  )
+  return (data as { day_number: number; completed_at: string }[]) ?? []
+}
+
 /** Which day she is on today, or null when not enrolled. */
 export async function getCurrentDay(): Promise<number | null> {
   const enrollment = await getEnrollment()

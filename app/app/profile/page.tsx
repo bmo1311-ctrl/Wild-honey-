@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Dumbbell, Flame, LogOut, ShoppingBag, Tent, Archive, ChevronRight, ClipboardList, Refrigerator, BookMarked, Users, HelpCircle, TrendingUp, ShieldCheck, Heart, ChefHat, Trophy, CalendarDays } from 'lucide-react'
+import { Sparkles, Dumbbell, Flame, LogOut, ShoppingBag, Tent, Archive, ChevronRight, ClipboardList, Refrigerator, BookMarked, Users, HelpCircle, TrendingUp, ShieldCheck, Heart, ChefHat, Trophy, CalendarDays } from 'lucide-react'
 import { signOut } from '@/app/actions'
 import { ProfileEditor } from '@/components/profile-editor'
 import { HoneyProfileCard } from '@/components/honey-profile-card'
@@ -60,10 +60,14 @@ export default async function ProfilePage() {
 
       <HoneyProfileCard profile={profile} goals={goals.map((g) => g.goal)} baseline={baseline} latest={latest} />
 
-      {(FEATURES.progress || FEATURES.fixedCalendar || FEATURES.challenges || FEATURES.archive) && (
-        <div>
-          <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">my journey</p>
-          <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
+      <div>
+        <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">my journey</p>
+        <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
+          <Link href="/app/becoming" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+            <Sparkles className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Your becoming</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
             {FEATURES.progress && (
               <Link href="/app/progress" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -94,7 +98,6 @@ export default async function ProfilePage() {
             )}
           </div>
         </div>
-      )}
 
       <div>
         <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">nourish &amp; move</p>
