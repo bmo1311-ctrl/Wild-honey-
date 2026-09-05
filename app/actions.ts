@@ -2183,3 +2183,33 @@ export async function logFoods(
   revalidatePath('/app')
   return { ok: true, count: rows.length }
 }
+
+/** Her body and goal, from which the daily targets are calculated. */
+export async function saveBodyGoals(input: {
+  weight: number | null
+  weightUnit: 'lb' | 'kg'
+  heightCm: number | null
+  birthYear: number | null
+  activityLevel: string | null
+  bodyGoal: string | null
+}) {
+  const { supabase, user } = await requireUser()
+  const weightKg =
+    input.weight == null ? null : input.weightUnit === 'lb' ? Math.round(input.weight * 0.45359237 * 10) / 10 : input.weight
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      weight_kg: weightKg,
+      weight_unit: input.weightUnit,
+      height_cm: input.heightCm,
+      birth_year: input.birthYear,
+      activity_level: input.activityLevel,
+      body_goal: input.bodyGoal,
+    })
+    .eq('id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/nutrition')
+  revalidatePath('/app/nutrition/log')
+  revalidatePath('/app')
+  return { ok: true }
+}

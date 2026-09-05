@@ -1,14 +1,42 @@
 import Link from 'next/link'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, Settings2 } from 'lucide-react'
 import { FoodLogger } from '@/components/food-logger'
-import { getFoodItems, getTodayNutrition, getUsualFoods } from '@/lib/data'
+import { getFoodItems, getSessionProfile, getTodayNutrition, getUsualFoods } from '@/lib/data'
+import { NutrientRings } from '@/components/nutrient-rings'
+import { calculateTargets, effectiveTargets, type ActivityLevel, type BodyGoal } from '@/lib/goals'
 
 /**
  * One job: log what she ate. No recipes, no browsing — she tapped "log what
  * you ate" and this is that, and only that.
  */
 export default async function LogFoodPage() {
-  const [foods, nutrition, usual] = await Promise.all([getFoodItems(), getTodayNutrition(), getUsualFoods()])
+  const [foods, nutrition, usual, profile] = await Promise.all([
+    getFoodItems(),
+    getTodayNutrition(),
+    getUsualFoods(),
+    getSessionProfile(),
+  ])
+
+  const p = profile as (typeof profile & {
+    weight_kg?: number | null
+    height_cm?: number | null
+    birth_year?: number | null
+    activity_level?: string | null
+    body_goal?: string | null
+  }) | null
+
+  const calculated = calculateTargets({
+    weightKg: p?.weight_kg ?? null,
+    heightCm: p?.height_cm ?? null,
+    birthYear: p?.birth_year ?? null,
+    activity: (p?.activity_level as ActivityLevel) ?? null,
+    goal: (p?.body_goal as BodyGoal) ?? null,
+  })
+  const targets = effectiveTargets(calculated, {
+    ...(profile?.daily_calorie_goal ? { calories: profile.daily_calorie_goal } : {}),
+    ...(profile?.daily_protein_goal_g ? { protein_g: profile.daily_protein_goal_g } : {}),
+  })
+  const hasGoals = Boolean(p?.weight_kg)
 
   const logged = nutrition.loggedMeals.map((m) => {
     const row = m as typeof m & {
@@ -28,32 +56,30 @@ export default async function LogFoodPage() {
     }
   })
 
-  const totals = [
-    { label: 'cal', value: Math.round(nutrition.calories), goal: nutrition.calorieGoal },
-    { label: 'protein', value: Math.round(nutrition.protein), goal: nutrition.proteinGoal },
-    { label: 'carbs', value: Math.round(nutrition.carbs), goal: null },
-    { label: 'fat', value: Math.round(nutrition.fat), goal: null },
-  ]
-
   return (
     <div className="flex flex-col gap-5">
       <div>
         <Link href="/app" className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground">
           <ChevronLeft className="h-4 w-4" /> Today
         </Link>
-        <h1 className="font-serif text-[29px] font-semibold leading-[1.1]">Log what you ate</h1>
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="font-serif text-[29px] font-semibold leading-[1.1]">Log what you ate</h1>
+          <Link href="/app/nutrition/goals" aria-label="Your targets" className="shrink-0 rounded-full bg-card p-2.5 ring-1 ring-border">
+            <Settings2 className="h-4 w-4 text-muted-foreground" />
+          </Link>
+        </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-2">
-        {totals.map((t) => (
-          <div key={t.label} className="rounded-2xl border border-border bg-card px-2 py-3 text-center">
-            <p className="font-serif text-[22px] font-semibold leading-none">{t.value}</p>
-            <p className="mt-1 text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
-              {t.goal ? `of ${t.goal}` : t.label}
-            </p>
-          </div>
-        ))}
-      </div>
+      <NutrientRings
+        totals={{
+          calories: nutrition.calories,
+          protein_g: nutrition.protein,
+          carbs_g: nutrition.carbs,
+          fat_g: nutrition.fat,
+        }}
+        targets={targets}
+        hasGoals={hasGoals}
+      />
 
       <FoodLogger foods={foods} logged={logged} usual={usual} />
 
