@@ -13,6 +13,18 @@ import { cn } from '@/lib/utils'
  * measured or scored, it is only what she says today, so that week eight has
  * something honest to compare against.
  */
+export function BaselineCardLink({ dayNumber }: { dayNumber: number | null }) {
+  return (
+    <a href="/app/checkin" className="flex w-full items-center gap-3 rounded-2xl border border-dashed border-border bg-card p-4 text-left">
+      <span className="min-w-0 flex-1">
+        <span className="block text-[15px] font-semibold">Mark where you&rsquo;re starting</span>
+        <span className="mt-0.5 block text-[13px] text-muted-foreground text-pretty">your first check-in becomes your before{dayNumber ? ` — day ${dayNumber} is early enough` : ''}</span>
+      </span>
+      <ChevronDown className="h-4 w-4 shrink-0 -rotate-90 text-muted-foreground" />
+    </a>
+  )
+}
+
 export function BaselineCard({ dayNumber }: { dayNumber: number | null }) {
   const [open, setOpen] = useState(false)
   const [dismissed, setDismissed] = useState(false)

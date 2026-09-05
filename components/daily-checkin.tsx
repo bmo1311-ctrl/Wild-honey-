@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Check } from 'lucide-react'
-import { saveCheckin } from '@/app/actions'
+import { addVitalityCheckin, saveCheckin } from '@/app/actions'
 import { CYCLE_PHASES } from '@/lib/cycle'
 import type { Checkin } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -19,7 +19,17 @@ const SCALES = [
  * One screen, one job. The cycle phase asked here is the same one the
  * nutrition targets use, so answering it moves today's numbers.
  */
-export function DailyCheckin({ existing }: { existing: Checkin | null }) {
+const MORE = [
+  { key: 'mood', label: 'Mood' },
+  { key: 'confidence', label: 'Confidence' },
+  { key: 'motivation', label: 'Motivation' },
+  { key: 'mental_clarity', label: 'Mental clarity' },
+  { key: 'physical_strength', label: 'Physical strength' },
+] as const
+
+export function DailyCheckin({ existing, hasBaseline }: { existing: Checkin | null; hasBaseline: boolean }) {
+  const [more, setMore] = useState(!hasBaseline)
+  const [extra, setExtra] = useState<Record<string, number | null>>({})
   const router = useRouter()
   const [pending, startTransition] = useTransition()
   const [v, setV] = useState<Record<string, number | null>>({
@@ -45,7 +55,14 @@ export function DailyCheckin({ existing }: { existing: Checkin | null }) {
         toast.error(res.error)
         return
       }
-      toast.success('Logged')
+      // The same numbers feed Your becoming. First one is her "before".
+      const snapshot: Record<string, number> = {}
+      if (v.energy) snapshot.energy = v.energy
+      if (v.sleep_quality) snapshot.sleep = v.sleep_quality
+      if (v.stress) snapshot.stress = v.stress
+      for (const m of MORE) if (extra[m.key]) snapshot[m.key] = extra[m.key] as number
+      if (Object.keys(snapshot).length) await addVitalityCheckin(snapshot, undefined, hasBaseline ? 'checkpoint' : 'baseline')
+      toast.success(hasBaseline ? 'Logged' : 'Logged — this is your before.')
       router.push('/app')
       router.refresh()
     })
@@ -76,6 +93,29 @@ export function DailyCheckin({ existing }: { existing: Checkin | null }) {
           </div>
         </div>
       ))}
+
+      {more ? (
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <p className="font-serif text-[18px] font-semibold">A bit more</p>
+          <p className="mt-0.5 text-[13px] text-muted-foreground">{hasBaseline ? 'optional — this is what Your becoming compares over time.' : 'this becomes your before. optional, but worth a minute.'}</p>
+          <div className="mt-3 flex flex-col gap-3">
+            {MORE.map((m) => (
+              <div key={m.key}>
+                <div className="mb-1 flex items-baseline justify-between"><span className="text-sm font-medium">{m.label}</span><span className="text-xs text-muted-foreground">{extra[m.key] ? `${extra[m.key]}/10` : '—'}</span></div>
+                <div className="flex gap-1">
+                  {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+                    <button key={n} type="button" aria-label={`${m.label} ${n} out of 10`} onClick={() => setExtra((p) => ({ ...p, [m.key]: n }))} className={cn('h-8 flex-1 rounded-md transition-colors', extra[m.key] && n <= (extra[m.key] as number) ? 'bg-mindset-pillar' : 'bg-muted')} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <button type="button" onClick={() => setMore(true)} className="self-start text-sm font-medium text-muted-foreground underline underline-offset-[3px]">
+          + mood, confidence, motivation, clarity, strength
+        </button>
+      )}
 
       <div className="rounded-2xl border border-border bg-card p-4">
         <p className="font-serif text-[18px] font-semibold">Where are you in your cycle?</p>

@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { ChevronRight, Flame } from 'lucide-react'
 import { TodayChecklist } from '@/components/today-checklist'
-import { BaselineCard } from '@/components/baseline-card'
+import { BaselineCardLink } from '@/components/baseline-card'
+import { nudgesFor } from '@/lib/nudges'
+import { suggestHabits } from '@/lib/habit-suggestions'
 import { todayRows } from '@/lib/modules'
 import { getCourse, getDay, toISODate, weekOfDay } from '@/lib/courses'
 import { CourseSwitcher } from '@/components/course/course-switcher'
@@ -13,6 +15,8 @@ import {
   getHabits,
   getRecentHabitLogs,
   getBaselineVitality,
+  getMyGoals,
+  getRecentCheckins,
   getSessionProfile,
   getTodayCheckin,
   getTodayNutrition,
@@ -34,7 +38,6 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     getHabits(),
     getRecentHabitLogs(7),
   ])
-  const baseline = await getBaselineVitality()
 
   const course = getCourse(slug)
   const activity = buildActivity(activityDates)
@@ -45,6 +48,21 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
   const dayDone = currentDay ? completedDays.includes(currentDay) : false
   const pct = course ? Math.round((completedDays.length / course.length_days) * 100) : 0
   const loggedHabitIds = new Set(habitLogs.filter((l) => l.date === today).map((l) => l.habit_id))
+
+  const [baseline, goals, recentCheckins] = await Promise.all([getBaselineVitality(), getMyGoals(), getRecentCheckins(30)])
+  const lastCheckin = recentCheckins[recentCheckins.length - 1]?.date ?? null
+  const daysSinceCheckin = lastCheckin ? Math.floor((Date.parse(today) - Date.parse(lastCheckin)) / 86_400_000) : null
+  const nudges = nudgesFor({
+    hour: new Date().getHours(),
+    courseDay: day ? { number: day.day_number, slug } : null,
+    courseDayDone: dayDone,
+    mealsLogged: nutrition.loggedMeals.length,
+    checkedIn: Boolean(checkin),
+    daysSinceCheckin,
+    weekHit: week.hit,
+    writingsCount: 0,
+  })
+  const habitSuggestions = suggestHabits(goals.map((g) => g.goal), habits.map((h) => h.title))
 
   const stats = [
     { label: 'Day', value: currentDay ? `${currentDay}` : '—', sub: course ? `of ${course.length_days}` : '' },
@@ -119,10 +137,21 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
         </p>
       </section>
 
-      {!baseline && <BaselineCard dayNumber={currentDay} />}
+      {nudges.length > 0 && (
+        <section className="flex flex-col gap-2">
+          {nudges.map((n) => (
+            <Link key={n.text} href={n.href} className="flex items-center gap-3 rounded-2xl bg-mindset-pillar/10 px-4 py-3 text-[14.5px] leading-[1.4] text-pretty">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-mindset-pillar" aria-hidden="true" />
+              <span className="flex-1">{n.text}</span>
+            </Link>
+          ))}
+        </section>
+      )}
+
+      {!baseline && <BaselineCardLink dayNumber={currentDay} />}
 
       <TodayChecklist rows={rows} />
-      <QuickAddHabit />
+      <QuickAddHabit suggestions={habitSuggestions} />
 
       {day && (
         <Link

@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { DailyCheckin } from '@/components/daily-checkin'
-import { getTodayCheckin } from '@/lib/data'
+import { getBaselineVitality, getTodayCheckin } from '@/lib/data'
 
 export default async function CheckinPage() {
-  const existing = await getTodayCheckin()
+  const [existing, baseline] = await Promise.all([getTodayCheckin(), getBaselineVitality()])
 
   return (
     <div className="flex flex-col gap-5">
@@ -15,7 +15,7 @@ export default async function CheckinPage() {
         <h1 className="font-serif text-[29px] font-semibold leading-[1.1]">How are you today?</h1>
         <p className="mt-1 text-sm text-muted-foreground text-pretty">four quick things. nothing here is required.</p>
       </div>
-      <DailyCheckin existing={existing} />
+      <DailyCheckin existing={existing} hasBaseline={Boolean(baseline)} />
     </div>
   )
 }
