@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { oneSignalConfigured, sendPushToUsers } from '@/lib/onesignal'
 import type { Comment, NotificationPrefs, Visibility } from '@/lib/types'
+import { COURSE_SLUG, toISODate } from '@/lib/courses'
+import type { WritingKind } from '@/lib/courses'
 
 async function requireUser() {
   const supabase = await createClient()
@@ -1931,4 +1933,99 @@ export async function getCheckinGap() {
   const last = new Date(data.date + 'T00:00:00')
   const days = Math.floor((Date.now() - last.getTime()) / 86400000)
   return { daysSinceLastCheckin: days }
+}
+
+// ---- Strong and Surrendered (the course) ----
+// The three course tables are live; these only read and write rows, never DDL.
+// The user is always resolved server-side via requireUser().
+
+export async function enrollInCourse() {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase
+    .from('course_enrollments')
+    .upsert(
+      { user_id: user.id, course_slug: COURSE_SLUG, started_on: toISODate(), is_active: true, completed_at: null },
+      { onConflict: 'user_id,course_slug' },
+    )
+  if (error) return { error: error.message }
+  revalidatePath('/app')
+  revalidatePath('/app/program')
+  return { ok: true }
+}
+
+export async function unenrollFromCourse() {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase
+    .from('course_enrollments')
+    .update({ is_active: false })
+    .eq('user_id', user.id)
+    .eq('course_slug', COURSE_SLUG)
+  if (error) return { error: error.message }
+  revalidatePath('/app')
+  revalidatePath('/app/program')
+  return { ok: true }
+}
+
+export async function completeCourseDay(dayNumber: number) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase
+    .from('course_day_progress')
+    .upsert(
+      { user_id: user.id, course_slug: COURSE_SLUG, day_number: dayNumber, completed_at: new Date().toISOString() },
+      { onConflict: 'user_id,course_slug,day_number' },
+    )
+  if (error) return { error: error.message }
+  await bumpStreak(user.id)
+  revalidateCourse(dayNumber)
+  return { ok: true }
+}
+
+export async function uncompleteCourseDay(dayNumber: number) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase
+    .from('course_day_progress')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('course_slug', COURSE_SLUG)
+    .eq('day_number', dayNumber)
+  if (error) return { error: error.message }
+  revalidateCourse(dayNumber)
+  return { ok: true }
+}
+
+/**
+ * Upsert on (user_id, course_slug, day_number, prompt_index). Nothing here is
+ * ever destructive — this replaces a paper workbook.
+ */
+export async function saveCourseWriting(input: {
+  dayNumber: number
+  promptIndex: number
+  prompt: string
+  body: string
+  kind?: WritingKind
+}) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('course_writings').upsert(
+    {
+      user_id: user.id,
+      course_slug: COURSE_SLUG,
+      day_number: input.dayNumber,
+      prompt_index: input.promptIndex,
+      prompt: input.prompt,
+      body: input.body,
+      kind: input.kind ?? 'write',
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id,course_slug,day_number,prompt_index' },
+  )
+  if (error) return { error: error.message }
+  revalidatePath('/app/write')
+  return { ok: true, savedAt: new Date().toISOString() }
+}
+
+function revalidateCourse(dayNumber: number) {
+  revalidatePath('/app')
+  revalidatePath('/app/program')
+  revalidatePath(`/app/program/day/${dayNumber}`)
+  revalidatePath(`/app/program/week/${Math.floor((dayNumber - 1) / 7) + 1}`)
 }

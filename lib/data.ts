@@ -38,6 +38,8 @@ import type {
   Workout,
 } from '@/lib/types'
 import { suggestProtocol } from '@/lib/protocols'
+import { COURSE_SLUG, currentDayFrom } from '@/lib/courses'
+import type { CourseEnrollment, CourseWriting } from '@/lib/courses'
 
 /**
  * Unwraps a Supabase response, throwing on error instead of quietly
@@ -856,6 +858,73 @@ export async function getAllChallengesForAdmin(): Promise<Challenge[]> {
   const countByChallenge = new Map<string, number>()
   ;(participants ?? []).forEach((p) => countByChallenge.set(p.challenge_id, (countByChallenge.get(p.challenge_id) ?? 0) + 1))
   return list.map((c) => ({ ...c, participant_count: countByChallenge.get(c.id) ?? 0 }))
+}
+
+// ---- Strong and Surrendered (the course) ----
+
+/** The member's enrollment, or null if she hasn't started. */
+export async function getEnrollment(): Promise<CourseEnrollment | null> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return null
+  const data = ok(
+    await supabase.from('course_enrollments').select('*').eq('user_id', user.id).eq('course_slug', COURSE_SLUG).maybeSingle(),
+  )
+  return (data as CourseEnrollment) ?? null
+}
+
+/** Day numbers she has ticked, ascending. */
+export async function getCompletedDays(): Promise<number[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const data = ok(
+    await supabase
+      .from('course_day_progress')
+      .select('day_number')
+      .eq('user_id', user.id)
+      .eq('course_slug', COURSE_SLUG)
+      .order('day_number', { ascending: true }),
+  )
+  return ((data as { day_number: number }[]) ?? []).map((r) => r.day_number)
+}
+
+/** Everything she has written, newest first. Pass a day to scope it to that day. */
+export async function getWritings(dayNumber?: number): Promise<CourseWriting[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  let q = supabase.from('course_writings').select('*').eq('user_id', user.id).eq('course_slug', COURSE_SLUG)
+  if (dayNumber !== undefined) q = q.eq('day_number', dayNumber)
+  const data = ok(await q.order('updated_at', { ascending: false }))
+  return (data as CourseWriting[]) ?? []
+}
+
+/** Which day she is on today, or null when not enrolled. */
+export async function getCurrentDay(): Promise<number | null> {
+  const enrollment = await getEnrollment()
+  return enrollment ? currentDayFrom(enrollment.started_on) : null
+}
+
+/**
+ * Everything the Program and Today screens need, in one pass — three
+ * round trips instead of the six the individual helpers would cost.
+ */
+export async function getCourseState(): Promise<{
+  enrollment: CourseEnrollment | null
+  currentDay: number | null
+  completedDays: number[]
+}> {
+  const enrollment = await getEnrollment()
+  if (!enrollment) return { enrollment: null, currentDay: null, completedDays: [] }
+  const completedDays = await getCompletedDays()
+  return { enrollment, currentDay: currentDayFrom(enrollment.started_on), completedDays }
 }
 
 // ---- AI companion (deferred — table exists, feature not wired up yet) ----
