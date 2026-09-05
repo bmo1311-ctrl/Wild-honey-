@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Flame, LogOut, ShoppingBag, Tent, Archive, ChevronRight, ClipboardList, Refrigerator, BookMarked, Users, HelpCircle, TrendingUp, ShieldCheck, Heart, ChefHat, Trophy, CalendarDays } from 'lucide-react'
+import { Dumbbell, Flame, LogOut, ShoppingBag, Tent, Archive, ChevronRight, ClipboardList, Refrigerator, BookMarked, Users, HelpCircle, TrendingUp, ShieldCheck, Heart, ChefHat, Trophy, CalendarDays } from 'lucide-react'
 import { signOut } from '@/app/actions'
 import { ProfileEditor } from '@/components/profile-editor'
 import { HoneyProfileCard } from '@/components/honey-profile-card'
@@ -96,34 +96,37 @@ export default async function ProfilePage() {
         </div>
       )}
 
-      {(FEATURES.recipes || FEATURES.pantry || FEATURES.protocols) && (
-        <div>
-          <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">nourish &amp; move</p>
-          <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
-            {FEATURES.recipes && (
-              <Link href="/app/recipes" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-                <ChefHat className="h-4 w-4 text-muted-foreground" />
-                <span className="flex-1 text-sm font-medium">Recipes</span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </Link>
-            )}
-            {FEATURES.pantry && (
-              <Link href="/app/pantry" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-                <Refrigerator className="h-4 w-4 text-muted-foreground" />
-                <span className="flex-1 text-sm font-medium">Pantry &amp; Grocery</span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </Link>
-            )}
-            {FEATURES.protocols && (
-              <Link href="/app/protocols" className="flex items-center gap-3 px-4 py-3.5">
-                <ClipboardList className="h-4 w-4 text-muted-foreground" />
-                <span className="flex-1 text-sm font-medium">Protocols</span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </Link>
-            )}
-          </div>
+      <div>
+        <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">nourish &amp; move</p>
+        <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
+          <Link href="/app/workouts" className="flex items-center gap-3 px-4 py-3.5">
+            <Dumbbell className="h-4 w-4 text-muted-foreground" />
+            <span className="flex-1 text-sm font-medium">Workouts</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+          {FEATURES.recipes && (
+            <Link href="/app/recipes" className="flex items-center gap-3 px-4 py-3.5 border-t border-border">
+              <ChefHat className="h-4 w-4 text-muted-foreground" />
+              <span className="flex-1 text-sm font-medium">Recipes</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+          )}
+          {FEATURES.pantry && (
+            <Link href="/app/pantry" className="flex items-center gap-3 px-4 py-3.5 border-t border-border">
+              <Refrigerator className="h-4 w-4 text-muted-foreground" />
+              <span className="flex-1 text-sm font-medium">Pantry &amp; Grocery</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+          )}
+          {FEATURES.protocols && (
+            <Link href="/app/protocols" className="flex items-center gap-3 px-4 py-3.5 border-t border-border">
+              <ClipboardList className="h-4 w-4 text-muted-foreground" />
+              <span className="flex-1 text-sm font-medium">Protocols</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+          )}
         </div>
-      )}
+      </div>
 
       <div>
         <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">connect</p>

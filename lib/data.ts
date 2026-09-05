@@ -42,8 +42,10 @@ import { suggestProtocol } from '@/lib/protocols'
 /**
  * Unwraps a Supabase response, throwing on error instead of quietly
  * returning nothing. An empty state may only claim emptiness when the
- * query actually succeeded — a missing table or a blocked RLS policy has
- * to surface as a failure, not as "nothing here yet".
+ * query actually succeeded — a missing table, a bad column or a permission
+ * error has to surface as a failure, not as "nothing here yet". (A blocked
+ * RLS policy on a SELECT returns no rows rather than an error, so that case
+ * still reads as empty.)
  */
 function ok<T>(res: { data: T; error: unknown }): T {
   if (res.error) throw res.error
