@@ -1077,7 +1077,10 @@ export async function getEnrollments(): Promise<CourseEnrollment[]> {
       .select('*')
       .eq('user_id', user.id)
       .eq('is_active', true)
-      .order('started_on', { ascending: false }),
+      // started_on is a date, so two courses begun the same day tie on it and
+      // the database picks arbitrarily — that is how Daily Bread came up as
+      // Strong and Surrendered. created_at is the real order of her actions.
+      .order('created_at', { ascending: false }),
   )
   return (data as CourseEnrollment[]) ?? []
 }
@@ -1099,7 +1102,7 @@ export async function getCourseState(slug: string = COURSE_SLUG): Promise<{
 }
 
 /** The course she is actually on right now: the most recently started. */
-export async function getActiveCourseState(): Promise<{
+export async function getActiveCourseState(preferredSlug?: string | null): Promise<{
   slug: string
   enrollment: CourseEnrollment | null
   currentDay: number | null
@@ -1110,12 +1113,12 @@ export async function getActiveCourseState(): Promise<{
   if (enrollments.length === 0) {
     return { slug: COURSE_SLUG, enrollment: null, currentDay: null, completedDays: [], otherSlugs: [] }
   }
-  const active = enrollments[0]
+  const active = (preferredSlug && enrollments.find((e) => e.course_slug === preferredSlug)) || enrollments[0]
   const state = await getCourseState(active.course_slug)
   return {
     slug: active.course_slug,
     ...state,
-    otherSlugs: enrollments.slice(1).map((e) => e.course_slug),
+    otherSlugs: enrollments.filter((e) => e.course_slug !== active.course_slug).map((e) => e.course_slug),
   }
 }
 

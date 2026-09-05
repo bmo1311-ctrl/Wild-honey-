@@ -4,6 +4,7 @@ import { TodayChecklist } from '@/components/today-checklist'
 import { BaselineCard } from '@/components/baseline-card'
 import { todayRows } from '@/lib/modules'
 import { getCourse, getDay, toISODate, weekOfDay } from '@/lib/courses'
+import { CourseSwitcher } from '@/components/course/course-switcher'
 import { computeStreaks } from '@/lib/rewards'
 import {
   getActiveCourseState,
@@ -21,9 +22,10 @@ import {
  * today actually needs — tickable where it can be ticked, and a link straight
  * to the work where it can't.
  */
-export default async function TodayPage() {
-  const [{ slug, enrollment, currentDay, completedDays }, profile, progress, checkin, nutrition, habits, habitLogs] = await Promise.all([
-    getActiveCourseState(),
+export default async function TodayPage({ searchParams }: { searchParams: Promise<{ course?: string }> }) {
+  const { course: preferred } = await searchParams
+  const [{ slug, enrollment, currentDay, completedDays, otherSlugs }, profile, progress, checkin, nutrition, habits, habitLogs] = await Promise.all([
+    getActiveCourseState(preferred),
     getSessionProfile(),
     getDayProgress(),
     getTodayCheckin(),
@@ -102,6 +104,8 @@ export default async function TodayPage() {
           </div>
         ))}
       </section>
+
+      {otherSlugs.length > 0 && <CourseSwitcher current={slug} others={otherSlugs} />}
 
       <section>
         <div className="h-2 w-full overflow-hidden rounded-full bg-muted">

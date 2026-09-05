@@ -21,6 +21,7 @@ export function StartCourseButton({ slug, label = 'Begin day 1' }: { slug?: stri
             toast.error(res.error)
             return
           }
+          router.push(slug ? `/app?course=${slug}` : '/app')
           router.refresh()
         })
       }
