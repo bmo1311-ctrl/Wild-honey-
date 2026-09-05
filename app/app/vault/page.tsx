@@ -1,20 +1,20 @@
-import { VaultBrowser } from '@/components/vault-browser'
-import { buildShelves, buildVaultIndex } from '@/lib/vault'
-import { getRecipes, getResources, getWorkouts } from '@/lib/data'
+import { WatchBrowser } from '@/components/watch-browser'
+import { getResources } from '@/lib/data'
 import { FeatureOff } from '@/components/feature-off'
 import { FEATURES } from '@/lib/features'
 
-export default async function VaultPage() {
+/** Teaching videos only. Food lives in Nutrition, training lives in Fitness. */
+export default async function WatchPage() {
   if (!FEATURES.vault) return <FeatureOff />
-
-  const [resources, recipes, workouts] = await Promise.all([getResources(), getRecipes(), getWorkouts()])
-  const items = buildVaultIndex({ resources, recipes, workouts })
-  const shelves = buildShelves(items)
+  const resources = await getResources()
 
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="font-serif text-[29px] font-semibold leading-[1.1]">Vault</h1>
-      <VaultBrowser shelves={shelves} all={items} />
+      <div>
+        <h1 className="font-serif text-[29px] font-semibold leading-[1.1]">Watch</h1>
+        <p className="mt-1 text-sm text-muted-foreground">teaching videos on identity, mindset and faith.</p>
+      </div>
+      <WatchBrowser resources={resources} />
     </div>
   )
 }

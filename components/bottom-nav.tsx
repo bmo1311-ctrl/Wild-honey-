@@ -2,13 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Sun, BookOpen, PenLine, Users, User } from 'lucide-react'
+import { Sun, BookOpen, LibraryBig, Users, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const TABS = [
   { href: '/app', label: 'Today', icon: Sun, exact: true },
   { href: '/app/program', label: 'Program', icon: BookOpen },
-  { href: '/app/write', label: 'Write', icon: PenLine },
+  { href: '/app/library', label: 'Library', icon: LibraryBig },
   { href: '/app/circle', label: 'Circle', icon: Users },
   { href: '/app/profile', label: 'You', icon: User },
 ]
