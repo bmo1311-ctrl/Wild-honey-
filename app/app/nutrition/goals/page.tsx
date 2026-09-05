@@ -4,7 +4,7 @@ import { BodyGoalsForm } from '@/components/body-goals-form'
 import { CycleSettingsForm } from '@/components/cycle-settings-form'
 import type { CyclePhaseKey } from '@/lib/cycle'
 import { getSessionProfile } from '@/lib/data'
-import { kgToLb, type ActivityLevel, type BodyGoal } from '@/lib/goals'
+import { calculateTargets, kgToLb, type ActivityLevel, type BodyGoal } from '@/lib/goals'
 
 export default async function GoalsPage() {
   const profile = (await getSessionProfile()) as (Awaited<ReturnType<typeof getSessionProfile>> & {
@@ -46,6 +46,15 @@ export default async function GoalsPage() {
       />
 
       <CycleSettingsForm
+        baseCalories={
+          calculateTargets({
+            weightKg: profile?.weight_kg ?? null,
+            heightCm: profile?.height_cm ?? null,
+            birthYear: profile?.birth_year ?? null,
+            activity: (profile?.activity_level as ActivityLevel) ?? null,
+            goal: (profile?.body_goal as BodyGoal) ?? null,
+          }).calories
+        }
         initial={{
           lastPeriodStart: profile?.last_period_start?.slice(0, 10) ?? '',
           cycleLength: profile?.cycle_length_days ? String(profile.cycle_length_days) : '',

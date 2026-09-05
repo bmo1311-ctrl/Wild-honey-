@@ -81,3 +81,17 @@ export function phaseFromDates(lastPeriodStart: string | null, cycleLength = 28,
 export function phaseLabel(phase: CyclePhaseKey | null): string {
   return CYCLE_PHASES.find((p) => p.key === phase)?.label ?? 'Not tracked'
 }
+
+/** Named choices instead of a percentage nobody can reason about. */
+export const CYCLE_CHOICES: { pct: number; label: string; blurb: string }[] = [
+  { pct: -7, label: 'Notably less', blurb: 'appetite drops off' },
+  { pct: -3, label: 'A little less', blurb: '' },
+  { pct: 0, label: 'The same', blurb: 'no change' },
+  { pct: 3, label: 'A little more', blurb: '' },
+  { pct: 7, label: 'Notably more', blurb: 'hungrier, training harder' },
+]
+
+/** Nearest named choice to a stored percentage. */
+export function nearestChoice(pct: number): number {
+  return CYCLE_CHOICES.reduce((best, c) => (Math.abs(c.pct - pct) < Math.abs(best - pct) ? c.pct : best), 0)
+}

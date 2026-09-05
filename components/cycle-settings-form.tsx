@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { saveCycleSettings } from '@/app/actions'
-import { CYCLE_PHASES, DEFAULT_ADJUSTMENTS, phaseFromDates, type CyclePhaseKey } from '@/lib/cycle'
+import { CYCLE_CHOICES, CYCLE_PHASES, DEFAULT_ADJUSTMENTS, nearestChoice, phaseFromDates, type CyclePhaseKey } from '@/lib/cycle'
 import { cn } from '@/lib/utils'
 
 /**
@@ -12,12 +12,19 @@ import { cn } from '@/lib/utils'
  */
 export function CycleSettingsForm({
   initial,
+  baseCalories,
 }: {
   initial: { lastPeriodStart: string; cycleLength: string; adjustments: Partial<Record<CyclePhaseKey, number>> }
+  baseCalories: number | null
 }) {
   const [start, setStart] = useState(initial.lastPeriodStart)
   const [len, setLen] = useState(initial.cycleLength || '28')
-  const [adj, setAdj] = useState<Record<string, number>>({ ...DEFAULT_ADJUSTMENTS, ...initial.adjustments })
+  const [adj, setAdj] = useState<Record<string, number>>(() => {
+    const merged: Record<string, number> = { ...DEFAULT_ADJUSTMENTS, ...initial.adjustments }
+    // snap anything stored as an odd percentage onto the nearest named choice
+    for (const k of Object.keys(merged)) merged[k] = nearestChoice(merged[k])
+    return merged
+  })
   const [pending, startTransition] = useTransition()
 
   const phaseToday = phaseFromDates(start || null, Number(len) || 28)
@@ -43,7 +50,7 @@ export function CycleSettingsForm({
     <div className="rounded-2xl border border-border bg-card p-4">
       <p className="mb-1.5 text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">Your cycle</p>
       <p className="mb-3 text-[13px] text-muted-foreground text-pretty">
-        targets shift with the phase instead of being the same every week.
+        how much you actually want to eat changes across the month. set each phase to what is true for you — the calorie figure updates as you choose.
       </p>
 
       <div className="grid grid-cols-2 gap-2">
@@ -63,41 +70,46 @@ export function CycleSettingsForm({
         </p>
       )}
 
-      <div className="mt-4 flex flex-col gap-2.5">
-        {CYCLE_PHASES.map((p) => (
-          <div key={p.key} className="flex items-center gap-3">
-            <span className="min-w-0 flex-1">
-              <span className="block text-[14.5px] font-medium">{p.label}</span>
-              <span className="block text-[12px] text-muted-foreground">{p.blurb}</span>
-            </span>
-            <div className="flex shrink-0 items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setAdj({ ...adj, [p.key]: Math.max((adj[p.key] ?? 0) - 1, -30) })}
-                aria-label={`less in ${p.label}`}
-                className="h-9 w-9 rounded-full bg-muted text-lg font-semibold"
-              >
-                −
-              </button>
-              <span className={cn('w-12 text-center text-[15px] font-semibold', (adj[p.key] ?? 0) > 0 && 'text-mindset-pillar', (adj[p.key] ?? 0) < 0 && 'text-primary')}>
-                {(adj[p.key] ?? 0) > 0 ? '+' : ''}
-                {adj[p.key] ?? 0}%
-              </span>
-              <button
-                type="button"
-                onClick={() => setAdj({ ...adj, [p.key]: Math.min((adj[p.key] ?? 0) + 1, 30) })}
-                aria-label={`more in ${p.label}`}
-                className="h-9 w-9 rounded-full bg-muted text-lg font-semibold"
-              >
-                +
-              </button>
+      <div className="mt-4 flex flex-col gap-4">
+        {CYCLE_PHASES.map((p) => {
+          const pct = adj[p.key] ?? 0
+          const shifted = baseCalories ? Math.round((baseCalories * (1 + pct / 100)) / 10) * 10 : null
+          const isDefault = pct === DEFAULT_ADJUSTMENTS[p.key]
+          return (
+            <div key={p.key}>
+              <div className="mb-1.5 flex items-baseline justify-between gap-2">
+                <span className="text-[15px] font-semibold">{p.label}</span>
+                <span className="text-[13px] text-muted-foreground">
+                  {shifted ? `${shifted} cal` : `${pct > 0 ? '+' : ''}${pct}%`}
+                  {shifted && pct !== 0 ? ` (${pct > 0 ? '+' : ''}${Math.round(baseCalories! * (pct / 100))})` : ''}
+                </span>
+              </div>
+              <div className="flex gap-1.5">
+                {CYCLE_CHOICES.map((c) => (
+                  <button
+                    key={c.pct}
+                    type="button"
+                    onClick={() => setAdj({ ...adj, [p.key]: c.pct })}
+                    className={cn(
+                      'h-11 flex-1 rounded-xl text-[12px] font-medium leading-tight transition-colors',
+                      pct === c.pct ? 'bg-mindset-pillar text-white' : 'bg-muted text-muted-foreground',
+                    )}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-1 text-[11.5px] text-muted-foreground">
+                {p.blurb}
+                {isDefault && DEFAULT_ADJUSTMENTS[p.key] !== 0 ? ' · typical' : ''}
+              </p>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       <p className="mt-3 text-[12.5px] text-muted-foreground text-pretty">
-        Applied to calories and carbs. Protein stays flat — the reason to eat it doesn&rsquo;t change week to week.
+        Applied to calories and carbs. Protein and water stay flat. &ldquo;Typical&rdquo; marks what most women find, but yours is the one that counts.
       </p>
 
       <button
