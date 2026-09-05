@@ -9,7 +9,17 @@ import { completeCourseDay, uncompleteCourseDay } from '@/app/actions'
  * The one primary action on a day. Optimistic, and always reversible —
  * a completed day becomes a quiet row with Undo, never a dead end.
  */
-export function DoneButton({ dayNumber, initialDone, doneAt }: { dayNumber: number; initialDone: boolean; doneAt: string | null }) {
+export function DoneButton({
+  dayNumber,
+  slug,
+  initialDone,
+  doneAt,
+}: {
+  dayNumber: number
+  slug: string
+  initialDone: boolean
+  doneAt: string | null
+}) {
   const [done, setDone] = useState(initialDone)
   const [at, setAt] = useState<string | null>(doneAt)
   const [, startTransition] = useTransition()

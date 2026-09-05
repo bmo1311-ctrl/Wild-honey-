@@ -3,11 +3,10 @@ import { ChevronRight, Flame } from 'lucide-react'
 import { TodayChecklist } from '@/components/today-checklist'
 import { BaselineCard } from '@/components/baseline-card'
 import { todayRows } from '@/lib/modules'
-import { StartCourseButton } from '@/components/course/start-course-button'
-import { COURSE, getDay, toISODate } from '@/lib/courses'
+import { getCourse, getDay, toISODate, weekOfDay } from '@/lib/courses'
 import { computeStreaks } from '@/lib/rewards'
 import {
-  getCourseState,
+  getActiveCourseState,
   getDayProgress,
   getHabits,
   getRecentHabitLogs,
@@ -23,8 +22,8 @@ import {
  * to the work where it can't.
  */
 export default async function TodayPage() {
-  const [{ enrollment, currentDay, completedDays }, profile, progress, checkin, nutrition, habits, habitLogs] = await Promise.all([
-    getCourseState(),
+  const [{ slug, enrollment, currentDay, completedDays }, profile, progress, checkin, nutrition, habits, habitLogs] = await Promise.all([
+    getActiveCourseState(),
     getSessionProfile(),
     getDayProgress(),
     getTodayCheckin(),
@@ -34,15 +33,16 @@ export default async function TodayPage() {
   ])
   const baseline = await getBaselineVitality()
 
+  const course = getCourse(slug)
   const streaks = computeStreaks(progress)
   const today = toISODate()
-  const day = currentDay ? getDay(currentDay) : null
+  const day = course && currentDay ? getDay(course, currentDay) : null
   const dayDone = currentDay ? completedDays.includes(currentDay) : false
-  const pct = Math.round((completedDays.length / COURSE.length_days) * 100)
+  const pct = course ? Math.round((completedDays.length / course.length_days) * 100) : 0
   const loggedHabitIds = new Set(habitLogs.filter((l) => l.date === today).map((l) => l.habit_id))
 
   const stats = [
-    { label: 'Day', value: currentDay ? `${currentDay}` : '—', sub: `of ${COURSE.length_days}` },
+    { label: 'Day', value: currentDay ? `${currentDay}` : '—', sub: course ? `of ${course.length_days}` : '' },
     { label: 'Streak', value: `${streaks.current}`, sub: streaks.longest > streaks.current ? `best ${streaks.longest}` : 'days', flame: true },
     { label: 'Done', value: `${completedDays.length}`, sub: `${pct}%` },
     {
@@ -60,20 +60,21 @@ export default async function TodayPage() {
     habits: habits.map((h) => ({ id: h.id, title: h.title, anchor: h.anchor, doneToday: loggedHabitIds.has(h.id) })),
   })
 
-  if (!enrollment || !currentDay) {
+  if (!enrollment || !currentDay || !course) {
     return (
       <div className="flex flex-col gap-6">
         <header>
-          <h1 className="font-serif text-[29px] font-semibold leading-[1.1] text-balance">{COURSE.title}</h1>
-          <p className="mt-2 text-[16.5px] leading-[1.5] text-pretty text-muted-foreground">{COURSE.subtitle}</p>
-        </header>
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <p className="font-serif text-xl font-semibold">Eight weeks. Fifty-six days.</p>
-          <p className="mt-1.5 text-[15px] leading-[1.5] text-pretty text-muted-foreground">
-            Thirty minutes of intentional practice a day. Today becomes day one.
+          <h1 className="font-serif text-[29px] font-semibold leading-[1.1] text-balance">Start a program</h1>
+          <p className="mt-2 text-[16.5px] leading-[1.5] text-pretty text-muted-foreground">
+            pick where you&rsquo;re beginning — you can carry more than one.
           </p>
-          <StartCourseButton />
-        </div>
+        </header>
+        <Link
+          href="/app/program"
+          className="flex h-[58px] items-center justify-center rounded-2xl bg-primary text-[18px] font-bold text-primary-foreground"
+        >
+          See the programs
+        </Link>
       </div>
     )
   }
@@ -107,7 +108,7 @@ export default async function TodayPage() {
           <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
         </div>
         <p className="mt-1.5 text-xs text-muted-foreground">
-          {completedDays.length} of {COURSE.length_days} days · week {Math.floor((currentDay - 1) / 7) + 1} of {COURSE.weeks}
+          {completedDays.length} of {course.length_days} days · week {weekOfDay(course, currentDay)} of {course.weeks}
         </p>
       </section>
 
@@ -117,7 +118,7 @@ export default async function TodayPage() {
 
       {day && (
         <Link
-          href={`/app/program/day/${day.day_number}`}
+          href={`/app/program/${slug}/day/${day.day_number}`}
           className="flex h-[58px] items-center justify-center gap-1.5 rounded-2xl bg-primary text-[18px] font-bold text-primary-foreground"
         >
           Open day {day.day_number}

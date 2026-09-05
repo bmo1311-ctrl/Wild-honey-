@@ -2,8 +2,8 @@ import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Blocks } from '@/components/course/blocks'
 import { DoneButton } from '@/components/course/done-button'
-import { COURSE, splitMilestone } from '@/lib/courses'
-import type { CourseDay, CourseWriting } from '@/lib/courses'
+import { splitMilestone } from '@/lib/courses'
+import type { Course, CourseDay, CourseWriting } from '@/lib/courses'
 import type { Checkin } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils'
  * Program. Nothing here competes with the primary action.
  */
 export function DayView({
+  course,
   day,
   saved,
   checkin,
@@ -20,6 +21,7 @@ export function DayView({
   part,
   showNav = true,
 }: {
+  course: Course
   day: CourseDay
   saved: Map<number, CourseWriting>
   checkin: Checkin | null
@@ -38,7 +40,7 @@ export function DayView({
   const offset = twoPart && activePart === 2 ? split.part1.length : 0
 
   const prev = day.day_number > 1 ? day.day_number - 1 : null
-  const next = day.day_number < COURSE.length_days ? day.day_number + 1 : null
+  const next = day.day_number < course.length_days ? day.day_number + 1 : null
 
   return (
     <div className="flex flex-col gap-5">
@@ -65,24 +67,24 @@ export function DayView({
         )}
       </header>
 
-      <Blocks blocks={blocks} ctx={{ dayNumber: day.day_number, saved, checkin, offset }} />
+      <Blocks blocks={blocks} ctx={{ dayNumber: day.day_number, slug: course.slug, saved, checkin, offset }} />
 
       <div className="flex flex-col gap-3 pt-2">
         {twoPart && activePart === 1 ? (
           <Link
-            href={`/app/program/day/${day.day_number}?part=2`}
+            href={`/app/program/${course.slug}/day/${day.day_number}?part=2`}
             className="flex h-[58px] w-full items-center justify-center rounded-2xl bg-primary text-[18px] font-bold text-primary-foreground"
           >
             The writing is done
           </Link>
         ) : (
-          <DoneButton dayNumber={day.day_number} initialDone={done} doneAt={doneAt} />
+          <DoneButton dayNumber={day.day_number} slug={course.slug} initialDone={done} doneAt={doneAt} />
         )}
 
         {showNav && (
           <div className="flex items-center justify-between">
             {prev ? (
-              <Link href={`/app/program/day/${prev}`} className="flex h-11 items-center gap-1 pr-3 text-sm text-muted-foreground">
+              <Link href={`/app/program/${course.slug}/day/${prev}`} className="flex h-11 items-center gap-1 pr-3 text-sm text-muted-foreground">
                 <ChevronLeft className="h-4 w-4" />
                 Day {prev}
               </Link>
@@ -90,7 +92,7 @@ export function DayView({
               <span />
             )}
             {next && (
-              <Link href={`/app/program/day/${next}`} className="flex h-11 items-center gap-1 pl-3 text-sm text-muted-foreground">
+              <Link href={`/app/program/${course.slug}/day/${next}`} className="flex h-11 items-center gap-1 pl-3 text-sm text-muted-foreground">
                 Day {next}
                 <ChevronRight className="h-4 w-4" />
               </Link>

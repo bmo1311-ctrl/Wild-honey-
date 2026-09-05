@@ -38,7 +38,7 @@ import type {
   Workout,
 } from '@/lib/types'
 import { suggestProtocol } from '@/lib/protocols'
-import { COURSE_SLUG, currentDayFrom } from '@/lib/courses'
+import { COURSE_SLUG, currentDayFrom, getCourse } from '@/lib/courses'
 import type { CourseEnrollment, CourseWriting } from '@/lib/courses'
 import type { FoodItem, HouseholdMember, LearningItem } from '@/lib/types'
 import { sumNutrients, type NutrientMap } from '@/lib/nutrients'
@@ -996,20 +996,20 @@ export async function getUsualFoods(limit = 8, memberId?: string | null): Promis
 // ---- Strong and Surrendered (the course) ----
 
 /** The member's enrollment, or null if she hasn't started. */
-export async function getEnrollment(): Promise<CourseEnrollment | null> {
+export async function getEnrollment(slug: string = COURSE_SLUG): Promise<CourseEnrollment | null> {
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) return null
   const data = ok(
-    await supabase.from('course_enrollments').select('*').eq('user_id', user.id).eq('course_slug', COURSE_SLUG).maybeSingle(),
+    await supabase.from('course_enrollments').select('*').eq('user_id', user.id).eq('course_slug', slug).maybeSingle(),
   )
   return (data as CourseEnrollment) ?? null
 }
 
 /** Day numbers she has ticked, ascending. */
-export async function getCompletedDays(): Promise<number[]> {
+export async function getCompletedDays(slug: string = COURSE_SLUG): Promise<number[]> {
   const supabase = await createClient()
   const {
     data: { user },
@@ -1020,27 +1020,27 @@ export async function getCompletedDays(): Promise<number[]> {
       .from('course_day_progress')
       .select('day_number')
       .eq('user_id', user.id)
-      .eq('course_slug', COURSE_SLUG)
+      .eq('course_slug', slug)
       .order('day_number', { ascending: true }),
   )
   return ((data as { day_number: number }[]) ?? []).map((r) => r.day_number)
 }
 
 /** Everything she has written, newest first. Pass a day to scope it to that day. */
-export async function getWritings(dayNumber?: number): Promise<CourseWriting[]> {
+export async function getWritings(dayNumber?: number, slug: string = COURSE_SLUG): Promise<CourseWriting[]> {
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) return []
-  let q = supabase.from('course_writings').select('*').eq('user_id', user.id).eq('course_slug', COURSE_SLUG)
+  let q = supabase.from('course_writings').select('*').eq('user_id', user.id).eq('course_slug', slug)
   if (dayNumber !== undefined) q = q.eq('day_number', dayNumber)
   const data = ok(await q.order('updated_at', { ascending: false }))
   return (data as CourseWriting[]) ?? []
 }
 
 /** Day progress with its dates, for streaks and milestones. */
-export async function getDayProgress(): Promise<{ day_number: number; completed_at: string }[]> {
+export async function getDayProgress(slug: string = COURSE_SLUG): Promise<{ day_number: number; completed_at: string }[]> {
   const supabase = await createClient()
   const {
     data: { user },
@@ -1051,31 +1051,72 @@ export async function getDayProgress(): Promise<{ day_number: number; completed_
       .from('course_day_progress')
       .select('day_number, completed_at')
       .eq('user_id', user.id)
-      .eq('course_slug', COURSE_SLUG)
+      .eq('course_slug', slug)
       .order('day_number', { ascending: true }),
   )
   return (data as { day_number: number; completed_at: string }[]) ?? []
 }
 
 /** Which day she is on today, or null when not enrolled. */
-export async function getCurrentDay(): Promise<number | null> {
-  const enrollment = await getEnrollment()
-  return enrollment ? currentDayFrom(enrollment.started_on) : null
+export async function getCurrentDay(slug: string = COURSE_SLUG): Promise<number | null> {
+  const enrollment = await getEnrollment(slug)
+  const course = getCourse(slug)
+  return enrollment && course ? currentDayFrom(course, enrollment.started_on) : null
+}
+
+/** Every course she is enrolled in, most recently started first. */
+export async function getEnrollments(): Promise<CourseEnrollment[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const data = ok(
+    await supabase
+      .from('course_enrollments')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .order('started_on', { ascending: false }),
+  )
+  return (data as CourseEnrollment[]) ?? []
 }
 
 /**
  * Everything the Program and Today screens need, in one pass — three
  * round trips instead of the six the individual helpers would cost.
  */
-export async function getCourseState(): Promise<{
+export async function getCourseState(slug: string = COURSE_SLUG): Promise<{
   enrollment: CourseEnrollment | null
   currentDay: number | null
   completedDays: number[]
 }> {
-  const enrollment = await getEnrollment()
-  if (!enrollment) return { enrollment: null, currentDay: null, completedDays: [] }
-  const completedDays = await getCompletedDays()
-  return { enrollment, currentDay: currentDayFrom(enrollment.started_on), completedDays }
+  const course = getCourse(slug)
+  const enrollment = await getEnrollment(slug)
+  if (!enrollment || !course) return { enrollment: null, currentDay: null, completedDays: [] }
+  const completedDays = await getCompletedDays(slug)
+  return { enrollment, currentDay: currentDayFrom(course, enrollment.started_on), completedDays }
+}
+
+/** The course she is actually on right now: the most recently started. */
+export async function getActiveCourseState(): Promise<{
+  slug: string
+  enrollment: CourseEnrollment | null
+  currentDay: number | null
+  completedDays: number[]
+  otherSlugs: string[]
+}> {
+  const enrollments = await getEnrollments()
+  if (enrollments.length === 0) {
+    return { slug: COURSE_SLUG, enrollment: null, currentDay: null, completedDays: [], otherSlugs: [] }
+  }
+  const active = enrollments[0]
+  const state = await getCourseState(active.course_slug)
+  return {
+    slug: active.course_slug,
+    ...state,
+    otherSlugs: enrollments.slice(1).map((e) => e.course_slug),
+  }
 }
 
 // ---- AI companion (deferred — table exists, feature not wired up yet) ----

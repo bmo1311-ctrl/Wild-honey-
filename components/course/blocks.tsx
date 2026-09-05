@@ -10,6 +10,7 @@ import { LogBlock } from '@/components/course/log-block'
 export interface BlocksContext {
   /** null on week pages, where there is no day to save against. */
   dayNumber: number | null
+  slug: string
   /** Saved answers for this day, keyed by prompt_index. */
   saved?: Map<number, CourseWriting>
   checkin?: Checkin | null
@@ -152,6 +153,7 @@ function BlockView({ block, index, ctx }: { block: Block; index: number; ctx: Bl
         <div className="shrink-0">
           <WriteBlock
             dayNumber={ctx.dayNumber}
+            slug={ctx.slug}
             promptIndex={index}
             prompt={block.prompt}
             lines={block.lines}
@@ -165,6 +167,7 @@ function BlockView({ block, index, ctx }: { block: Block; index: number; ctx: Bl
         <div className="shrink-0">
           <RateBlock
             dayNumber={ctx.dayNumber}
+            slug={ctx.slug}
             promptIndex={index}
             q={block.q}
             left={block.left}
@@ -179,6 +182,7 @@ function BlockView({ block, index, ctx }: { block: Block; index: number; ctx: Bl
         <div className="shrink-0">
           <CheckBlock
             dayNumber={ctx.dayNumber}
+            slug={ctx.slug}
             promptIndex={index}
             title={block.title}
             items={block.items}

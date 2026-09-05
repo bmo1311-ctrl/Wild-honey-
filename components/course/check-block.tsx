@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 /** Checklist plus the demonstration. Saves on tap; ticks survive a new phone. */
 export function CheckBlock({
   dayNumber,
+  slug,
   promptIndex,
   title,
   items,
@@ -15,6 +16,7 @@ export function CheckBlock({
   initialChecked,
 }: {
   dayNumber: number | null
+  slug: string
   promptIndex: number
   title?: string
   items: string[]
@@ -31,6 +33,7 @@ export function CheckBlock({
     if (dayNumber === null) return
     const res = await saveCourseWriting({
       dayNumber,
+      slug,
       promptIndex,
       prompt: title ?? 'check',
       body: JSON.stringify(next),

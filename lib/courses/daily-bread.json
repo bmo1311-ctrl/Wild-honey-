@@ -1,0 +1,2412 @@
+{
+ "slug": "daily-bread",
+ "title": "Daily Bread",
+ "subtitle": "Thirty days. The rung everything else stands on.",
+ "length_days": 30,
+ "weeks": 4,
+ "week_from_day": false,
+ "note": "Week 4 runs nine days (22-30), not seven. Do NOT compute week from day for this course - use each day's own week_number.",
+ "week_list": [
+  {
+   "week_number": 1,
+   "title": "Show Up",
+   "verb": "prepare",
+   "principle": "repetition to automaticity",
+   "opening_line": "This is the easiest week of your life and roughly half of women do not finish it.",
+   "stakes": "Skip it and you spend the next three weeks building on a base that is not there — and you will not find out until day twenty-four, which is the worst possible day to find out.",
+   "pull_quote": "You are not starting a fitness program. You are finding out whether your own word means anything, and you already suspect it doesn't.",
+   "blocks": [
+    {
+     "t": "h",
+     "v": "The four shapes"
+    },
+    {
+     "t": "figure",
+     "pose": "hollow",
+     "label": "Hollow",
+     "cue": "Low back flat to the floor, ribs down, head and feet lifted, held from the middle. Twenty seconds, twice."
+    },
+    {
+     "t": "figure",
+     "pose": "arch",
+     "label": "Arch",
+     "cue": "Chest and thighs lifted, throat open, chin up, the front of you unguarded. Twenty seconds, twice."
+    },
+    {
+     "t": "figure",
+     "pose": "stacked",
+     "label": "Stacked",
+     "cue": "Standing under something. Head over ribs over hips over heels. Nothing shoved sideways. Thirty seconds each hand."
+    },
+    {
+     "t": "figure",
+     "pose": "landing",
+     "label": "Landing",
+     "cue": "Drop off a low step and land. Feet flat, knees soft, chest up, still for one second. Quiet feet. Five reps."
+    },
+    {
+     "t": "text",
+     "v": "Two minutes. That is the whole drill. You will do it every day for thirty days and nothing gets added to it. On any day you miss the thirty minutes, you still do this."
+    },
+    {
+     "t": "grid",
+     "title": "The four shapes, and where they go next",
+     "cols": [
+      "Shape",
+      "What it becomes"
+     ],
+     "rows": [
+      [
+       "Hollow",
+       "In Strong and Surrendered it is under load. In The Honest Room it is what your body does when somebody says a true thing to you and you stay."
+      ],
+      [
+       "Arch",
+       "In Still Waters it is how you sit to pray. It is also the hardest one to do in front of another person and you will find that out."
+      ],
+      [
+       "Stacked",
+       "In Strong and Surrendered it is every carry. Everywhere else it is not performing."
+      ],
+      [
+       "Landing",
+       "In every program it is the same thing — you fell, and you are back the next morning without a speech."
+      ]
+     ]
+    },
+    {
+     "t": "h",
+     "v": "Falling is routine"
+    },
+    {
+     "t": "text",
+     "v": "Read this now, while nothing has gone wrong. You will miss a day. Probably two. Every gymnast who ever learned a skill fell off it repeatedly, in public, and got back on it the same afternoon without a conversation about it."
+    },
+    {
+     "t": "versus",
+     "title": "What a missed day is",
+     "left": {
+      "head": "What you will make it mean",
+      "items": [
+       "I knew it.",
+       "This is the eleventh one.",
+       "I am not the kind of woman who finishes.",
+       "I will start again on the first of the month."
+      ]
+     },
+     "right": {
+      "head": "What it actually is",
+      "items": [
+       "I missed one.",
+       "Return time was one day.",
+       "The pattern is Wednesdays.",
+       "I moved the slot to the morning."
+      ]
+     }
+    },
+    {
+     "t": "steps",
+     "title": "The restart, in full",
+     "items": [
+      {
+       "n": 1,
+       "head": "Mark the day you did",
+       "sub": "Do not hide the gap. A blank is honest and a hidden blank is not."
+      },
+      {
+       "n": 2,
+       "head": "Four words",
+       "sub": "Post: missed one, back today. Exactly that. No reason — the reason is where the shame gets in."
+      },
+      {
+       "n": 3,
+       "head": "Do the two minutes",
+       "sub": "The four shapes happen on the day you fall. In whatever you are wearing. This is the landing and it is the actual skill."
+      },
+      {
+       "n": 4,
+       "head": "Go the next morning",
+       "sub": "Not a bigger session to make up for it. The ordinary one, at your time, as though nothing happened. Because nothing did."
+      }
+     ]
+    },
+    {
+     "t": "steps",
+     "title": "The body this week",
+     "items": [
+      {
+       "n": 1,
+       "head": "Thirty minutes daily",
+       "sub": "Your choice, your intensity, logged every night with the actual number on it."
+      },
+      {
+       "n": 2,
+       "head": "The four shapes, two minutes",
+       "sub": "All four, every day, before the thirty minutes. Never skipped."
+      },
+      {
+       "n": 3,
+       "head": "One time of day, kept",
+       "sub": "The same slot, seven days running. This is the week's real assignment and it is not the movement."
+      },
+      {
+       "n": 4,
+       "head": "One written line, nightly",
+       "sub": "One sentence. Not a diary entry."
+      }
+     ]
+    },
+    {
+     "t": "steps",
+     "title": "The inner work — What You Promised in January",
+     "items": [
+      {
+       "n": 1,
+       "head": "Ten minutes, on paper",
+       "sub": "Every promise you have made to yourself about your body in the last five years. All of them. Do not think, list."
+      },
+      {
+       "n": 2,
+       "head": "Beside each one",
+       "sub": "How many days it lasted. A number, not a story."
+      },
+      {
+       "n": 3,
+       "head": "Circle the longest one",
+       "sub": "Not the best one. The one that ran longest before it stopped."
+      },
+      {
+       "n": 4,
+       "head": "One line underneath",
+       "sub": "What was happening on the day it stopped. Where you were standing. What you told yourself that night."
+      }
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "Luke 16:10",
+     "text": "Whoever is faithful in very little is also faithful in much.",
+     "why": "It is not a moral warning. It is a training principle, and it was written two thousand years before anybody wrote a progression chart."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Seven days done, seven of seven, with a real number of minutes on each",
+      "The four shapes done all seven days, two minutes, all four, in order",
+      "A time of day written down and kept at least five of the seven",
+      "The promises page written in one sitting, with a number beside every line",
+      "Day seven's read-back done in one sitting"
+     ],
+     "demo": "Say your time of day out loud, and say what you moved for on day four, without opening the app."
+    },
+    {
+     "t": "rate",
+     "q": "Do you have a time of day, or a vague intention?",
+     "left": "Mornings, ish",
+     "right": "Six-forty, and I have kept it"
+    },
+    {
+     "t": "rate",
+     "q": "Can you name the four shapes without looking?",
+     "left": "I would get two",
+     "right": "All four, in order, right now"
+    },
+    {
+     "t": "grid",
+     "title": "When it doesn't work",
+     "cols": [
+      "Where you cut the corner",
+      "What you do"
+     ],
+     "rows": [
+      [
+       "You did not pick a time of day",
+       "This is the corner, and it is the only one that matters this week. Everything downstream fails here. Go and pick one now, out loud, and write it in ink."
+      ],
+      [
+       "You did four big sessions instead of seven small ones",
+       "Four is not seven. Cut every session to thirty minutes and go every day. You are training a frequency, not a body, and the body comes free with it."
+      ],
+      [
+       "You skipped the shapes because the thirty minutes felt like enough",
+       "The two minutes are the non-negotiable and the thirty are the flexible part. You have it backwards, and week three is where that shows."
+      ],
+      [
+       "You are already bored",
+       "Good. Boring is what daily looks like from the inside, and the fact that you expected it to feel like something is the exact belief this month is dismantling."
+      ],
+      [
+       "You are ill, travelling, or in pain",
+       "Lie on the floor and breathe for thirty minutes. Log it as that. It counts identically and nobody is grading the content."
+      ]
+     ]
+    },
+    {
+     "t": "note",
+     "tone": "warn",
+     "title": "Not every hard thing is a cut corner",
+     "v": "If the promises page brought up something bigger than a habit — old material arriving with your whole body attached — that is not a cut corner and I will not treat it as one. Keep the daily practice and take that to somebody licensed to hold it."
+    }
+   ]
+  },
+  {
+   "week_number": 2,
+   "title": "Keep It",
+   "verb": "prepare",
+   "principle": "progressive overload",
+   "opening_line": "Week two is where you meet the voice that has ended every one of these before, and it is not going to sound like an enemy. It is going to sound extremely reasonable.",
+   "stakes": "Skip the negotiation and you will believe, for another decade, that you are a woman who does not follow through — when what you actually are is a woman who has never once heard the sentence out loud.",
+   "pull_quote": "You are not lazy and you are not broken. You have been having a negotiation every morning that you did not know was happening.",
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Thirty minutes of anything you chose on purpose stays exactly as it was. The base does not change. What goes on top of it does."
+    },
+    {
+     "t": "steps",
+     "title": "The body this week",
+     "items": [
+      {
+       "n": 1,
+       "head": "Thirty minutes daily",
+       "sub": "Same as last week. Same time."
+      },
+      {
+       "n": 2,
+       "head": "A little more, twice",
+       "sub": "Two sessions this week are harder than the same session last week. A hill, a heavier bag, five more minutes, one more round."
+      },
+      {
+       "n": 3,
+       "head": "Carry something",
+       "sub": "Once. Heavy enough that you would rather not, far enough that you have to change hands."
+      },
+      {
+       "n": 4,
+       "head": "The four shapes, two minutes",
+       "sub": "Every day. Nothing added."
+      }
+     ]
+    },
+    {
+     "t": "steps",
+     "title": "The inner work — The Negotiation",
+     "items": [
+      {
+       "n": 1,
+       "head": "Catch it in the act",
+       "sub": "The morning it happens, stop and write the sentence down verbatim, in the voice it arrives in. Quotation marks."
+      },
+      {
+       "n": 2,
+       "head": "Do not argue with it",
+       "sub": "Not on paper, not in your head. You are collecting, not debating."
+      },
+      {
+       "n": 3,
+       "head": "Collect three of them",
+       "sub": "Over the week. Most women find the same one three times."
+      },
+      {
+       "n": 4,
+       "head": "Read them back on day fourteen",
+       "sub": "Out loud, standing, flat. That is the whole intervention and it works better than willpower."
+      }
+     ]
+    },
+    {
+     "t": "grid",
+     "title": "The five numbers — day 8 and day 28",
+     "cols": [
+      "The measurement",
+      "How you take it"
+     ],
+     "rows": [
+      [
+       "Sit-to-stands in 30 seconds",
+       "Count. One attempt."
+      ],
+      [
+       "Forearm plank",
+       "Seconds until the hips drop. Not seconds until it hurts."
+      ],
+      [
+       "Push-ups",
+       "Level and count. Wall, knees or floor — write which."
+      ],
+      [
+       "12-minute walk",
+       "Distance, and what your breathing is doing at minute nine."
+      ],
+      [
+       "Floor get-up",
+       "Points of contact on the way up. Hands and knees count."
+      ]
+     ]
+    },
+    {
+     "t": "versus",
+     "title": "Taking a number, and performing one",
+     "left": {
+      "head": "Performing it",
+      "items": [
+       "Training for it beforehand",
+       "Retaking the bad one",
+       "Warming up until you feel good about it",
+       "Writing down what you think you could do"
+      ]
+     },
+     "right": {
+      "head": "Taking it",
+      "items": [
+       "Warm up ten minutes and go",
+       "One attempt each, including the one you hate",
+       "Write it cold, immediately",
+       "Close the page until day twenty-eight"
+      ]
+     }
+    },
+    {
+     "t": "scripture",
+     "ref": "Proverbs 31:17",
+     "text": "She dresses herself with strength and makes her arms strong.",
+     "why": "The verb is makes. It is not a description of a woman who woke up like that."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Five baseline numbers written in the book, one attempt each, nothing retaken",
+      "Three negotiation sentences collected in quotation marks",
+      "Two sessions written down as heavier than the same session last week",
+      "One thing carried far enough that you changed hands",
+      "Fourteen days done, and the shapes fourteen of fourteen"
+     ],
+     "demo": "Read your three negotiation sentences out loud, flat, standing, without laughing at the end of any of them."
+    },
+    {
+     "t": "rate",
+     "q": "Can you quote the negotiation?",
+     "left": "I know I have one",
+     "right": "Word for word, its own voice"
+    },
+    {
+     "t": "rate",
+     "q": "Did the time of day hold under pressure?",
+     "left": "It moved every day",
+     "right": "It held on the two hard days"
+    },
+    {
+     "t": "grid",
+     "title": "When it doesn't work",
+     "cols": [
+      "Where you cut the corner",
+      "What you do"
+     ],
+     "rows": [
+      [
+       "You retook the baseline numbers",
+       "Then they are not numbers, they are a performance, and in three weeks you will have nothing to compare against. Take them again cold on day nine and write the first attempt."
+      ],
+      [
+       "The negotiation never showed up in words",
+       "It is there and it is preverbal. Write what you did instead — the phone, the second coffee, the reorganised morning. The behaviour is the sentence."
+      ],
+      [
+       "You went heavier and now something hurts",
+       "Sharp, in a joint, one side only, still there tomorrow — that is pain and not effort. Stop that movement, take the range smaller, and go and see somebody with letters after their name."
+      ],
+      [
+       "You are logging but not writing",
+       "The written line is half the product. Sixty seconds. Do not upgrade it into journalling, just answer the question."
+      ],
+      [
+       "You missed a day",
+       "Four words, the two minutes, the ordinary session tomorrow. That is the entire protocol."
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "week_number": 3,
+   "title": "The Week You Miss",
+   "verb": "surrender",
+   "principle": "falling is routine",
+   "opening_line": "I scheduled this week a year ago. If you have already fallen, you are on time.",
+   "stakes": "Skip this and the first miss of the rest of your life ends the practice — because you will still be carrying a private rule that says a broken streak is a verdict, and you will never once have tested it.",
+   "pull_quote": "Falling is not the interruption to the training. Falling is the training.",
+   "blocks": [
+    {
+     "t": "figure",
+     "pose": "landing",
+     "label": "The landing",
+     "cue": "Drop off a low step. Feet flat, knees soft, chest up, still for one second at the bottom. Quiet feet. Ten a day, every day this week, including any day you miss everything else."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "Return time is the only number that matters",
+     "v": "Not the length of the streak. Not the total days. The gap, in days, between falling off and getting back on. A woman with a return time of one day will still be training in ten years. A woman with a perfect streak and no return protocol is one bad Wednesday from stopping altogether, and she has no idea."
+    },
+    {
+     "t": "steps",
+     "title": "The body this week",
+     "items": [
+      {
+       "n": 1,
+       "head": "Ten landings, daily",
+       "sub": "Added to the four shapes, all seven days, including any day you miss everything else."
+      },
+      {
+       "n": 2,
+       "head": "Thirty minutes daily",
+       "sub": "Unchanged. Same time."
+      },
+      {
+       "n": 3,
+       "head": "One session with no mirror and no clock",
+       "sub": "Cover the mirror. Leave the watch. Go by feel and find out how badly you need the instruments."
+      },
+      {
+       "n": 4,
+       "head": "The four shapes",
+       "sub": "Every day. Non-negotiable, and this is the week that phrase gets tested."
+      }
+     ]
+    },
+    {
+     "t": "steps",
+     "title": "The inner work — The Return Plan",
+     "items": [
+      {
+       "n": 1,
+       "head": "Write the four words now",
+       "sub": "Missed one, back today. In the book, before you need it."
+      },
+      {
+       "n": 2,
+       "head": "Name the likely day",
+       "sub": "Look at your fourteen days. Which weekday is thinnest? That is the one coming for you."
+      },
+      {
+       "n": 3,
+       "head": "Write what you will do at eleven at night",
+       "sub": "Specifically. Which two minutes, in what room, in what clothes."
+      },
+      {
+       "n": 4,
+       "head": "Write who you will tell",
+       "sub": "One name, or the Circle. A restart that nobody sees is one you can quietly cancel."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Ten landings on all seven days, including any missed day",
+      "The return plan written in full before day nineteen, all four steps",
+      "One session taken with no mirror, no clock and no numbers",
+      "Any miss left in the record, four words posted, and the return time written as a number",
+      "Twenty-one days honestly accounted for — no invented ones"
+     ],
+     "demo": "Say your return plan out loud from memory: the four words, the room, the clothes, and the name of the person you tell."
+    },
+    {
+     "t": "rate",
+     "q": "What do you do at eleven at night on a missed day?",
+     "left": "Bed, and start again Monday",
+     "right": "Two minutes, four words, bed"
+    },
+    {
+     "t": "rate",
+     "q": "Is your return plan written or intended?",
+     "left": "Roughly, in my head",
+     "right": "Written — room, clothes, name"
+    },
+    {
+     "t": "grid",
+     "title": "When it doesn't work",
+     "cols": [
+      "Where you cut the corner",
+      "What you do"
+     ],
+     "rows": [
+      [
+       "You have not fallen and you are treating that as the achievement",
+       "The streak is not the product. Write the return plan anyway, this week, while it is cheap. You are buying insurance and the premium goes up after the fire."
+      ],
+      [
+       "You fell and disappeared for four days",
+       "The falling was routine. The four days were the injury. Go back today, four words, no reason. Then write down what happened on day two that made day three easier to skip."
+      ],
+      [
+       "You posted the four words with a paragraph of explanation attached",
+       "The reason is where the shame gets in and a paragraph is an invitation to be forgiven. Four words. That is the whole discipline and it takes about nine seconds."
+      ],
+      [
+       "You cannot do the landings — knees, ankles, pelvic floor",
+       "Step down instead of dropping, off a stair, one leg at a time, and take the same one-second stillness at the bottom. The stillness is the skill and the height never was."
+      ],
+      [
+       "The no-mirror session made you anxious",
+       "That is the week working. Do it once more before Sunday and say nothing about it to anybody."
+      ]
+     ]
+    },
+    {
+     "t": "note",
+     "tone": "scope",
+     "title": "What is not a cut corner",
+     "v": "If what surfaced on the missed day was old and it arrived with your whole body attached, that is not a cut corner and it does not get drilled at. Keep the practice. Take that part to a licensed professional."
+    }
+   ]
+  },
+  {
+   "week_number": 4,
+   "title": "Nine Days",
+   "verb": "ask",
+   "principle": "witnessed work",
+   "opening_line": "Nine days, not seven. You are past the part where this is impressive and into the part where it is simply what you do.",
+   "stakes": "Skip these last nine and you will have spent a month proving something to yourself and then quit two days before the door opened — which is the specific way most women lose the thing they have already paid for.",
+   "pull_quote": "Ask boldly. Prepare like it is coming. Then receive it without putting it down and running.",
+   "blocks": [
+    {
+     "t": "text",
+     "v": "You cannot watch your own form. It was easy to change when somebody else saw it — easy, not brave. The seeing was the whole cost. The fixing was nothing. This is the week you let yourself be seen."
+    },
+    {
+     "t": "steps",
+     "title": "The body this week",
+     "items": [
+      {
+       "n": 1,
+       "head": "Load, twice",
+       "sub": "Two loaded sessions. Heavier or further than week two, written down both times."
+      },
+      {
+       "n": 2,
+       "head": "The compulsories, once",
+       "sub": "Floor and up, kneel and rise, lift, carry, stairs, overhead, stand, walk. All eight, one session, day twenty-five."
+      },
+      {
+       "n": 3,
+       "head": "One long one",
+       "sub": "Sixty minutes, conversational, day twenty-six. Longer than anything you have done this month."
+      },
+      {
+       "n": 4,
+       "head": "The four shapes",
+       "sub": "Every day. Nine of nine. Nothing added and nothing skipped."
+      }
+     ]
+    },
+    {
+     "t": "steps",
+     "title": "The inner work — The Ask",
+     "items": [
+      {
+       "n": 1,
+       "head": "Ten minutes, verbs only",
+       "sub": "What do you want to be able to do. Not have, not feel, not look like. Do. No ranking and no crossing out."
+      },
+      {
+       "n": 2,
+       "head": "Circle the one that tightened your chest",
+       "sub": "Not the sensible one."
+      },
+      {
+       "n": 3,
+       "head": "Write what you would have to become",
+       "sub": "Four lines, no more. Capacities, not adjectives."
+      },
+      {
+       "n": 4,
+       "head": "Pray it out loud, once, standing",
+       "sub": "Named, specific, out loud, with your eyes open. God is for you and He is not vague. Neither should you be."
+      }
+     ]
+    },
+    {
+     "t": "grid",
+     "title": "The eight compulsories",
+     "cols": [
+      "Pattern",
+      "Why it is on the list"
+     ],
+     "rows": [
+      [
+       "Floor and up",
+       "The one you lose first and notice last."
+      ],
+      [
+       "Kneel and rise",
+       "Every low cupboard, every child, every garden."
+      ],
+      [
+       "Lift something heavy",
+       "Off the ground, with your hips."
+      ],
+      [
+       "Carry it far",
+       "Groceries, water, a case, a child on a bad night."
+      ],
+      [
+       "Carry it up stairs",
+       "The one that decides whether you can live where you live."
+      ],
+      [
+       "Overhead onto a shelf",
+       "Shoulders that still go over your head at seventy-five."
+      ],
+      [
+       "Stand for a while",
+       "Four hours on your feet without your back deciding."
+      ],
+      [
+       "Walk",
+       "An hour, conversational, without planning around it."
+      ]
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "Matthew 6:11",
+     "text": "Give us this day our daily bread.",
+     "why": "Not this month's. Not this year's. He gave a portion sized for one day, on purpose, and the asking is meant to happen again tomorrow."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Nine days done, nine of nine, with the shapes on every one",
+      "One real thing posted in the Circle, in your own words, not the tidy version",
+      "One compliment received with thank you and then three seconds of silence",
+      "The ask written, all four steps, and said out loud standing",
+      "Five numbers retaken cold on day twenty-eight, both columns on one page, nothing retaken"
+     ],
+     "demo": "Say the thing you are asking for out loud, in one sentence, with no preamble and no joke on the end."
+    },
+    {
+     "t": "rate",
+     "q": "Can you name what you want as a verb?",
+     "left": "To feel better in myself",
+     "right": "Carry my bags up two flights"
+    },
+    {
+     "t": "rate",
+     "q": "What did you do the last time somebody said something good?",
+     "left": "Deflected inside two seconds",
+     "right": "Thank you, then three seconds"
+    },
+    {
+     "t": "h",
+     "v": "Which door"
+    },
+    {
+     "t": "text",
+     "v": "You have the thirty days. That is the gate on all three programs and you are through it. Choose while it is still in your body."
+    },
+    {
+     "t": "grid",
+     "title": "The three doors",
+     "cols": [
+      "If this is you",
+      "This one"
+     ],
+     "rows": [
+      [
+       "You want to be strong, and the mirror has been the enemy for thirty years",
+       "Strong and Surrendered. Eight weeks. Gymnastics progressions turned on a grown woman's whole life."
+      ],
+      [
+       "You cannot be still, you have downloaded three apps, and you read that as a discipline problem",
+       "Still Waters. Four weeks. Christian contemplative practice with a progression under it, because nobody ever gave you one."
+      ],
+      [
+       "You did the therapy, you can name the pattern in one clean sentence, and you are quietly furious that naming it changed nothing",
+       "The Honest Room. Ten weeks, twelve seats, application required, and completed clinical work is a hard prerequisite alongside the thirty days."
+      ],
+      [
+       "You are not ready to choose",
+       "Stay in the app. The count does not reset, the Circle stays, and the door is open whenever you want it."
+      ],
+      [
+       "You want to do it again",
+       "Do it again. Nobody in a gym finds a second cycle of the compulsories embarrassing. Second time through, take the numbers seriously and keep the same time of day."
+      ]
+     ]
+    },
+    {
+     "t": "grid",
+     "title": "When it doesn't work",
+     "cols": [
+      "Where you cut the corner",
+      "What you do"
+     ],
+     "rows": [
+      [
+       "You cannot write a verb, only a feeling",
+       "Ask it differently. What could you do at thirty that you cannot do now, and which stairs would tell you. Concrete first, the feeling comes free."
+      ],
+      [
+       "You posted the tidy version",
+       "Everybody does, the first time. Post one more, today, and make it the thinnest day you have had this month. Nobody will do what you are afraid they will do."
+      ],
+      [
+       "You did not retake the numbers because you are afraid one went down",
+       "One probably did. Retake them anyway and write both columns. A number that went down in a month where you showed up twenty-nine times is telling you something useful and it is not about your character."
+      ],
+      [
+       "You are on day twenty-eight and quietly finished",
+       "This is the corner this week exists for. Two more. Ordinary ones. That is the entire remaining assignment."
+      ]
+     ]
+    }
+   ]
+  }
+ ],
+ "days": [
+  {
+   "day_number": 1,
+   "week_number": 1,
+   "title": "Learn the four shapes",
+   "kind": "teaching",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Four shapes. Two minutes. You will do them every day for thirty days and nothing gets added to them."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Four shapes, two minutes",
+       "sub": "Hollow, arch, stacked, landing. In that order. On the floor."
+      },
+      {
+       "n": 2,
+       "head": "Thirty minutes",
+       "sub": "Anything you chose on purpose. Slow is fine. Short is not."
+      },
+      {
+       "n": 3,
+       "head": "Log it",
+       "sub": "Minutes, shapes, and one sentence."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Shapes done",
+      "Thirty minutes logged",
+      "Prompt answered"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "write",
+     "prompt": "What did you promise your body last January, and where were you standing when you broke it?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 2,
+   "week_number": 1,
+   "title": "The time of day",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "A promise with no time on it is a wish with better lighting."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Write the time",
+       "sub": "In the book, in ink, before you move. Six-forty. After the school run. Whatever is true."
+      },
+      {
+       "n": 2,
+       "head": "Set the alarm",
+       "sub": "Seven days out, labelled with the words you will need to read at that hour."
+      },
+      {
+       "n": 3,
+       "head": "Shapes, then thirty minutes",
+       "sub": "At that time, today. Prove it fits before you promise it."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "A time written in the book",
+      "Alarm set",
+      "Thirty minutes taken at that time"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The time of day goes in the book, on the promise page, in ink."
+    },
+    {
+     "t": "write",
+     "prompt": "What time did you pick, and what has to be true about your evening for it to survive?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 3,
+   "week_number": 1,
+   "title": "Outside",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Go outside",
+       "sub": "The whole thirty. Weather is not a reason and you know it."
+      },
+      {
+       "n": 2,
+       "head": "No headphones for the first ten",
+       "sub": "You are going to want to fill it. Do not."
+      },
+      {
+       "n": 3,
+       "head": "Shapes when you get back",
+       "sub": "On the floor, two minutes, before the shower."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Thirty minutes outdoors",
+      "Ten of them in silence",
+      "Shapes done after"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "write",
+     "prompt": "What arrived in the first ten minutes when there was nothing to listen to?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 4,
+   "week_number": 1,
+   "title": "The floor",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Getting off the floor is a skill and you have been quietly losing it since you were thirty."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Get down and get up",
+       "sub": "Ten times. Any route. Count the points of contact you use on the last one."
+      },
+      {
+       "n": 2,
+       "head": "The long stretch",
+       "sub": "Fifteen minutes on the floor. Hips, hamstrings, the front of the shoulders, ankles."
+      },
+      {
+       "n": 3,
+       "head": "Shapes",
+       "sub": "Then log."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Ten get-ups",
+      "Fifteen minutes of floor",
+      "Shapes done"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The points-of-contact number goes on the workbook page in the book."
+    },
+    {
+     "t": "write",
+     "prompt": "How many points of contact on the last one, and what did you assume it would be?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 5,
+   "week_number": 1,
+   "title": "Slow",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Conversational, the whole way",
+       "sub": "You should be able to talk in full sentences for thirty minutes. If you cannot, you are going too fast."
+      },
+      {
+       "n": 2,
+       "head": "Do not check the time until the end",
+       "sub": "Not once."
+      },
+      {
+       "n": 3,
+       "head": "Shapes, then log",
+       "sub": "Two minutes. Same as every day."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Thirty conversational minutes",
+      "No clock-checking",
+      "Shapes done"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "write",
+     "prompt": "Where in your life are you going too fast to sustain it, and calling that commitment?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 6,
+   "week_number": 1,
+   "title": "The short day",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "This is the day you have no time. It arrives every week for the rest of your life. Today you find out it fits anyway."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Thirty minutes, in the worst window you have",
+       "sub": "The one with something either side of it. Do not clear the day."
+      },
+      {
+       "n": 2,
+       "head": "Do not upgrade it",
+       "sub": "No extra, no making it count. Thirty exactly."
+      },
+      {
+       "n": 3,
+       "head": "Shapes, then log",
+       "sub": "Two minutes. Before, not after."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Thirty minutes taken inside a full day",
+      "Nothing added to make it feel worthwhile",
+      "Shapes done"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "write",
+     "prompt": "What did you have to say no to for thirty minutes, and who did you have to say it to?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 7,
+   "week_number": 1,
+   "title": "Seven",
+   "kind": "milestone",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Move first",
+       "sub": "Thirty minutes, your choice, your time. Then sit down."
+      },
+      {
+       "n": 2,
+       "head": "Read all seven days back",
+       "sub": "In one sitting, in order. Do not edit anything."
+      },
+      {
+       "n": 3,
+       "head": "Write one line in the book",
+       "sub": "What kind of woman wrote those seven days. One sentence, no hedging."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Seven of seven done",
+      "All seven read back in one sitting",
+      "One sentence written in the book"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The sentence goes in the book. The read-back happens here."
+    },
+    {
+     "t": "write",
+     "prompt": "Seven days. What do you know about yourself now that you did not know on Monday?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 8,
+   "week_number": 2,
+   "title": "Five numbers",
+   "kind": "session",
+   "minutes": 40,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Warm up first. One attempt at each. Nothing gets retaken, including the one you hate."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Warm up properly",
+       "sub": "Ten minutes. This is not part of the test."
+      },
+      {
+       "n": 2,
+       "head": "Take all five, in order",
+       "sub": "Sit-to-stands in thirty seconds. Forearm plank, seconds until the hips drop. Push-ups, level and count. Twelve-minute walk, distance. Floor get-up, points of contact."
+      },
+      {
+       "n": 3,
+       "head": "Write them down cold",
+       "sub": "In the book, on the baseline page, immediately. No retakes and no commentary."
+      },
+      {
+       "n": 4,
+       "head": "Close the page",
+       "sub": "You will not look at it again until day twenty-eight."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "All five taken in one session",
+      "Written in the book",
+      "Nothing retaken"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The five numbers go in the book, on the baseline page. You will write the second column beside them on day twenty-eight."
+    },
+    {
+     "t": "write",
+     "prompt": "When you wrote the number, where did the heat start?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 9,
+   "week_number": 2,
+   "title": "The negotiation",
+   "kind": "teaching",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "You are going to meet the voice that has ended every one of these before. It will not sound like an enemy. It will sound extremely reasonable."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Go at your time",
+       "sub": "Whatever it says."
+      },
+      {
+       "n": 2,
+       "head": "Catch the sentence",
+       "sub": "The moment it arrives, write it down verbatim in the book. Its words, not yours."
+      },
+      {
+       "n": 3,
+       "head": "Go anyway",
+       "sub": "Do not win the argument. Just move while it is still talking."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "One sentence collected in quotation marks",
+      "Thirty minutes taken anyway",
+      "Shapes done"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The sentence goes in the book, on the negotiation page. You are collecting three this week."
+    },
+    {
+     "t": "write",
+     "prompt": "Whose voice was it in?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 10,
+   "week_number": 2,
+   "title": "A little more",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Repeat a session from last week",
+       "sub": "The same one. Same route, same movements."
+      },
+      {
+       "n": 2,
+       "head": "Add one thing",
+       "sub": "Five minutes, one round, one hill, one increment. One. Not four."
+      },
+      {
+       "n": 3,
+       "head": "Write both numbers",
+       "sub": "Last week's and this week's, side by side, in the book."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "A repeated session",
+      "One increment added",
+      "Both numbers written"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "Both numbers go in the book, side by side."
+    },
+    {
+     "t": "write",
+     "prompt": "How much more did you want to add, and what stopped you?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 11,
+   "week_number": 2,
+   "title": "Carry something",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Pick something heavy",
+       "sub": "Water, groceries, a loaded bag, a child. Heavy enough that you would rather not."
+      },
+      {
+       "n": 2,
+       "head": "Carry it far",
+       "sub": "Far enough to change hands at least twice. Ribs down, whole foot, nothing shoved sideways."
+      },
+      {
+       "n": 3,
+       "head": "Notice where it fails first",
+       "sub": "Grip, shoulder, breath, or will. One word in the book."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "One loaded carry",
+      "Hands changed twice",
+      "One word written"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The one word goes in the book."
+    },
+    {
+     "t": "write",
+     "prompt": "What are you already carrying that nobody has ever offered to take?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 12,
+   "week_number": 2,
+   "title": "The hill",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Find a hill or a staircase",
+       "sub": "Real incline. Whatever your town has."
+      },
+      {
+       "n": 2,
+       "head": "Go up it repeatedly for twenty minutes",
+       "sub": "Slow is fine. Stopping is fine. Turning around is not."
+      },
+      {
+       "n": 3,
+       "head": "Nose-breathe as long as you can",
+       "sub": "Note the minute it breaks. Write it down."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Twenty minutes of climbing",
+      "The minute your breathing broke, written",
+      "Shapes done"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The minute goes in the book."
+    },
+    {
+     "t": "write",
+     "prompt": "What did you say to yourself at minute fourteen?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 13,
+   "week_number": 2,
+   "title": "The honest half-hour",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Today is boring. That is the dose."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Thirty minutes, unremarkable",
+       "sub": "No hill, no load, no music that makes you feel like the main character."
+      },
+      {
+       "n": 2,
+       "head": "Do not shorten it",
+       "sub": "Not by two minutes. Not by ninety seconds."
+      },
+      {
+       "n": 3,
+       "head": "Log the actual number",
+       "sub": "If it was twenty-six, log twenty-six."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Thirty minutes exactly",
+      "Nothing added and nothing shaved",
+      "The honest number logged"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "write",
+     "prompt": "Where else in your life do you shave the last four minutes and call it done?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 14,
+   "week_number": 2,
+   "title": "Fourteen",
+   "kind": "milestone",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Move first",
+       "sub": "Thirty minutes, your time."
+      },
+      {
+       "n": 2,
+       "head": "Read the three sentences out loud",
+       "sub": "Standing, flat, no laugh at the end. All three."
+      },
+      {
+       "n": 3,
+       "head": "Write one line",
+       "sub": "What do these three have in common. One sentence in the book."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Fourteen of fourteen done",
+      "The three sentences read aloud standing",
+      "One line written in the book"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The three sentences and the line are in the book. The read-back is yours alone."
+    },
+    {
+     "t": "write",
+     "prompt": "Halfway. What has already changed that you were not expecting?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 15,
+   "week_number": 3,
+   "title": "The landing",
+   "kind": "teaching",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "I scheduled this week a year ago. If you have already fallen, you are on time."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Ten landings",
+       "sub": "Off a low step. Feet flat, knees soft, chest up. Still for one second at the bottom. Quiet."
+      },
+      {
+       "n": 2,
+       "head": "Then the shapes, then the thirty",
+       "sub": "In that order."
+      },
+      {
+       "n": 3,
+       "head": "Say the sentence out loud",
+       "sub": "Falling is routine. Once, standing. It will feel stupid and it is not."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Ten landings",
+      "Shapes",
+      "Thirty minutes",
+      "The sentence said aloud"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "write",
+     "prompt": "What was the last thing you quit, and how many days passed before you decided it was over?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 16,
+   "week_number": 3,
+   "title": "Four words",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Write the return plan",
+       "sub": "All four steps, in the book, today. Not in your head."
+      },
+      {
+       "n": 2,
+       "head": "Name the thin day",
+       "sub": "Look back at fifteen days. Write the weekday."
+      },
+      {
+       "n": 3,
+       "head": "Post the four words as a drill",
+       "sub": "In the Circle, today, with nothing wrong. Missed one, back today. Say you are drilling it. Everybody else is too."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Four written steps in the book",
+      "A weekday named",
+      "The four words posted once as a drill"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The plan goes in the book, on the return-plan page. The post goes in the Circle."
+    },
+    {
+     "t": "write",
+     "prompt": "What would you have to believe about yourself for a missed day to mean nothing?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 17,
+   "week_number": 3,
+   "title": "Return time",
+   "kind": "teaching",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Return time is the only number that matters. Not the length of the streak. The gap, in days, between falling off and getting back on."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Open your record",
+       "sub": "Find every blank or thin day in seventeen days."
+      },
+      {
+       "n": 2,
+       "head": "Count the gaps",
+       "sub": "Days between each thin one and the next full one. Write the numbers in the book."
+      },
+      {
+       "n": 3,
+       "head": "Circle the biggest gap",
+       "sub": "That number is your actual training age. Not the streak."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Every gap counted",
+      "Numbers in the book",
+      "The biggest one circled"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The gaps and the circled number go in the book."
+    },
+    {
+     "t": "write",
+     "prompt": "What is the longest you have ever gone between falling down and getting up, in any part of your life?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 18,
+   "week_number": 3,
+   "title": "No mirror, no clock",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Cover the mirror",
+       "sub": "A towel over it. Before you start."
+      },
+      {
+       "n": 2,
+       "head": "Leave the watch on the side",
+       "sub": "No timing, no distance, no count."
+      },
+      {
+       "n": 3,
+       "head": "Move by feel for what you think is thirty minutes",
+       "sub": "Then check. Write the two numbers, what you guessed and what it was."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Mirror covered",
+      "Nothing measured during",
+      "Both numbers written after"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The two numbers go in the book."
+    },
+    {
+     "t": "write",
+     "prompt": "How far off were you, and what does it tell you about how much of this you have been outsourcing?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 19,
+   "week_number": 3,
+   "title": "The second attempt",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Go back to something you were bad at",
+       "sub": "Day four's get-ups, day twelve's hill, the push-up level you did not like."
+      },
+      {
+       "n": 2,
+       "head": "Do it again, deliberately",
+       "sub": "Same thing, no adjustments to make it easier."
+      },
+      {
+       "n": 3,
+       "head": "Write one word for the difference",
+       "sub": "Not the number. The feeling in your body when you started."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The same hard thing, done a second time",
+      "One word written"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The word goes in the book."
+    },
+    {
+     "t": "write",
+     "prompt": "Where in your life do you only ever attempt things once?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 20,
+   "week_number": 3,
+   "title": "Cut corners",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Move first",
+       "sub": "Thirty minutes, at your time."
+      },
+      {
+       "n": 2,
+       "head": "Then audit twenty days",
+       "sub": "Where have you been shaving? Minutes, shapes, the written line, the honest number."
+      },
+      {
+       "n": 3,
+       "head": "Write the three corners",
+       "sub": "Plainly, in the book. No apology and no plan attached."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Twenty minutes of honest audit",
+      "Three corners written",
+      "Nothing promised about them yet"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The three corners go in the book."
+    },
+    {
+     "t": "write",
+     "prompt": "The little things when you cut corners show. Where will yours show first?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 21,
+   "week_number": 3,
+   "title": "Twenty-one",
+   "kind": "milestone",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Move, then sit",
+       "sub": "Thirty minutes first. Always."
+      },
+      {
+       "n": 2,
+       "head": "Read twenty-one days back",
+       "sub": "In one sitting. Include the blanks. Especially the blanks."
+      },
+      {
+       "n": 3,
+       "head": "Write your return time as one number",
+       "sub": "On the front page of the workbook, where you will see it. That number is what you are taking into the last stretch."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Twenty-one days accounted for, honestly",
+      "All of it read back",
+      "Return time written on the front page"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The number goes on the front page of the book."
+    },
+    {
+     "t": "write",
+     "prompt": "Three weeks. What is different about the way you enter a room?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 22,
+   "week_number": 4,
+   "title": "Nine, not seven",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Nine days, not seven. You are past the part where this is impressive and into the part where it is simply what you do."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Count forward",
+       "sub": "Write today's date and day thirty's date in the book. Look at both."
+      },
+      {
+       "n": 2,
+       "head": "Thirty minutes, ordinary",
+       "sub": "Nothing special about today on purpose."
+      },
+      {
+       "n": 3,
+       "head": "Write one line",
+       "sub": "What you would have told yourself on day twenty-eight if nobody had warned you."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Both dates written",
+      "Thirty minutes",
+      "One line in the book"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The dates and the line go in the book."
+    },
+    {
+     "t": "write",
+     "prompt": "What do you usually do in the last ten percent of something?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 23,
+   "week_number": 4,
+   "title": "Post the real one",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Move first",
+       "sub": "Thirty minutes."
+      },
+      {
+       "n": 2,
+       "head": "Post the true version",
+       "sub": "In the Circle. The number, the mood, what you almost did instead. No tidying."
+      },
+      {
+       "n": 3,
+       "head": "Leave it up",
+       "sub": "Do not edit it, do not add a joke to the end, do not delete it at eleven."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "One unedited post",
+      "Left up overnight",
+      "Shapes done"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "write",
+     "prompt": "What were you afraid they would think, and has any woman in that feed ever thought it about anybody else?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 24,
+   "week_number": 4,
+   "title": "Thank you, then stop",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Move",
+       "sub": "Thirty minutes."
+      },
+      {
+       "n": 2,
+       "head": "Comment on three other women",
+       "sub": "By name, with a specific detail. You are doing amazing does not count."
+      },
+      {
+       "n": 3,
+       "head": "When somebody says something good to you",
+       "sub": "Say thank you. Then count three seconds of silence before you say anything else. Write down what happened in your chest."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Three named comments",
+      "One compliment received without deflection",
+      "One line about what your chest did"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The line goes in the book. The comments go in the Circle."
+    },
+    {
+     "t": "write",
+     "prompt": "Which is yours — the redirect, the diminish, or the laugh? Write the exact words you use.",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 25,
+   "week_number": 4,
+   "title": "The compulsories",
+   "kind": "session",
+   "minutes": 40,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "All eight, one session",
+       "sub": "Floor and up. Kneel and rise. Lift something heavy. Carry it far. Carry it upstairs. Something overhead onto a shelf. Stand for a while. Walk."
+      },
+      {
+       "n": 2,
+       "head": "Do not rush them",
+       "sub": "Forty minutes is fine. This one is allowed to run long."
+      },
+      {
+       "n": 3,
+       "head": "Mark the two that were hardest",
+       "sub": "In the book. Those are what you take into the next program."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "All eight patterns done in one session",
+      "The two hardest marked in the book"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The two marks go in the book."
+    },
+    {
+     "t": "write",
+     "prompt": "Which of the eight will you need most at seventy-five, and which stairs are you thinking of?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 26,
+   "week_number": 4,
+   "title": "The long one, and the ask",
+   "kind": "session",
+   "minutes": 60,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Ask boldly. Prepare like it is coming. Then receive it without putting it down and running."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Sixty minutes, conversational",
+       "sub": "Slower than you want. No podcast for the first twenty or the last ten."
+      },
+      {
+       "n": 2,
+       "head": "At minute five, say it out loud",
+       "sub": "The thing you have been waiting on. Out loud, to God, walking. Then carry it without solving it."
+      },
+      {
+       "n": 3,
+       "head": "When you get home, write the ask",
+       "sub": "Verbs only, ten minutes. Circle the one that tightened your chest. Then say it out loud, standing, eyes open."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Sixty minutes on your feet",
+      "The ask written in four steps",
+      "Said out loud standing"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The ask goes in the book, on the ask page."
+    },
+    {
+     "t": "write",
+     "prompt": "Minute thirty-eight. Where were you, what did you want, and what did you do with the wanting?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 27,
+   "week_number": 4,
+   "title": "Prepare like it is coming",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Thirty minutes",
+       "sub": "Ordinary, at your time."
+      },
+      {
+       "n": 2,
+       "head": "Do one thing that only makes sense if the answer is yes",
+       "sub": "Book it, clear it, buy the thing, make the call, put it in the calendar. Small and real."
+      },
+      {
+       "n": 3,
+       "head": "Write what you did",
+       "sub": "One line. Preparing is the physical half of asking and most women skip it."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "One preparatory act, done today, in the real world",
+      "One line in the book"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The line goes in the book."
+    },
+    {
+     "t": "write",
+     "prompt": "What have you been asking for while quietly arranging your life around it not arriving?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 28,
+   "week_number": 4,
+   "title": "The repeat",
+   "kind": "milestone",
+   "minutes": 40,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Warm up properly",
+       "sub": "Ten minutes. Same as day eight."
+      },
+      {
+       "n": 2,
+       "head": "Take all five again, cold",
+       "sub": "Same order, one attempt each, nothing retaken."
+      },
+      {
+       "n": 3,
+       "head": "Write the second column",
+       "sub": "Beside the first, on the same page. Both columns visible at once."
+      },
+      {
+       "n": 4,
+       "head": "Sit with the page for two full minutes",
+       "sub": "Writing nothing. Then one sentence, with no well in it."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Five numbers retaken cold",
+      "Both columns on one page",
+      "Two silent minutes",
+      "One sentence with no hedge in it"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The second column goes in the book, beside the first, on the baseline page."
+    },
+    {
+     "t": "write",
+     "prompt": "Both columns. What do these numbers say about you, and say it without a single well.",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 29,
+   "week_number": 4,
+   "title": "The one nobody talks about",
+   "kind": "practice",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "There is nothing in today. That is what makes it the hardest day of the month."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Thirty minutes",
+       "sub": "Your time. Your choice. Nothing added, nothing special."
+      },
+      {
+       "n": 2,
+       "head": "The shapes",
+       "sub": "Two minutes. Twenty-ninth time."
+      },
+      {
+       "n": 3,
+       "head": "Log it",
+       "sub": "One sentence. Then close the app and go to bed."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Thirty minutes",
+      "Shapes",
+      "Logged"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "write",
+     "prompt": "Nothing happened today. Write four sentences about it anyway.",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 30,
+   "week_number": 4,
+   "title": "Qualified",
+   "kind": "milestone",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Thirty days ago you did not trust your own word. You now have thirty days that argue with you, and you cannot cross-examine a record."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Move first",
+       "sub": "Thirty minutes. Then the shapes. Then sit down."
+      },
+      {
+       "n": 2,
+       "head": "Read all thirty days back",
+       "sub": "Blanks included. In one sitting. It takes about twelve minutes."
+      },
+      {
+       "n": 3,
+       "head": "Fill in the card",
+       "sub": "The tear-out at the back of the book. Five lines. Line one is already printed and it does not change."
+      },
+      {
+       "n": 4,
+       "head": "Choose the door",
+       "sub": "The three doors are on the week page. Do it tonight, while the thirty days are still in your body."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Thirty days accounted for, honestly",
+      "Both columns of numbers on one page",
+      "The card written",
+      "One door chosen"
+     ],
+     "demo": "Tick them. Nobody is grading them."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "In the book",
+     "v": "The card and the door go in the book. The thirty days stay here, and nobody can take them off you."
+    },
+    {
+     "t": "write",
+     "prompt": "Thirty days, in one sentence. No hedging, no well, no joke on the end.",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  }
+ ]
+}

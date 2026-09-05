@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 /** Ten cells, saved on tap. The answer survives a page change. */
 export function RateBlock({
   dayNumber,
+  slug,
   promptIndex,
   q,
   left,
@@ -14,6 +15,7 @@ export function RateBlock({
   initialValue,
 }: {
   dayNumber: number | null
+  slug: string
   promptIndex: number
   q: string
   left?: string
@@ -27,7 +29,7 @@ export function RateBlock({
     const prev = value
     setValue(n)
     if (dayNumber === null) return
-    const res = await saveCourseWriting({ dayNumber, promptIndex, prompt: q, body: String(n), kind: 'rate' })
+    const res = await saveCourseWriting({ dayNumber, slug, promptIndex, prompt: q, body: String(n), kind: 'rate' })
     if ('error' in res) setValue(prev)
     else setSavedAt(new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }))
   }

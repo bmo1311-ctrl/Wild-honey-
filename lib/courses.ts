@@ -1,4 +1,5 @@
-import courseJson from '@/lib/courses/strong-and-surrendered.json'
+import strongAndSurrendered from '@/lib/courses/strong-and-surrendered.json'
+import dailyBread from '@/lib/courses/daily-bread.json'
 
 /** Block types, exactly as they appear in the course JSON. */
 export type Block =
@@ -46,29 +47,51 @@ export interface Course {
   weeks: number
   week_list: CourseWeek[]
   days: CourseDay[]
+  /**
+   * False when weeks are not all seven days long. Daily Bread's week four runs
+   * nine days on purpose, so day 29 and 30 are still week four — the
+   * (day-1)/7+1 formula puts them in a week five that does not exist.
+   */
+  week_from_day?: boolean
 }
 
-export const COURSE = courseJson as unknown as Course
+export const COURSES: Course[] = [
+  strongAndSurrendered as unknown as Course,
+  dailyBread as unknown as Course,
+]
+
+export function getCourse(slug: string): Course | null {
+  return COURSES.find((c) => c.slug === slug) ?? null
+}
+
+/** The original course, kept for the handful of places that still assume one. */
+export const COURSE = COURSES[0]
 export const COURSE_SLUG = COURSE.slug
 
-export function getDay(dayNumber: number): CourseDay | null {
-  return COURSE.days.find((d) => d.day_number === dayNumber) ?? null
+export function getDay(course: Course, dayNumber: number): CourseDay | null {
+  return course.days.find((d) => d.day_number === dayNumber) ?? null
 }
 
-export function getWeek(weekNumber: number): CourseWeek | null {
-  return COURSE.week_list.find((w) => w.week_number === weekNumber) ?? null
+export function getWeek(course: Course, weekNumber: number): CourseWeek | null {
+  return course.week_list.find((w) => w.week_number === weekNumber) ?? null
 }
 
-export function daysInWeek(weekNumber: number): CourseDay[] {
-  return COURSE.days.filter((d) => d.week_number === weekNumber)
+export function daysInWeek(course: Course, weekNumber: number): CourseDay[] {
+  return course.days.filter((d) => d.week_number === weekNumber)
 }
 
-export function weekOfDay(dayNumber: number): number {
-  return Math.floor((dayNumber - 1) / 7) + 1
+/**
+ * Always ask the day which week it is in. Only fall back to arithmetic for a
+ * day number that has no entry, which should not happen for a valid course.
+ */
+export function weekOfDay(course: Course, dayNumber: number): number {
+  const day = getDay(course, dayNumber)
+  if (day) return day.week_number
+  return Math.min(Math.floor((dayNumber - 1) / 7) + 1, course.weeks)
 }
 
-export function clampDay(day: number): number {
-  return Math.min(Math.max(day, 1), COURSE.length_days)
+export function clampDay(course: Course, day: number): number {
+  return Math.min(Math.max(day, 1), course.length_days)
 }
 
 /**
@@ -76,12 +99,12 @@ export function clampDay(day: number): number {
  * read as plain calendar days so a member who opens the app at 11pm and
  * again at 7am the next morning moves exactly one day, regardless of zone.
  */
-export function currentDayFrom(startedOn: string, today = new Date()): number {
+export function currentDayFrom(course: Course, startedOn: string, today = new Date()): number {
   const start = Date.parse(`${startedOn.slice(0, 10)}T00:00:00Z`)
   const now = Date.parse(`${toISODate(today)}T00:00:00Z`)
   if (Number.isNaN(start) || Number.isNaN(now)) return 1
   const elapsed = Math.floor((now - start) / 86_400_000)
-  return clampDay(elapsed + 1)
+  return clampDay(course, elapsed + 1)
 }
 
 export function toISODate(d = new Date()): string {

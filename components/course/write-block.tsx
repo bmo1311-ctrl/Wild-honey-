@@ -9,12 +9,14 @@ import { saveCourseWriting } from '@/app/actions'
  */
 export function WriteBlock({
   dayNumber,
+  slug,
   promptIndex,
   prompt,
   lines = 6,
   initialBody,
 }: {
   dayNumber: number | null
+  slug: string
   promptIndex: number
   prompt: string
   lines?: number
@@ -29,7 +31,7 @@ export function WriteBlock({
     if (!dirty.current || dayNumber === null) return
     if (timer.current) clearTimeout(timer.current)
     timer.current = setTimeout(async () => {
-      const res = await saveCourseWriting({ dayNumber, promptIndex, prompt, body })
+      const res = await saveCourseWriting({ dayNumber, slug, promptIndex, prompt, body })
       if (!('error' in res)) setSavedAt(new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }))
     }, 800)
     return () => {

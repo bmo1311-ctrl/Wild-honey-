@@ -2,17 +2,20 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Check, ChevronRight } from 'lucide-react'
 import { Blocks } from '@/components/course/blocks'
-import { daysInWeek, getWeek } from '@/lib/courses'
+import { daysInWeek, getCourse, getWeek } from '@/lib/courses'
 import { getCompletedDays } from '@/lib/data'
 import { cn } from '@/lib/utils'
 
-export default async function CourseWeekPage({ params }: { params: Promise<{ n: string }> }) {
-  const { n } = await params
-  const week = getWeek(Number(n))
+export default async function CourseWeekPage({ params }: { params: Promise<{ slug: string; n: string }> }) {
+  const { slug, n } = await params
+  const course = getCourse(slug)
+  if (!course) notFound()
+  const week = getWeek(course, Number(n))
   if (!week) notFound()
 
-  const completed = await getCompletedDays()
-  const days = daysInWeek(week.week_number)
+  const completed = await getCompletedDays(slug)
+  // days come from their own week_number, so a nine-day week four is right
+  const days = daysInWeek(course, week.week_number)
 
   return (
     <div className="flex flex-col gap-6">
@@ -22,7 +25,7 @@ export default async function CourseWeekPage({ params }: { params: Promise<{ n: 
         <p className="mt-3 text-[16.5px] leading-[1.5] text-pretty text-muted-foreground">{week.stakes}</p>
       </header>
 
-      <Blocks blocks={week.blocks} ctx={{ dayNumber: null }} />
+      <Blocks blocks={week.blocks} ctx={{ dayNumber: null, slug }} />
 
       <div>
         <h2 className="mb-2 text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">the seven days</h2>
@@ -32,7 +35,7 @@ export default async function CourseWeekPage({ params }: { params: Promise<{ n: 
             return (
               <Link
                 key={d.day_number}
-                href={`/app/program/day/${d.day_number}`}
+                href={`/app/program/${slug}/day/${d.day_number}`}
                 className={cn('flex items-center gap-3 px-4 py-3.5', i > 0 && 'border-t border-border')}
               >
                 <span

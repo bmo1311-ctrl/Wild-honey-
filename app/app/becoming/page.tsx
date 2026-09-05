@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Check, Flame, Lock } from 'lucide-react'
-import { COURSE, currentDayFrom } from '@/lib/courses'
+import { COURSE, currentDayFrom, weekOfDay } from '@/lib/courses'
 import { computeBecoming, computeMilestones, computeStreaks } from '@/lib/rewards'
 import { getBaselineVitality, getDayProgress, getEnrollment, getLatestVitalityCheckin, getWritings } from '@/lib/data'
 import { VITALITY_DIMENSIONS } from '@/lib/honey-profile'
@@ -35,8 +35,8 @@ export default async function BecomingPage() {
     .filter((w) => w.kind === 'rate' && Number(w.body))
     .map((w) => ({ day_number: w.day_number, value: Number(w.body) }))
 
-  const currentDay = enrollment ? currentDayFrom(enrollment.started_on) : 0
-  const weeksReached = currentDay ? Math.min(Math.floor((currentDay - 1) / 7) + 1, COURSE.weeks) : 0
+  const currentDay = enrollment ? currentDayFrom(COURSE, enrollment.started_on) : 0
+  const weeksReached = currentDay ? weekOfDay(COURSE, currentDay) : 0
 
   const streaks = computeStreaks(progress)
   const { earned, next, all } = computeMilestones(progress, writingCount)
