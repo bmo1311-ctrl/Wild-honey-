@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { Target, GraduationCap, PenLine, Sparkles, Dumbbell, Flame, LogOut, ShoppingBag, Tent, Archive, ChevronRight, ClipboardList, Refrigerator, BookMarked, Users, HelpCircle, TrendingUp, ShieldCheck, Heart, ChefHat, Trophy, CalendarDays } from 'lucide-react'
 import { signOut } from '@/app/actions'
-import { ProfileEditor } from '@/components/profile-editor'
 import { HoneyProfileCard } from '@/components/honey-profile-card'
 import { BloomAvatar } from '@/components/bloom-avatar'
 import { TierBadge } from '@/components/tier-badge'
@@ -55,8 +54,6 @@ export default async function ProfilePage() {
           manage your membership
         </Link>
       )}
-
-      <ProfileEditor name={profile.name} avatarColor={profile.avatar_color} avatarUrl={profile.avatar_url} />
 
       <HoneyProfileCard profile={profile} goals={goals.map((g) => g.goal)} baseline={baseline} latest={latest} />
 

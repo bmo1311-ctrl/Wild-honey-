@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { COURSE } from '@/lib/courses'
 import { libraryModules } from '@/lib/modules'
+import { VaultBrowser } from '@/components/vault-browser'
+import { buildVaultIndex } from '@/lib/vault'
 import { getRecipes, getResources, getWorkouts } from '@/lib/data'
 import { youTubeId } from '@/lib/youtube'
 
@@ -14,6 +16,7 @@ export default async function LibraryPage() {
     courseDays: COURSE.length_days,
   }
   const doors = libraryModules()
+  const index = buildVaultIndex({ resources, recipes, workouts })
 
   return (
     <div className="flex flex-col gap-5">
@@ -21,6 +24,8 @@ export default async function LibraryPage() {
         <h1 className="font-serif text-[29px] font-semibold leading-[1.1]">Library</h1>
         <p className="mt-1 text-sm text-muted-foreground text-pretty">everything outside the course, kept apart so it stays findable.</p>
       </div>
+
+      <VaultBrowser shelves={[]} all={index} searchOnly />
 
       <div className="flex flex-col gap-3">
         {doors.map((d) => {

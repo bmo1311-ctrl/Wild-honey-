@@ -12,10 +12,18 @@ import { cn } from '@/lib/utils'
  * laid out as shelves of artwork you scroll through — and a video plays in the
  * app rather than throwing you out to another tab.
  */
-export function VaultBrowser({ shelves, all }: { shelves: { title: string; items: VaultItem[] }[]; all: VaultItem[] }) {
+export function VaultBrowser({
+  shelves,
+  all,
+  searchOnly = false,
+}: {
+  shelves: { title: string; items: VaultItem[] }[]
+  all: VaultItem[]
+  searchOnly?: boolean
+}) {
   const [playing, setPlaying] = useState<VaultItem | null>(null)
   const [q, setQ] = useState('')
-  const [searching, setSearching] = useState(false)
+  const [searching, setSearching] = useState(searchOnly)
 
   const results = useMemo(() => {
     const terms = q.trim().toLowerCase().split(/\s+/).filter(Boolean)
@@ -44,6 +52,7 @@ export function VaultBrowser({ shelves, all }: { shelves: { title: string; items
         ) : (
           <p className="flex-1 text-sm text-muted-foreground">{all.length} things to watch, cook and move to</p>
         )}
+        {!searchOnly && (
         <button
           type="button"
           onClick={() => {
@@ -55,9 +64,10 @@ export function VaultBrowser({ shelves, all }: { shelves: { title: string; items
         >
           {searching ? <X className="h-4 w-4" /> : <Search className="h-4 w-4" />}
         </button>
+        )}
       </div>
 
-      {searching && q.trim() ? (
+      {searchOnly && !q.trim() ? null : searching && q.trim() ? (
         <section>
           <p className="mb-2 text-xs text-muted-foreground">
             {results.length} {results.length === 1 ? 'result' : 'results'}

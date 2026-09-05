@@ -71,7 +71,7 @@ export async function getSessionProfile(): Promise<Profile | null> {
   return (data as Profile) ?? null
 }
 
-const GOAL_PILLAR: Record<string, 'Body' | 'Identity' | 'Mindset' | 'Faith'> = {
+export const GOAL_PILLAR: Record<string, 'Body' | 'Identity' | 'Mindset' | 'Faith'> = {
   more_energy: 'Body',
   better_sleep: 'Body',
   strength: 'Body',

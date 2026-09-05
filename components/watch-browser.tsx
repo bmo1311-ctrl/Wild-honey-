@@ -7,11 +7,16 @@ import { youTubeId, youTubeThumb } from '@/lib/youtube'
 import type { Resource } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
-const TABS = ['All', 'Body', 'Identity', 'Mindset', 'Faith'] as const
+const TABS = ['For you', 'All', 'Body', 'Identity', 'Mindset', 'Faith'] as const
 
 /** Teaching videos only. Nothing to read, one tap to watch. */
-export function WatchBrowser({ resources }: { resources: Resource[] }) {
-  const [tab, setTab] = useState<(typeof TABS)[number]>('All')
+export function WatchBrowser({ resources, preferredPillars = [] }: { resources: Resource[]; preferredPillars?: string[] }) {
+  const [tab, setTab] = useState<(typeof TABS)[number]>(preferredPillars.length ? 'For you' : 'All')
+  // the pillars behind the goals she chose come first; everything else follows
+  const rank = (p: string | null) => {
+    const i = p ? preferredPillars.indexOf(p) : -1
+    return i === -1 ? 99 : i
+  }
   const [playing, setPlaying] = useState<{ id: string; title: string; description: string } | null>(null)
 
   const videos = useMemo(
@@ -19,12 +24,14 @@ export function WatchBrowser({ resources }: { resources: Resource[] }) {
       resources
         .map((r) => ({ ...r, videoId: youTubeId(r.url) }))
         .filter((r) => r.videoId)
-        .filter((r) => tab === 'All' || r.pillar === tab),
-    [resources, tab],
+        .filter((r) => tab === 'All' || tab === 'For you' || r.pillar === tab)
+        .sort((a, b) => (tab === 'For you' ? rank(a.pillar) - rank(b.pillar) : 0)),
+    [resources, tab, preferredPillars],
   )
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { All: resources.filter((r) => youTubeId(r.url)).length }
+    c['For you'] = c.All
     for (const t of TABS.slice(1)) c[t] = resources.filter((r) => r.pillar === t && youTubeId(r.url)).length
     return c
   }, [resources])
