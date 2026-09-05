@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ChevronLeft, Settings2 } from 'lucide-react'
-import { FoodLogger } from '@/components/food-logger'
-import { getCurrentCyclePhase, getFoodItems, getSessionProfile, getTodayNutrition, getUsualFoods } from '@/lib/data'
+import { FoodLogScreen } from '@/components/food-log-screen'
+import { getCurrentCyclePhase, getFoodItems, getHouseholdMembers, getSessionProfile, getTodayNutrition, getUsualFoods } from '@/lib/data'
 import { applyCycle, phaseFromDates, phaseLabel, type CyclePhaseKey } from '@/lib/cycle'
 import { NutrientRings } from '@/components/nutrient-rings'
 import { calculateTargets, effectiveTargets, type ActivityLevel, type BodyGoal } from '@/lib/goals'
@@ -10,11 +10,16 @@ import { calculateTargets, effectiveTargets, type ActivityLevel, type BodyGoal }
  * One job: log what she ate. No recipes, no browsing — she tapped "log what
  * you ate" and this is that, and only that.
  */
-export default async function LogFoodPage() {
+export default async function LogFoodPage({ searchParams }: { searchParams: Promise<{ member?: string }> }) {
+  const { member } = await searchParams
+  const members = await getHouseholdMembers()
+  const self = members.find((m) => m.is_self)
+  // null means the account holder; anyone else is logged against their id.
+  const memberId = member && member !== self?.id && members.some((m) => m.id === member) ? member : null
   const [foods, nutrition, usual, profile, loggedPhase] = await Promise.all([
     getFoodItems(),
-    getTodayNutrition(),
-    getUsualFoods(),
+    getTodayNutrition(memberId),
+    getUsualFoods(8, memberId),
     getSessionProfile(),
     getCurrentCyclePhase(),
   ])
@@ -82,7 +87,7 @@ export default async function LogFoodPage() {
         </div>
       </div>
 
-      {phase && (
+      {phase && !memberId && (
         <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3">
           <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-faith-pillar" aria-hidden="true" />
           <span className="min-w-0 flex-1">
@@ -107,10 +112,16 @@ export default async function LogFoodPage() {
           fat_g: nutrition.fat,
         }}
         targets={cycled.targets}
-        hasGoals={hasGoals}
+        hasGoals={hasGoals && !memberId}
       />
 
-      <FoodLogger foods={foods} logged={logged} usual={usual} />
+      <FoodLogScreen
+        foods={foods}
+        logged={logged}
+        usual={usual}
+        members={members.map((m) => ({ id: m.id, name: m.name, is_self: m.is_self }))}
+        memberId={memberId}
+      />
 
       <Link href="/app/nutrition" className="text-center text-sm font-medium text-mindset-pillar underline underline-offset-[3px]">
         Browse recipes instead

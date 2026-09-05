@@ -109,7 +109,7 @@ export const MODULES: AppModule[] = [
       {
         key: 'checkin',
         kind: 'link',
-        href: '/app/nutrition',
+        href: '/app/checkin',
         label: 'Log how you feel',
         hint: ctx.checkedInToday ? 'logged today' : 'energy, sleep, stress',
         done: ctx.checkedInToday,

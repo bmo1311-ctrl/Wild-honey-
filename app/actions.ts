@@ -2052,6 +2052,7 @@ export async function logFood(input: {
   fat: number
   mealSlot?: string
   date?: string
+  memberId?: string | null
 }) {
   const { supabase, user } = await requireUser()
   if (!input.foodItemId && !input.customName?.trim()) return { error: 'Give it a name first.' }
@@ -2068,6 +2069,7 @@ export async function logFood(input: {
     carbs_g: round1(input.carbs),
     fat_g: round1(input.fat),
     meal_slot: input.mealSlot ?? null,
+    member_id: input.memberId ?? null,
     date: input.date ?? toISODate(),
     servings: 1,
   })
@@ -2149,6 +2151,7 @@ function round1(n: number): number {
 export async function logFoods(
   entries: { foodItemId: string; quantity: number }[],
   mealSlot?: string,
+  memberId?: string | null,
 ) {
   const { supabase, user } = await requireUser()
   if (entries.length === 0) return { error: 'Nothing selected.' }
@@ -2174,6 +2177,7 @@ export async function logFoods(
         carbs_g: round1(f.carbs_g * factor),
         fat_g: round1(f.fat_g * factor),
         meal_slot: mealSlot ?? null,
+        member_id: memberId ?? null,
         date: toISODate(),
         servings: 1,
       },

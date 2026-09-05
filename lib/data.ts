@@ -951,7 +951,7 @@ export async function getFoodItems(): Promise<FoodItem[]> {
  * she last had. One tap re-logs it at that amount — the common case costs one
  * interaction rather than five.
  */
-export async function getUsualFoods(limit = 8): Promise<
+export async function getUsualFoods(limit = 8, memberId?: string | null): Promise<
   { food: FoodItem; lastQuantity: number; unit: string; timesLogged: number }[]
 > {
   const supabase = await createClient()
@@ -960,15 +960,13 @@ export async function getUsualFoods(limit = 8): Promise<
   } = await supabase.auth.getUser()
   if (!user) return []
 
-  const data = ok(
-    await supabase
-      .from('meal_logs')
-      .select('food_item_id, quantity, unit, created_at, food:food_items(*)')
-      .eq('user_id', user.id)
-      .not('food_item_id', 'is', null)
-      .order('created_at', { ascending: false })
-      .limit(200),
-  )
+  let usualQuery = supabase
+    .from('meal_logs')
+    .select('food_item_id, quantity, unit, created_at, food:food_items(*)')
+    .eq('user_id', user.id)
+    .not('food_item_id', 'is', null)
+  usualQuery = memberId ? usualQuery.eq('member_id', memberId) : usualQuery.is('member_id', null)
+  const data = ok(await usualQuery.order('created_at', { ascending: false }).limit(200))
   const rows = (data as unknown as {
     food_item_id: string
     quantity: number | null
@@ -1189,7 +1187,7 @@ export async function adminGetAnalytics() {
 
 // ---- Nutrition tracking ----
 
-export async function getTodayNutrition(): Promise<{
+export async function getTodayNutrition(memberId?: string | null): Promise<{
   calories: number
   protein: number
   carbs: number
@@ -1205,8 +1203,11 @@ export async function getTodayNutrition(): Promise<{
   if (!user) return { calories: 0, protein: 0, carbs: 0, fat: 0, calorieGoal: null, proteinGoal: null, loggedMeals: [] }
 
   const today = new Date().toISOString().slice(0, 10)
+  let logQuery = supabase.from('meal_logs').select('*, recipe:recipes(*)').eq('user_id', user.id).eq('date', today)
+  // null member_id is the account holder, so her existing rows stay hers.
+  logQuery = memberId ? logQuery.eq('member_id', memberId) : logQuery.is('member_id', null)
   const [{ data: logs }, { data: profile }] = await Promise.all([
-    supabase.from('meal_logs').select('*, recipe:recipes(*)').eq('user_id', user.id).eq('date', today).order('created_at', { ascending: true }),
+    logQuery.order('created_at', { ascending: true }),
     supabase.from('profiles').select('daily_calorie_goal, daily_protein_goal_g').eq('id', user.id).maybeSingle(),
   ])
 

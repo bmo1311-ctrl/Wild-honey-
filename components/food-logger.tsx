@@ -28,7 +28,21 @@ export interface UsualFood {
   timesLogged: number
 }
 
-export function FoodLogger({ foods, logged, usual }: { foods: FoodItem[]; logged: LoggedRow[]; usual: UsualFood[] }) {
+export function FoodLogger({
+  foods,
+  logged,
+  usual,
+  members = [],
+  memberId = null,
+  onSwitchMember,
+}: {
+  foods: FoodItem[]
+  logged: LoggedRow[]
+  usual: UsualFood[]
+  members?: { id: string; name: string; is_self: boolean }[]
+  memberId?: string | null
+  onSwitchMember?: (id: string | null) => void
+}) {
   const [multi, setMulti] = useState<Record<string, number>>({})
   const [q, setQ] = useState('')
   const [picked, setPicked] = useState<FoodItem | null>(null)
@@ -70,6 +84,7 @@ export function FoodLogger({ foods, logged, usual }: { foods: FoodItem[]; logged
         protein: scaled.protein,
         carbs: scaled.carbs,
         fat: scaled.fat,
+        memberId,
       })
       if ('error' in res && res.error) {
         toast.error(res.error)
@@ -115,6 +130,7 @@ export function FoodLogger({ foods, logged, usual }: { foods: FoodItem[]; logged
         protein: Number(c.pro) || 0,
         carbs: Number(c.carb) || 0,
         fat: Number(c.fat) || 0,
+        memberId,
       })
       if ('error' in res && res.error) {
         toast.error(res.error)
@@ -128,7 +144,7 @@ export function FoodLogger({ foods, logged, usual }: { foods: FoodItem[]; logged
 
   function quickLog(u: UsualFood) {
     startTransition(async () => {
-      const res = await logFoods([{ foodItemId: u.food.id, quantity: u.lastQuantity }])
+      const res = await logFoods([{ foodItemId: u.food.id, quantity: u.lastQuantity }], undefined, memberId)
       if ('error' in res && res.error) {
         toast.error(res.error)
         return
@@ -149,7 +165,7 @@ export function FoodLogger({ foods, logged, usual }: { foods: FoodItem[]; logged
   function logSelected() {
     const entries = Object.entries(multi).map(([foodItemId, quantity]) => ({ foodItemId, quantity }))
     startTransition(async () => {
-      const res = await logFoods(entries)
+      const res = await logFoods(entries, undefined, memberId)
       if ('error' in res && res.error) {
         toast.error(res.error)
         return
@@ -172,6 +188,30 @@ export function FoodLogger({ foods, logged, usual }: { foods: FoodItem[]; logged
 
   return (
     <div className="flex flex-col gap-4">
+      {members.length > 1 && onSwitchMember && (
+        <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
+          {members.map((m) => {
+            const active = m.is_self ? memberId === null : memberId === m.id
+            return (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => onSwitchMember(m.is_self ? null : m.id)}
+                className={cn(
+                  'flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium transition-colors',
+                  active ? 'bg-mindset-pillar text-white' : 'bg-muted text-muted-foreground',
+                )}
+              >
+                <span className={cn('flex h-6 w-6 items-center justify-center rounded-full font-serif text-xs', active ? 'bg-white/20' : 'bg-card')}>
+                  {m.name.charAt(0).toUpperCase()}
+                </span>
+                {m.name}
+              </button>
+            )
+          })}
+        </div>
+      )}
+
       {usual.length > 0 && (
         <section>
           <div className="mb-2 flex items-baseline justify-between">
