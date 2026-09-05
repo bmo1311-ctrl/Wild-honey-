@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Wordmark } from '@/components/logo'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export default function SignUpSuccessPage() {
   return (
@@ -14,9 +15,9 @@ export default function SignUpSuccessPage() {
           We&apos;ve sent you a confirmation link. Confirm your email to open the door to your daily
           practice and the circle.
         </p>
-        <Button asChild variant="outline" className="mt-8 h-12 w-full text-base">
-          <Link href="/auth/login">Back to sign in</Link>
-        </Button>
+        <Link href="/auth/login" className={cn(buttonVariants({ variant: 'outline' }), 'mt-8 h-12 w-full text-base')}>
+          Back to sign in
+        </Link>
       </div>
     </main>
   )

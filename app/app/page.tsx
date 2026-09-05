@@ -1,140 +1,72 @@
-import { Flame, Lock, Sparkles } from 'lucide-react'
-import Link from 'next/link'
-import { JournalComposer } from '@/components/journal-composer'
-import { TodayFocusCard } from '@/components/today-focus-card'
-import { ResetPanel } from '@/components/reset-panel'
-import { MorningResetCard } from '@/components/morning-reset-card'
-import { EveningReflectionCard } from '@/components/evening-reflection-card'
-import { ActiveChallengeTracker } from '@/components/active-challenge-tracker'
-import { pickSparkLine } from '@/lib/spark-lines'
-import {
-  computeTodayFocus,
-  getMyActiveChallenge,
-  getMyEntryForPrompt,
-  getMyGoals,
-  getRecentCheckins,
-  getSessionProfile,
-  getTodayCheckin,
-  getTodayEveningReflection,
-  getTodayMorningReset,
-  getTodayPrompt,
-} from '@/lib/data'
-import { PILLAR_META } from '@/lib/pillars'
-import { SEASON_META } from '@/lib/honey-profile'
+import { Flame } from 'lucide-react'
+import { DayView } from '@/components/course/day-view'
+import { COURSE, getDay } from '@/lib/courses'
+import type { CourseWriting } from '@/lib/courses'
+import { getCourseState, getSessionProfile, getTodayCheckin, getWritings } from '@/lib/data'
+import { StartCourseButton } from '@/components/course/start-course-button'
 
+/**
+ * Today shows today. If she is enrolled it renders the day inline, identical
+ * to the day view, with no extra navigation — two taps from lock screen to
+ * done. Morning reset, evening reflection, prompt-of-the-day, goals and the
+ * focus card are deliberately not here any more.
+ */
 export default async function TodayPage() {
-  const [profile, prompt, todayCheckin, recentCheckins, morningReset, eveningReflection, goals, activeChallenge] = await Promise.all([
-    getSessionProfile(),
-    getTodayPrompt(),
-    getTodayCheckin(),
-    getRecentCheckins(7),
-    getTodayMorningReset(),
-    getTodayEveningReflection(),
-    getMyGoals(),
-    getMyActiveChallenge(),
-  ])
-  const existing = prompt ? await getMyEntryForPrompt(prompt.id) : null
-  const focus = computeTodayFocus(todayCheckin, recentCheckins, {
-    hydrationGoalOz: profile?.hydration_goal_oz,
-    goals: goals.map((g) => g.goal),
-    faithPreference: profile?.faith_preference,
-    season: profile?.season,
-  })
+  const [{ enrollment, currentDay, completedDays }, profile] = await Promise.all([getCourseState(), getSessionProfile()])
 
-  const today = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  })
+  if (!enrollment || currentDay === null) {
+    return (
+      <div className="flex flex-col gap-6">
+        <header>
+          <h1 className="font-serif text-[29px] font-semibold leading-[1.1] text-balance">{COURSE.title}</h1>
+          <p className="mt-2 text-[16.5px] leading-[1.5] text-pretty text-muted-foreground">{COURSE.subtitle}</p>
+        </header>
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <p className="font-serif text-xl font-semibold">Eight weeks. Fifty-six days.</p>
+          <p className="mt-1.5 text-[15px] leading-[1.5] text-pretty text-muted-foreground">
+            Thirty minutes of intentional practice a day. Today becomes day one.
+          </p>
+          <StartCourseButton />
+        </div>
+      </div>
+    )
+  }
 
-  const hour = new Date().getHours()
-  const timeGreeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+  const day = getDay(currentDay)
+  if (!day) return null
 
-  const locked = prompt?.is_premium && profile?.membership_tier === 'free'
-  const seasonLabel = profile?.season ? SEASON_META[profile.season].label : null
-  const sparkLine = profile ? pickSparkLine(profile.id, goals.map((g) => g.goal), profile.faith_preference) : null
+  const [writings, checkin] = await Promise.all([getWritings(currentDay), getTodayCheckin()])
+  const saved = new Map<number, CourseWriting>(writings.map((w) => [w.prompt_index, w]))
+  const pct = Math.round((completedDays.length / COURSE.length_days) * 100)
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">{today}</p>
-          <h1 className="font-serif text-3xl font-semibold text-balance">
-            {timeGreeting}, {profile?.name}
-          </h1>
-          {seasonLabel && <p className="mt-0.5 text-xs text-muted-foreground">a season of {seasonLabel}</p>}
+    <div className="flex flex-col gap-5">
+      {/* Progress is visible on every screen, so Program is for browsing, not orientation. */}
+      <div className="-mx-5 -mt-5 overflow-hidden bg-mindset-pillar">
+        <div className="flex items-center justify-between px-5 py-3">
+          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-white">
+            Day {currentDay} of {COURSE.length_days}
+          </p>
+          {profile?.streak_count ? (
+            <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-[0.14em] text-white">
+              <Flame className="h-3.5 w-3.5" />
+              {profile.streak_count}
+            </p>
+          ) : null}
         </div>
-        <div className="flex flex-col items-center rounded-2xl bg-card px-4 py-3 ring-1 ring-border">
-          <span className="flex items-center gap-1 font-serif text-2xl font-semibold text-honey">
-            <Flame className="h-5 w-5" />
-            {profile?.streak_count ?? 0}
-          </span>
-          <span className="text-[0.65rem] uppercase tracking-wide text-muted-foreground">
-            day streak
-          </span>
+        <div className="h-[5px] w-full bg-[#0d2c53]">
+          <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
         </div>
       </div>
 
-      {sparkLine && (
-        <div className={`flex items-start gap-3 rounded-2xl p-5 ring-1 ${PILLAR_META[sparkLine.pillar].chip} ring-transparent`}>
-          <Sparkles className="mt-0.5 h-4 w-4 shrink-0" />
-          <p className="font-serif text-lg font-medium leading-snug text-pretty">{sparkLine.text}</p>
-        </div>
-      )}
-
-      <ResetPanel />
-      <TodayFocusCard focus={focus} />
-      {activeChallenge && <ActiveChallengeTracker challenge={activeChallenge} compact />}
-      <MorningResetCard existing={morningReset} />
-      <EveningReflectionCard existing={eveningReflection} />
-
-      <div className="border-t border-border pt-6">
-        <p className="mb-4 text-xs font-medium uppercase tracking-wide text-muted-foreground">today's writing prompt</p>
-      </div>
-
-      {!prompt && (
-        <div className="rounded-2xl bg-card p-6 text-center ring-1 ring-border">
-          <p className="text-muted-foreground">No prompt today. Check back soon.</p>
-        </div>
-      )}
-
-      {prompt && (
-        <>
-          <section className="rounded-2xl bg-secondary/60 p-6 ring-1 ring-border">
-            <span
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${PILLAR_META[prompt.pillar].chip}`}
-            >
-              <span className={`h-2 w-2 rounded-full ${PILLAR_META[prompt.pillar].dot}`} />
-              {prompt.pillar}
-            </span>
-            <h2 className="mt-4 font-serif text-2xl font-medium leading-snug text-pretty">
-              {prompt.text}
-            </h2>
-          </section>
-
-          {locked ? (
-            <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border bg-card p-8 text-center">
-              <span className="hex-clip flex h-12 w-12 items-center justify-center bg-honey text-honey-foreground">
-                <Lock className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="font-serif text-lg font-semibold">A premium Faith prompt</p>
-                <p className="mt-1 text-sm text-muted-foreground text-pretty">
-                  Join The Circle to unlock premium prompts and share with the community.
-                </p>
-              </div>
-              <Link
-                href="/app/profile"
-                className="rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background"
-              >
-                Upgrade membership
-              </Link>
-            </div>
-          ) : (
-            <JournalComposer promptId={prompt.id} existing={existing} />
-          )}
-        </>
-      )}
+      <DayView
+        day={day}
+        saved={saved}
+        checkin={checkin}
+        done={completedDays.includes(currentDay)}
+        doneAt={null}
+        showNav={false}
+      />
     </div>
   )
 }

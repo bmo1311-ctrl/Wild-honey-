@@ -208,7 +208,7 @@ export function RecipeRow({ recipe }: { recipe: Recipe }) {
       <div className="flex flex-wrap gap-3">
         <div className="flex flex-col gap-1.5">
           <Label>season</Label>
-          <select value={season} onChange={(e) => setSeason(e.target.value)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
+          <select value={season} onChange={(e) => setSeason(e.target.value as typeof season)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
             {SEASONS.map((s) => (
               <option key={s} value={s}>{s}</option>
             ))}
@@ -216,7 +216,7 @@ export function RecipeRow({ recipe }: { recipe: Recipe }) {
         </div>
         <div className="flex flex-col gap-1.5">
           <Label>cycle phase</Label>
-          <select value={cyclePhase} onChange={(e) => setCyclePhase(e.target.value)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
+          <select value={cyclePhase} onChange={(e) => setCyclePhase(e.target.value as typeof cyclePhase)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
             {CYCLE_PHASES.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
@@ -224,7 +224,7 @@ export function RecipeRow({ recipe }: { recipe: Recipe }) {
         </div>
         <div className="flex flex-col gap-1.5">
           <Label>budget</Label>
-          <select value={budgetTier} onChange={(e) => setBudgetTier(e.target.value)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
+          <select value={budgetTier} onChange={(e) => setBudgetTier(e.target.value as typeof budgetTier)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
             {BUDGETS.map((b) => (
               <option key={b} value={b}>{b}</option>
             ))}
@@ -232,7 +232,7 @@ export function RecipeRow({ recipe }: { recipe: Recipe }) {
         </div>
         <div className="flex flex-col gap-1.5">
           <Label>meal type</Label>
-          <select value={mealType} onChange={(e) => setMealType(e.target.value)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
+          <select value={mealType} onChange={(e) => setMealType(e.target.value as typeof mealType)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
             {MEAL_TYPES.map((m) => (
               <option key={m} value={m}>{m}</option>
             ))}

@@ -128,7 +128,7 @@ export function WorkoutRow({ workout }: { workout: Workout }) {
         </div>
         <div className="flex flex-col gap-1.5">
           <Label>body group</Label>
-          <select value={bodyGroup} onChange={(e) => setBodyGroup(e.target.value)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
+          <select value={bodyGroup} onChange={(e) => setBodyGroup(e.target.value as typeof bodyGroup)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
             {BODY_GROUPS.map((b) => (
               <option key={b} value={b}>{b.replace('_', ' ')}</option>
             ))}
@@ -136,7 +136,7 @@ export function WorkoutRow({ workout }: { workout: Workout }) {
         </div>
         <div className="flex flex-col gap-1.5">
           <Label>workout type</Label>
-          <select value={workoutType} onChange={(e) => setWorkoutType(e.target.value)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
+          <select value={workoutType} onChange={(e) => setWorkoutType(e.target.value as typeof workoutType)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
             {WORKOUT_TYPES.map((w) => (
               <option key={w} value={w}>{w}</option>
             ))}
