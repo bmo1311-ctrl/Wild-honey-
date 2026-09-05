@@ -1,20 +1,85 @@
-import { Flame } from 'lucide-react'
-import { DayView } from '@/components/course/day-view'
-import { COURSE, getDay } from '@/lib/courses'
-import type { CourseWriting } from '@/lib/courses'
-import { getCourseState, getSessionProfile, getTodayCheckin, getWritings } from '@/lib/data'
+import Link from 'next/link'
+import { ChevronRight, Flame } from 'lucide-react'
+import { TodayChecklist, type TodoRow } from '@/components/today-checklist'
 import { StartCourseButton } from '@/components/course/start-course-button'
+import { COURSE, getDay, toISODate } from '@/lib/courses'
+import { computeStreaks } from '@/lib/rewards'
+import {
+  getCourseState,
+  getDayProgress,
+  getHabits,
+  getRecentHabitLogs,
+  getSessionProfile,
+  getTodayCheckin,
+  getTodayNutrition,
+} from '@/lib/data'
 
 /**
- * Today shows today. If she is enrolled it renders the day inline, identical
- * to the day view, with no extra navigation — two taps from lock screen to
- * done. Morning reset, evening reflection, prompt-of-the-day, goals and the
- * focus card are deliberately not here any more.
+ * The dashboard. Stats she has earned at the top, then one plain list of what
+ * today actually needs — tickable where it can be ticked, and a link straight
+ * to the work where it can't.
  */
 export default async function TodayPage() {
-  const [{ enrollment, currentDay, completedDays }, profile] = await Promise.all([getCourseState(), getSessionProfile()])
+  const [{ enrollment, currentDay, completedDays }, profile, progress, checkin, nutrition, habits, habitLogs] = await Promise.all([
+    getCourseState(),
+    getSessionProfile(),
+    getDayProgress(),
+    getTodayCheckin(),
+    getTodayNutrition(),
+    getHabits(),
+    getRecentHabitLogs(7),
+  ])
 
-  if (!enrollment || currentDay === null) {
+  const streaks = computeStreaks(progress)
+  const today = toISODate()
+  const day = currentDay ? getDay(currentDay) : null
+  const dayDone = currentDay ? completedDays.includes(currentDay) : false
+  const pct = Math.round((completedDays.length / COURSE.length_days) * 100)
+  const loggedHabitIds = new Set(habitLogs.filter((l) => l.date === today).map((l) => l.habit_id))
+
+  const stats = [
+    { label: 'Day', value: currentDay ? `${currentDay}` : '—', sub: `of ${COURSE.length_days}` },
+    { label: 'Streak', value: `${streaks.current}`, sub: streaks.longest > streaks.current ? `best ${streaks.longest}` : 'days', flame: true },
+    { label: 'Done', value: `${completedDays.length}`, sub: `${pct}%` },
+    {
+      label: 'Protein',
+      value: nutrition.protein ? `${Math.round(nutrition.protein)}` : '0',
+      sub: nutrition.proteinGoal ? `of ${nutrition.proteinGoal}g` : 'g today',
+    },
+  ]
+
+  const rows: TodoRow[] = []
+  if (day) {
+    rows.push({
+      key: 'course',
+      kind: 'course',
+      id: String(day.day_number),
+      label: `Day ${day.day_number} · ${day.title}`,
+      hint: `${day.kind} · ${day.minutes} min`,
+      done: dayDone,
+    })
+  }
+  rows.push({
+    key: 'checkin',
+    kind: 'link',
+    href: '/app/nutrition',
+    label: 'Log how you feel',
+    hint: checkin ? 'logged today' : 'energy, sleep, stress',
+    done: Boolean(checkin),
+  })
+  rows.push({
+    key: 'meals',
+    kind: 'link',
+    href: '/app/nutrition',
+    label: 'Log what you ate',
+    hint: nutrition.loggedMeals.length ? `${nutrition.loggedMeals.length} logged` : 'nothing logged yet',
+    done: nutrition.loggedMeals.length > 0,
+  })
+  for (const h of habits) {
+    rows.push({ key: `habit-${h.id}`, kind: 'habit', id: h.id, label: h.title, hint: h.anchor ?? undefined, done: loggedHabitIds.has(h.id) })
+  }
+
+  if (!enrollment || !currentDay) {
     return (
       <div className="flex flex-col gap-6">
         <header>
@@ -32,41 +97,58 @@ export default async function TodayPage() {
     )
   }
 
-  const day = getDay(currentDay)
-  if (!day) return null
-
-  const [writings, checkin] = await Promise.all([getWritings(currentDay), getTodayCheckin()])
-  const saved = new Map<number, CourseWriting>(writings.map((w) => [w.prompt_index, w]))
-  const pct = Math.round((completedDays.length / COURSE.length_days) * 100)
-
   return (
-    <div className="flex flex-col gap-5">
-      {/* Progress is visible on every screen, so Program is for browsing, not orientation. */}
-      <div className="-mx-5 -mt-5 overflow-hidden bg-mindset-pillar">
-        <div className="flex items-center justify-between px-5 py-3">
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-white">
-            Day {currentDay} of {COURSE.length_days}
-          </p>
-          {profile?.streak_count ? (
-            <p className="flex items-center gap-1 text-[11px] font-medium uppercase tracking-[0.14em] text-white">
-              <Flame className="h-3.5 w-3.5" />
-              {profile.streak_count}
-            </p>
-          ) : null}
-        </div>
-        <div className="h-[5px] w-full bg-[#0d2c53]">
-          <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
-        </div>
-      </div>
+    <div className="flex flex-col gap-6">
+      <header>
+        <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+          {new Date().toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}
+        </p>
+        <h1 className="mt-1 font-serif text-[29px] font-semibold leading-[1.1]">
+          {profile?.name ? `Morning, ${profile.name.split(' ')[0]}` : 'Today'}
+        </h1>
+      </header>
 
-      <DayView
-        day={day}
-        saved={saved}
-        checkin={checkin}
-        done={completedDays.includes(currentDay)}
-        doneAt={null}
-        showNav={false}
-      />
+      <section className="grid grid-cols-4 gap-2">
+        {stats.map((s) => (
+          <div key={s.label} className="rounded-2xl border border-border bg-card px-2 py-3 text-center">
+            <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted-foreground">{s.label}</p>
+            <p className="mt-1 flex items-center justify-center gap-0.5 font-serif text-[22px] font-semibold leading-none">
+              {s.flame && <Flame className="h-3.5 w-3.5 text-primary" />}
+              {s.value}
+            </p>
+            <p className="mt-0.5 truncate text-[10px] text-muted-foreground">{s.sub}</p>
+          </div>
+        ))}
+      </section>
+
+      <section>
+        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+          <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+        </div>
+        <p className="mt-1.5 text-xs text-muted-foreground">
+          {completedDays.length} of {COURSE.length_days} days · week {Math.floor((currentDay - 1) / 7) + 1} of {COURSE.weeks}
+        </p>
+      </section>
+
+      <TodayChecklist rows={rows} />
+
+      {day && (
+        <Link
+          href={`/app/program/day/${day.day_number}`}
+          className="flex h-[58px] items-center justify-center gap-1.5 rounded-2xl bg-primary text-[18px] font-bold text-primary-foreground"
+        >
+          Open day {day.day_number}
+          <ChevronRight className="h-5 w-5" />
+        </Link>
+      )}
+
+      <Link href="/app/becoming" className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
+        <span className="min-w-0 flex-1">
+          <span className="block text-[15px] font-semibold">Your becoming</span>
+          <span className="mt-0.5 block text-[13px] text-muted-foreground">what&rsquo;s changed since you started</span>
+        </span>
+        <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+      </Link>
     </div>
   )
 }
