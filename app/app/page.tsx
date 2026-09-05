@@ -70,7 +70,7 @@ export default async function TodayPage() {
   rows.push({
     key: 'meals',
     kind: 'link',
-    href: '/app/nutrition',
+    href: '/app/nutrition/log',
     label: 'Log what you ate',
     hint: nutrition.loggedMeals.length ? `${nutrition.loggedMeals.length} logged` : 'nothing logged yet',
     done: nutrition.loggedMeals.length > 0,

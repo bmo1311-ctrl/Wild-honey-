@@ -2029,3 +2029,112 @@ function revalidateCourse(dayNumber: number) {
   revalidatePath(`/app/program/day/${dayNumber}`)
   revalidatePath(`/app/program/week/${Math.floor((dayNumber - 1) / 7) + 1}`)
 }
+
+// ---- Food logging ----
+// meal_logs could only ever point at one of the sixty recipes. These let her
+// log anything, with the macros snapshotted onto the row so correcting a food
+// later never rewrites what she already ate.
+
+export async function logFood(input: {
+  foodItemId?: string
+  customName?: string
+  quantity: number
+  unit: string
+  calories: number
+  protein: number
+  carbs: number
+  fat: number
+  mealSlot?: string
+  date?: string
+}) {
+  const { supabase, user } = await requireUser()
+  if (!input.foodItemId && !input.customName?.trim()) return { error: 'Give it a name first.' }
+  if (!(input.quantity > 0)) return { error: 'How much did you have?' }
+
+  const { error } = await supabase.from('meal_logs').insert({
+    user_id: user.id,
+    food_item_id: input.foodItemId ?? null,
+    custom_name: input.customName?.trim() || null,
+    quantity: input.quantity,
+    unit: input.unit,
+    calories: round1(input.calories),
+    protein_g: round1(input.protein),
+    carbs_g: round1(input.carbs),
+    fat_g: round1(input.fat),
+    meal_slot: input.mealSlot ?? null,
+    date: input.date ?? toISODate(),
+    servings: 1,
+  })
+  if (error) return { error: error.message }
+  await bumpStreak(user.id)
+  revalidatePath('/app/nutrition')
+  revalidatePath('/app')
+  return { ok: true }
+}
+
+export async function logRecipeMeal(recipeId: string, servings = 1) {
+  const { supabase, user } = await requireUser()
+  const { data: recipe } = await supabase.from('recipes').select('calories, protein_g, carbs_g, fat_g, title').eq('id', recipeId).maybeSingle()
+  const { error } = await supabase.from('meal_logs').insert({
+    user_id: user.id,
+    recipe_id: recipeId,
+    servings,
+    custom_name: recipe?.title ?? null,
+    quantity: servings,
+    unit: 'serving',
+    calories: round1((recipe?.calories ?? 0) * servings),
+    protein_g: round1((recipe?.protein_g ?? 0) * servings),
+    carbs_g: round1((recipe?.carbs_g ?? 0) * servings),
+    fat_g: round1((recipe?.fat_g ?? 0) * servings),
+    date: toISODate(),
+  })
+  if (error) return { error: error.message }
+  await bumpStreak(user.id)
+  revalidatePath('/app/nutrition')
+  revalidatePath('/app')
+  return { ok: true }
+}
+
+/** Saves a food she typed in so it is one tap next time. */
+export async function saveFoodItem(input: {
+  name: string
+  servingSize: number
+  servingUnit: string
+  calories: number
+  protein: number
+  carbs: number
+  fat: number
+}) {
+  const { supabase, user } = await requireUser()
+  if (!input.name.trim()) return { error: 'Give it a name first.' }
+  const { data, error } = await supabase
+    .from('food_items')
+    .insert({
+      user_id: user.id,
+      name: input.name.trim(),
+      serving_size: input.servingSize,
+      serving_unit: input.servingUnit,
+      calories: round1(input.calories),
+      protein_g: round1(input.protein),
+      carbs_g: round1(input.carbs),
+      fat_g: round1(input.fat),
+    })
+    .select('id')
+    .maybeSingle()
+  if (error) return { error: error.message }
+  revalidatePath('/app/nutrition')
+  return { ok: true, id: data?.id as string | undefined }
+}
+
+export async function deleteMealLog(id: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('meal_logs').delete().eq('id', id).eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/nutrition')
+  revalidatePath('/app')
+  return { ok: true }
+}
+
+function round1(n: number): number {
+  return Math.round((Number.isFinite(n) ? n : 0) * 10) / 10
+}

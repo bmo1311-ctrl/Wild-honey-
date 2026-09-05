@@ -40,6 +40,7 @@ import type {
 import { suggestProtocol } from '@/lib/protocols'
 import { COURSE_SLUG, currentDayFrom } from '@/lib/courses'
 import type { CourseEnrollment, CourseWriting } from '@/lib/courses'
+import type { FoodItem } from '@/lib/types'
 
 /**
  * Unwraps a Supabase response, throwing on error instead of quietly
@@ -858,6 +859,20 @@ export async function getAllChallengesForAdmin(): Promise<Challenge[]> {
   const countByChallenge = new Map<string, number>()
   ;(participants ?? []).forEach((p) => countByChallenge.set(p.challenge_id, (countByChallenge.get(p.challenge_id) ?? 0) + 1))
   return list.map((c) => ({ ...c, participant_count: countByChallenge.get(c.id) ?? 0 }))
+}
+
+// ---- Food logging ----
+
+/** Shared staples plus anything she has added, hers first. */
+export async function getFoodItems(): Promise<FoodItem[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const data = ok(await supabase.from('food_items').select('*').order('name', { ascending: true }))
+  const all = (data as FoodItem[]) ?? []
+  if (!user) return all
+  return [...all.filter((f) => f.user_id === user.id), ...all.filter((f) => f.user_id !== user.id)]
 }
 
 // ---- Strong and Surrendered (the course) ----

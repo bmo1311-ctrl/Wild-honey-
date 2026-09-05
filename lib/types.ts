@@ -535,3 +535,17 @@ export interface ExpertQuestion {
   created_at: string
   profile?: Pick<Profile, 'name' | 'avatar_color' | 'avatar_url'> | null
 }
+
+export interface FoodItem {
+  id: string
+  user_id: string | null
+  name: string
+  brand: string | null
+  serving_size: number
+  serving_unit: string
+  calories: number
+  protein_g: number
+  carbs_g: number
+  fat_g: number
+  created_at: string
+}
