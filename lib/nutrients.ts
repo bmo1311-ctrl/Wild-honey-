@@ -10,7 +10,7 @@
 export type NutrientKey =
   | 'calories' | 'protein_g' | 'carbs_g' | 'fat_g'
   | 'fiber_g' | 'sugar_g' | 'sat_fat_g'
-  | 'water_ml' | 'sodium_mg' | 'potassium_mg' | 'calcium_mg' | 'iron_mg'
+  | 'water_ml' | 'caffeine_mg' | 'sodium_mg' | 'potassium_mg' | 'calcium_mg' | 'iron_mg'
   | 'magnesium_mg' | 'zinc_mg'
   | 'vit_a_mcg' | 'vit_c_mg' | 'vit_d_mcg' | 'vit_e_mg' | 'vit_b12_mcg' | 'folate_mcg'
 
@@ -33,6 +33,7 @@ export const NUTRIENTS: NutrientDef[] = [
   { key: 'sat_fat_g', label: 'Saturated fat', unit: 'g', target: 20, group: 'macro' },
 
   { key: 'water_ml', label: 'Water', unit: 'ml', target: 2700, group: 'hydration' },
+  { key: 'caffeine_mg', label: 'Caffeine', unit: 'mg', target: 400, group: 'hydration' },
 
   { key: 'sodium_mg', label: 'Sodium', unit: 'mg', target: 2300, group: 'mineral' },
   { key: 'potassium_mg', label: 'Potassium', unit: 'mg', target: 2600, group: 'mineral' },
