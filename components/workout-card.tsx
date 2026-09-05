@@ -8,7 +8,7 @@ export function WorkoutCard({ workout: w }: { workout: Workout }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
+    <div id={`w-${w.id}`} className="flex h-full flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
       {w.image_url && (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={w.image_url} alt="" className="h-36 w-full object-cover" />

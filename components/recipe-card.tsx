@@ -79,7 +79,7 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
   const placeholderColor = recipe.pillar ? PILLAR_META[recipe.pillar].dot : 'bg-secondary'
 
   return (
-    <div className="relative flex h-full flex-col gap-2 rounded-2xl bg-card p-4 ring-1 ring-border">
+    <div id={`r-${recipe.id}`} className="relative flex h-full flex-col gap-2 rounded-2xl bg-card p-4 ring-1 ring-border">
       {recipe.image_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
