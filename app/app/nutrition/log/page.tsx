@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { ChevronLeft, Settings2 } from 'lucide-react'
 import { FoodLogger } from '@/components/food-logger'
-import { getFoodItems, getSessionProfile, getTodayNutrition, getUsualFoods } from '@/lib/data'
+import { getCurrentCyclePhase, getFoodItems, getSessionProfile, getTodayNutrition, getUsualFoods } from '@/lib/data'
+import { applyCycle, phaseFromDates, phaseLabel, type CyclePhaseKey } from '@/lib/cycle'
 import { NutrientRings } from '@/components/nutrient-rings'
 import { calculateTargets, effectiveTargets, type ActivityLevel, type BodyGoal } from '@/lib/goals'
 
@@ -10,11 +11,12 @@ import { calculateTargets, effectiveTargets, type ActivityLevel, type BodyGoal }
  * you ate" and this is that, and only that.
  */
 export default async function LogFoodPage() {
-  const [foods, nutrition, usual, profile] = await Promise.all([
+  const [foods, nutrition, usual, profile, loggedPhase] = await Promise.all([
     getFoodItems(),
     getTodayNutrition(),
     getUsualFoods(),
     getSessionProfile(),
+    getCurrentCyclePhase(),
   ])
 
   const p = profile as (typeof profile & {
@@ -23,6 +25,9 @@ export default async function LogFoodPage() {
     birth_year?: number | null
     activity_level?: string | null
     body_goal?: string | null
+    last_period_start?: string | null
+    cycle_length_days?: number | null
+    cycle_adjustments?: Record<string, number> | null
   }) | null
 
   const calculated = calculateTargets({
@@ -37,6 +42,13 @@ export default async function LogFoodPage() {
     ...(profile?.daily_protein_goal_g ? { protein_g: profile.daily_protein_goal_g } : {}),
   })
   const hasGoals = Boolean(p?.weight_kg)
+
+  // A phase she logged on a check-in wins; otherwise work it out from her dates.
+  const phase =
+    loggedPhase && loggedPhase !== 'not_tracked'
+      ? (loggedPhase as CyclePhaseKey)
+      : phaseFromDates(p?.last_period_start ?? null, p?.cycle_length_days ?? 28)
+  const cycled = applyCycle(targets, phase, (p?.cycle_adjustments ?? {}) as Record<string, number>)
 
   const logged = nutrition.loggedMeals.map((m) => {
     const row = m as typeof m & {
@@ -70,6 +82,23 @@ export default async function LogFoodPage() {
         </div>
       </div>
 
+      {phase && (
+        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3">
+          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-faith-pillar" aria-hidden="true" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-[15px] font-semibold">{phaseLabel(phase)} phase</span>
+            <span className="block text-[13px] text-muted-foreground">
+              {cycled.pct === 0
+                ? 'targets unchanged this week'
+                : `${cycled.pct > 0 ? '+' : ''}${cycled.pct}% on calories and carbs today`}
+            </span>
+          </span>
+          <Link href="/app/nutrition/goals" className="shrink-0 text-[13px] font-medium text-mindset-pillar underline underline-offset-[3px]">
+            adjust
+          </Link>
+        </div>
+      )}
+
       <NutrientRings
         totals={{
           calories: nutrition.calories,
@@ -77,7 +106,7 @@ export default async function LogFoodPage() {
           carbs_g: nutrition.carbs,
           fat_g: nutrition.fat,
         }}
-        targets={targets}
+        targets={cycled.targets}
         hasGoals={hasGoals}
       />
 

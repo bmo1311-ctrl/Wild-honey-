@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { BodyGoalsForm } from '@/components/body-goals-form'
+import { CycleSettingsForm } from '@/components/cycle-settings-form'
+import type { CyclePhaseKey } from '@/lib/cycle'
 import { getSessionProfile } from '@/lib/data'
 import { kgToLb, type ActivityLevel, type BodyGoal } from '@/lib/goals'
 
@@ -12,6 +14,9 @@ export default async function GoalsPage() {
     birth_year?: number | null
     activity_level?: string | null
     body_goal?: string | null
+    last_period_start?: string | null
+    cycle_length_days?: number | null
+    cycle_adjustments?: Partial<Record<CyclePhaseKey, number>> | null
   }) | null
 
   const unit = (profile?.weight_unit as 'lb' | 'kg') ?? 'lb'
@@ -37,6 +42,14 @@ export default async function GoalsPage() {
           birthYear: profile?.birth_year ? String(profile.birth_year) : '',
           activity: (profile?.activity_level as ActivityLevel) ?? null,
           goal: (profile?.body_goal as BodyGoal) ?? null,
+        }}
+      />
+
+      <CycleSettingsForm
+        initial={{
+          lastPeriodStart: profile?.last_period_start?.slice(0, 10) ?? '',
+          cycleLength: profile?.cycle_length_days ? String(profile.cycle_length_days) : '',
+          adjustments: profile?.cycle_adjustments ?? {},
         }}
       />
     </div>

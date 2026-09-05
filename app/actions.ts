@@ -2213,3 +2213,30 @@ export async function saveBodyGoals(input: {
   revalidatePath('/app')
   return { ok: true }
 }
+
+/** Per-phase percentage shifts, and the dates the phase is worked out from. */
+export async function saveCycleSettings(input: {
+  lastPeriodStart: string | null
+  cycleLengthDays: number | null
+  adjustments: Record<string, number>
+}) {
+  const { supabase, user } = await requireUser()
+  const clean: Record<string, number> = {}
+  for (const [k, v] of Object.entries(input.adjustments)) {
+    if (['menstrual', 'follicular', 'ovulation', 'luteal'].includes(k) && Number.isFinite(v)) {
+      clean[k] = Math.max(Math.min(Math.round(v), 30), -30)
+    }
+  }
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      last_period_start: input.lastPeriodStart,
+      cycle_length_days: input.cycleLengthDays,
+      cycle_adjustments: clean,
+    })
+    .eq('id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/nutrition/log')
+  revalidatePath('/app/nutrition/goals')
+  return { ok: true }
+}
