@@ -1,4 +1,5 @@
-import { RecipeFilterBar } from '@/components/recipe-filter-bar'
+import { RecipeSources } from '@/components/recipe-sources'
+import { RecipeImport } from '@/components/recipe-import'
 import { RecommendedRecipesRow } from '@/components/recommended-recipes-row'
 import { NutritionSummary } from '@/components/nutrition-summary'
 import { NutritionTabs } from '@/components/nutrition-tabs'
@@ -58,8 +59,9 @@ export default async function NutritionPage() {
         counts={{ recipes: recipes.length, plans: plans.length, grocery: grocery.length, pantry: pantry.length }}
         recipes={
           <div className="flex flex-col gap-6">
+            <RecipeImport />
             <RecommendedRecipesRow recipes={recommended} season={season} cyclePhase={cyclePhase} />
-            <RecipeFilterBar recipes={recipes} />
+            <RecipeSources recipes={recipes} userId={profile?.id ?? null} />
           </div>
         }
         plans={<MealPlanList plans={plans} unlocked={unlocked} />}

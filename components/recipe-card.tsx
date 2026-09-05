@@ -117,6 +117,11 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
 
       <button type="button" onClick={() => setOpen((o) => !o)} className="text-left">
         <p className="font-serif text-base font-semibold text-pretty">{recipe.title}</p>
+        {recipe.user_id && (recipe.author_name || recipe.source_name) && (
+          <p className="text-[11.5px] text-muted-foreground">
+            {recipe.author_name ? `shared by ${recipe.author_name}` : ''}{recipe.author_name && recipe.source_name ? ' · ' : ''}{recipe.source_name ? `from ${recipe.source_name}` : ''}
+          </p>
+        )}
         {recipe.description && <p className="text-sm text-muted-foreground text-pretty">{recipe.description}</p>}
       </button>
 

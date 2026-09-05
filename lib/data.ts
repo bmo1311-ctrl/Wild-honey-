@@ -765,8 +765,12 @@ export async function getRecipes(): Promise<Recipe[]> {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  const data = ok(await supabase.from('recipes').select('*').order('created_at', { ascending: false }))
-  const recipes = (data as Recipe[]) ?? []
+  // the policy already limits this to official, her own, and shared; the join names the sharer
+  const data = ok(await supabase.from('recipes').select('*, owner:profiles(name)').order('created_at', { ascending: false }))
+  const recipes = ((data as (Recipe & { owner?: { name: string } | null })[]) ?? []).map((r) => ({
+    ...r,
+    author_name: r.owner?.name ?? null,
+  })) as Recipe[]
   if (!user) return recipes
   const saved = ok(await supabase.from('saved_recipes').select('recipe_id').eq('user_id', user.id))
   const savedIds = new Set((saved ?? []).map((s) => s.recipe_id))

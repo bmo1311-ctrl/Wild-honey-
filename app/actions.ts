@@ -8,6 +8,7 @@ import { oneSignalConfigured, sendPushToUsers } from '@/lib/onesignal'
 import type { Comment, NotificationPrefs, Visibility } from '@/lib/types'
 import { COURSE_SLUG, getCourse, toISODate, weekOfDay } from '@/lib/courses'
 import { scaleNutrients, type NutrientMap } from '@/lib/nutrients'
+import { fetchRecipe, safeUrl } from '@/lib/recipe-import'
 import type { WritingKind } from '@/lib/courses'
 
 async function requireUser() {
@@ -2377,5 +2378,85 @@ export async function recordContentEvent(input: { kind: 'play' | 'complete' | 's
     pillar: input.pillar ?? null,
   })
   if (error) return { error: error.message }
+  return { ok: true }
+}
+
+// ---- Her own recipes ----
+
+/** Read a recipe off a web page. Returns it for her to check before saving. */
+export async function previewRecipeFromUrl(url: string) {
+  await requireUser()
+  if (!safeUrl(url)) return { error: 'That does not look like a web address I can open.' }
+  try {
+    const recipe = await fetchRecipe(url)
+    return { ok: true, recipe }
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Could not read that page.' }
+  }
+}
+
+export async function saveOwnRecipe(input: {
+  title: string
+  description?: string | null
+  ingredients: string
+  instructions: string
+  image_url?: string | null
+  prep_minutes?: number | null
+  calories?: number | null
+  protein_g?: number | null
+  carbs_g?: number | null
+  fat_g?: number | null
+  meal_type?: string
+  source_url?: string | null
+  source_name?: string | null
+  is_public?: boolean
+}) {
+  const { supabase, user } = await requireUser()
+  if (!input.title.trim()) return { error: 'Give it a title.' }
+  if (!input.ingredients.trim() || !input.instructions.trim()) return { error: 'It needs ingredients and steps.' }
+  const { data, error } = await supabase
+    .from('recipes')
+    .insert({
+      user_id: user.id,
+      title: input.title.trim(),
+      description: input.description?.trim() || null,
+      ingredients: input.ingredients.trim(),
+      instructions: input.instructions.trim(),
+      image_url: input.image_url || null,
+      prep_minutes: input.prep_minutes ?? null,
+      calories: input.calories == null ? null : Math.round(input.calories),
+      protein_g: input.protein_g ?? null,
+      carbs_g: input.carbs_g ?? null,
+      fat_g: input.fat_g ?? null,
+      meal_type: input.meal_type ?? 'any',
+      season: 'any',
+      cycle_phase: 'any',
+      budget_tier: 'moderate',
+      is_premium: false,
+      kid_friendly: false,
+      source_url: input.source_url ?? null,
+      source_name: input.source_name ?? null,
+      is_public: Boolean(input.is_public),
+    })
+    .select('id')
+    .maybeSingle()
+  if (error) return { error: error.message }
+  revalidatePath('/app/nutrition')
+  return { ok: true, id: data?.id as string | undefined }
+}
+
+export async function setRecipePublic(id: string, isPublic: boolean) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('recipes').update({ is_public: isPublic }).eq('id', id).eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/nutrition')
+  return { ok: true }
+}
+
+export async function deleteOwnRecipe(id: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('recipes').delete().eq('id', id).eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/nutrition')
   return { ok: true }
 }

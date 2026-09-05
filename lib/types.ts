@@ -153,6 +153,12 @@ export interface Recipe {
   calories: number | null
   carbs_g: number | null
   fat_g: number | null
+  /** null = an official Wild Honey recipe */
+  user_id?: string | null
+  is_public?: boolean
+  source_url?: string | null
+  source_name?: string | null
+  author_name?: string | null
   nutrition_highlights: string | null
   created_at: string
   saved?: boolean
