@@ -2329,3 +2329,32 @@ export async function archiveLearningItem(itemId: string) {
   revalidatePath('/app/learning')
   return { ok: true }
 }
+
+export async function updateHouseholdMember(input: { id: string; name?: string; birthYear?: number | null; color?: string }) {
+  const { supabase, user } = await requireUser()
+  const patch: Record<string, unknown> = {}
+  if (input.name?.trim()) patch.name = input.name.trim()
+  if (input.birthYear !== undefined) patch.birth_year = input.birthYear
+  if (input.color) patch.color = input.color
+  if (Object.keys(patch).length === 0) return { ok: true }
+  const { error } = await supabase.from('household_members').update(patch).eq('id', input.id).eq('owner_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/household')
+  revalidatePath('/app/learning')
+  revalidatePath('/app/nutrition/log')
+  return { ok: true }
+}
+
+/** Used by onboarding, where several children may be added at once. */
+export async function addHouseholdMembers(people: { name: string; birthYear: number | null }[]) {
+  const { supabase, user } = await requireUser()
+  const rows = people
+    .filter((p) => p.name.trim())
+    .map((p, i) => ({ owner_id: user.id, name: p.name.trim(), birth_year: p.birthYear, position: i + 1 }))
+  if (rows.length === 0) return { ok: true }
+  const { error } = await supabase.from('household_members').insert(rows)
+  if (error) return { error: error.message }
+  revalidatePath('/app/household')
+  revalidatePath('/app/learning')
+  return { ok: true }
+}

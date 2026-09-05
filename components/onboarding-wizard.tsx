@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
-import { completeOnboarding, saveBodyGoals, skipOnboarding } from '@/app/actions'
+import { addHouseholdMembers, completeOnboarding, saveBodyGoals, skipOnboarding } from '@/app/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -78,6 +78,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
   const [allergies, setAllergies] = useState('')
   const [communicationStyle, setCommunicationStyle] = useState<string | null>(null)
   const [faithPreference, setFaithPreference] = useState<string | null>(null)
+  const [children, setChildren] = useState<{ name: string; birthYear: string }[]>([])
 
   const step: Step = STEPS[stepIndex]
   const isLast = stepIndex === STEPS.length - 1
@@ -128,6 +129,9 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
           activityLevel,
           bodyGoal,
         })
+      }
+      if (children.some((c) => c.name.trim())) {
+        await addHouseholdMembers(children.map((c) => ({ name: c.name, birthYear: Number(c.birthYear) || null })))
       }
       toast.success('Welcome to Wild Honey.')
       router.push('/app')
@@ -320,6 +324,43 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                 ))}
               </div>
             </div>
+            <div className="flex flex-col gap-1.5">
+              <Label>anyone else at home you want to track? (optional)</Label>
+              {children.map((c, i) => (
+                <div key={i} className="flex gap-2">
+                  <Input
+                    value={c.name}
+                    onChange={(e) => setChildren(children.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))}
+                    placeholder="name"
+                    className="h-11"
+                  />
+                  <Input
+                    value={c.birthYear}
+                    onChange={(e) => setChildren(children.map((x, j) => (j === i ? { ...x, birthYear: e.target.value } : x)))}
+                    inputMode="numeric"
+                    placeholder="year born"
+                    className="h-11 w-32"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setChildren(children.filter((_, j) => j !== i))}
+                    aria-label="remove"
+                    className="shrink-0 px-2 text-muted-foreground"
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => setChildren([...children, { name: '', birthYear: '' }])}
+                className="self-start rounded-full px-3.5 py-2 text-sm font-medium text-muted-foreground ring-1 ring-border"
+              >
+                + add a child
+              </button>
+              <p className="text-xs text-muted-foreground">the year lets the app keep up as they grow. you can add more later.</p>
+            </div>
+
             <div className="flex flex-col gap-1.5">
               <Label>faith woven in? totally your call.</Label>
               <div className="flex flex-wrap gap-2">
