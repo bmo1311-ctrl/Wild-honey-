@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
-import { completeOnboarding, skipOnboarding } from '@/app/actions'
+import { completeOnboarding, skipOnboarding, saveBodyGoals } from '@/app/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -20,13 +20,14 @@ import {
   SEASONS,
   VITALITY_DIMENSIONS,
 } from '@/lib/honey-profile'
+import { BODY_GOALS } from '@/lib/goals'
 import { cn } from '@/lib/utils'
 
 const AGE_RANGES = ['18-24', '25-34', '35-44', '45-54', '55-64', '65+']
 const MOVEMENT_OPTIONS = ['walking', 'strength training', 'yoga', 'dance', 'swimming', 'running', 'low-impact', 'not sure yet']
 const CAFFEINE_OPTIONS = ['none', '1 cup', '2+ cups', 'trying to cut back']
 
-const STEPS = ['name', 'season', 'goals', 'vitality', 'lifestyle', 'food', 'style'] as const
+const STEPS = ['name', 'season', 'goals', 'vitality', 'lifestyle', 'food', 'style', 'body'] as const
 type Step = (typeof STEPS)[number]
 
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
@@ -61,6 +62,9 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
   const [movementPreference, setMovementPreference] = useState<string | null>(null)
   const [hydrationGoalOz, setHydrationGoalOz] = useState('')
   const [caffeine, setCaffeine] = useState<string | null>(null)
+  const [weight, setWeight] = useState('')
+  const [weightUnit, setWeightUnit] = useState<'lb' | 'kg'>('lb')
+  const [bodyGoal, setBodyGoal] = useState<string | null>(null)
   const [foodsAvoided, setFoodsAvoided] = useState('')
   const [allergies, setAllergies] = useState('')
   const [communicationStyle, setCommunicationStyle] = useState<string | null>(null)
@@ -112,6 +116,17 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
         communicationStyle: communicationStyle ?? undefined,
         faithPreference: faithPreference ?? undefined,
       })
+      // Optional, and saved separately so skipping it costs nothing.
+      if (weight.trim() || bodyGoal) {
+        await saveBodyGoals({
+          weight: Number(weight) || null,
+          weightUnit,
+          heightCm: null,
+          birthYear: null,
+          activityLevel: null,
+          bodyGoal,
+        })
+      }
       if (res?.error) {
         toast.error(res.error)
         return
@@ -336,6 +351,54 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
       </div>
 
       <div className="mt-8 flex items-center justify-between gap-3">
+        {step === 'body' && (
+          <div className="flex flex-col gap-5">
+            <div>
+              <h2 className="font-serif text-2xl font-semibold">one last thing — and it&rsquo;s optional</h2>
+              <p className="mt-1.5 text-sm text-muted-foreground text-pretty">
+                this is what lets the app work out your protein and calories instead of guessing. skip it and set it later.
+              </p>
+            </div>
+
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">what are you working toward?</p>
+              <div className="flex flex-wrap gap-2">
+                {BODY_GOALS.map((g) => (
+                  <Chip key={g.key} active={bodyGoal === g.key} onClick={() => setBodyGoal(bodyGoal === g.key ? null : g.key)}>
+                    {g.label}
+                  </Chip>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">your weight (optional)</p>
+              <div className="flex gap-2">
+                <input
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  inputMode="decimal"
+                  placeholder="130"
+                  className="h-12 w-full rounded-xl bg-background px-3 text-base outline-none ring-1 ring-border focus-visible:ring-2 focus-visible:ring-primary/40"
+                />
+                <div className="flex shrink-0 overflow-hidden rounded-xl ring-1 ring-border">
+                  {(['lb', 'kg'] as const).map((u) => (
+                    <button
+                      key={u}
+                      type="button"
+                      onClick={() => setWeightUnit(u)}
+                      className={cn('h-12 px-4 text-sm font-semibold', weightUnit === u ? 'bg-foreground text-background' : 'bg-transparent text-muted-foreground')}
+                    >
+                      {u}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">never shown to anyone else, and you can change it any time.</p>
+            </div>
+          </div>
+        )}
+
         <Button variant="ghost" onClick={handleBack} disabled={stepIndex === 0 || pending} className="h-11">
           <ArrowLeft className="h-4 w-4" />
           back
