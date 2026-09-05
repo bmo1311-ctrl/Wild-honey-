@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Bookmark, ChevronRight, Play, Search, X } from 'lucide-react'
 import { VaultPlayer } from '@/components/vault-player'
+import { recordContentEvent } from '@/app/actions'
 import type { VaultItem } from '@/lib/vault'
 import { cn } from '@/lib/utils'
 
@@ -22,6 +23,11 @@ export function VaultBrowser({
   searchOnly?: boolean
 }) {
   const [playing, setPlaying] = useState<VaultItem | null>(null)
+  function play(it: VaultItem) {
+    setPlaying(it)
+    // fire-and-forget; the engine reads it next time
+    void recordContentEvent({ kind: 'play', itemType: it.kind, itemId: it.id, pillar: it.pillar })
+  }
   const [q, setQ] = useState('')
   const [searching, setSearching] = useState(searchOnly)
 
@@ -74,15 +80,15 @@ export function VaultBrowser({
           </p>
           <div className="grid grid-cols-2 gap-3">
             {results.map((it) => (
-              <Poster key={`${it.kind}-${it.id}`} item={it} onPlay={setPlaying} wide />
+              <Poster key={`${it.kind}-${it.id}`} item={it} onPlay={play} wide />
             ))}
           </div>
         </section>
       ) : (
         <>
-          {featured && <Featured item={featured} onPlay={setPlaying} />}
+          {featured && <Featured item={featured} onPlay={play} />}
           {shelves.map((shelf) =>
-            shelf.items.length ? <Shelf key={shelf.title} title={shelf.title} items={shelf.items} onPlay={setPlaying} /> : null,
+            shelf.items.length ? <Shelf key={shelf.title} title={shelf.title} items={shelf.items} onPlay={play} /> : null,
           )}
         </>
       )}

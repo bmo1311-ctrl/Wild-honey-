@@ -2365,3 +2365,17 @@ export async function addHouseholdMembers(people: { name: string; birthYear: num
   revalidatePath('/app/learning')
   return { ok: true }
 }
+
+/** What she did with a piece of content. The engine ranks from these. */
+export async function recordContentEvent(input: { kind: 'play' | 'complete' | 'save' | 'open'; itemType: string; itemId: string; pillar?: string | null }) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('content_events').insert({
+    user_id: user.id,
+    kind: input.kind,
+    item_type: input.itemType,
+    item_id: input.itemId,
+    pillar: input.pillar ?? null,
+  })
+  if (error) return { error: error.message }
+  return { ok: true }
+}

@@ -42,6 +42,7 @@ import { COURSE_SLUG, currentDayFrom, getCourse } from '@/lib/courses'
 import type { CourseEnrollment, CourseWriting } from '@/lib/courses'
 import type { FoodItem, HouseholdMember, LearningItem } from '@/lib/types'
 import { sumNutrients, type NutrientMap } from '@/lib/nutrients'
+import type { ContentEvent } from '@/lib/engine'
 
 /**
  * Unwraps a Supabase response, throwing on error instead of quietly
@@ -917,6 +918,24 @@ export async function getAllWritings(): Promise<(CourseWriting & { course_title:
   return lists
     .flatMap((list, i) => list.map((w) => ({ ...w, course_title: getCourse(slugs[i])?.title ?? slugs[i] })))
     .sort((a, b) => b.updated_at.localeCompare(a.updated_at))
+}
+
+/** Recent content events, newest first, for the engine. */
+export async function getContentEvents(limit = 400): Promise<ContentEvent[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const data = ok(
+    await supabase
+      .from('content_events')
+      .select('kind, item_type, item_id, pillar, created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(limit),
+  )
+  return (data as ContentEvent[]) ?? []
 }
 
 // ---- Household + learning ----
