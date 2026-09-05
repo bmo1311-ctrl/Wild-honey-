@@ -17,7 +17,7 @@ export default async function CourseOverviewPage({ params }: { params: Promise<{
     return (
       <div className="flex flex-col gap-6">
         <div>
-          <Link href="/app/program" className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground">
+          <Link href="/app/program?all=1" className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground">
             <ChevronLeft className="h-4 w-4" /> All programs
           </Link>
           <h1 className="font-serif text-[29px] font-semibold leading-[1.1]">{course.title}</h1>
@@ -41,7 +41,7 @@ export default async function CourseOverviewPage({ params }: { params: Promise<{
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href="/app/program" className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground">
+        <Link href="/app/program?all=1" className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground">
           <ChevronLeft className="h-4 w-4" /> All programs
         </Link>
         <h1 className="font-serif text-[29px] font-semibold leading-[1.1]">{course.title}</h1>

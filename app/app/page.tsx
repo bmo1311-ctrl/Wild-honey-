@@ -5,10 +5,11 @@ import { BaselineCard } from '@/components/baseline-card'
 import { todayRows } from '@/lib/modules'
 import { getCourse, getDay, toISODate, weekOfDay } from '@/lib/courses'
 import { CourseSwitcher } from '@/components/course/course-switcher'
-import { computeStreaks } from '@/lib/rewards'
+import { buildActivity, consistency, streaksFrom } from '@/lib/activity'
+import { QuickAddHabit } from '@/components/quick-add-habit'
 import {
   getActiveCourseState,
-  getDayProgress,
+  getActivityDates,
   getHabits,
   getRecentHabitLogs,
   getBaselineVitality,
@@ -24,10 +25,10 @@ import {
  */
 export default async function TodayPage({ searchParams }: { searchParams: Promise<{ course?: string }> }) {
   const { course: preferred } = await searchParams
-  const [{ slug, enrollment, currentDay, completedDays, otherSlugs }, profile, progress, checkin, nutrition, habits, habitLogs] = await Promise.all([
+  const [{ slug, enrollment, currentDay, completedDays, otherSlugs }, profile, activityDates, checkin, nutrition, habits, habitLogs] = await Promise.all([
     getActiveCourseState(preferred),
     getSessionProfile(),
-    getDayProgress(),
+    getActivityDates(),
     getTodayCheckin(),
     getTodayNutrition(),
     getHabits(),
@@ -36,7 +37,9 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
   const baseline = await getBaselineVitality()
 
   const course = getCourse(slug)
-  const streaks = computeStreaks(progress)
+  const activity = buildActivity(activityDates)
+  const streaks = streaksFrom(activity)
+  const week = consistency(activity, 7)
   const today = toISODate()
   const day = course && currentDay ? getDay(course, currentDay) : null
   const dayDone = currentDay ? completedDays.includes(currentDay) : false
@@ -45,7 +48,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
 
   const stats = [
     { label: 'Day', value: currentDay ? `${currentDay}` : '—', sub: course ? `of ${course.length_days}` : '' },
-    { label: 'Streak', value: `${streaks.current}`, sub: streaks.longest > streaks.current ? `best ${streaks.longest}` : 'days', flame: true },
+    { label: 'Streak', value: `${streaks.current}`, sub: streaks.longest > streaks.current ? `best ${streaks.longest}` : `${week.hit} of 7 days`, flame: true },
     { label: 'Done', value: `${completedDays.length}`, sub: `${pct}%` },
     {
       label: 'Protein',
@@ -119,6 +122,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       {!baseline && <BaselineCard dayNumber={currentDay} />}
 
       <TodayChecklist rows={rows} />
+      <QuickAddHabit />
 
       {day && (
         <Link

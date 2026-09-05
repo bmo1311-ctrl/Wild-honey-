@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
-import { getWritings } from '@/lib/data'
+import { getAllWritings } from '@/lib/data'
 import { cn } from '@/lib/utils'
 
 /** Everything she has written, newest first. Nothing here is destructive. */
 export default async function WritePage() {
-  const writings = (await getWritings()).filter((w) => w.kind === 'write' && w.body.trim())
+  const writings = (await getAllWritings()).filter((w) => w.kind === 'write' && w.body.trim())
 
   return (
     <div className="flex flex-col gap-6">
@@ -27,12 +27,12 @@ export default async function WritePage() {
           {writings.map((w) => (
             <Link
               key={w.id}
-              href={`/app/program/day/${w.day_number}`}
+              href={`/app/program/${w.course_slug}/day/${w.day_number}`}
               className={cn('flex items-center gap-3 rounded-2xl border border-border bg-card p-4')}
             >
               <span className="min-w-0 flex-1">
                 <span className="flex items-baseline gap-2">
-                  <span className="text-[11px] uppercase tracking-[0.14em] text-mindset-pillar">Day {w.day_number}</span>
+                  <span className="text-[11px] uppercase tracking-[0.14em] text-mindset-pillar">{w.course_title} · Day {w.day_number}</span>
                   <span className="text-xs text-muted-foreground">
                     {new Date(w.updated_at).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                   </span>

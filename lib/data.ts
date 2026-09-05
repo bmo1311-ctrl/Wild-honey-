@@ -882,6 +882,43 @@ export async function getBaselineVitality(): Promise<VitalityCheckin | null> {
   return (data as VitalityCheckin) ?? null
 }
 
+/**
+ * Every date she did anything — ticked a day in any course, logged a habit,
+ * logged a meal, or checked in. This is what the streak counts, so logging
+ * dinner registers the same as finishing a session.
+ */
+export async function getActivityDates(): Promise<Record<'course' | 'habit' | 'meal' | 'checkin', string[]>> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const empty = { course: [], habit: [], meal: [], checkin: [] }
+  if (!user) return empty
+  const since = new Date(Date.now() - 400 * 86_400_000).toISOString().slice(0, 10)
+  const [course, habit, meal, checkin] = await Promise.all([
+    supabase.from('course_day_progress').select('completed_at').eq('user_id', user.id).gte('completed_at', since).then(ok),
+    supabase.from('habit_logs').select('date').eq('user_id', user.id).gte('date', since).then(ok),
+    supabase.from('meal_logs').select('date').eq('user_id', user.id).is('member_id', null).gte('date', since).then(ok),
+    supabase.from('checkins').select('date').eq('user_id', user.id).gte('date', since).then(ok),
+  ])
+  return {
+    course: ((course as { completed_at: string }[]) ?? []).map((r) => r.completed_at),
+    habit: ((habit as { date: string }[]) ?? []).map((r) => r.date),
+    meal: ((meal as { date: string }[]) ?? []).map((r) => r.date),
+    checkin: ((checkin as { date: string }[]) ?? []).map((r) => r.date),
+  }
+}
+
+/** Her writing from every course she is in, newest first. */
+export async function getAllWritings(): Promise<(CourseWriting & { course_title: string })[]> {
+  const enrollments = await getEnrollments()
+  const slugs = enrollments.length ? enrollments.map((e) => e.course_slug) : [COURSE_SLUG]
+  const lists = await Promise.all(slugs.map((slug) => getWritings(undefined, slug)))
+  return lists
+    .flatMap((list, i) => list.map((w) => ({ ...w, course_title: getCourse(slugs[i])?.title ?? slugs[i] })))
+    .sort((a, b) => b.updated_at.localeCompare(a.updated_at))
+}
+
 // ---- Household + learning ----
 
 /** Everyone under this account. The account holder is created on first read. */

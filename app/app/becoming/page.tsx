@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { Check, Flame, Lock } from 'lucide-react'
-import { COURSE, currentDayFrom, weekOfDay } from '@/lib/courses'
+import { getCourse, currentDayFrom, weekOfDay } from '@/lib/courses'
 import { computeBecoming, computeMilestones, computeStreaks } from '@/lib/rewards'
-import { getBaselineVitality, getDayProgress, getEnrollment, getLatestVitalityCheckin, getWritings } from '@/lib/data'
+import { getActiveCourseState, getBaselineVitality, getDayProgress, getLatestVitalityCheckin, getWritings } from '@/lib/data'
 import { VITALITY_DIMENSIONS } from '@/lib/honey-profile'
 import { PILLAR_META } from '@/lib/pillars'
 import { cn } from '@/lib/utils'
@@ -12,10 +12,11 @@ import { cn } from '@/lib/utils'
  * score, nothing is compared to another member, and a gap is never scolded.
  */
 export default async function BecomingPage() {
-  const [enrollment, progress, writings, baseline, latest] = await Promise.all([
-    getEnrollment(),
-    getDayProgress(),
-    getWritings(),
+  // Which course first, so progress and writing are read for that course, not the default.
+  const active = await getActiveCourseState()
+  const [progress, writings, baseline, latest] = await Promise.all([
+    getDayProgress(active.slug),
+    getWritings(undefined, active.slug),
     getBaselineVitality(),
     getLatestVitalityCheckin(),
   ])
@@ -35,8 +36,9 @@ export default async function BecomingPage() {
     .filter((w) => w.kind === 'rate' && Number(w.body))
     .map((w) => ({ day_number: w.day_number, value: Number(w.body) }))
 
-  const currentDay = enrollment ? currentDayFrom(COURSE, enrollment.started_on) : 0
-  const weeksReached = currentDay ? weekOfDay(COURSE, currentDay) : 0
+  const course = getCourse(active.slug)
+  const currentDay = active.enrollment && course ? currentDayFrom(course, active.enrollment.started_on) : 0
+  const weeksReached = currentDay && course ? weekOfDay(course, currentDay) : 0
 
   const streaks = computeStreaks(progress)
   const { earned, next, all } = computeMilestones(progress, writingCount)

@@ -1,12 +1,16 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { ChevronRight } from 'lucide-react'
 import { COURSES } from '@/lib/courses'
 import { getEnrollments } from '@/lib/data'
 import { cn } from '@/lib/utils'
 
 /** Both courses. She can hold more than one at a time. */
-export default async function ProgramIndexPage() {
+export default async function ProgramIndexPage({ searchParams }: { searchParams: Promise<{ all?: string }> }) {
+  const { all } = await searchParams
   const enrollments = await getEnrollments()
+  // One course, no decision to make — go straight to it. ?all=1 shows the list.
+  if (enrollments.length === 1 && !all) redirect(`/app/program/${enrollments[0].course_slug}`)
   const bySlug = new Map(enrollments.map((e) => [e.course_slug, e]))
 
   return (
