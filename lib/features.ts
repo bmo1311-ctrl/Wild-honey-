@@ -1,30 +1,32 @@
 /**
- * Feature flags for the course-first rebuild.
+ * Feature flags.
  *
- * Nav is Today · Program · Write · Circle · You. Everything below is built,
- * tested and still in the tree — it is switched off, not deleted. Flip a
- * boolean to true and the route and its links come back exactly as they were.
+ * The nav stays at five tabs — Today · Program · Write · Circle · You — because
+ * the daily loop should be small. But the library behind it is open: 19
+ * resources, 60 recipes, 13 workouts and the rest were switched off during the
+ * course-first rebuild and are switched back on here. Hiding built, populated
+ * features is what made the app feel empty.
  *
- * Stays on regardless: Today, Program, Write, Circle, profile, settings,
- * membership, workouts.
+ * `community` stays off because that route only redirects into Circle, which
+ * is already on.
  */
 export const FEATURES = {
-  recipes: false,
-  pantry: false,
-  mealPlans: false,
-  groceries: false,
-  energy: false,
-  vault: false,
-  archive: false,
-  fixedCalendar: false,
-  expertQA: false,
-  shop: false,
-  retreats: false,
+  recipes: true,
+  pantry: true,
+  mealPlans: true,
+  groceries: true,
+  energy: true,
+  vault: true,
+  archive: true,
+  fixedCalendar: true,
+  expertQA: true,
+  shop: true,
+  retreats: true,
   community: false,
-  challenges: false,
-  protocols: false,
-  groups: false,
-  progress: false,
+  challenges: true,
+  protocols: true,
+  groups: true,
+  progress: true,
 }
 
 export type FeatureName = keyof typeof FEATURES
