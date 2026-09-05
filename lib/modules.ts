@@ -1,4 +1,4 @@
-import { BookOpen, ChefHat, Dumbbell, GraduationCap, LibraryBig, type LucideIcon, Play, Sun, User, Users } from 'lucide-react'
+import { BookOpen, ChefHat, Dumbbell, GraduationCap, LibraryBig, type LucideIcon, Play, Scale, Sun, User, Users, Wallet } from 'lucide-react'
 import { FEATURES } from '@/lib/features'
 import type { TodoRow } from '@/components/today-checklist'
 
@@ -17,6 +17,10 @@ export interface TodayContext {
   checkedInToday: boolean
   mealsLoggedToday: number
   habits: { id: string; title: string; anchor: string | null; doneToday: boolean }[]
+  /** days since she last logged weight, null if never */
+  daysSinceWeighIn: number | null
+  /** days since she last logged money, null if never */
+  daysSinceMoney: number | null
 }
 
 export interface ModuleCounts {
@@ -133,6 +137,34 @@ export const MODULES: AppModule[] = [
     inLibrary: true,
     pillar: 'identity',
     count: (c) => `${c.workouts} workouts`,
+  },
+  {
+    key: 'body',
+    title: 'Body',
+    href: '/app/body',
+    icon: Scale,
+    blurb: 'weight and tape, once a week — watch the line',
+    inLibrary: true,
+    pillar: 'body',
+    count: () => 'your trend',
+    todo: (ctx) =>
+      ctx.daysSinceWeighIn === null || ctx.daysSinceWeighIn >= 7
+        ? [{ key: 'weigh', kind: 'link', href: '/app/body', label: 'Weekly weigh-in', hint: ctx.daysSinceWeighIn === null ? 'set your starting point' : `${ctx.daysSinceWeighIn} days since the last one`, done: false }]
+        : [],
+  },
+  {
+    key: 'money',
+    title: 'Freedom',
+    href: '/app/money',
+    icon: Wallet,
+    blurb: 'know your numbers, then move them',
+    inLibrary: true,
+    pillar: 'identity',
+    count: () => 'private',
+    todo: (ctx) =>
+      ctx.daysSinceMoney === null || ctx.daysSinceMoney >= 7
+        ? [{ key: 'money', kind: 'link', href: '/app/money', label: 'Money check-in', hint: ctx.daysSinceMoney === null ? 'list your accounts to start' : 'log the week, glance at the path', done: false }]
+        : [],
   },
   {
     key: 'habits',

@@ -43,6 +43,7 @@ import type { CourseEnrollment, CourseWriting } from '@/lib/courses'
 import type { FoodItem, HouseholdMember, LearningItem, PublicProfile } from '@/lib/types'
 import { sumNutrients, type NutrientMap } from '@/lib/nutrients'
 import type { ContentEvent } from '@/lib/engine'
+import type { MoneyAccount, MoneyEntry, MoneyGoal } from '@/lib/money'
 
 /**
  * Unwraps a Supabase response, throwing on error instead of quietly
@@ -940,6 +941,50 @@ export async function getContentEvents(limit = 400): Promise<ContentEvent[]> {
       .limit(limit),
   )
   return (data as ContentEvent[]) ?? []
+}
+
+// ---- Body measurements ----
+
+export interface Measurement {
+  id: string
+  date: string
+  weight_kg: number | null
+  waist_cm: number | null
+  hips_cm: number | null
+  chest_cm: number | null
+  arm_cm: number | null
+  thigh_cm: number | null
+  photo_url: string | null
+  note: string | null
+}
+
+export async function getMeasurements(memberId: string | null = null): Promise<Measurement[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  let q = supabase.from('body_measurements').select('*').eq('user_id', user.id)
+  q = memberId ? q.eq('member_id', memberId) : q.is('member_id', null)
+  const data = ok(await q.order('date', { ascending: true }))
+  return (data as Measurement[]) ?? []
+}
+
+// ---- Money ----
+
+export async function getMoney(): Promise<{ accounts: MoneyAccount[]; entries: MoneyEntry[]; goals: MoneyGoal[] }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { accounts: [], entries: [], goals: [] }
+  const since = new Date(Date.now() - 400 * 86_400_000).toISOString().slice(0, 10)
+  const [accounts, entries, goals] = await Promise.all([
+    supabase.from('money_accounts').select('*').eq('user_id', user.id).order('created_at').then(ok),
+    supabase.from('money_entries').select('*').eq('user_id', user.id).gte('date', since).order('date', { ascending: false }).then(ok),
+    supabase.from('money_goals').select('*').eq('user_id', user.id).order('created_at').then(ok),
+  ])
+  return { accounts: (accounts as MoneyAccount[]) ?? [], entries: (entries as MoneyEntry[]) ?? [], goals: (goals as MoneyGoal[]) ?? [] }
 }
 
 // ---- Member pages ----

@@ -2480,3 +2480,92 @@ export async function saveProfilePage(input: {
   revalidatePath(`/app/members/${user.id}`)
   return { ok: true }
 }
+
+// ---- Body measurements ----
+
+export async function logMeasurement(input: {
+  memberId?: string | null
+  date?: string
+  weight?: number | null
+  weightUnit?: 'lb' | 'kg'
+  waist?: number | null
+  hips?: number | null
+  chest?: number | null
+  arm?: number | null
+  thigh?: number | null
+  note?: string | null
+}) {
+  const { supabase, user } = await requireUser()
+  const kg = input.weight == null ? null : input.weightUnit === 'kg' ? input.weight : Math.round(input.weight * 0.45359237 * 10) / 10
+  const row = {
+    user_id: user.id,
+    member_id: input.memberId ?? null,
+    date: input.date ?? toISODate(),
+    weight_kg: kg,
+    waist_cm: input.waist ?? null,
+    hips_cm: input.hips ?? null,
+    chest_cm: input.chest ?? null,
+    arm_cm: input.arm ?? null,
+    thigh_cm: input.thigh ?? null,
+    note: input.note?.trim() || null,
+  }
+  // one row per day; a second entry the same day corrects the first
+  const { error } = await supabase.from('body_measurements').upsert(row, { onConflict: 'user_id,member_id,date' })
+  if (error) return { error: error.message }
+  // keep her profile weight current so targets follow her
+  if (kg && !input.memberId) await supabase.from('profiles').update({ weight_kg: kg }).eq('id', user.id)
+  await bumpStreak(user.id)
+  revalidatePath('/app/body')
+  revalidatePath('/app')
+  revalidatePath('/app/becoming')
+  return { ok: true }
+}
+
+// ---- Money ----
+
+export async function upsertMoneyAccount(input: { id?: string; name: string; kind: string; balance: number; apr?: number | null; minPayment?: number | null }) {
+  const { supabase, user } = await requireUser()
+  if (!input.name.trim()) return { error: 'Name the account.' }
+  const row = { user_id: user.id, name: input.name.trim(), kind: input.kind, balance: input.balance, apr: input.apr ?? null, min_payment: input.minPayment ?? null }
+  const q = input.id
+    ? supabase.from('money_accounts').update(row).eq('id', input.id).eq('user_id', user.id)
+    : supabase.from('money_accounts').insert(row)
+  const { error } = await q
+  if (error) return { error: error.message }
+  revalidatePath('/app/money')
+  return { ok: true }
+}
+
+export async function archiveMoneyAccount(id: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('money_accounts').update({ archived: true }).eq('id', id).eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/money')
+  return { ok: true }
+}
+
+export async function addMoneyEntry(input: { kind: string; amount: number; category?: string; note?: string; date?: string }) {
+  const { supabase, user } = await requireUser()
+  if (!(input.amount > 0)) return { error: 'How much?' }
+  const { error } = await supabase.from('money_entries').insert({
+    user_id: user.id,
+    kind: input.kind,
+    amount: input.amount,
+    category: input.category?.trim() || null,
+    note: input.note?.trim() || null,
+    date: input.date ?? toISODate(),
+  })
+  if (error) return { error: error.message }
+  await bumpStreak(user.id)
+  revalidatePath('/app/money')
+  revalidatePath('/app')
+  return { ok: true }
+}
+
+export async function deleteMoneyEntry(id: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('money_entries').delete().eq('id', id).eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/money')
+  return { ok: true }
+}

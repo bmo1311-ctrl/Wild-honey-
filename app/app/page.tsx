@@ -12,6 +12,8 @@ import { QuickAddHabit } from '@/components/quick-add-habit'
 import {
   getActiveCourseState,
   getActivityDates,
+  getMeasurements,
+  getMoney,
   getHabits,
   getRecentHabitLogs,
   getBaselineVitality,
@@ -49,7 +51,10 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
   const pct = course ? Math.round((completedDays.length / course.length_days) * 100) : 0
   const loggedHabitIds = new Set(habitLogs.filter((l) => l.date === today).map((l) => l.habit_id))
 
-  const [baseline, goals, recentCheckins] = await Promise.all([getBaselineVitality(), getMyGoals(), getRecentCheckins(30)])
+  const [baseline, goals, recentCheckins, measurements, money] = await Promise.all([getBaselineVitality(), getMyGoals(), getRecentCheckins(30), getMeasurements(), getMoney()])
+  const lastWeigh = measurements[measurements.length - 1]?.date ?? null
+  const lastMoney = money.entries[0]?.date ?? null
+  const since = (d: string | null) => (d ? Math.floor((Date.parse(today) - Date.parse(d)) / 86_400_000) : null)
   const lastCheckin = recentCheckins[recentCheckins.length - 1]?.date ?? null
   const daysSinceCheckin = lastCheckin ? Math.floor((Date.parse(today) - Date.parse(lastCheckin)) / 86_400_000) : null
   const nudges = nudgesFor({
@@ -81,6 +86,8 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     checkedInToday: Boolean(checkin),
     mealsLoggedToday: nutrition.loggedMeals.length,
     habits: habits.map((h) => ({ id: h.id, title: h.title, anchor: h.anchor, doneToday: loggedHabitIds.has(h.id) })),
+    daysSinceWeighIn: since(lastWeigh),
+    daysSinceMoney: since(lastMoney),
   })
 
   if (!enrollment || !currentDay || !course) {
