@@ -4,8 +4,12 @@ import { MapPin, Calendar, Tent, Users } from 'lucide-react'
 import { BuyButton } from '@/components/buy-button'
 import { getRetreats } from '@/lib/data'
 import { formatPrice } from '@/lib/pillars'
+import { FeatureOff } from '@/components/feature-off'
+import { FEATURES } from '@/lib/features'
 
 export default async function RetreatsPage() {
+  if (!FEATURES.retreats) return <FeatureOff />
+
   const retreats = await getRetreats()
 
   return (

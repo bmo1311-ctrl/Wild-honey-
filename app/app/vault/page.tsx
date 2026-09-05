@@ -1,7 +1,11 @@
 import { ResourceVault } from '@/components/resource-vault'
 import { getResources } from '@/lib/data'
+import { FeatureOff } from '@/components/feature-off'
+import { FEATURES } from '@/lib/features'
 
 export default async function VaultPage() {
+  if (!FEATURES.vault) return <FeatureOff />
+
   const resources = await getResources()
 
   return (

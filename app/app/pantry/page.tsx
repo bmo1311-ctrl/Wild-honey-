@@ -1,8 +1,12 @@
 import { PantryList } from '@/components/pantry-list'
 import { GroceryBuilder } from '@/components/grocery-builder'
 import { getGroceryBuilderItems, getPantryItems } from '@/lib/data'
+import { FeatureOff } from '@/components/feature-off'
+import { FEATURES } from '@/lib/features'
 
 export default async function PantryPage() {
+  if (!FEATURES.pantry) return <FeatureOff />
+
   const [pantryItems, groceryItems] = await Promise.all([getPantryItems(), getGroceryBuilderItems()])
 
   return (

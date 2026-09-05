@@ -7,6 +7,7 @@ import { BloomAvatar } from '@/components/bloom-avatar'
 import { TierBadge } from '@/components/tier-badge'
 import { getMyEntries, getMyGoals, getSessionProfile, getVitalityHistory } from '@/lib/data'
 import { relativeTime } from '@/lib/pillars'
+import { FEATURES } from '@/lib/features'
 
 export default async function ProfilePage() {
   const [profile, entries, goals, vitalityHistory] = await Promise.all([getSessionProfile(), getMyEntries(), getMyGoals(), getVitalityHistory()])
@@ -59,71 +60,95 @@ export default async function ProfilePage() {
 
       <HoneyProfileCard profile={profile} goals={goals.map((g) => g.goal)} baseline={baseline} latest={latest} />
 
-      <div>
-        <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">my journey</p>
-        <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
-          <Link href="/app/progress" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">My Evolution</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-          <Link href="/app/calendar" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-            <CalendarDays className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Calendar</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-          <Link href="/app/challenges" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-            <Trophy className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Challenges</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-          <Link href="/app/archive" className="flex items-center gap-3 px-4 py-3.5">
-            <Archive className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Archive</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
+      {(FEATURES.progress || FEATURES.fixedCalendar || FEATURES.challenges || FEATURES.archive) && (
+        <div>
+          <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">my journey</p>
+          <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
+            {FEATURES.progress && (
+              <Link href="/app/progress" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                <span className="flex-1 text-sm font-medium">My Evolution</span>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </Link>
+            )}
+            {FEATURES.fixedCalendar && (
+              <Link href="/app/calendar" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+                <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                <span className="flex-1 text-sm font-medium">Calendar</span>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </Link>
+            )}
+            {FEATURES.challenges && (
+              <Link href="/app/challenges" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+                <Trophy className="h-4 w-4 text-muted-foreground" />
+                <span className="flex-1 text-sm font-medium">Challenges</span>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </Link>
+            )}
+            {FEATURES.archive && (
+              <Link href="/app/archive" className="flex items-center gap-3 px-4 py-3.5">
+                <Archive className="h-4 w-4 text-muted-foreground" />
+                <span className="flex-1 text-sm font-medium">Archive</span>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </Link>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
-      <div>
-        <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">nourish &amp; move</p>
-        <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
-          <Link href="/app/recipes" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-            <ChefHat className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Recipes</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-          <Link href="/app/pantry" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-            <Refrigerator className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Pantry &amp; Grocery</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-          <Link href="/app/protocols" className="flex items-center gap-3 px-4 py-3.5">
-            <ClipboardList className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Protocols</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
+      {(FEATURES.recipes || FEATURES.pantry || FEATURES.protocols) && (
+        <div>
+          <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">nourish &amp; move</p>
+          <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
+            {FEATURES.recipes && (
+              <Link href="/app/recipes" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+                <ChefHat className="h-4 w-4 text-muted-foreground" />
+                <span className="flex-1 text-sm font-medium">Recipes</span>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </Link>
+            )}
+            {FEATURES.pantry && (
+              <Link href="/app/pantry" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+                <Refrigerator className="h-4 w-4 text-muted-foreground" />
+                <span className="flex-1 text-sm font-medium">Pantry &amp; Grocery</span>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </Link>
+            )}
+            {FEATURES.protocols && (
+              <Link href="/app/protocols" className="flex items-center gap-3 px-4 py-3.5">
+                <ClipboardList className="h-4 w-4 text-muted-foreground" />
+                <span className="flex-1 text-sm font-medium">Protocols</span>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </Link>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       <div>
         <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">connect</p>
         <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
-          <Link href="/app/groups" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-            <Users className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Groups</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-          <Link href="/app/vault" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-            <BookMarked className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Resource Vault</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-          <Link href="/app/ask" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-            <HelpCircle className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Ask an Expert</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
+          {FEATURES.groups && (
+            <Link href="/app/groups" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <span className="flex-1 text-sm font-medium">Groups</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+          )}
+          {FEATURES.vault && (
+            <Link href="/app/vault" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+              <BookMarked className="h-4 w-4 text-muted-foreground" />
+              <span className="flex-1 text-sm font-medium">Resource Vault</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+          )}
+          {FEATURES.expertQA && (
+            <Link href="/app/ask" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+              <HelpCircle className="h-4 w-4 text-muted-foreground" />
+              <span className="flex-1 text-sm font-medium">Ask an Expert</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+          )}
           <Link href="/app/guidelines" className="flex items-center gap-3 px-4 py-3.5">
             <Heart className="h-4 w-4 text-muted-foreground" />
             <span className="flex-1 text-sm font-medium">Community Guidelines</span>
@@ -132,21 +157,27 @@ export default async function ProfilePage() {
         </div>
       </div>
 
-      <div>
-        <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">retreats &amp; shop</p>
-        <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
-          <Link href="/app/retreats" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-            <Tent className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Retreats</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-          <Link href="/app/shop" className="flex items-center gap-3 px-4 py-3.5">
-            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Shop</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
+      {(FEATURES.retreats || FEATURES.shop) && (
+        <div>
+          <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">retreats &amp; shop</p>
+          <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
+            {FEATURES.retreats && (
+              <Link href="/app/retreats" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+                <Tent className="h-4 w-4 text-muted-foreground" />
+                <span className="flex-1 text-sm font-medium">Retreats</span>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </Link>
+            )}
+            {FEATURES.shop && (
+              <Link href="/app/shop" className="flex items-center gap-3 px-4 py-3.5">
+                <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+                <span className="flex-1 text-sm font-medium">Shop</span>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </Link>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       <div>
         <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">account</p>

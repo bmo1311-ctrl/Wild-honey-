@@ -2,14 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Sun, Users, Dumbbell, User, Activity } from 'lucide-react'
+import { Sun, BookOpen, PenLine, Users, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const TABS = [
   { href: '/app', label: 'Today', icon: Sun, exact: true },
-  { href: '/app/energy', label: 'Energy', icon: Activity },
+  { href: '/app/program', label: 'Program', icon: BookOpen },
+  { href: '/app/write', label: 'Write', icon: PenLine },
   { href: '/app/circle', label: 'Circle', icon: Users },
-  { href: '/app/workouts', label: 'Workouts', icon: Dumbbell },
   { href: '/app/profile', label: 'You', icon: User },
 ]
 
@@ -34,15 +34,15 @@ export function BottomNav() {
               >
                 <span
                   className={cn(
-                    'hex-clip flex h-9 w-9 items-center justify-center transition-colors',
-                    active ? 'bg-honey text-honey-foreground' : 'bg-transparent text-muted-foreground',
+                    'hex-clip flex h-11 w-11 items-center justify-center transition-colors',
+                    active ? 'bg-mindset-pillar text-white' : 'bg-transparent text-muted-foreground',
                   )}
                 >
                   <Icon className="h-4 w-4" />
                 </span>
                 <span
                   className={cn(
-                    'text-[0.62rem] font-medium leading-none',
+                    'text-xs font-medium leading-none',
                     active ? 'text-foreground' : 'text-muted-foreground',
                   )}
                 >

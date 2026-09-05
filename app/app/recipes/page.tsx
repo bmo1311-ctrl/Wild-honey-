@@ -2,8 +2,12 @@ import { RecipeFilterBar } from '@/components/recipe-filter-bar'
 import { RecommendedRecipesRow } from '@/components/recommended-recipes-row'
 import { NutritionSummary } from '@/components/nutrition-summary'
 import { getCurrentCyclePhase, getCurrentSeason, getRecipes, getRecommendedRecipes, getTodayNutrition } from '@/lib/data'
+import { FeatureOff } from '@/components/feature-off'
+import { FEATURES } from '@/lib/features'
 
 export default async function RecipesPage() {
+  if (!FEATURES.recipes) return <FeatureOff />
+
   const [recipes, recommended, season, cyclePhase, nutrition] = await Promise.all([
     getRecipes(),
     getRecommendedRecipes(),

@@ -1,8 +1,12 @@
 import { ChallengeCard } from '@/components/challenge-card'
 import { ActiveChallengeTracker } from '@/components/active-challenge-tracker'
 import { getChallenges } from '@/lib/data'
+import { FeatureOff } from '@/components/feature-off'
+import { FEATURES } from '@/lib/features'
 
 export default async function ChallengesPage() {
+  if (!FEATURES.challenges) return <FeatureOff />
+
   const challenges = await getChallenges()
   const active = challenges.find((c) => c.joined)
   const others = challenges.filter((c) => !c.joined)

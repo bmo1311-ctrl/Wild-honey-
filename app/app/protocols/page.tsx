@@ -2,8 +2,12 @@ import { ProtocolCard } from '@/components/protocol-card'
 import { ProtocolTracker } from '@/components/protocol-tracker'
 import { getActiveEnrollment, getEnrollmentCompletions, getTodayCheckin } from '@/lib/data'
 import { PROTOCOLS, getProtocol, suggestProtocol } from '@/lib/protocols'
+import { FeatureOff } from '@/components/feature-off'
+import { FEATURES } from '@/lib/features'
 
 export default async function ProtocolsPage() {
+  if (!FEATURES.protocols) return <FeatureOff />
+
   const [enrollment, todayCheckin] = await Promise.all([getActiveEnrollment(), getTodayCheckin()])
   const completions = enrollment ? await getEnrollmentCompletions(enrollment.id) : []
   const activeProtocol = enrollment ? getProtocol(enrollment.protocol_slug) : null

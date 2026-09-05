@@ -6,8 +6,12 @@ import { SymptomIntelligence } from '@/components/symptom-intelligence'
 import { WinsJournal } from '@/components/wins-journal'
 import { HabitStack } from '@/components/habit-stack'
 import { getHabits, getRecentCheckins, getRecentHabitLogs, getRecentWins, getTodayCheckin } from '@/lib/data'
+import { FeatureOff } from '@/components/feature-off'
+import { FEATURES } from '@/lib/features'
 
 export default async function EnergyPage() {
+  if (!FEATURES.energy) return <FeatureOff />
+
   const [today, recent, wins, habits, habitLogs] = await Promise.all([
     getTodayCheckin(),
     getRecentCheckins(30),

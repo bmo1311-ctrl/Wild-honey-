@@ -6,6 +6,8 @@ import { MyBecomingSummary } from '@/components/my-becoming-summary'
 import { getMyCommitments, getMyExperiments, getRecentWins, getReflections, getSessionProfile, getVitalityHistory } from '@/lib/data'
 import { relativeTime } from '@/lib/pillars'
 import { Sparkles } from 'lucide-react'
+import { FeatureOff } from '@/components/feature-off'
+import { FEATURES } from '@/lib/features'
 
 const MILESTONE_LABEL: Record<string, string> = {
   '30_day': '30 days in',
@@ -16,6 +18,8 @@ const MILESTONE_LABEL: Record<string, string> = {
 }
 
 export default async function ProgressPage() {
+  if (!FEATURES.progress) return <FeatureOff />
+
   const [profile, vitalityHistory, reflections, commitments, experiments, wins] = await Promise.all([
     getSessionProfile(),
     getVitalityHistory(),

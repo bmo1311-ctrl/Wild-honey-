@@ -2,8 +2,12 @@ import { CalendarView } from '@/components/calendar-view'
 import { CommitmentsPanel } from '@/components/commitments-panel'
 import { ExperimentsPanel } from '@/components/experiments-panel'
 import { getMyCommitments, getMyExperiments } from '@/lib/data'
+import { FeatureOff } from '@/components/feature-off'
+import { FEATURES } from '@/lib/features'
 
 export default async function CalendarPage() {
+  if (!FEATURES.fixedCalendar) return <FeatureOff />
+
   const [commitments, experiments] = await Promise.all([getMyCommitments(), getMyExperiments()])
 
   return (

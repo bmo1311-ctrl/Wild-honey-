@@ -1,8 +1,12 @@
 import { Users } from 'lucide-react'
 import { CreateOrJoinGroup, GroupListCard } from '@/components/group-actions'
 import { getMyGroups } from '@/lib/data'
+import { FeatureOff } from '@/components/feature-off'
+import { FEATURES } from '@/lib/features'
 
 export default async function GroupsPage() {
+  if (!FEATURES.groups) return <FeatureOff />
+
   const groups = await getMyGroups()
 
   return (

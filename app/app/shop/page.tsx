@@ -3,8 +3,12 @@ import { Download, ShoppingBag } from 'lucide-react'
 import { BuyButton } from '@/components/buy-button'
 import { getProducts } from '@/lib/data'
 import { formatPrice } from '@/lib/pillars'
+import { FeatureOff } from '@/components/feature-off'
+import { FEATURES } from '@/lib/features'
 
 export default async function ShopPage() {
+  if (!FEATURES.shop) return <FeatureOff />
+
   const products = await getProducts()
 
   return (
