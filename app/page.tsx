@@ -52,7 +52,7 @@ export default function LandingPage() {
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <Wordmark />
         <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" className="hidden sm:inline-flex">
+          <Button asChild variant="ghost" className="h-11 text-mindset-pillar">
             <Link href="/auth/login">Sign in</Link>
           </Button>
           <Button asChild>
@@ -82,6 +82,12 @@ export default function LandingPage() {
               <Link href="#membership">See membership</Link>
             </Button>
           </div>
+          <p className="mt-4 text-center text-[15px] text-muted-foreground">
+            Already a member?{' '}
+            <Link href="/auth/login" className="font-semibold text-mindset-pillar underline underline-offset-[3px]">
+              Sign in
+            </Link>
+          </p>
         </div>
         <div className="relative">
           <div className="overflow-hidden rounded-3xl">
@@ -192,6 +198,11 @@ export default function LandingPage() {
           <p className="font-serif text-lg">Wild Honey Circle</p>
           <p className="max-w-sm text-sm text-muted-foreground text-pretty">
             Show up softly. Grow wildly. A gentle daily practice for women becoming who they are.
+          </p>
+          <p className="text-sm">
+            <Link href="/auth/login" className="font-medium text-mindset-pillar underline underline-offset-[3px]">
+              Sign in
+            </Link>
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} Wild Honey Circle
