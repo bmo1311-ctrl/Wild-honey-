@@ -202,7 +202,7 @@ export async function getCircleFeed(): Promise<JournalEntry[]> {
 
   const { data: entries } = await supabase
     .from('journal_entries')
-    .select('*, prompt:prompts(*), profile:profiles(name, avatar_color, avatar_url, membership_tier)')
+    .select('*, prompt:prompts(*), profile:public_profiles(name, avatar_color, avatar_url, membership_tier)')
     .eq('visibility', 'circle')
     .order('pinned', { ascending: false })
     .order('created_at', { ascending: false })
@@ -259,7 +259,7 @@ export async function getCommunityFeed(): Promise<CommunityPost[]> {
 
   const { data: posts } = await supabase
     .from('community_posts')
-    .select('*, profile:profiles(name, avatar_color, avatar_url, membership_tier)')
+    .select('*, profile:public_profiles(name, avatar_color, avatar_url, membership_tier)')
     .order('pinned', { ascending: false })
     .order('created_at', { ascending: false })
     .limit(80)
@@ -603,7 +603,7 @@ export async function getGroupMembers(groupId: string): Promise<GroupMember[]> {
   const data = ok(
     await supabase
       .from('group_members')
-      .select('*, profile:profiles(name, avatar_color, avatar_url, membership_tier)')
+      .select('*, profile:public_profiles(name, avatar_color, avatar_url, membership_tier)')
       .eq('group_id', groupId)
       .order('joined_at', { ascending: true }),
   )
@@ -620,7 +620,7 @@ export async function getGroupPosts(groupId: string): Promise<GroupPost[]> {
   const posts = ok(
     await supabase
       .from('group_posts')
-      .select('*, profile:profiles(name, avatar_color, avatar_url, membership_tier)')
+      .select('*, profile:public_profiles(name, avatar_color, avatar_url, membership_tier)')
       .eq('group_id', groupId)
       .order('created_at', { ascending: false }),
   )
@@ -673,7 +673,7 @@ export async function getAllQuestionsForAdmin(): Promise<ExpertQuestion[]> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('expert_questions')
-    .select('*, profile:profiles(name, avatar_color, avatar_url)')
+    .select('*, profile:public_profiles(name, avatar_color, avatar_url)')
     .order('created_at', { ascending: false })
   return (data as ExpertQuestion[]) ?? []
 }
@@ -752,7 +752,7 @@ export async function getReportsForAdmin(): Promise<ContentReport[]> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('content_reports')
-    .select('*, reporter_profile:profiles(name, avatar_color, avatar_url)')
+    .select('*, reporter_profile:public_profiles(name, avatar_color, avatar_url)')
     .order('status', { ascending: true })
     .order('created_at', { ascending: false })
   return (data as ContentReport[]) ?? []
@@ -766,7 +766,7 @@ export async function getRecipes(): Promise<Recipe[]> {
     data: { user },
   } = await supabase.auth.getUser()
   // the policy already limits this to official, her own, and shared; the join names the sharer
-  const data = ok(await supabase.from('recipes').select('*, owner:profiles(name)').order('created_at', { ascending: false }))
+  const data = ok(await supabase.from('recipes').select('*, owner:public_profiles(name)').order('created_at', { ascending: false }))
   const recipes = ((data as (Recipe & { owner?: { name: string } | null })[]) ?? []).map((r) => ({
     ...r,
     author_name: r.owner?.name ?? null,

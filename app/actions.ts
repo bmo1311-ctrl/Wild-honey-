@@ -112,7 +112,7 @@ export async function getComments(entryId: string): Promise<Comment[]> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('comments')
-    .select('*, profile:profiles(name, avatar_color, membership_tier)')
+    .select('*, profile:public_profiles(name, avatar_color, membership_tier)')
     .eq('entry_id', entryId)
     .order('pinned', { ascending: false })
     .order('created_at', { ascending: true })
@@ -196,7 +196,7 @@ export async function getCommunityComments(postId: string) {
   const supabase = await createClient()
   const { data } = await supabase
     .from('community_comments')
-    .select('*, profile:profiles(name, avatar_color, membership_tier)')
+    .select('*, profile:public_profiles(name, avatar_color, membership_tier)')
     .eq('post_id', postId)
     .order('pinned', { ascending: false })
     .order('created_at', { ascending: true })
@@ -1023,7 +1023,7 @@ export async function getGroupPostComments(postId: string) {
   const supabase = await createClient()
   const { data } = await supabase
     .from('group_post_comments')
-    .select('*, profile:profiles(name, avatar_color)')
+    .select('*, profile:public_profiles(name, avatar_color)')
     .eq('post_id', postId)
     .order('created_at', { ascending: true })
   return data ?? []
