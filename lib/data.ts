@@ -39,6 +39,17 @@ import type {
 } from '@/lib/types'
 import { suggestProtocol } from '@/lib/protocols'
 
+/**
+ * Unwraps a Supabase response, throwing on error instead of quietly
+ * returning nothing. An empty state may only claim emptiness when the
+ * query actually succeeded — a missing table or a blocked RLS policy has
+ * to surface as a failure, not as "nothing here yet".
+ */
+function ok<T>(res: { data: T; error: unknown }): T {
+  if (res.error) throw res.error
+  return res.data
+}
+
 const PAID_TIERS = new Set(['circle', 'inner-circle', 'founder'])
 export function hasPaidAccess(tier: string | undefined | null): boolean {
   return !!tier && PAID_TIERS.has(tier)
@@ -544,10 +555,10 @@ export async function getResources(): Promise<Resource[]> {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  const { data } = await supabase.from('resources').select('*').order('created_at', { ascending: false })
+  const data = ok(await supabase.from('resources').select('*').order('created_at', { ascending: false }))
   const resources = (data as Resource[]) ?? []
   if (!user) return resources
-  const { data: saved } = await supabase.from('saved_resources').select('resource_id').eq('user_id', user.id)
+  const saved = ok(await supabase.from('saved_resources').select('resource_id').eq('user_id', user.id))
   const savedIds = new Set((saved ?? []).map((s) => s.resource_id))
   return resources.map((r) => ({ ...r, saved: savedIds.has(r.id) }))
 }
@@ -560,14 +571,14 @@ export async function getMyGroups(): Promise<Group[]> {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) return []
-  const { data: memberships } = await supabase.from('group_members').select('group_id, role').eq('user_id', user.id)
+  const memberships = ok(await supabase.from('group_members').select('group_id, role').eq('user_id', user.id))
   const list = memberships ?? []
   if (list.length === 0) return []
   const groupIds = list.map((m) => m.group_id)
-  const { data: groups } = await supabase.from('groups').select('*').in('id', groupIds).order('created_at', { ascending: false })
+  const groups = ok(await supabase.from('groups').select('*').in('id', groupIds).order('created_at', { ascending: false }))
   const roleByGroup = new Map(list.map((m) => [m.group_id, m.role as 'owner' | 'member']))
 
-  const { data: allMembers } = await supabase.from('group_members').select('group_id').in('group_id', groupIds)
+  const allMembers = ok(await supabase.from('group_members').select('group_id').in('group_id', groupIds))
   const countByGroup = new Map<string, number>()
   ;(allMembers ?? []).forEach((m) => countByGroup.set(m.group_id, (countByGroup.get(m.group_id) ?? 0) + 1))
 
@@ -576,17 +587,19 @@ export async function getMyGroups(): Promise<Group[]> {
 
 export async function getGroupById(groupId: string): Promise<Group | null> {
   const supabase = await createClient()
-  const { data } = await supabase.from('groups').select('*').eq('id', groupId).maybeSingle()
+  const data = ok(await supabase.from('groups').select('*').eq('id', groupId).maybeSingle())
   return (data as Group) ?? null
 }
 
 export async function getGroupMembers(groupId: string): Promise<GroupMember[]> {
   const supabase = await createClient()
-  const { data } = await supabase
-    .from('group_members')
-    .select('*, profile:profiles(name, avatar_color, avatar_url, membership_tier)')
-    .eq('group_id', groupId)
-    .order('joined_at', { ascending: true })
+  const data = ok(
+    await supabase
+      .from('group_members')
+      .select('*, profile:profiles(name, avatar_color, avatar_url, membership_tier)')
+      .eq('group_id', groupId)
+      .order('joined_at', { ascending: true }),
+  )
   return (data as GroupMember[]) ?? []
 }
 
@@ -597,19 +610,21 @@ export async function getGroupPosts(groupId: string): Promise<GroupPost[]> {
   } = await supabase.auth.getUser()
   const hidden = await getHiddenAuthorIds()
 
-  const { data: posts } = await supabase
-    .from('group_posts')
-    .select('*, profile:profiles(name, avatar_color, avatar_url, membership_tier)')
-    .eq('group_id', groupId)
-    .order('created_at', { ascending: false })
+  const posts = ok(
+    await supabase
+      .from('group_posts')
+      .select('*, profile:profiles(name, avatar_color, avatar_url, membership_tier)')
+      .eq('group_id', groupId)
+      .order('created_at', { ascending: false }),
+  )
 
   const list = ((posts as GroupPost[]) ?? []).filter((p) => !hidden.has(p.user_id))
   if (list.length === 0) return []
 
   const ids = list.map((p) => p.id)
-  const [{ data: reactions }, { data: comments }] = await Promise.all([
-    supabase.from('group_post_reactions').select('post_id, user_id').in('post_id', ids),
-    supabase.from('group_post_comments').select('post_id').in('post_id', ids),
+  const [reactions, comments] = await Promise.all([
+    supabase.from('group_post_reactions').select('post_id, user_id').in('post_id', ids).then(ok),
+    supabase.from('group_post_comments').select('post_id').in('post_id', ids).then(ok),
   ])
 
   return list.map((p) => {
@@ -743,10 +758,10 @@ export async function getRecipes(): Promise<Recipe[]> {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  const { data } = await supabase.from('recipes').select('*').order('created_at', { ascending: false })
+  const data = ok(await supabase.from('recipes').select('*').order('created_at', { ascending: false }))
   const recipes = (data as Recipe[]) ?? []
   if (!user) return recipes
-  const { data: saved } = await supabase.from('saved_recipes').select('recipe_id').eq('user_id', user.id)
+  const saved = ok(await supabase.from('saved_recipes').select('recipe_id').eq('user_id', user.id))
   const savedIds = new Set((saved ?? []).map((s) => s.recipe_id))
   return recipes.map((r) => ({ ...r, saved: savedIds.has(r.id) }))
 }
@@ -795,15 +810,19 @@ export async function getChallenges(): Promise<Challenge[]> {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  const { data: challenges } = await supabase.from('challenges').select('*').eq('is_active', true).order('created_at', { ascending: false })
+  const challenges = ok(await supabase.from('challenges').select('*').eq('is_active', true).order('created_at', { ascending: false }))
   const list = (challenges as Challenge[]) ?? []
   if (list.length === 0) return []
 
   const ids = list.map((c) => c.id)
-  const [{ data: allParticipants }, { data: myParticipation }, { data: myCheckins }] = await Promise.all([
-    supabase.from('challenge_participants').select('challenge_id').in('challenge_id', ids),
-    user ? supabase.from('challenge_participants').select('challenge_id').eq('user_id', user.id).in('challenge_id', ids) : Promise.resolve({ data: [] }),
-    user ? supabase.from('challenge_checkins').select('challenge_id').eq('user_id', user.id).in('challenge_id', ids) : Promise.resolve({ data: [] }),
+  const [allParticipants, myParticipation, myCheckins] = await Promise.all([
+    supabase.from('challenge_participants').select('challenge_id').in('challenge_id', ids).then(ok),
+    user
+      ? supabase.from('challenge_participants').select('challenge_id').eq('user_id', user.id).in('challenge_id', ids).then(ok)
+      : Promise.resolve([] as { challenge_id: string }[]),
+    user
+      ? supabase.from('challenge_checkins').select('challenge_id').eq('user_id', user.id).in('challenge_id', ids).then(ok)
+      : Promise.resolve([] as { challenge_id: string }[]),
   ])
 
   const joinedIds = new Set((myParticipation ?? []).map((p: any) => p.challenge_id))
@@ -827,11 +846,11 @@ export async function getMyActiveChallenge(): Promise<Challenge | null> {
 
 export async function getAllChallengesForAdmin(): Promise<Challenge[]> {
   const supabase = await createClient()
-  const { data: challenges } = await supabase.from('challenges').select('*').order('created_at', { ascending: false })
+  const challenges = ok(await supabase.from('challenges').select('*').order('created_at', { ascending: false }))
   const list = (challenges as Challenge[]) ?? []
   if (list.length === 0) return []
   const ids = list.map((c) => c.id)
-  const { data: participants } = await supabase.from('challenge_participants').select('challenge_id').in('challenge_id', ids)
+  const participants = ok(await supabase.from('challenge_participants').select('challenge_id').in('challenge_id', ids))
   const countByChallenge = new Map<string, number>()
   ;(participants ?? []).forEach((p) => countByChallenge.set(p.challenge_id, (countByChallenge.get(p.challenge_id) ?? 0) + 1))
   return list.map((c) => ({ ...c, participant_count: countByChallenge.get(c.id) ?? 0 }))
