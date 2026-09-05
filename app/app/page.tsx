@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ChevronRight, Flame } from 'lucide-react'
-import { TodayChecklist, type TodoRow } from '@/components/today-checklist'
+import { TodayChecklist } from '@/components/today-checklist'
+import { todayRows } from '@/lib/modules'
 import { StartCourseButton } from '@/components/course/start-course-button'
 import { COURSE, getDay, toISODate } from '@/lib/courses'
 import { computeStreaks } from '@/lib/rewards'
@@ -48,36 +49,13 @@ export default async function TodayPage() {
     },
   ]
 
-  const rows: TodoRow[] = []
-  if (day) {
-    rows.push({
-      key: 'course',
-      kind: 'course',
-      id: String(day.day_number),
-      label: `Day ${day.day_number} · ${day.title}`,
-      hint: `${day.kind} · ${day.minutes} min`,
-      done: dayDone,
-    })
-  }
-  rows.push({
-    key: 'checkin',
-    kind: 'link',
-    href: '/app/nutrition',
-    label: 'Log how you feel',
-    hint: checkin ? 'logged today' : 'energy, sleep, stress',
-    done: Boolean(checkin),
+  const rows = todayRows({
+    courseDay: day ? { number: day.day_number, title: day.title, kind: day.kind, minutes: day.minutes } : null,
+    courseDayDone: dayDone,
+    checkedInToday: Boolean(checkin),
+    mealsLoggedToday: nutrition.loggedMeals.length,
+    habits: habits.map((h) => ({ id: h.id, title: h.title, anchor: h.anchor, doneToday: loggedHabitIds.has(h.id) })),
   })
-  rows.push({
-    key: 'meals',
-    kind: 'link',
-    href: '/app/nutrition/log',
-    label: 'Log what you ate',
-    hint: nutrition.loggedMeals.length ? `${nutrition.loggedMeals.length} logged` : 'nothing logged yet',
-    done: nutrition.loggedMeals.length > 0,
-  })
-  for (const h of habits) {
-    rows.push({ key: `habit-${h.id}`, kind: 'habit', id: h.id, label: h.title, hint: h.anchor ?? undefined, done: loggedHabitIds.has(h.id) })
-  }
 
   if (!enrollment || !currentDay) {
     return (

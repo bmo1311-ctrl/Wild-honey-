@@ -2,28 +2,19 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Sun, BookOpen, LibraryBig, Users, User } from 'lucide-react'
+import { navModules } from '@/lib/modules'
 import { cn } from '@/lib/utils'
 
-const TABS = [
-  { href: '/app', label: 'Today', icon: Sun, exact: true },
-  { href: '/app/program', label: 'Program', icon: BookOpen },
-  { href: '/app/library', label: 'Library', icon: LibraryBig },
-  { href: '/app/circle', label: 'Circle', icon: Users },
-  { href: '/app/profile', label: 'You', icon: User },
-]
-
+/** Built from the module registry — a new tab is one entry in lib/modules.ts. */
 export function BottomNav() {
   const pathname = usePathname()
+  const tabs = navModules()
 
   return (
-    <nav
-      aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur-sm"
-    >
+    <nav aria-label="Primary" className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur-sm">
       <ul className="mx-auto flex max-w-2xl items-stretch justify-between px-2 py-2">
-        {TABS.map((tab) => {
-          const active = tab.exact ? pathname === tab.href : pathname.startsWith(tab.href)
+        {tabs.map((tab) => {
+          const active = tab.href === '/app' ? pathname === tab.href : pathname.startsWith(tab.href)
           const Icon = tab.icon
           return (
             <li key={tab.href} className="flex-1">
@@ -40,13 +31,8 @@ export function BottomNav() {
                 >
                   <Icon className="h-4 w-4" />
                 </span>
-                <span
-                  className={cn(
-                    'text-xs font-medium leading-none',
-                    active ? 'text-foreground' : 'text-muted-foreground',
-                  )}
-                >
-                  {tab.label}
+                <span className={cn('text-xs font-medium leading-none', active ? 'text-foreground' : 'text-muted-foreground')}>
+                  {tab.title}
                 </span>
               </Link>
             </li>
