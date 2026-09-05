@@ -807,8 +807,14 @@ export async function completeOnboarding(input: {
     if (goalsError) return { error: goalsError.message }
   }
 
+  // Onboarding no longer asks for a baseline, so only write one if something
+  // was actually rated. Otherwise this inserted a row of nulls that would have
+  // counted as her "before" and made the week-8 comparison meaningless.
   const v = input.vitality
-  const { error: vitalityError } = await supabase.from('vitality_checkins').insert({
+  const rated = Object.values(v).some((n) => typeof n === 'number' && n > 0)
+  const { error: vitalityError } = !rated
+    ? { error: null }
+    : await supabase.from('vitality_checkins').insert({
     user_id: user.id,
     energy: v.energy ?? null,
     mood: v.mood ?? null,
@@ -818,8 +824,8 @@ export async function completeOnboarding(input: {
     motivation: v.motivation ?? null,
     mental_clarity: v.mental_clarity ?? null,
     physical_strength: v.physical_strength ?? null,
-    label: 'baseline',
-  })
+        label: 'baseline',
+      })
   if (vitalityError) return { error: vitalityError.message }
 
   revalidatePath('/app')
@@ -884,7 +890,7 @@ export async function updateHoneyProfile(input: {
   return { ok: true }
 }
 
-export async function addVitalityCheckin(vitality: Record<string, number>, note?: string) {
+export async function addVitalityCheckin(vitality: Record<string, number>, note?: string, label: 'baseline' | 'checkpoint' = 'checkpoint') {
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from('vitality_checkins').insert({
     user_id: user.id,
@@ -896,7 +902,7 @@ export async function addVitalityCheckin(vitality: Record<string, number>, note?
     motivation: vitality.motivation ?? null,
     mental_clarity: vitality.mental_clarity ?? null,
     physical_strength: vitality.physical_strength ?? null,
-    label: 'checkpoint',
+    label,
     note: note?.trim() || null,
   })
   if (error) return { error: error.message }

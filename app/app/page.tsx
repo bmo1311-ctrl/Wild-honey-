@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ChevronRight, Flame } from 'lucide-react'
 import { TodayChecklist } from '@/components/today-checklist'
+import { BaselineCard } from '@/components/baseline-card'
 import { todayRows } from '@/lib/modules'
 import { StartCourseButton } from '@/components/course/start-course-button'
 import { COURSE, getDay, toISODate } from '@/lib/courses'
@@ -10,6 +11,7 @@ import {
   getDayProgress,
   getHabits,
   getRecentHabitLogs,
+  getBaselineVitality,
   getSessionProfile,
   getTodayCheckin,
   getTodayNutrition,
@@ -30,6 +32,7 @@ export default async function TodayPage() {
     getHabits(),
     getRecentHabitLogs(7),
   ])
+  const baseline = await getBaselineVitality()
 
   const streaks = computeStreaks(progress)
   const today = toISODate()
@@ -107,6 +110,8 @@ export default async function TodayPage() {
           {completedDays.length} of {COURSE.length_days} days · week {Math.floor((currentDay - 1) / 7) + 1} of {COURSE.weeks}
         </p>
       </section>
+
+      {!baseline && <BaselineCard dayNumber={currentDay} />}
 
       <TodayChecklist rows={rows} />
 

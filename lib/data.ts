@@ -861,6 +861,26 @@ export async function getAllChallengesForAdmin(): Promise<Challenge[]> {
   return list.map((c) => ({ ...c, participant_count: countByChallenge.get(c.id) ?? 0 }))
 }
 
+/** Her starting snapshot, if she has taken one. */
+export async function getBaselineVitality(): Promise<VitalityCheckin | null> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return null
+  const data = ok(
+    await supabase
+      .from('vitality_checkins')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('label', 'baseline')
+      .order('taken_at', { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+  )
+  return (data as VitalityCheckin) ?? null
+}
+
 // ---- Household + learning ----
 
 /** Everyone under this account. The account holder is created on first read. */

@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { Check, Flame, Lock } from 'lucide-react'
 import { COURSE, currentDayFrom } from '@/lib/courses'
 import { computeBecoming, computeMilestones, computeStreaks } from '@/lib/rewards'
-import { getDayProgress, getEnrollment, getWritings } from '@/lib/data'
+import { getBaselineVitality, getDayProgress, getEnrollment, getLatestVitalityCheckin, getWritings } from '@/lib/data'
+import { VITALITY_DIMENSIONS } from '@/lib/honey-profile'
 import { PILLAR_META } from '@/lib/pillars'
 import { cn } from '@/lib/utils'
 
@@ -11,7 +12,23 @@ import { cn } from '@/lib/utils'
  * score, nothing is compared to another member, and a gap is never scolded.
  */
 export default async function BecomingPage() {
-  const [enrollment, progress, writings] = await Promise.all([getEnrollment(), getDayProgress(), getWritings()])
+  const [enrollment, progress, writings, baseline, latest] = await Promise.all([
+    getEnrollment(),
+    getDayProgress(),
+    getWritings(),
+    getBaselineVitality(),
+    getLatestVitalityCheckin(),
+  ])
+
+  // Only a comparison if the two snapshots are actually different check-ins.
+  const compare =
+    baseline && latest && latest.id !== baseline.id
+      ? VITALITY_DIMENSIONS.map((d) => {
+          const before = (baseline as unknown as Record<string, number | null>)[d.key]
+          const now = (latest as unknown as Record<string, number | null>)[d.key]
+          return typeof before === 'number' && typeof now === 'number' ? { label: d.label, before, now } : null
+        }).filter((x): x is { label: string; before: number; now: number } => x !== null)
+      : []
 
   const writingCount = writings.filter((w) => w.kind === 'write' && w.body.trim()).length
   const ratings = writings
@@ -80,6 +97,35 @@ export default async function BecomingPage() {
           )
         })}
       </section>
+
+      {compare.length > 0 && (
+        <section>
+          <h2 className="mb-2 text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">Then and now</h2>
+          <div className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card">
+            {compare.map((c, i) => {
+              const delta = c.now - c.before
+              return (
+                <div key={c.label} className={cn('flex items-center gap-3 px-4 py-3', i > 0 && 'border-t border-border')}>
+                  <span className="min-w-0 flex-1 text-[15px] font-medium">{c.label}</span>
+                  <span className="shrink-0 text-sm text-muted-foreground">
+                    {c.before} &rarr; <span className="font-semibold text-foreground">{c.now}</span>
+                  </span>
+                  <span
+                    className={cn(
+                      'w-10 shrink-0 text-right text-sm font-semibold',
+                      delta > 0 ? 'text-mindset-pillar' : delta < 0 ? 'text-primary' : 'text-muted-foreground',
+                    )}
+                  >
+                    {delta > 0 ? '+' : ''}
+                    {delta || '—'}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+          <p className="mt-2 text-[12.5px] text-muted-foreground">your own ratings, first against most recent.</p>
+        </section>
+      )}
 
       <section>
         <h2 className="mb-2 text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">
