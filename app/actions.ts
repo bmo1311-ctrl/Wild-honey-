@@ -2240,3 +2240,82 @@ export async function saveCycleSettings(input: {
   revalidatePath('/app/nutrition/goals')
   return { ok: true }
 }
+
+// ---- Household + learning ----
+
+export async function addHouseholdMember(input: { name: string; birthYear?: number | null; color?: string }) {
+  const { supabase, user } = await requireUser()
+  if (!input.name.trim()) return { error: 'Give them a name.' }
+  const { count } = await supabase
+    .from('household_members')
+    .select('id', { count: 'exact', head: true })
+    .eq('owner_id', user.id)
+  const { error } = await supabase.from('household_members').insert({
+    owner_id: user.id,
+    name: input.name.trim(),
+    birth_year: input.birthYear ?? null,
+    color: input.color ?? 'sapphire',
+    position: count ?? 0,
+  })
+  if (error) return { error: error.message }
+  revalidatePath('/app/learning')
+  return { ok: true }
+}
+
+export async function removeHouseholdMember(id: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('household_members').delete().eq('id', id).eq('owner_id', user.id).eq('is_self', false)
+  if (error) return { error: error.message }
+  revalidatePath('/app/learning')
+  return { ok: true }
+}
+
+export async function addLearningItem(input: { memberId: string | null; subject: string; title: string; cadence?: string; notes?: string }) {
+  const { supabase, user } = await requireUser()
+  if (!input.title.trim()) return { error: 'What is it called?' }
+  const { error } = await supabase.from('learning_items').insert({
+    owner_id: user.id,
+    member_id: input.memberId,
+    subject: input.subject.trim() || 'General',
+    title: input.title.trim(),
+    notes: input.notes?.trim() || null,
+    cadence: input.cadence ?? 'once',
+  })
+  if (error) return { error: error.message }
+  revalidatePath('/app/learning')
+  revalidatePath('/app')
+  return { ok: true }
+}
+
+export async function toggleLearningItem(itemId: string) {
+  const { supabase, user } = await requireUser()
+  const today = toISODate()
+  const { data: existing } = await supabase
+    .from('learning_completions')
+    .select('id')
+    .eq('owner_id', user.id)
+    .eq('item_id', itemId)
+    .eq('date', today)
+    .maybeSingle()
+
+  if (existing) {
+    const { error } = await supabase.from('learning_completions').delete().eq('id', existing.id)
+    if (error) return { error: error.message }
+    revalidatePath('/app/learning')
+    return { ok: true, done: false }
+  }
+  const { error } = await supabase.from('learning_completions').insert({ owner_id: user.id, item_id: itemId, date: today })
+  if (error) return { error: error.message }
+  await bumpStreak(user.id)
+  revalidatePath('/app/learning')
+  revalidatePath('/app')
+  return { ok: true, done: true }
+}
+
+export async function archiveLearningItem(itemId: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('learning_items').update({ archived: true }).eq('id', itemId).eq('owner_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/learning')
+  return { ok: true }
+}

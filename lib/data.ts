@@ -40,7 +40,7 @@ import type {
 import { suggestProtocol } from '@/lib/protocols'
 import { COURSE_SLUG, currentDayFrom } from '@/lib/courses'
 import type { CourseEnrollment, CourseWriting } from '@/lib/courses'
-import type { FoodItem } from '@/lib/types'
+import type { FoodItem, HouseholdMember, LearningItem } from '@/lib/types'
 
 /**
  * Unwraps a Supabase response, throwing on error instead of quietly
@@ -859,6 +859,57 @@ export async function getAllChallengesForAdmin(): Promise<Challenge[]> {
   const countByChallenge = new Map<string, number>()
   ;(participants ?? []).forEach((p) => countByChallenge.set(p.challenge_id, (countByChallenge.get(p.challenge_id) ?? 0) + 1))
   return list.map((c) => ({ ...c, participant_count: countByChallenge.get(c.id) ?? 0 }))
+}
+
+// ---- Household + learning ----
+
+/** Everyone under this account. The account holder is created on first read. */
+export async function getHouseholdMembers(): Promise<HouseholdMember[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const data = ok(
+    await supabase.from('household_members').select('*').eq('owner_id', user.id).order('position', { ascending: true }),
+  )
+  const members = (data as HouseholdMember[]) ?? []
+  if (members.length > 0) return members
+
+  const profile = await getSessionProfile()
+  const inserted = ok(
+    await supabase
+      .from('household_members')
+      .insert({ owner_id: user.id, name: profile?.name || 'Me', is_self: true, position: 0 })
+      .select('*'),
+  )
+  return ((inserted as HouseholdMember[]) ?? []) as HouseholdMember[]
+}
+
+/** Learning items for one member, with today's tick state resolved. */
+export async function getLearningItems(memberId: string | null): Promise<LearningItem[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+
+  let q = supabase.from('learning_items').select('*').eq('owner_id', user.id).eq('archived', false)
+  q = memberId ? q.eq('member_id', memberId) : q.is('member_id', null)
+  const items = (ok(await q.order('subject', { ascending: true }).order('position', { ascending: true })) as LearningItem[]) ?? []
+  if (items.length === 0) return []
+
+  const today = new Date().toISOString().slice(0, 10)
+  const done = ok(
+    await supabase
+      .from('learning_completions')
+      .select('item_id')
+      .eq('owner_id', user.id)
+      .eq('date', today)
+      .in('item_id', items.map((i) => i.id)),
+  )
+  const doneIds = new Set(((done as { item_id: string }[]) ?? []).map((d) => d.item_id))
+  return items.map((i) => ({ ...i, doneToday: doneIds.has(i.id) }))
 }
 
 // ---- Food logging ----

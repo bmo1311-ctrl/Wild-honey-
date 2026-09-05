@@ -549,3 +549,32 @@ export interface FoodItem {
   fat_g: number
   created_at: string
 }
+
+export interface HouseholdMember {
+  id: string
+  owner_id: string
+  name: string
+  birth_year: number | null
+  color: string
+  is_self: boolean
+  position: number
+  created_at: string
+}
+
+export type LearningCadence = 'daily' | 'weekly' | 'once'
+
+export interface LearningItem {
+  id: string
+  owner_id: string
+  member_id: string | null
+  subject: string
+  title: string
+  notes: string | null
+  cadence: LearningCadence
+  due_date: string | null
+  archived: boolean
+  position: number
+  created_at: string
+  /** filled in by the read helper */
+  doneToday?: boolean
+}

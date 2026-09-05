@@ -1,4 +1,4 @@
-import { BookOpen, ChefHat, Dumbbell, LibraryBig, type LucideIcon, Play, Sun, User, Users } from 'lucide-react'
+import { BookOpen, ChefHat, Dumbbell, GraduationCap, LibraryBig, type LucideIcon, Play, Sun, User, Users } from 'lucide-react'
 import { FEATURES } from '@/lib/features'
 import type { TodoRow } from '@/components/today-checklist'
 
@@ -149,6 +149,16 @@ export const MODULES: AppModule[] = [
         hint: h.anchor ?? undefined,
         done: h.doneToday,
       })),
+  },
+  {
+    key: 'learning',
+    title: 'Learning',
+    href: '/app/learning',
+    icon: GraduationCap,
+    blurb: 'homeschool lists for everyone at home',
+    inLibrary: true,
+    pillar: 'faith',
+    count: () => 'your household',
   },
   {
     key: 'circle',
