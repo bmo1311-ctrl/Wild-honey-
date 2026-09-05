@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { oneSignalConfigured, sendPushToUsers } from '@/lib/onesignal'
-import type { Comment, Visibility } from '@/lib/types'
+import type { Comment, NotificationPrefs, Visibility } from '@/lib/types'
 
 async function requireUser() {
   const supabase = await createClient()
@@ -549,7 +549,8 @@ export async function addPantryItem(input: { name: string; category?: string; qu
 export async function updatePantryItem(id: string, input: { name?: string; quantity?: string; category?: string }) {
   const { supabase, user } = await requireUser()
   const updates: Record<string, string | null> = {}
-  if (input.name !== undefined) updates.name = input.name.trim() || undefined
+  // a blank name is ignored rather than written, so an accidental clear cannot wipe the row
+  if (input.name?.trim()) updates.name = input.name.trim()
   if (input.quantity !== undefined) updates.quantity = input.quantity.trim() || null
   if (input.category !== undefined) updates.category = input.category
   const { error } = await supabase.from('pantry_items').update(updates).eq('id', id).eq('user_id', user.id)
@@ -593,7 +594,8 @@ export async function addGroceryBuilderItem(input: { name: string; category?: st
 export async function updateGroceryBuilderItem(id: string, input: { name?: string; quantity?: string }) {
   const { supabase, user } = await requireUser()
   const updates: Record<string, string | null> = {}
-  if (input.name !== undefined) updates.name = input.name.trim() || undefined
+  // as above: never overwrite a name with an empty string
+  if (input.name?.trim()) updates.name = input.name.trim()
   if (input.quantity !== undefined) updates.quantity = input.quantity.trim() || null
   const { error } = await supabase.from('grocery_builder_items').update(updates).eq('id', id).eq('user_id', user.id)
   if (error) return { error: error.message }
@@ -1300,7 +1302,7 @@ export async function adminGetMetrics() {
 // ============================================================
 
 export async function updateNotificationPrefs(input: {
-  prefs: Record<string, boolean>
+  prefs: NotificationPrefs
   quietHoursStart?: string
   quietHoursEnd?: string
 }) {

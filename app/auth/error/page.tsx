@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Wordmark } from '@/components/logo'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export default function AuthErrorPage() {
   return (
@@ -13,9 +14,9 @@ export default function AuthErrorPage() {
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground text-pretty">
           We couldn&apos;t complete that request. Please try signing in again.
         </p>
-        <Button asChild className="mt-8 h-12 w-full text-base">
-          <Link href="/auth/login">Back to sign in</Link>
-        </Button>
+        <Link href="/auth/login" className={cn(buttonVariants(), 'mt-8 h-12 w-full text-base')}>
+          Back to sign in
+        </Link>
       </div>
     </main>
   )

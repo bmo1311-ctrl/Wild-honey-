@@ -2,7 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Check } from 'lucide-react'
 import { Wordmark, HoneycombMark } from '@/components/logo'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { PILLAR_META, PILLARS } from '@/lib/pillars'
 
 const TIERS = [
@@ -52,12 +53,12 @@ export default function LandingPage() {
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <Wordmark />
         <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" className="h-11 text-mindset-pillar">
-            <Link href="/auth/login">Sign in</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/auth/sign-up">Join</Link>
-          </Button>
+          <Link href="/auth/login" className={cn(buttonVariants({ variant: 'ghost' }), 'h-11 text-mindset-pillar')}>
+            Sign in
+          </Link>
+          <Link href="/auth/sign-up" className={cn(buttonVariants())}>
+            Join
+          </Link>
         </div>
       </header>
 
@@ -75,12 +76,12 @@ export default function LandingPage() {
             growing in Body, Identity, Mindset, and Faith. Show up softly. Grow wildly.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button asChild className="h-12 px-7 text-base">
-              <Link href="/auth/sign-up">Begin your practice</Link>
-            </Button>
-            <Button asChild variant="outline" className="h-12 px-7 text-base">
-              <Link href="#membership">See membership</Link>
-            </Button>
+            <Link href="/auth/sign-up" className={cn(buttonVariants(), 'h-12 px-7 text-base')}>
+              Begin your practice
+            </Link>
+            <Link href="#membership" className={cn(buttonVariants({ variant: 'outline' }), 'h-12 px-7 text-base')}>
+              See membership
+            </Link>
           </div>
           <p className="mt-4 text-center text-[15px] text-muted-foreground">
             Already a member?{' '}
@@ -179,13 +180,12 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <Button
-                asChild
-                variant={tier.featured ? 'secondary' : 'default'}
-                className="mt-8 h-12 text-base"
+              <Link
+                href="/auth/sign-up"
+                className={cn(buttonVariants({ variant: tier.featured ? 'secondary' : 'default' }), 'mt-8 h-12 text-base')}
               >
-                <Link href="/auth/sign-up">{tier.cta}</Link>
-              </Button>
+                {tier.cta}
+              </Link>
             </div>
           ))}
         </div>
