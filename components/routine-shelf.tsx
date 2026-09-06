@@ -1,8 +1,8 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { Plus, Sun, Moon, X, AlertTriangle, Info, ScanLine, ClipboardPaste } from 'lucide-react'
+import { Plus, Sun, Moon, X, AlertTriangle, Info, ScanLine, ClipboardPaste, Loader2 } from 'lucide-react'
 import { addBeautyProduct, removeBeautyProduct, setLifeStage } from '@/app/actions'
 import { ACTIVES, detectActives, getActive } from '@/lib/actives'
 import { buildRoutines, findGaps, type ShelfItem } from '@/lib/routine'
@@ -50,10 +50,16 @@ export function RoutineShelf({
   const [picked, setPicked] = useState<string[]>([])
   const [pasting, setPasting] = useState(false)
   const [pasted, setPasted] = useState('')
+  const [looking, setLooking] = useState(false)
+  const formRef = useRef<HTMLDivElement>(null)
   const [pending, startTransition] = useTransition()
 
   const { am, pm } = useMemo(() => buildRoutines(shelf, lifeStage), [shelf, lifeStage])
   const gaps = useMemo(() => findGaps(shelf), [shelf])
+
+  useEffect(() => {
+    if (adding) formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [adding])
 
   function toggleActive(key: string) {
     setPicked((p) => (p.includes(key) ? p.filter((k) => k !== key) : [...p, key]))
@@ -63,6 +69,8 @@ export function RoutineShelf({
   async function handleScanned(code: string) {
     setScanning(false)
     setBarcode(code)
+    setLooking(true)
+    setAdding(true)
     try {
       const res = await fetch(`/api/beauty/lookup?barcode=${encodeURIComponent(code)}`)
       const data = await res.json()
@@ -77,12 +85,14 @@ export function RoutineShelf({
             : 'found it, but the ingredients aren’t listed — tick anything you know.',
         )
       } else {
-        setScanNote('not in the database yet. add it here and you’ll be the one who put it there.')
+        setScanNote(
+          `couldn’t find ${code} in the database — a lot of american and korean products aren’t in there yet. type the name below, or paste the ingredients and I’ll read them.`,
+        )
       }
-      setAdding(true)
     } catch {
-      setScanNote('couldn’t reach the product database. you can still add it by hand.')
-      setAdding(true)
+      setScanNote('couldn’t reach the product database. type the name below, or paste the ingredients.')
+    } finally {
+      setLooking(false)
     }
   }
 
@@ -224,8 +234,16 @@ export function RoutineShelf({
       {scanning && <BarcodeScanner onFound={handleScanned} onCancel={() => setScanning(false)} />}
 
       {adding ? (
-        <div className="flex flex-col gap-3 rounded-2xl bg-card p-5 ring-1 ring-border">
-          {scanNote && <p className="text-sm text-muted-foreground text-pretty">{scanNote}</p>}
+        <div ref={formRef} className="flex flex-col gap-3 rounded-2xl bg-card p-5 ring-1 ring-border">
+          {looking && (
+            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              looking up {barcode}…
+            </p>
+          )}
+          {!looking && scanNote && (
+            <p className="rounded-xl bg-muted p-3 text-sm leading-relaxed text-pretty">{scanNote}</p>
+          )}
           <div className="flex flex-col gap-1.5">
             <Label>what is it?</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. the ordinary niacinamide" className="h-11" />
