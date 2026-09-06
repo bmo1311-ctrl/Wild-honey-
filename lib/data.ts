@@ -1044,9 +1044,8 @@ export async function getHouseholdMembers(): Promise<HouseholdMember[]> {
 /** Learning items for one member, with today's tick state resolved. */
 export async function getLearningItems(memberId: string | null): Promise<LearningItem[]> {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const scope = await getOwnerScope()
+  const user = scope ? { id: scope.ownerId } : null
   if (!user) return []
 
   let q = supabase.from('learning_items').select('*').eq('owner_id', user.id).eq('archived', false)
@@ -1065,6 +1064,25 @@ export async function getLearningItems(memberId: string | null): Promise<Learnin
   )
   const doneIds = new Set(((done as { item_id: string }[]) ?? []).map((d) => d.item_id))
   return items.map((i) => ({ ...i, doneToday: doneIds.has(i.id) }))
+}
+
+// ---- Who owns the rows ----
+
+/**
+ * A child's rows live under her parent's user_id, scoped to her household
+ * member row. This resolves both, so every member-scoped helper works the
+ * same for parent and child.
+ */
+export async function getOwnerScope(): Promise<{ userId: string; ownerId: string; childMemberId: string | null } | null> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return null
+  const { data: p } = await supabase.from('profiles').select('is_child, guardian_id').eq('id', user.id).maybeSingle()
+  if (!p?.is_child || !p.guardian_id) return { userId: user.id, ownerId: user.id, childMemberId: null }
+  const { data: m } = await supabase.from('household_members').select('id').eq('child_user_id', user.id).maybeSingle()
+  return { userId: user.id, ownerId: p.guardian_id, childMemberId: m?.id ?? null }
 }
 
 // ---- Food logging ----
@@ -1090,9 +1108,8 @@ export async function getUsualFoods(limit = 8, memberId?: string | null): Promis
   { food: FoodItem; lastQuantity: number; unit: string; timesLogged: number }[]
 > {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const scope = await getOwnerScope()
+  const user = scope ? { id: scope.ownerId } : null
   if (!user) return []
 
   let usualQuery = supabase
@@ -1140,9 +1157,8 @@ export interface SavedMeal {
 /** Her saved combinations, foods resolved, totals computed. */
 export async function getSavedMeals(memberId?: string | null): Promise<SavedMeal[]> {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const scope = await getOwnerScope()
+  const user = scope ? { id: scope.ownerId } : null
   if (!user) return []
   let q = supabase.from('saved_meals').select('*').eq('user_id', user.id)
   q = memberId ? q.eq('member_id', memberId) : q.is('member_id', null)
@@ -1408,9 +1424,8 @@ export async function getTodayNutrition(memberId?: string | null): Promise<{
   loggedMeals: MealLog[]
 }> {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const scope = await getOwnerScope()
+  const user = scope ? { id: scope.ownerId } : null
   if (!user) return { calories: 0, protein: 0, carbs: 0, fat: 0, nutrients: {}, calorieGoal: null, proteinGoal: null, loggedMeals: [] }
 
   const today = (await localToday())

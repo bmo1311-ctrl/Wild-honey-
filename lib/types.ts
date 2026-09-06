@@ -66,6 +66,8 @@ export interface Profile {
   bio?: string | null
   profile_show?: { recipes?: boolean; progress?: boolean; wins?: boolean } | null
   color_season?: 'winter' | 'spring' | 'summer' | 'autumn' | null
+  is_child?: boolean
+  guardian_id?: string | null
 }
 
 /** The columns of profiles another member is allowed to see. */
@@ -581,6 +583,8 @@ export interface HouseholdMember {
   is_self: boolean
   position: number
   created_at: string
+  child_user_id?: string | null
+  family_code?: string | null
 }
 
 export type LearningCadence = 'daily' | 'weekly' | 'once'

@@ -12,6 +12,15 @@ import { scaleNutrients, type NutrientMap } from '@/lib/nutrients'
 import { fetchRecipe, safeUrl } from '@/lib/recipe-import'
 import type { WritingKind } from '@/lib/courses'
 
+/** The user, plus the account her rows are stored under (her parent's, if she is a child). */
+async function requireOwner() {
+  const { supabase, user } = await requireUser()
+  const { data: p } = await supabase.from('profiles').select('is_child, guardian_id').eq('id', user.id).maybeSingle()
+  if (!p?.is_child || !p.guardian_id) return { supabase, user, ownerId: user.id, childMemberId: null as string | null }
+  const { data: m } = await supabase.from('household_members').select('id').eq('child_user_id', user.id).maybeSingle()
+  return { supabase, user, ownerId: p.guardian_id as string, childMemberId: (m?.id as string | undefined) ?? null }
+}
+
 async function requireUser() {
   const supabase = await createClient()
   const {
@@ -2142,7 +2151,8 @@ export async function saveFoodItem(input: {
 }
 
 export async function deleteMealLog(id: string) {
-  const { supabase, user } = await requireUser()
+  const { supabase, ownerId } = await requireOwner()
+  const user = { id: ownerId }
   const { error } = await supabase.from('meal_logs').delete().eq('id', id).eq('user_id', user.id)
   if (error) return { error: error.message }
   revalidatePath('/app/nutrition')
@@ -2163,7 +2173,9 @@ export async function logFoods(
 ) {
   // several foods logged together share a group so the day shows one meal
   const groupId = entries.length > 1 || mealName ? crypto.randomUUID() : null
-  const { supabase, user } = await requireUser()
+  const { supabase, ownerId, childMemberId } = await requireOwner()
+  const user = { id: ownerId }
+  if (childMemberId) memberId = childMemberId
   if (entries.length === 0) return { error: 'Nothing selected.' }
 
   const ids = entries.map((e) => e.foodItemId)
@@ -2295,7 +2307,9 @@ export async function removeHouseholdMember(id: string) {
 }
 
 export async function addLearningItem(input: { memberId: string | null; subject: string; title: string; cadence?: string; notes?: string }) {
-  const { supabase, user } = await requireUser()
+  const { supabase, ownerId, childMemberId } = await requireOwner()
+  const user = { id: ownerId }
+  if (childMemberId) input.memberId = childMemberId
   if (!input.title.trim()) return { error: 'What is it called?' }
   const { error } = await supabase.from('learning_items').insert({
     owner_id: user.id,
@@ -2312,7 +2326,8 @@ export async function addLearningItem(input: { memberId: string | null; subject:
 }
 
 export async function toggleLearningItem(itemId: string) {
-  const { supabase, user } = await requireUser()
+  const { supabase, ownerId } = await requireOwner()
+  const user = { id: ownerId }
   const today = (await localToday())
   const { data: existing } = await supabase
     .from('learning_completions')
@@ -2580,7 +2595,9 @@ export async function deleteMoneyEntry(id: string) {
 // ---- Saved meals ----
 
 export async function saveMeal(input: { name: string; items: { foodItemId: string; quantity: number }[]; memberId?: string | null }) {
-  const { supabase, user } = await requireUser()
+  const { supabase, ownerId, childMemberId } = await requireOwner()
+  const user = { id: ownerId }
+  if (childMemberId) input.memberId = childMemberId
   if (!input.name.trim()) return { error: 'Name the meal.' }
   if (input.items.length === 0) return { error: 'Pick the foods first.' }
   const { error } = await supabase.from('saved_meals').insert({
@@ -2604,11 +2621,87 @@ export async function deleteSavedMeal(id: string) {
 
 /** Delete every row of a logged meal at once. */
 export async function deleteMealGroup(groupId: string) {
-  const { supabase, user } = await requireUser()
+  const { supabase, ownerId } = await requireOwner()
+  const user = { id: ownerId }
   const { error } = await supabase.from('meal_logs').delete().eq('group_id', groupId).eq('user_id', user.id)
   if (error) return { error: error.message }
   revalidatePath('/app/nutrition/log')
   revalidatePath('/app/nutrition')
   revalidatePath('/app')
   return { ok: true }
+}
+
+// ---- A child's own access ----
+
+function childEmail(memberId: string) {
+  return `${memberId}@kid.wildhoney.app`
+}
+function childPassword(familyCode: string, pin: string) {
+  return `${familyCode}-${pin}`
+}
+
+/**
+ * Give a household member her own sign-in: her name plus a four-digit PIN.
+ * No email is collected; the address is synthetic. She lands in kid mode
+ * with no social features, and everything she logs is stored under the
+ * parent so it shows in both places.
+ */
+export async function createChildAccess(memberId: string, pin: string) {
+  const { supabase, user } = await requireUser()
+  if (!/^\d{4}$/.test(pin)) return { error: 'The PIN is four digits.' }
+  const { data: m } = await supabase.from('household_members').select('*').eq('id', memberId).eq('owner_id', user.id).maybeSingle()
+  if (!m) return { error: 'That person is not in your household.' }
+  if (m.is_self) return { error: 'That is you.' }
+
+  const familyCode = (m.family_code as string | null) ?? Math.random().toString(36).slice(2, 8).toUpperCase()
+  const admin = createServiceClient()
+  let childUserId = m.child_user_id as string | null
+
+  if (!childUserId) {
+    const { data: created, error } = await admin.auth.admin.createUser({
+      email: childEmail(memberId),
+      password: childPassword(familyCode, pin),
+      email_confirm: true,
+      user_metadata: { name: m.name, is_child: true },
+    })
+    if (error || !created.user) return { error: error?.message ?? 'Could not create her sign-in.' }
+    childUserId = created.user.id
+  } else {
+    const { error } = await admin.auth.admin.updateUserById(childUserId, { password: childPassword(familyCode, pin) })
+    if (error) return { error: error.message }
+  }
+
+  const { error: pErr } = await admin.from('profiles').upsert(
+    {
+      id: childUserId,
+      name: m.name,
+      email: childEmail(memberId),
+      is_child: true,
+      guardian_id: user.id,
+      onboarding_completed_at: new Date().toISOString(),
+      birth_year: m.birth_year ?? null,
+      color_season: 'spring',
+    },
+    { onConflict: 'id' },
+  )
+  if (pErr) return { error: pErr.message }
+  const { error: mErr } = await admin.from('household_members').update({ child_user_id: childUserId, family_code: familyCode }).eq('id', memberId)
+  if (mErr) return { error: mErr.message }
+  revalidatePath('/app/household')
+  return { ok: true, familyCode }
+}
+
+/** For the sign-in screen: which names belong to this family code. Names only. */
+export async function lookupFamily(familyCode: string) {
+  const code = familyCode.trim().toUpperCase()
+  if (!/^[A-Z0-9]{6}$/.test(code)) return { error: 'That code is six letters or numbers.' }
+  const admin = createServiceClient()
+  const { data } = await admin.from('household_members').select('id, name').eq('family_code', code).not('child_user_id', 'is', null)
+  if (!data || data.length === 0) return { error: 'No family found with that code.' }
+  return { ok: true, members: data.map((d) => ({ id: d.id as string, name: d.name as string })) }
+}
+
+/** The credentials the sign-in screen uses. The PIN never leaves the device except to sign in. */
+export async function childCredentials(memberId: string, familyCode: string, pin: string) {
+  return { email: childEmail(memberId), password: childPassword(familyCode.trim().toUpperCase(), pin) }
 }

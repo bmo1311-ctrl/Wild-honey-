@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ChevronRight, Flame } from 'lucide-react'
 import { TodayChecklist } from '@/components/today-checklist'
+import { KidToday } from '@/components/kid-today'
 import { BaselineCardLink } from '@/components/baseline-card'
 import { nudgesFor } from '@/lib/nudges'
 import { suggestHabits } from '@/lib/habit-suggestions'
@@ -13,8 +14,10 @@ import { QuickAddHabit } from '@/components/quick-add-habit'
 import {
   getActiveCourseState,
   getActivityDates,
+  getLearningItems,
   getMeasurements,
   getMoney,
+  getOwnerScope,
   getHabits,
   getRecentHabitLogs,
   getBaselineVitality,
@@ -32,6 +35,13 @@ import {
  */
 export default async function TodayPage({ searchParams }: { searchParams: Promise<{ course?: string }> }) {
   const { course: preferred } = await searchParams
+  const me = await getSessionProfile()
+  if (me?.is_child) {
+    const scope = await getOwnerScope()
+    const [items, nutrition] = await Promise.all([getLearningItems(scope?.childMemberId ?? null), getTodayNutrition(scope?.childMemberId ?? null)])
+    const stars = items.filter((i) => i.doneToday).length + (nutrition.loggedMeals.length > 0 ? 1 : 0)
+    return <KidToday name={me.name?.split(' ')[0] ?? 'there'} items={items} mealsToday={nutrition.loggedMeals.length} starsThisWeek={stars} />
+  }
   const [{ slug, enrollment, currentDay, completedDays, otherSlugs }, profile, activityDates, checkin, nutrition, habits, habitLogs] = await Promise.all([
     getActiveCourseState(preferred),
     getSessionProfile(),

@@ -1,5 +1,5 @@
 import { LearningScreen } from '@/components/learning-screen'
-import { getHouseholdMembers, getLearningItems } from '@/lib/data'
+import { getHouseholdMembers, getLearningItems, getOwnerScope } from '@/lib/data'
 
 /**
  * Homeschool at home: what each person is working through, ticked off day by
@@ -7,8 +7,9 @@ import { getHouseholdMembers, getLearningItems } from '@/lib/data'
  */
 export default async function LearningPage({ searchParams }: { searchParams: Promise<{ member?: string }> }) {
   const { member } = await searchParams
-  const members = await getHouseholdMembers()
-  const activeId = member && members.some((m) => m.id === member) ? member : (members[0]?.id ?? null)
+  const scope = await getOwnerScope()
+  const members = scope?.childMemberId ? [] : await getHouseholdMembers()
+  const activeId = scope?.childMemberId ?? (member && members.some((m) => m.id === member) ? member : (members[0]?.id ?? null))
   const items = await getLearningItems(activeId)
 
   return (

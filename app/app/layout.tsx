@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Wordmark } from '@/components/logo'
 import { BottomNav } from '@/components/bottom-nav'
+import { KidNav } from '@/components/kid-nav'
+import { KidGate } from '@/components/kid-gate'
 import { TzCookie } from '@/components/tz-cookie'
 import { BloomAvatar } from '@/components/bloom-avatar'
 import { OneSignalInit } from '@/components/onesignal-init'
@@ -42,7 +44,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </header>
       <main className="mx-auto max-w-2xl px-5 py-6">{children}</main>
-      <BottomNav />
+      {profile.is_child ? <KidNav /> : <BottomNav />}
+      {profile.is_child && <KidGate />}
       <TzCookie />
     </div>
   )

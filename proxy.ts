@@ -38,7 +38,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Keep logged-in users out of auth pages
-  if (path.startsWith('/auth/login') && user) {
+  if ((path.startsWith('/auth/login') || path === '/kid') && user) {
     const url = request.nextUrl.clone()
     url.pathname = '/app'
     return NextResponse.redirect(url)

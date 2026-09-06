@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ChevronLeft, Settings2 } from 'lucide-react'
 import { FoodLogScreen } from '@/components/food-log-screen'
-import { getCurrentCyclePhase, getFoodItems, getHouseholdMembers, getSavedMeals, getSessionProfile, getTodayNutrition, getUsualFoods } from '@/lib/data'
+import { getCurrentCyclePhase, getFoodItems, getHouseholdMembers, getOwnerScope, getSavedMeals, getSessionProfile, getTodayNutrition, getUsualFoods } from '@/lib/data'
 import { applyCycle, phaseFromDates, phaseLabel, type CyclePhaseKey } from '@/lib/cycle'
 import { NutrientRings } from '@/components/nutrient-rings'
 import { NutrientPanel } from '@/components/nutrient-panel'
@@ -14,10 +14,11 @@ import { calculateTargets, effectiveTargets, type ActivityLevel, type BodyGoal }
  */
 export default async function LogFoodPage({ searchParams }: { searchParams: Promise<{ member?: string }> }) {
   const { member } = await searchParams
-  const members = await getHouseholdMembers()
+  const scope = await getOwnerScope()
+  const members = scope?.childMemberId ? [] : await getHouseholdMembers()
   const self = members.find((m) => m.is_self)
   // null means the account holder; anyone else is logged against their id.
-  const memberId = member && member !== self?.id && members.some((m) => m.id === member) ? member : null
+  const memberId = scope?.childMemberId ?? (member && member !== self?.id && members.some((m) => m.id === member) ? member : null)
   const [foods, nutrition, usual, profile, loggedPhase, savedMeals] = await Promise.all([
     getFoodItems(),
     getTodayNutrition(memberId),

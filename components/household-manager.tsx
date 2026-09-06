@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Check, Pencil, Trash2, UserPlus, X } from 'lucide-react'
-import { addHouseholdMember, removeHouseholdMember, updateHouseholdMember } from '@/app/actions'
+import { addHouseholdMember, createChildAccess, removeHouseholdMember, updateHouseholdMember } from '@/app/actions'
 import type { HouseholdMember } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -23,6 +23,23 @@ export function HouseholdManager({ members }: { members: HouseholdMember[] }) {
   const [editing, setEditing] = useState<string | null>(null)
   const [edit, setEdit] = useState({ name: '', birthYear: '', sex: '' })
   const [confirming, setConfirming] = useState<string | null>(null)
+  const [access, setAccess] = useState<string | null>(null)
+  const [pin, setPin] = useState('')
+  const [issued, setIssued] = useState<{ name: string; code: string } | null>(null)
+
+  function giveAccess(id: string, name: string) {
+    startTransition(async () => {
+      const res = await createChildAccess(id, pin)
+      if ('error' in res && res.error) {
+        toast.error(res.error)
+        return
+      }
+      if ('familyCode' in res && res.familyCode) setIssued({ name, code: res.familyCode })
+      setAccess(null)
+      setPin('')
+      router.refresh()
+    })
+  }
 
   const field = 'h-11 w-full rounded-xl bg-background px-3 text-base outline-none ring-1 ring-border focus-visible:ring-2 focus-visible:ring-primary/40'
 
@@ -132,6 +149,11 @@ export function HouseholdManager({ members }: { members: HouseholdMember[] }) {
                   <Pencil className="h-4 w-4" />
                 </button>
                 {!m.is_self && (
+                  <button type="button" onClick={() => setAccess(access === m.id ? null : m.id)} className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold">
+                    {(m as { child_user_id?: string | null }).child_user_id ? 'reset PIN' : 'give her the app'}
+                  </button>
+                )}
+                {!m.is_self && (
                   <button type="button" onClick={() => setConfirming(m.id)} aria-label={`Remove ${m.name}`} className="shrink-0 p-1.5 text-muted-foreground">
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -141,6 +163,25 @@ export function HouseholdManager({ members }: { members: HouseholdMember[] }) {
           </li>
         ))}
       </ul>
+
+      {access && (() => { const m = members.find((x) => x.id === access); return m ? (
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <p className="font-serif text-[17px] font-semibold">{m.name}&rsquo;s own sign-in</p>
+          <p className="mt-1 text-[13px] text-muted-foreground text-pretty">She signs in at <span className="font-semibold text-foreground">/kid</span> with your family code and a four-digit PIN. No email, nothing public, no Circle. Everything she logs shows up here for you.</p>
+          <input value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))} inputMode="numeric" placeholder="pick a 4-digit PIN" className="mt-3 h-12 w-full rounded-xl bg-background px-3 text-center text-xl tracking-[0.3em] outline-none ring-1 ring-border" />
+          <button type="button" onClick={() => giveAccess(m.id, m.name)} disabled={pending || pin.length !== 4} className="mt-2 h-11 w-full rounded-xl bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50">Create her sign-in</button>
+        </div>
+      ) : null })()}
+
+      {issued && (
+        <div className="rounded-2xl border-2 border-primary bg-card p-4">
+          <p className="font-serif text-[17px] font-semibold">{issued.name} is set up</p>
+          <p className="mt-1 text-[14px] text-muted-foreground">Family code — she&rsquo;ll type this once:</p>
+          <p className="mt-1 font-serif text-3xl font-semibold tracking-[0.25em]">{issued.code}</p>
+          <p className="mt-2 text-[13px] text-muted-foreground">Open <span className="font-semibold text-foreground">wild-honey-circle.vercel.app/kid</span> on her device, type the code, tap her name, enter the PIN.</p>
+          <button type="button" onClick={() => setIssued(null)} className="mt-3 text-sm text-muted-foreground">done</button>
+        </div>
+      )}
 
       {adding ? (
         <div className="rounded-2xl border border-border bg-card p-4">
