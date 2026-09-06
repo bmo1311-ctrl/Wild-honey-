@@ -70,8 +70,23 @@ export default async function ProtocolsPage() {
       {/* Routines — ongoing, rebuilt from what she owns. */}
       <section>
         <h2 className="font-serif text-lg font-semibold">Skin</h2>
-        <p className="mb-4 mt-0.5 text-sm text-muted-foreground text-pretty">
+        <p className="mt-0.5 text-sm text-muted-foreground text-pretty">
           your products, in the order they actually go on.
+        </p>
+
+        {/*
+          Where we stand on this, said once and plainly.
+
+          "Clean" is unregulated — any brand can print it, and plenty charge a
+          premium for the word. Naming what actually matters gives a member
+          something she can use in a shop, instead of something to be afraid of.
+        */}
+        <p className="mb-4 mt-3 rounded-2xl bg-muted p-4 text-sm leading-relaxed text-pretty">
+          <span className="font-medium">effective, transparent, affordable.</span>{' '}
+          &ldquo;clean&rdquo; has no legal meaning — any brand can print it, and many charge you
+          for the word. what matters is what is actually in the bottle, at a strength that does
+          something, at a price you can keep paying. the same retinoid sits in a twelve dollar
+          bottle and a ninety dollar one.
         </p>
         {tonight && (
           <div className="mb-5">
