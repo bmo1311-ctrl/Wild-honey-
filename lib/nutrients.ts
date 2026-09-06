@@ -12,7 +12,8 @@ export type NutrientKey =
   | 'fiber_g' | 'sugar_g' | 'sat_fat_g'
   | 'water_ml' | 'caffeine_mg' | 'sodium_mg' | 'potassium_mg' | 'calcium_mg' | 'iron_mg'
   | 'magnesium_mg' | 'zinc_mg'
-  | 'vit_a_mcg' | 'vit_c_mg' | 'vit_d_mcg' | 'vit_e_mg' | 'vit_b12_mcg' | 'folate_mcg'
+  | 'vit_a_mcg' | 'vit_c_mg' | 'vit_d_mcg' | 'vit_e_mg' | 'vit_k_mcg' | 'vit_b1_mg' | 'vit_b2_mg' | 'vit_b3_mg' | 'vit_b6_mg' | 'vit_b12_mcg' | 'folate_mcg' | 'choline_mg'
+  | 'phosphorus_mg' | 'copper_mg' | 'manganese_mg' | 'selenium_mcg'
 
 export interface NutrientDef {
   key: NutrientKey
@@ -41,6 +42,10 @@ export const NUTRIENTS: NutrientDef[] = [
   { key: 'iron_mg', label: 'Iron', unit: 'mg', target: 18, group: 'mineral' },
   { key: 'magnesium_mg', label: 'Magnesium', unit: 'mg', target: 320, group: 'mineral' },
   { key: 'zinc_mg', label: 'Zinc', unit: 'mg', target: 8, group: 'mineral' },
+  { key: 'phosphorus_mg', label: 'Phosphorus', unit: 'mg', target: 700, group: 'mineral' },
+  { key: 'copper_mg', label: 'Copper', unit: 'mg', target: 0.9, group: 'mineral' },
+  { key: 'manganese_mg', label: 'Manganese', unit: 'mg', target: 1.8, group: 'mineral' },
+  { key: 'selenium_mcg', label: 'Selenium', unit: 'mcg', target: 55, group: 'mineral' },
 
   { key: 'vit_a_mcg', label: 'Vitamin A', unit: 'mcg', target: 700, group: 'vitamin' },
   { key: 'vit_c_mg', label: 'Vitamin C', unit: 'mg', target: 75, group: 'vitamin' },
@@ -48,6 +53,12 @@ export const NUTRIENTS: NutrientDef[] = [
   { key: 'vit_e_mg', label: 'Vitamin E', unit: 'mg', target: 15, group: 'vitamin' },
   { key: 'vit_b12_mcg', label: 'Vitamin B12', unit: 'mcg', target: 2.4, group: 'vitamin' },
   { key: 'folate_mcg', label: 'Folate', unit: 'mcg', target: 400, group: 'vitamin' },
+  { key: 'vit_k_mcg', label: 'Vitamin K', unit: 'mcg', target: 90, group: 'vitamin' },
+  { key: 'vit_b1_mg', label: 'Thiamin (B1)', unit: 'mg', target: 1.1, group: 'vitamin' },
+  { key: 'vit_b2_mg', label: 'Riboflavin (B2)', unit: 'mg', target: 1.1, group: 'vitamin' },
+  { key: 'vit_b3_mg', label: 'Niacin (B3)', unit: 'mg', target: 14, group: 'vitamin' },
+  { key: 'vit_b6_mg', label: 'Vitamin B6', unit: 'mg', target: 1.3, group: 'vitamin' },
+  { key: 'choline_mg', label: 'Choline', unit: 'mg', target: 425, group: 'vitamin' },
 ]
 
 export const NUTRIENT_BY_KEY: Record<string, NutrientDef> = Object.fromEntries(NUTRIENTS.map((n) => [n.key, n]))
