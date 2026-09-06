@@ -25,7 +25,7 @@ const CYCLE_PHASES: { value: CyclePhase; label: string }[] = [
 
 const SYMPTOM_OPTIONS = SYMPTOM_KEYS
 
-function ScaleRow({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
+export function ScaleRow({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between">

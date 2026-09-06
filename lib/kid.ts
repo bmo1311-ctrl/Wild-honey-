@@ -18,3 +18,14 @@ export function kidAllowed(path: string, perms: ChildPermissions = {}): boolean 
   }
   return false
 }
+
+/**
+ * Which programs this viewer may open: null means all of them (an adult), a
+ * list means only those (a child, set by her parent).
+ */
+export function courseAllowList(
+  p: { is_child?: boolean | null; child_permissions?: { program?: string[] } | null } | null | undefined,
+): string[] | null {
+  if (!p?.is_child) return null
+  return p.child_permissions?.program ?? []
+}

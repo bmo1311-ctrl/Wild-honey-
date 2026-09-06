@@ -1,3 +1,4 @@
+import type { TrackedToday } from '@/components/course/log-block'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Blocks } from '@/components/course/blocks'
@@ -17,6 +18,7 @@ export function DayView({
   day,
   saved,
   checkin,
+  tracked = null,
   done,
   doneAt,
   part,
@@ -27,6 +29,7 @@ export function DayView({
   day: CourseDay
   saved: Map<number, CourseWriting>
   checkin: Checkin | null
+  tracked?: TrackedToday | null
   done: boolean
   doneAt: string | null
   part?: 1 | 2
@@ -72,7 +75,7 @@ export function DayView({
         )}
       </header>
 
-      <Blocks blocks={blocks} ctx={{ dayNumber: day.day_number, slug: course.slug, saved, checkin, offset }} />
+      <Blocks blocks={blocks} ctx={{ dayNumber: day.day_number, slug: course.slug, saved, checkin, tracked, offset }} />
 
       <div className="flex flex-col gap-3 pt-2">
         {twoPart && activePart === 1 ? (

@@ -1,3 +1,4 @@
+import { courseAllowList } from '@/lib/kid'
 import { createClient } from '@/lib/supabase/server'
 import type {
   Checkin,
@@ -1577,4 +1578,10 @@ export async function getYearDayReflection(wildHoneyYear: number): Promise<Trans
     .eq('wild_honey_year', wildHoneyYear)
     .maybeSingle()
   return (data as TransformationReflection) ?? null
+}
+
+/** A child may only open the programs her parent turned on; an adult may open any. */
+export async function mayOpenCourse(slug: string): Promise<boolean> {
+  const allowed = courseAllowList(await getSessionProfile())
+  return !allowed || allowed.includes(slug)
 }

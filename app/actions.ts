@@ -1,5 +1,6 @@
 'use server'
 
+import { courseAllowList } from '@/lib/kid'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
@@ -394,20 +395,24 @@ export async function saveCheckin(input: {
 }) {
   const { supabase, user } = await requireUser()
   const today = (await localToday())
+  // Merge with what she already logged today, so the three scales on a course
+  // day never wipe mood, cycle or symptoms from the full check-in, or the other
+  // way round. One row per day, filled in from wherever she is.
+  const { data: prev } = await supabase.from('checkins').select('*').eq('user_id', user.id).eq('date', today).maybeSingle()
   const { error } = await supabase.from('checkins').upsert(
     {
       user_id: user.id,
       date: today,
-      energy: input.energy ?? null,
-      mood: input.mood ?? null,
-      stress: input.stress ?? null,
-      sleep_quality: input.sleepQuality ?? null,
-      hydration_oz: input.hydrationOz ?? null,
-      protein_g: input.proteinG ?? null,
-      sunlight_minutes: input.sunlightMinutes ?? null,
-      movement_minutes: input.movementMinutes ?? null,
-      cycle_phase: input.cyclePhase ?? null,
-      symptoms: input.symptoms ?? [],
+      energy: input.energy ?? prev?.energy ?? null,
+      mood: input.mood ?? prev?.mood ?? null,
+      stress: input.stress ?? prev?.stress ?? null,
+      sleep_quality: input.sleepQuality ?? prev?.sleep_quality ?? null,
+      hydration_oz: input.hydrationOz ?? prev?.hydration_oz ?? null,
+      protein_g: input.proteinG ?? prev?.protein_g ?? null,
+      sunlight_minutes: input.sunlightMinutes ?? prev?.sunlight_minutes ?? null,
+      movement_minutes: input.movementMinutes ?? prev?.movement_minutes ?? null,
+      cycle_phase: input.cyclePhase ?? prev?.cycle_phase ?? null,
+      symptoms: input.symptoms ?? ((prev?.symptoms as string[] | null) ?? []),
     },
     { onConflict: 'user_id,date' },
   )
@@ -1959,6 +1964,10 @@ export async function getCheckinGap() {
 
 export async function enrollInCourse(slug: string = COURSE_SLUG) {
   const { supabase, user } = await requireUser()
+  // A child can only start what her parent turned on, whatever the page showed.
+  const { data: me } = await supabase.from('profiles').select('is_child, child_permissions').eq('id', user.id).maybeSingle()
+  const allowed = courseAllowList(me as unknown as { is_child?: boolean | null; child_permissions?: { program?: string[] } | null } | null)
+  if (allowed && !allowed.includes(slug)) return { error: 'That program is not turned on for you yet.' }
   const { error } = await supabase
     .from('course_enrollments')
     .upsert(
@@ -2084,6 +2093,7 @@ export async function logFood(input: {
     protein_g: round1(input.protein),
     carbs_g: round1(input.carbs),
     fat_g: round1(input.fat),
+    nutrients: { calories: round1(input.calories), protein_g: round1(input.protein), carbs_g: round1(input.carbs), fat_g: round1(input.fat) },
     meal_slot: input.mealSlot ?? null,
     member_id: input.memberId ?? null,
     date: input.date ?? (await localToday()),
@@ -2176,6 +2186,21 @@ export async function deleteMealLog(id: string) {
   return { ok: true }
 }
 
+/**
+ * A food's full per-serving map. Foods added before the map existed carry
+ * their macros only as columns, so the map is built from both — every logged
+ * row then has calories and protein in it, whichever way the food was made.
+ */
+function foodMap(f: { calories: number; protein_g: number; carbs_g: number; fat_g: number; nutrients?: unknown }): NutrientMap {
+  return {
+    calories: f.calories,
+    protein_g: f.protein_g,
+    carbs_g: f.carbs_g,
+    fat_g: f.fat_g,
+    ...((f.nutrients ?? {}) as NutrientMap),
+  }
+}
+
 function round1(n: number): number {
   return Math.round((Number.isFinite(n) ? n : 0) * 10) / 10
 }
@@ -2206,7 +2231,7 @@ export async function logFoods(
     const factor = e.quantity / f.serving_size
     return [
       {
-        nutrients: scaleNutrients((f.nutrients ?? {}) as NutrientMap, factor),
+        nutrients: scaleNutrients(foodMap(f), factor),
         user_id: user.id,
         food_item_id: f.id,
         custom_name: f.name,
@@ -2853,7 +2878,7 @@ export async function updateFoodItem(input: {
   const { supabase, user } = await requireUser()
   const { data: f } = await supabase.from('food_items').select('*').eq('id', input.id).eq('user_id', user.id).maybeSingle()
   if (!f) return { error: 'You can only edit foods you added.' }
-  const nutrients: Record<string, number> = { ...((f.nutrients ?? {}) as Record<string, number>) }
+  const nutrients: Record<string, number> = { ...(foodMap(f) as Record<string, number>) }
   const patch: Record<string, unknown> = {}
   const setN = (k: string, v: number | null | undefined) => {
     if (v === undefined) return

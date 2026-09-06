@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { WriteBlock } from '@/components/course/write-block'
 import { RateBlock } from '@/components/course/rate-block'
 import { CheckBlock } from '@/components/course/check-block'
-import { LogBlock } from '@/components/course/log-block'
+import { LogBlock, type TrackedToday } from '@/components/course/log-block'
 
 export interface BlocksContext {
   /** null on week pages, where there is no day to save against. */
@@ -14,6 +14,8 @@ export interface BlocksContext {
   /** Saved answers for this day, keyed by prompt_index. */
   saved?: Map<number, CourseWriting>
   checkin?: Checkin | null
+  /** Today's food log totals, so the day never asks for what is already logged. */
+  tracked?: TrackedToday | null
   /**
    * Added to a block's position to get its prompt_index. Milestone days are
    * split for rendering, so part 2's blocks must keep the indices they have
@@ -195,7 +197,7 @@ function BlockView({ block, index, ctx }: { block: Block; index: number; ctx: Bl
     case 'log':
       return (
         <div className="shrink-0">
-          <LogBlock existing={ctx.checkin ?? null} />
+          <LogBlock existing={ctx.checkin ?? null} tracked={ctx.tracked ?? null} />
         </div>
       )
 

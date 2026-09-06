@@ -2,13 +2,18 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { ChevronRight } from 'lucide-react'
 import { COURSES } from '@/lib/courses'
-import { getEnrollments } from '@/lib/data'
+import { getEnrollments, getSessionProfile } from '@/lib/data'
+import { courseAllowList } from '@/lib/kid'
 import { cn } from '@/lib/utils'
 
 /** Both courses. She can hold more than one at a time. */
 export default async function ProgramIndexPage({ searchParams }: { searchParams: Promise<{ all?: string }> }) {
   const { all } = await searchParams
-  const enrollments = await getEnrollments()
+  const [allEnrollments, me] = await Promise.all([getEnrollments(), getSessionProfile()])
+  // A child sees only the programs her parent turned on.
+  const allowed = courseAllowList(me)
+  const courses = allowed ? COURSES.filter((c) => allowed.includes(c.slug)) : COURSES
+  const enrollments = allowed ? allEnrollments.filter((e) => allowed.includes(e.course_slug)) : allEnrollments
   // One course, no decision to make — go straight to it. ?all=1 shows the list.
   if (enrollments.length === 1 && !all) redirect(`/app/program/${enrollments[0].course_slug}`)
   const bySlug = new Map(enrollments.map((e) => [e.course_slug, e]))
@@ -21,7 +26,7 @@ export default async function ProgramIndexPage({ searchParams }: { searchParams:
       </div>
 
       <div className="flex flex-col gap-3">
-        {COURSES.map((c) => {
+        {courses.map((c) => {
           const enrolled = bySlug.get(c.slug)
           return (
             <Link

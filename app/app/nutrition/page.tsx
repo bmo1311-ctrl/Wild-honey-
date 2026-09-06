@@ -1,7 +1,9 @@
 import { RecipeSources } from '@/components/recipe-sources'
 import { RecipeImport } from '@/components/recipe-import'
 import { RecommendedRecipesRow } from '@/components/recommended-recipes-row'
-import { NutritionSummary } from '@/components/nutrition-summary'
+import { TodayNutrition } from '@/components/today-nutrition'
+import { ownerTargets } from '@/lib/targets'
+import { ageFromBirthYear, driFor } from '@/lib/dri'
 import { NutritionTabs } from '@/components/nutrition-tabs'
 import { GroceryBuilder } from '@/components/grocery-builder'
 import { PantryList } from '@/components/pantry-list'
@@ -37,6 +39,8 @@ export default async function NutritionPage() {
     getSessionProfile(),
   ])
   const unlocked = hasPaidAccess(profile?.membership_tier)
+  const own = ownerTargets(profile, cyclePhase)
+  const panelTargets = { ...(driFor(ageFromBirthYear(own.birthYear), 'female') ?? {}), ...own.cycled.targets }
 
   return (
     <div className="flex flex-col gap-5">
@@ -45,13 +49,12 @@ export default async function NutritionPage() {
         <p className="mt-1 text-sm text-muted-foreground text-pretty">what you eat, what you&rsquo;re buying, what&rsquo;s in the cupboard.</p>
       </div>
 
-      <NutritionSummary
-        calories={nutrition.calories}
-        protein={nutrition.protein}
-        carbs={nutrition.carbs}
-        fat={nutrition.fat}
-        calorieGoal={nutrition.calorieGoal}
-        proteinGoal={nutrition.proteinGoal}
+      <TodayNutrition
+        totals={{ calories: nutrition.calories, protein_g: nutrition.protein, carbs_g: nutrition.carbs, fat_g: nutrition.fat }}
+        nutrients={nutrition.nutrients}
+        targets={own.cycled.targets}
+        panelTargets={panelTargets}
+        hasGoals={own.hasGoals}
         loggedMeals={nutrition.loggedMeals}
       />
 

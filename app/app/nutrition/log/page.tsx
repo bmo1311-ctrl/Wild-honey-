@@ -2,11 +2,11 @@ import Link from 'next/link'
 import { ChevronLeft, Settings2 } from 'lucide-react'
 import { FoodLogScreen } from '@/components/food-log-screen'
 import { getCurrentCyclePhase, getFoodItems, getHouseholdMembers, getOwnerScope, getSavedMeals, getSessionProfile, getTodayNutrition, getUsualFoods } from '@/lib/data'
-import { applyCycle, phaseFromDates, phaseLabel, type CyclePhaseKey } from '@/lib/cycle'
+import { phaseLabel } from '@/lib/cycle'
+import { ownerTargets } from '@/lib/targets'
 import { NutrientRings } from '@/components/nutrient-rings'
 import { NutrientPanel } from '@/components/nutrient-panel'
 import { ageFromBirthYear, driFor, type Sex } from '@/lib/dri'
-import { calculateTargets, effectiveTargets, type ActivityLevel, type BodyGoal } from '@/lib/goals'
 
 /**
  * One job: log what she ate. No recipes, no browsing — she tapped "log what
@@ -28,43 +28,14 @@ export default async function LogFoodPage({ searchParams }: { searchParams: Prom
     getSavedMeals(memberId),
   ])
 
-  const p = profile as (typeof profile & {
-    weight_kg?: number | null
-    height_cm?: number | null
-    birth_year?: number | null
-    activity_level?: string | null
-    body_goal?: string | null
-    last_period_start?: string | null
-    cycle_length_days?: number | null
-    cycle_adjustments?: Record<string, number> | null
-  }) | null
-
-  const calculated = calculateTargets({
-    weightKg: p?.weight_kg ?? null,
-    heightCm: p?.height_cm ?? null,
-    birthYear: p?.birth_year ?? null,
-    activity: (p?.activity_level as ActivityLevel) ?? null,
-    goal: (p?.body_goal as BodyGoal) ?? null,
-  })
-  const targets = effectiveTargets(calculated, {
-    ...(profile?.daily_calorie_goal ? { calories: profile.daily_calorie_goal } : {}),
-    ...(profile?.daily_protein_goal_g ? { protein_g: profile.daily_protein_goal_g } : {}),
-  })
-  const hasGoals = Boolean(p?.weight_kg)
-
-  // A phase she logged on a check-in wins; otherwise work it out from her dates.
-  const phase =
-    loggedPhase && loggedPhase !== 'not_tracked'
-      ? (loggedPhase as CyclePhaseKey)
-      : phaseFromDates(p?.last_period_start ?? null, p?.cycle_length_days ?? 28)
-  const cycled = applyCycle(targets, phase, (p?.cycle_adjustments ?? {}) as Record<string, number>)
+  const { cycled, phase, hasGoals, birthYear } = ownerTargets(profile, loggedPhase)
 
   // Whoever is selected gets their own reference intakes. For her, the
   // calculated macro targets override the generic adult figures.
   const selected = members.find((m) => (memberId ? m.id === memberId : m.is_self))
   const selectedAge = memberId
     ? ageFromBirthYear(selected?.birth_year ?? null)
-    : ageFromBirthYear(p?.birth_year ?? null)
+    : ageFromBirthYear(birthYear)
   const selectedSex: Sex | null = memberId ? ((selected as { sex?: Sex | null })?.sex ?? null) : 'female'
   const reference = driFor(selectedAge, selectedSex) ?? {}
   const panelTargets = memberId ? reference : { ...reference, ...cycled.targets }
