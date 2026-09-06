@@ -4,6 +4,7 @@ import { ProtocolNav } from '@/components/protocol-nav'
 import { ProtocolChooser } from '@/components/protocol-chooser'
 import { RoutineShelf } from '@/components/routine-shelf'
 import { TonightCard } from '@/components/tonight-card'
+import { WeekStrip } from '@/components/week-strip'
 import {
   getActiveEnrollment,
   getEnrollmentCompletions,
@@ -15,7 +16,7 @@ import {
 import { PROTOCOLS, getProtocol, suggestProtocol } from '@/lib/protocols'
 import { AREAS, getArea, type ProtocolArea } from '@/lib/domains'
 import type { ShelfItem } from '@/lib/routine'
-import { planTonight } from '@/lib/tonight'
+import { planTonight, planWeek } from '@/lib/tonight'
 import { localToday } from '@/lib/today'
 import { FeatureOff } from '@/components/feature-off'
 import { FEATURES } from '@/lib/features'
@@ -119,6 +120,7 @@ function BeautyArea({
     }))
 
   const tonight = shelf.length > 0 ? planTonight({ shelf, log, today, allergies: profile?.allergies }) : null
+  const week = shelf.length > 0 ? planWeek({ shelf, log, today, allergies: profile?.allergies }) : []
   const doneTonight = log.some(
     (l) =>
       l.date === today &&
@@ -130,6 +132,7 @@ function BeautyArea({
   return (
     <div className="flex flex-col gap-5">
       {tonight && <TonightCard plan={tonight} doneToday={doneTonight} />}
+      {week.length > 0 && <WeekStrip nights={week} />}
 
       <RoutineShelf
         shelf={shelf}

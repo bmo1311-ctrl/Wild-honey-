@@ -12,7 +12,7 @@
  */
 
 import { getActive } from '@/lib/actives'
-import { ritualFor, type Ritual } from '@/lib/rituals'
+import { getRitual, ritualFor, type Ritual } from '@/lib/rituals'
 import type { ShelfItem } from '@/lib/routine'
 
 /**
@@ -156,4 +156,97 @@ export function planTonight(input: {
     reason,
     waiting,
   }
+}
+
+export interface PlannedNight {
+  date: string
+  /** Mon, Tue… */
+  weekday: string
+  kind: 'treatment' | 'nourish'
+  /** What it is, short enough for a calendar cell. */
+  label: string
+  isToday: boolean
+  isPast: boolean
+  done: boolean
+}
+
+/**
+ * The week ahead, laid out.
+ *
+ * Tonight answers "what now". This answers "when is my acid night" without
+ * her having to hold it in her head — which is the actual job a calendar
+ * does. It runs the same decision forward, assuming she follows it, so the
+ * week she sees is the week she gets.
+ *
+ * Past days show what actually happened; future days show the plan.
+ */
+export function planWeek(input: {
+  shelf: ShelfItem[]
+  log: LogEntry[]
+  today: string
+  allergies?: string | null
+  /** How many days back to show. The rest of the seven runs forward. */
+  lookBack?: number
+}): PlannedNight[] {
+  const { shelf, log, today, allergies, lookBack = 2 } = input
+  const out: PlannedNight[] = []
+
+  // Everything already recorded stays fixed; the future is simulated on top.
+  const projected: LogEntry[] = log.slice()
+  const start = new Date(today)
+  start.setDate(start.getDate() - lookBack)
+
+  for (let i = 0; i < 7; i += 1) {
+    const d = new Date(start)
+    d.setDate(d.getDate() + i)
+    const date = d.toISOString().slice(0, 10)
+    const isPast = date < today
+    const isToday = date === today
+
+    const doneThat = log.filter((e) => e.date === date)
+
+    if (isPast) {
+      // What actually happened, not what was planned.
+      const productDone = doneThat.find((e) => e.memberProductId)
+      const ritualDone = doneThat.find((e) => e.ritualSlug)
+      const item = productDone ? shelf.find((s) => s.id === productDone.memberProductId) : null
+      out.push({
+        date,
+        weekday: d.toLocaleDateString('en-US', { weekday: 'short' }),
+        kind: productDone ? 'treatment' : 'nourish',
+        label: item?.name ?? (ritualDone ? getRitualLabel(ritualDone.ritualSlug) : '—'),
+        isToday: false,
+        isPast: true,
+        done: doneThat.length > 0,
+      })
+      continue
+    }
+
+    const plan = planTonight({ shelf, log: projected, today: date, allergies })
+    const label = plan.kind === 'treatment' ? plan.treatment!.name : (plan.ritual?.title ?? 'rest')
+
+    out.push({
+      date,
+      weekday: d.toLocaleDateString('en-US', { weekday: 'short' }),
+      kind: plan.kind,
+      label,
+      isToday,
+      isPast: false,
+      done: isToday && doneThat.length > 0,
+    })
+
+    // Assume she follows it, so tomorrow is planned against today's choice.
+    if (plan.kind === 'treatment') {
+      projected.push({ memberProductId: plan.treatment!.id, ritualSlug: null, date })
+    } else if (plan.ritual) {
+      projected.push({ memberProductId: null, ritualSlug: plan.ritual.slug, date })
+    }
+  }
+
+  return out
+}
+
+function getRitualLabel(slug: string | null): string {
+  if (!slug) return 'rest'
+  return getRitual(slug)?.title ?? slug.replace(/-/g, ' ')
 }
