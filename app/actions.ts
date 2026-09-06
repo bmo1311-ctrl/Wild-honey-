@@ -2836,3 +2836,44 @@ export async function setDayPillar(slug: string, dayNumber: number, pillar: stri
   revalidatePath('/admin/course')
   return { ok: true }
 }
+
+/** Edit one of her own foods. Caffeine and water are the ones she is most likely to be missing. */
+export async function updateFoodItem(input: {
+  id: string
+  caffeineMg?: number | null
+  waterMl?: number | null
+  calories?: number | null
+  protein?: number | null
+  carbs?: number | null
+  fat?: number | null
+}) {
+  const { supabase, user } = await requireUser()
+  const { data: f } = await supabase.from('food_items').select('*').eq('id', input.id).eq('user_id', user.id).maybeSingle()
+  if (!f) return { error: 'You can only edit foods you added.' }
+  const nutrients: Record<string, number> = { ...((f.nutrients ?? {}) as Record<string, number>) }
+  const patch: Record<string, unknown> = {}
+  const setN = (k: string, v: number | null | undefined) => {
+    if (v === undefined) return
+    if (v === null) delete nutrients[k]
+    else nutrients[k] = round1(v)
+  }
+  setN('caffeine_mg', input.caffeineMg)
+  setN('water_ml', input.waterMl)
+  if (input.calories != null) { patch.calories = round1(input.calories); nutrients.calories = round1(input.calories) }
+  if (input.protein != null) { patch.protein_g = round1(input.protein); nutrients.protein_g = round1(input.protein) }
+  if (input.carbs != null) { patch.carbs_g = round1(input.carbs); nutrients.carbs_g = round1(input.carbs) }
+  if (input.fat != null) { patch.fat_g = round1(input.fat); nutrients.fat_g = round1(input.fat) }
+  patch.nutrients = nutrients
+  const { error } = await supabase.from('food_items').update(patch).eq('id', input.id).eq('user_id', user.id)
+  if (error) return { error: error.message }
+
+  // today's rows of this food pick up the change, scaled to what she logged
+  const today = await localToday()
+  const { data: rows } = await supabase.from('meal_logs').select('id, quantity').eq('food_item_id', input.id).eq('date', today)
+  for (const r of rows ?? []) {
+    const factor = Number(r.quantity ?? f.serving_size) / (Number(f.serving_size) || 1)
+    await supabase.from('meal_logs').update({ nutrients: scaleNutrients(nutrients as NutrientMap, factor) }).eq('id', r.id)
+  }
+  revalidatePath('/app/nutrition/log')
+  return { ok: true }
+}

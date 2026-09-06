@@ -3,7 +3,7 @@
 import { useMemo, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { Check, Plus, Search, Trash2, X } from 'lucide-react'
-import { deleteMealGroup, deleteMealLog, deleteSavedMeal, logFoods, saveFoodItem, saveMeal } from '@/app/actions'
+import { deleteMealGroup, deleteMealLog, deleteSavedMeal, logFoods, saveFoodItem, saveMeal, updateFoodItem } from '@/app/actions'
 import type { SavedMeal } from '@/lib/data'
 import type { FoodItem } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -50,6 +50,8 @@ export function FoodLogger({
 }) {
   const [multi, setMulti] = useState<Record<string, number>>({})
   const [building, setBuilding] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [ed, setEd] = useState({ caffeine: '', water: '' })
   const [mealName, setMealName] = useState('')
   const [q, setQ] = useState('')
   const [picked, setPicked] = useState<FoodItem | null>(null)
@@ -391,6 +393,27 @@ export function FoodLogger({
                   </div>
                 ))}
               </div>
+              {picked.user_id && (
+                <div className="mt-3">
+                  {!editing ? (
+                    <button type="button" onClick={() => { setEditing(true); const n = (picked.nutrients ?? {}) as Record<string, number>; setEd({ caffeine: n.caffeine_mg != null ? String(n.caffeine_mg) : '', water: n.water_ml != null ? String(n.water_ml) : '' }) }} className="text-sm font-medium text-muted-foreground underline underline-offset-[3px]">
+                      edit this food — caffeine, water
+                    </button>
+                  ) : (
+                    <div className="rounded-xl border border-border p-3">
+                      <p className="mb-2 text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">per {picked.serving_size}{picked.serving_unit}</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <input value={ed.caffeine} onChange={(e) => setEd({ ...ed, caffeine: e.target.value })} inputMode="decimal" placeholder="caffeine mg" className={field} />
+                        <input value={ed.water} onChange={(e) => setEd({ ...ed, water: e.target.value })} inputMode="decimal" placeholder="water ml" className={field} />
+                      </div>
+                      <div className="mt-2 flex gap-2">
+                        <button type="button" disabled={pending} onClick={() => startTransition(async () => { const res = await updateFoodItem({ id: picked.id, caffeineMg: ed.caffeine.trim() === '' ? null : Number(ed.caffeine), waterMl: ed.water.trim() === '' ? null : Number(ed.water) }); if ('error' in res && res.error) { toast.error(res.error); return } toast.success('Updated — today\'s logs of it too'); setEditing(false); setPicked({ ...picked, nutrients: { ...((picked.nutrients ?? {}) as Record<string, number>), ...(ed.caffeine.trim() ? { caffeine_mg: Number(ed.caffeine) } : {}), ...(ed.water.trim() ? { water_ml: Number(ed.water) } : {}) } }) })} className="h-10 flex-1 rounded-xl bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50">Save</button>
+                        <button type="button" onClick={() => setEditing(false)} className="h-10 rounded-xl bg-muted px-3 text-sm">Cancel</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
               <button
                 type="button"
                 onClick={submitPicked}

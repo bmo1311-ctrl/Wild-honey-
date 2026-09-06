@@ -573,6 +573,8 @@ export interface FoodItem {
   protein_g: number
   carbs_g: number
   fat_g: number
+  nutrients?: Record<string, number> | null
+  category?: string | null
   created_at: string
 }
 
