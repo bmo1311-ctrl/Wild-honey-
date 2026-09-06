@@ -53,7 +53,7 @@ export default function SignUpPage() {
         <div className="mb-8 text-center">
           <h1 className="font-serif text-3xl font-semibold text-balance">Join the circle</h1>
           <p className="mt-2 text-sm text-muted-foreground text-pretty">
-            Begin your daily practice with women becoming rooted.
+            Start with the body. The rest of the life is in here.
           </p>
         </div>
         <form onSubmit={handleSignUp} className="flex flex-col gap-4">

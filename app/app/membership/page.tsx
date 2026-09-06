@@ -46,7 +46,7 @@ export default async function MembershipPage({ searchParams }: { searchParams: P
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="font-serif text-3xl font-semibold text-balance">Membership</h1>
-        <p className="mt-1 text-sm text-muted-foreground">start with the body. the rest of the life is in here.</p>
+        <p className="mt-1 text-sm text-muted-foreground">one membership. everything opens. no tier above this one.</p>
       </div>
 
       {fromTitle && (

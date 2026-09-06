@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: 'Wild Honey Circle',
     short_name: 'Wild Honey',
     description:
-      'A daily journaling practice and private community for women becoming rooted in Body, Identity, Mindset, and Faith.',
+      'Start with the body — the rest of the life is in here. Programs, teaching, food, movement, money and a circle of women, for Body, Identity, Mindset and Faith.',
     start_url: '/app',
     display: 'standalone',
     background_color: '#faf6ec',
