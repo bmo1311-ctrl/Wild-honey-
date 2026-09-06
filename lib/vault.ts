@@ -1,6 +1,7 @@
 import { COURSE } from '@/lib/courses'
 import { youTubeId, youTubeThumb } from '@/lib/youtube'
-import type { Pillar, Recipe, Resource, Workout } from '@/lib/types'
+import { COLLECTIONS, COLLECTION_LABEL } from '@/lib/types'
+import type { Collection, Pillar, Recipe, Resource, Workout } from '@/lib/types'
 
 export type VaultKind = 'resource' | 'recipe' | 'workout' | 'day'
 
@@ -10,6 +11,8 @@ export interface VaultItem {
   title: string
   description: string
   pillar: Pillar | null
+  /** Library shelf outside the four pillars (worship, sleep). */
+  collection: Collection | null
   href: string
   /** Set when it can play in the app instead of opening another tab. */
   videoId: string | null
@@ -44,13 +47,14 @@ export function buildVaultIndex({
       title: r.title,
       description: clean(r.description),
       pillar: r.pillar,
+      collection: r.collection ?? null,
       href: r.url ?? '/app/vault',
       videoId: vid,
       image: r.image_url ?? (vid ? youTubeThumb(vid) : null),
       meta: r.pillar ?? r.resource_type,
       saved: Boolean(r.saved),
       createdAt: r.created_at,
-      search: `${r.title} ${clean(r.description)} ${r.resource_type} ${r.pillar ?? ''}`.toLowerCase(),
+      search: `${r.title} ${clean(r.description)} ${r.resource_type} ${r.pillar ?? ''} ${r.collection ?? ''}`.toLowerCase(),
     })
   }
 
@@ -62,6 +66,7 @@ export function buildVaultIndex({
       title: r.title,
       description: clean(r.description),
       pillar: r.pillar,
+      collection: null,
       href: `/app/recipes#r-${r.id}`,
       videoId: vid,
       image: r.image_url ?? (vid ? youTubeThumb(vid) : null),
@@ -80,6 +85,7 @@ export function buildVaultIndex({
       title: w.title,
       description: clean(w.description),
       pillar: w.pillar,
+      collection: null,
       href: `/app/workouts#w-${w.id}`,
       videoId: vid,
       image: w.image_url ?? (vid ? youTubeThumb(vid) : null),
@@ -98,6 +104,7 @@ export function buildVaultIndex({
       title: `Day ${d.day_number} · ${d.title}`,
       description: clean(text).slice(0, 160),
       pillar: null,
+      collection: null,
       href: `/app/program/day/${d.day_number}`,
       videoId: null,
       image: null,
@@ -128,6 +135,7 @@ export function buildShelves(items: VaultItem[]): { title: string; items: VaultI
     { title: 'Watch', items: videos },
     { title: 'Saved', items: saved },
     ...PILLAR_SHELF.map((p) => ({ title: p.title, items: items.filter((i) => i.pillar === p.pillar).sort(byNewest) })),
+    ...COLLECTIONS.map((c) => ({ title: COLLECTION_LABEL[c], items: items.filter((i) => i.collection === c).sort(byNewest) })),
     { title: 'Cook', items: items.filter((i) => i.kind === 'recipe').sort(byNewest) },
     { title: 'Move', items: items.filter((i) => i.kind === 'workout').sort(byNewest) },
     { title: 'Course days', items: items.filter((i) => i.kind === 'day') },

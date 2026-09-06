@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import type { Pillar, ResourceType } from '@/lib/types'
+import { COLLECTIONS, COLLECTION_LABEL } from '@/lib/types'
+import type { Collection, Pillar, ResourceType } from '@/lib/types'
 
 const PILLARS: Pillar[] = ['Body', 'Identity', 'Mindset', 'Faith']
 const TYPES: ResourceType[] = ['article', 'video', 'pdf', 'audio', 'link']
@@ -26,6 +27,7 @@ export function AddResourceForm() {
   const [imageTouched, setImageTouched] = useState(false)
   const [resourceType, setResourceType] = useState<ResourceType>('article')
   const [pillar, setPillar] = useState<Pillar | ''>('')
+  const [collection, setCollection] = useState<Collection | ''>('')
   const [pending, startTransition] = useTransition()
 
   function handleUrlChange(next: string) {
@@ -47,7 +49,7 @@ export function AddResourceForm() {
       return
     }
     startTransition(async () => {
-      const res = await adminAddResource({ title, description, url, imageUrl, resourceType, pillar: pillar || undefined })
+      const res = await adminAddResource({ title, description, url, imageUrl, resourceType, pillar: pillar || undefined, collection: collection || undefined })
       if (res?.error) {
         toast.error(res.error)
         return
@@ -84,6 +86,17 @@ export function AddResourceForm() {
             {TYPES.map((t) => (
               <option key={t} value={t}>
                 {t}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label>shelf (optional)</Label>
+          <select value={collection} onChange={(e) => setCollection(e.target.value as Collection | '')} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
+            <option value="">none</option>
+            {COLLECTIONS.map((c) => (
+              <option key={c} value={c}>
+                {COLLECTION_LABEL[c]}
               </option>
             ))}
           </select>

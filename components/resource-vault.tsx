@@ -76,3 +76,17 @@ export function ResourceVault({ resources }: { resources: Resource[] }) {
     />
   )
 }
+
+/** Flat grid for shelves that have no pillar of their own — short cooking videos. */
+export function ResourceShelf({ resources, empty }: { resources: Resource[]; empty?: string }) {
+  if (resources.length === 0) {
+    return <p className="text-sm text-muted-foreground">{empty ?? 'nothing here yet.'}</p>
+  }
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {resources.map((r) => (
+        <ResourceCard key={r.id} resource={r} />
+      ))}
+    </div>
+  )
+}

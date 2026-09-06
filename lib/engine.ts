@@ -1,3 +1,4 @@
+import { COLLECTIONS, COLLECTION_LABEL } from '@/lib/types'
 import type { VaultItem } from '@/lib/vault'
 
 /**
@@ -78,6 +79,8 @@ export function buildEngineShelves(items: VaultItem[], ctx: EngineContext): { ti
     { title: 'Continue watching', items: continueWatching },
     { title: 'For you', items: forYou },
     ...order.map((p) => ({ title: p, items: scored.filter((i) => i.pillar === p) })),
+    // Shelves that sit outside the four pillars — worship and sleep scripture.
+    ...COLLECTIONS.map((c) => ({ title: COLLECTION_LABEL[c], items: scored.filter((i) => i.collection === c) })),
     { title: 'Newest', items: newest },
   ]
   return shelves.filter((s) => s.items.length > 0)

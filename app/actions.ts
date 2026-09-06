@@ -746,7 +746,7 @@ export async function toggleSavedResource(resourceId: string) {
   return { ok: true, saved: true }
 }
 
-export async function adminAddResource(input: { title: string; description?: string; url?: string; imageUrl?: string; resourceType: string; pillar?: string }) {
+export async function adminAddResource(input: { title: string; description?: string; url?: string; imageUrl?: string; resourceType: string; pillar?: string; collection?: string }) {
   const { supabase } = await requireAdmin()
   const title = input.title.trim()
   if (!title) return { error: 'Give the resource a title first.' }
@@ -757,6 +757,7 @@ export async function adminAddResource(input: { title: string; description?: str
     image_url: input.imageUrl?.trim() || null,
     resource_type: input.resourceType || 'article',
     pillar: input.pillar || null,
+    collection: input.collection || null,
   })
   if (error) return { error: error.message }
   revalidatePath('/app/vault')
@@ -766,7 +767,7 @@ export async function adminAddResource(input: { title: string; description?: str
 
 export async function adminUpdateResource(
   resourceId: string,
-  input: { title: string; description?: string; url?: string; imageUrl?: string; resourceType: string; pillar?: string },
+  input: { title: string; description?: string; url?: string; imageUrl?: string; resourceType: string; pillar?: string; collection?: string },
 ) {
   const { supabase } = await requireAdmin()
   const title = input.title.trim()
@@ -780,6 +781,7 @@ export async function adminUpdateResource(
       image_url: input.imageUrl?.trim() || null,
       resource_type: input.resourceType || 'article',
       pillar: input.pillar || null,
+      collection: input.collection || null,
     })
     .eq('id', resourceId)
   if (error) return { error: error.message }
@@ -2071,7 +2073,30 @@ export async function saveCourseWriting(input: {
     { onConflict: 'user_id,course_slug,day_number,prompt_index' },
   )
   if (error) return { error: error.message }
+
+  // Writing the day's entry IS doing the day. Marking it complete used to be a
+  // separate tap, so a day of real work could still read as zero. Anything with
+  // actual words in it now counts, without taking away the manual tick.
+  const slug = input.slug ?? COURSE_SLUG
+  if (input.body.trim().length > 0) {
+    const { data: existing } = await supabase
+      .from('course_day_progress')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('course_slug', slug)
+      .eq('day_number', input.dayNumber)
+      .maybeSingle()
+    if (!existing) {
+      await supabase.from('course_day_progress').upsert(
+        { user_id: user.id, course_slug: slug, day_number: input.dayNumber, completed_at: new Date().toISOString() },
+        { onConflict: 'user_id,course_slug,day_number' },
+      )
+      await bumpStreak(user.id)
+    }
+  }
+
   revalidatePath('/app/write')
+  revalidateCourse(input.dayNumber, slug)
   return { ok: true, savedAt: new Date().toISOString() }
 }
 

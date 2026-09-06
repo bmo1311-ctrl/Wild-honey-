@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { stripeConfigured, getStripe } from '@/lib/stripe'
+import { squareConfigured, createPaymentLink, planVariationFor } from '@/lib/square'
 
-const MEMBERSHIP_PRICE_ENV: Record<string, string | undefined> = {
-  circle: process.env.STRIPE_PRICE_CIRCLE,
-  'inner-circle': process.env.STRIPE_PRICE_INNER_CIRCLE,
-}
-
+/**
+ * One route for every kind of payment, all of them Square-hosted links.
+ *
+ * The buyer leaves for Square's own checkout page, pays there, and comes back.
+ * Card details never touch this app, which is both safer and far less to build.
+ */
 export async function POST(req: Request) {
-  if (!stripeConfigured()) {
+  if (!squareConfigured()) {
     return NextResponse.json({ notConfigured: true }, { status: 200 })
   }
 
@@ -21,93 +22,75 @@ export async function POST(req: Request) {
   }
 
   const body = await req.json()
-  const { kind, productId, retreatId, tier } = body as {
-    kind: 'product' | 'retreat' | 'membership'
+  const { kind, productId, retreatId, billing } = body as {
+    kind: 'product' | 'retreat' | 'membership' | 'call'
     productId?: string
     retreatId?: string
-    tier?: string
+    billing?: 'monthly' | 'annual'
   }
 
-  const stripe = getStripe()
   const origin = req.headers.get('origin') ?? process.env.NEXT_PUBLIC_SITE_URL ?? ''
 
   try {
+    if (kind === 'membership') {
+      const cycle = billing === 'annual' ? 'annual' : 'monthly'
+      const planVariationId = planVariationFor(cycle)
+      if (!planVariationId) {
+        return NextResponse.json(
+          { error: 'Membership pricing is not set up yet. Add SQUARE_PLAN_MONTHLY / SQUARE_PLAN_ANNUAL.' },
+          { status: 400 },
+        )
+      }
+      const link = await createPaymentLink({
+        name: cycle === 'annual' ? 'Wild Honey Circle — yearly' : 'Wild Honey Circle — monthly',
+        amountCents: Number(cycle === 'annual' ? process.env.SQUARE_PRICE_ANNUAL : process.env.SQUARE_PRICE_MONTHLY) || (cycle === 'annual' ? 29000 : 2900),
+        planVariationId,
+        buyerEmail: user.email ?? undefined,
+        redirectUrl: `${origin}/app/profile?upgraded=1`,
+        note: `membership:${cycle}:${user.id}`,
+        idempotencyKey: `member-${user.id}-${cycle}-${Date.now()}`,
+      })
+      return NextResponse.json({ url: link.url })
+    }
+
+    if (kind === 'call') {
+      const link = await createPaymentLink({
+        name: '1:1 call with Brooke — 90 minutes',
+        amountCents: Number(process.env.SQUARE_PRICE_CALL) || 19800,
+        buyerEmail: user.email ?? undefined,
+        redirectUrl: `${origin}/app/profile?call=booked`,
+        note: `call:${user.id}`,
+        idempotencyKey: `call-${user.id}-${Date.now()}`,
+      })
+      return NextResponse.json({ url: link.url })
+    }
+
     if (kind === 'product') {
       const { data: product } = await supabase.from('products').select('*').eq('id', productId).single()
       if (!product) return NextResponse.json({ error: 'Product not found.' }, { status: 404 })
-
-      const session = await stripe.checkout.sessions.create({
-        mode: 'payment',
-        customer_email: user.email ?? undefined,
-        line_items: product.stripe_price_id
-          ? [{ price: product.stripe_price_id, quantity: 1 }]
-          : [
-              {
-                price_data: {
-                  currency: 'usd',
-                  product_data: { name: product.title },
-                  unit_amount: product.price_cents,
-                },
-                quantity: 1,
-              },
-            ],
-        success_url: `${origin}/app/shop?purchased=1`,
-        cancel_url: `${origin}/app/shop`,
-        metadata: { kind: 'product', productId: product.id, userId: user.id },
+      const link = await createPaymentLink({
+        name: product.title,
+        amountCents: product.price_cents,
+        buyerEmail: user.email ?? undefined,
+        redirectUrl: `${origin}/app/shop?purchased=1`,
+        note: `product:${product.id}:${user.id}`,
+        idempotencyKey: `product-${user.id}-${product.id}-${Date.now()}`,
       })
-      return NextResponse.json({ url: session.url })
+      return NextResponse.json({ url: link.url })
     }
 
     if (kind === 'retreat') {
       const { data: retreat } = await supabase.from('retreats').select('*').eq('id', retreatId).single()
       if (!retreat) return NextResponse.json({ error: 'Retreat not found.' }, { status: 404 })
-
-      const session = await stripe.checkout.sessions.create({
-        mode: 'payment',
-        customer_email: user.email ?? undefined,
-        line_items: [
-          {
-            price_data: {
-              currency: 'usd',
-              product_data: { name: retreat.title },
-              unit_amount: retreat.price_cents,
-            },
-            quantity: 1,
-          },
-        ],
-        success_url: `${origin}/app/retreats?joined=1`,
-        cancel_url: `${origin}/app/retreats`,
-        metadata: { kind: 'retreat', retreatId: retreat.id, userId: user.id },
+      const link = await createPaymentLink({
+        name: retreat.title,
+        amountCents: retreat.price_cents,
+        buyerEmail: user.email ?? undefined,
+        redirectUrl: `${origin}/app/retreats?joined=1`,
+        note: `retreat:${retreat.id}:${user.id}`,
+        idempotencyKey: `retreat-${user.id}-${retreat.id}-${Date.now()}`,
       })
-      return NextResponse.json({ url: session.url })
-    }
-
-    if (kind === 'membership') {
-      const priceId = tier ? MEMBERSHIP_PRICE_ENV[tier] : undefined
-      if (!tier || !priceId) {
-        return NextResponse.json(
-          { error: 'Membership pricing isn\u2019t set up yet. Add STRIPE_PRICE_CIRCLE / STRIPE_PRICE_INNER_CIRCLE env vars.' },
-          { status: 400 },
-        )
-      }
-      const trialDays = Number(process.env.STRIPE_TRIAL_DAYS ?? 0)
-      const session = await stripe.checkout.sessions.create({
-        mode: 'subscription',
-        customer_email: user.email ?? undefined,
-        client_reference_id: user.id,
-        allow_promotion_codes: true,
-        line_items: [{ price: priceId, quantity: 1 }],
-        // Carried on the subscription too, so renewals and cancellations can
-        // find her even if the checkout row was never written.
-        subscription_data: {
-          metadata: { userId: user.id, tier },
-          ...(trialDays > 0 ? { trial_period_days: trialDays } : {}),
-        },
-        success_url: `${origin}/app/profile?upgraded=1`,
-        cancel_url: `${origin}/app/membership`,
-        metadata: { kind: 'membership', tier, userId: user.id },
-      })
-      return NextResponse.json({ url: session.url })
+      return NextResponse.json({ url: link.url })
     }
 
     return NextResponse.json({ error: 'Unknown checkout kind.' }, { status: 400 })

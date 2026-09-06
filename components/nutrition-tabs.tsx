@@ -9,6 +9,7 @@ const TABS = [
   { id: 'plans', label: 'Meal plans' },
   { id: 'grocery', label: 'Grocery' },
   { id: 'pantry', label: 'Pantry' },
+  { id: 'cook', label: 'Cook' },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']
@@ -20,15 +21,17 @@ export function NutritionTabs({
   plans,
   grocery,
   pantry,
+  cook,
 }: {
   counts: Partial<Record<TabId, number>>
   recipes: React.ReactNode
   plans: React.ReactNode
   grocery: React.ReactNode
   pantry: React.ReactNode
+  cook: React.ReactNode
 }) {
   const [active, setActive] = useState<TabId>('recipes')
-  const panes: Record<TabId, React.ReactNode> = { recipes, plans, grocery, pantry }
+  const panes: Record<TabId, React.ReactNode> = { recipes, plans, grocery, pantry, cook }
 
   return (
     <div className="flex flex-col gap-4">

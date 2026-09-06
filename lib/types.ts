@@ -495,6 +495,24 @@ export interface GroceryBuilderItem {
 
 export type ResourceType = 'article' | 'video' | 'pdf' | 'audio' | 'link'
 
+/**
+ * A library shelf that sits alongside the four pillars rather than inside them.
+ * Worship songs and sleep scripture are ways to sort videos, not pillars —
+ * pillars drive prompts, recipes and workouts too, so they stay the four.
+ */
+export type Collection = 'worship' | 'sleep' | 'nourish'
+
+export const COLLECTIONS: Collection[] = ['worship', 'sleep', 'nourish']
+
+export const COLLECTION_LABEL: Record<Collection, string> = {
+  worship: 'Worship',
+  sleep: 'Sleep & scripture',
+  nourish: 'Cook',
+}
+
+/** Shelves that belong to another area of the app, so Watch stays teaching-only. */
+export const WATCH_EXCLUDED_COLLECTIONS: Collection[] = ['nourish']
+
 export interface Resource {
   id: string
   title: string
@@ -503,6 +521,7 @@ export interface Resource {
   image_url: string | null
   resource_type: ResourceType
   pillar: Pillar | null
+  collection: Collection | null
   created_at: string
   saved?: boolean
 }

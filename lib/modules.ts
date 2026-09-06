@@ -108,7 +108,7 @@ export const MODULES: AppModule[] = [
   },
   {
     key: 'nutrition',
-    title: 'Nutrition',
+    title: 'Nourish',
     href: '/app/nutrition',
     icon: ChefHat,
     blurb: 'recipes, meal plans, grocery and pantry',

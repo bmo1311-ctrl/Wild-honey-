@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import type { Pillar, Resource, ResourceType } from '@/lib/types'
+import { COLLECTIONS, COLLECTION_LABEL } from '@/lib/types'
+import type { Collection, Pillar, Resource, ResourceType } from '@/lib/types'
 
 const PILLARS: Pillar[] = ['Body', 'Identity', 'Mindset', 'Faith']
 const TYPES: ResourceType[] = ['article', 'video', 'pdf', 'audio', 'link']
@@ -22,6 +23,7 @@ export function ResourceRow({ resource }: { resource: Resource }) {
   const [imageUrl, setImageUrl] = useState(resource.image_url ?? '')
   const [resourceType, setResourceType] = useState<ResourceType>(resource.resource_type)
   const [pillar, setPillar] = useState<Pillar | ''>(resource.pillar ?? '')
+  const [collection, setCollection] = useState<Collection | ''>(resource.collection ?? '')
   const [pending, startTransition] = useTransition()
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -32,7 +34,7 @@ export function ResourceRow({ resource }: { resource: Resource }) {
       return
     }
     startTransition(async () => {
-      const res = await adminUpdateResource(resource.id, { title, description, url, imageUrl, resourceType, pillar: pillar || undefined })
+      const res = await adminUpdateResource(resource.id, { title, description, url, imageUrl, resourceType, pillar: pillar || undefined, collection: collection || undefined })
       if (res?.error) {
         toast.error(res.error)
         return
@@ -65,7 +67,7 @@ export function ResourceRow({ resource }: { resource: Resource }) {
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium">{resource.title}</p>
           <p className="text-xs text-muted-foreground">
-            {resource.resource_type} {resource.pillar ? `· ${resource.pillar}` : ''}
+            {resource.resource_type} {resource.pillar ? `· ${resource.pillar}` : ''} {resource.collection ? `· ${COLLECTION_LABEL[resource.collection]}` : ''}
           </p>
         </div>
         {confirmingDelete ? (
@@ -117,6 +119,15 @@ export function ResourceRow({ resource }: { resource: Resource }) {
           <select value={resourceType} onChange={(e) => setResourceType(e.target.value as ResourceType)} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
             {TYPES.map((t) => (
               <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label>shelf</Label>
+          <select value={collection} onChange={(e) => setCollection(e.target.value as Collection | '')} className="h-11 rounded-md border border-input bg-background px-3 text-sm">
+            <option value="">none</option>
+            {COLLECTIONS.map((c) => (
+              <option key={c} value={c}>{COLLECTION_LABEL[c]}</option>
             ))}
           </select>
         </div>

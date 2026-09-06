@@ -9,7 +9,7 @@ import { FEATURES } from '@/lib/features'
 export default async function AskExpertPage() {
   if (!FEATURES.expertQA) return <FeatureOff />
   const access = await getAccess()
-  if (!access.inner) return <LockedArea title="Ask" subtitle="a question to the experts, and every public answer." blurb="Put your question to the experts and read everything they have answered. Part of Inner Circle." from="ask" tier="inner-circle" />
+  if (!access.paid) return <LockedArea title="Ask" subtitle="a question to the experts, and every public answer." blurb="Put your question to the experts and read everything they have answered. Part of The Circle." from="ask" />
 
   const [mine, publicQA] = await Promise.all([getMyQuestions(), getPublicAnsweredQuestions()])
   const otherPublic = publicQA.filter((q) => !mine.some((m) => m.id === q.id))

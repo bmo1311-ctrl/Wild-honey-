@@ -1,5 +1,6 @@
 import { VaultBrowser } from '@/components/vault-browser'
 import { buildVaultIndex } from '@/lib/vault'
+import { WATCH_EXCLUDED_COLLECTIONS } from '@/lib/types'
 import { buildEngineShelves } from '@/lib/engine'
 import { getAccess, GOAL_PILLAR, getContentEvents, getMyGoals, getResources } from '@/lib/data'
 import { FeatureOff } from '@/components/feature-off'
@@ -13,7 +14,10 @@ export default async function WatchPage() {
   if (!access.paid) return <LockedArea title="Watch" subtitle="teaching videos on identity, mindset and faith." blurb="The whole library, on shelves that learn what you watch. Part of The Circle." from="watch" />
   const [resources, goals, events] = await Promise.all([getResources(), getMyGoals(), getContentEvents()])
   const goalPillars = [...new Set(goals.map((g) => GOAL_PILLAR[g.goal]).filter(Boolean))]
-  const videos = buildVaultIndex({ resources, recipes: [], workouts: [] }).filter((i) => i.videoId)
+  const videos = buildVaultIndex({ resources, recipes: [], workouts: [] })
+    .filter((i) => i.videoId)
+    // Food videos live in Nourish, not here.
+    .filter((i) => !i.collection || !WATCH_EXCLUDED_COLLECTIONS.includes(i.collection))
   const shelves = buildEngineShelves(videos, { goalPillars, events })
 
   return (

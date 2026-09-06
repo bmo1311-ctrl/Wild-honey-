@@ -7,14 +7,14 @@ import { Button } from '@/components/ui/button'
 export function BuyButton({
   productId,
   retreatId,
-  tier,
+  billing,
   kind,
   label = 'buy now',
 }: {
   productId?: string
   retreatId?: string
-  tier?: string
-  kind: 'product' | 'retreat' | 'membership'
+  billing?: 'monthly' | 'annual'
+  kind: 'product' | 'retreat' | 'membership' | 'call'
   label?: string
 }) {
   const [pending, startTransition] = useTransition()
@@ -25,7 +25,7 @@ export function BuyButton({
         const res = await fetch('/api/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ kind, productId, retreatId, tier }),
+          body: JSON.stringify({ kind, productId, retreatId, billing }),
         })
         const data = await res.json()
         if (data.url) {
@@ -33,7 +33,7 @@ export function BuyButton({
           return
         }
         if (data.notConfigured) {
-          toast.info('Payments aren\u2019t connected yet \u2014 add your Stripe keys to enable checkout.')
+          toast.info('Payments aren\u2019t connected yet \u2014 add your Square keys to enable checkout.')
           return
         }
         toast.error(data.error ?? 'Something went wrong starting checkout.')

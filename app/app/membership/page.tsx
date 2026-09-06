@@ -2,9 +2,9 @@ import Link from 'next/link'
 import { Check } from 'lucide-react'
 import { BuyButton } from '@/components/buy-button'
 import { getAccess, getSessionProfile } from '@/lib/data'
-import { stripeConfigured } from '@/lib/stripe'
+import { squareConfigured } from '@/lib/square'
 import { MODULES } from '@/lib/modules'
-import { TIER_RANK, type Tier } from '@/lib/access'
+
 
 const FREE = [
   'Today, and what today needs',
@@ -14,35 +14,33 @@ const FREE = [
   'Reading the Circle',
 ]
 
-const TIERS: { id: Tier; name: string; price: string; features: string[] }[] = [
-  {
-    id: 'circle',
-    name: 'The Circle',
-    price: '$19/mo',
-    features: [
-      'Both programs — Strong and Surrendered, Daily Bread',
-      'Watch: the whole teaching library',
-      'Recipes, meal plans, grocery and pantry',
-      'Every workout',
-      'Freedom: your money, tracked and taught',
-      'Learning boards and a sign-in for your child',
-      'Post, comment and react in the Circle',
-    ],
-  },
-  {
-    id: 'inner-circle',
-    name: 'Inner Circle',
-    price: '$49/mo',
-    features: ['Everything in The Circle', 'Ask the experts, and read every answer', 'Monthly live Q&A', 'Early retreat access'],
-  },
+/**
+ * One membership. Everything opens.
+ *
+ * Two tiers meant the only thing behind the higher one was Ask the experts,
+ * which made the split feel arbitrary and gave people a reason to hesitate.
+ * One price, one decision.
+ */
+const INCLUDED = [
+  'All three programs — Strong and Surrendered, Daily Bread, The Honest Room',
+  'The whole teaching library, on shelves that learn what you watch',
+  'Nourish: recipes, meal plans, grocery, pantry and cooking videos',
+  'Every workout, and the routines that keep you well',
+  'Freedom: your money, tracked and taught',
+  'Learning boards and a sign-in for your child',
+  'Ask the experts, and read every answer',
+  'Post, comment and react in the Circle',
 ]
+
+const PRICE_MONTHLY = '$29/mo'
+const PRICE_ANNUAL = '$290/yr'
 
 export default async function MembershipPage({ searchParams }: { searchParams: Promise<{ from?: string }> }) {
   const { from } = await searchParams
   const [profile, access] = await Promise.all([getSessionProfile(), getAccess()])
   const fromTitle = from === 'ask' ? 'Ask the experts' : (MODULES.find((m) => m.key === from)?.title ?? null)
   const fromTier = from === 'ask' ? 'Inner Circle' : 'The Circle'
-  const configured = stripeConfigured()
+  const configured = squareConfigured()
 
   return (
     <div className="flex flex-col gap-6">
@@ -76,34 +74,28 @@ export default async function MembershipPage({ searchParams }: { searchParams: P
         </ul>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2">
-        {TIERS.map((tier) => {
-          const current = access.tier === tier.id
-          const included = TIER_RANK[access.tier] > TIER_RANK[tier.id]
-          return (
-            <div key={tier.id} className={`flex flex-col gap-4 rounded-2xl bg-card p-6 ring-1 ${current ? 'ring-2 ring-primary' : 'ring-border'}`}>
-              <div>
-                <h2 className="font-serif text-xl font-semibold">{tier.name}</h2>
-                <p className="mt-1 font-serif text-2xl font-semibold">{tier.price}</p>
-              </div>
-              <ul className="flex flex-1 flex-col gap-2 text-sm text-muted-foreground">
-                {tier.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-mindset-pillar" />
-                    <span className="text-pretty">{f}</span>
-                  </li>
-                ))}
-              </ul>
-              {current ? (
-                <span className="rounded-full bg-secondary px-4 py-2.5 text-center text-sm font-medium text-secondary-foreground">your current plan</span>
-              ) : included ? (
-                <span className="rounded-full bg-secondary px-4 py-2.5 text-center text-sm font-medium text-secondary-foreground">included in your plan</span>
-              ) : (
-                <BuyButton kind="membership" tier={tier.id} label={`join ${tier.name}`} />
-              )}
-            </div>
-          )
-        })}
+      <div className={`flex flex-col gap-5 rounded-2xl bg-card p-6 ring-1 ${access.paid ? 'ring-2 ring-primary' : 'ring-border'}`}>
+        <div>
+          <h2 className="font-serif text-xl font-semibold">The Circle</h2>
+          <p className="mt-1 font-serif text-2xl font-semibold">{PRICE_MONTHLY}</p>
+          <p className="mt-0.5 text-sm text-muted-foreground">or {PRICE_ANNUAL} — two months free</p>
+        </div>
+        <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
+          {INCLUDED.map((f) => (
+            <li key={f} className="flex items-start gap-2">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-mindset-pillar" />
+              <span className="text-pretty">{f}</span>
+            </li>
+          ))}
+        </ul>
+        {access.paid ? (
+          <span className="rounded-full bg-secondary px-4 py-2.5 text-center text-sm font-medium text-secondary-foreground">your current plan</span>
+        ) : (
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <BuyButton kind="membership" billing="monthly" label="join monthly" />
+            <BuyButton kind="membership" billing="annual" label="join yearly" />
+          </div>
+        )}
       </div>
 
       {access.paid && access.tier !== 'founder' && (
@@ -114,7 +106,7 @@ export default async function MembershipPage({ searchParams }: { searchParams: P
 
       {!configured && profile?.is_admin && (
         <p className="text-center text-xs text-muted-foreground text-pretty">
-          Checkout isn&rsquo;t connected yet. Add the Stripe keys in Vercel and the join buttons go live.
+          Checkout isn&rsquo;t connected yet. Add the Square keys in Vercel and the join buttons go live.
         </p>
       )}
     </div>
