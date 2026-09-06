@@ -62,10 +62,10 @@
   --bg: oklch(0.968 0.06 100);            /* Bright Winter lemon — clear, bright, softened; the outer ground */
   --surface: oklch(1 0 0);                /* neutral white — every card and panel sits on this */
   --line: oklch(0.9 0.012 95);
-  --icy-blue: oklch(0.68 0.17 235);
+  --icy-blue: oklch(0.71 0.14 235);
   --icy-blue-deep: oklch(0.45 0.16 250);
   --icy-blue-tint: oklch(0.955 0.04 235);
-  --icy-blue-line: oklch(0.82 0.09 235);
+  --icy-blue-line: oklch(0.84 0.075 235);
   --honey-glow: oklch(0.9 0.12 76);
   --pink: oklch(0.53 0.14 38);
   --baby-pink: oklch(0.83 0.11 352);      /* bright, cool, the one primary action */
