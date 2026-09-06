@@ -1,7 +1,7 @@
 {
  "slug": "daily-bread",
  "title": "Daily Bread",
- "subtitle": "Thirty days. The rung everything else stands on.",
+ "subtitle": "Thirty days with God. Everything else in this program stands on it.",
  "length_days": 30,
  "weeks": 4,
  "week_from_day": false,
@@ -11,66 +11,73 @@
    "week_number": 1,
    "title": "Show Up",
    "verb": "prepare",
-   "principle": "repetition to automaticity",
+   "principle": "practicing the presence of God",
    "opening_line": "This is the easiest week of your life and roughly half of women do not finish it.",
-   "stakes": "Skip it and you spend the next three weeks building on a base that is not there — and you will not find out until day twenty-four, which is the worst possible day to find out.",
-   "pull_quote": "You are not starting a fitness program. You are finding out whether your own word means anything, and you already suspect it doesn't.",
+   "stakes": "Skip it and you spend the next three weeks reciting a practice you never actually built — and you will not find out until day twenty-four, which is the worst possible day to find out.",
+   "pull_quote": "You are not building a devotional habit. You are finding out whether you actually believe anyone is listening, and you already suspect you don't.",
    "blocks": [
     {
      "t": "h",
-     "v": "The four shapes"
+     "v": "The five things"
     },
     {
-     "t": "figure",
-     "pose": "hollow",
-     "label": "Hollow",
-     "cue": "Low back flat to the floor, ribs down, head and feet lifted, held from the middle. Twenty seconds, twice."
-    },
-    {
-     "t": "figure",
-     "pose": "arch",
-     "label": "Arch",
-     "cue": "Chest and thighs lifted, throat open, chin up, the front of you unguarded. Twenty seconds, twice."
-    },
-    {
-     "t": "figure",
-     "pose": "stacked",
-     "label": "Stacked",
-     "cue": "Standing under something. Head over ribs over hips over heels. Nothing shoved sideways. Thirty seconds each hand."
-    },
-    {
-     "t": "figure",
-     "pose": "landing",
-     "label": "Landing",
-     "cue": "Drop off a low step and land. Feet flat, knees soft, chest up, still for one second. Quiet feet. Five reps."
+     "t": "steps",
+     "title": "The five things, in order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Invite the Spirit",
+       "sub": "Out loud, before anything else. Not a mood. An invitation, spoken."
+      },
+      {
+       "n": 2,
+       "head": "Play one worship song",
+       "sub": "From YouTube, out loud in the room, not buried in your earbuds. Let your body respond to it before your mind does."
+      },
+      {
+       "n": 3,
+       "head": "Read the Scripture",
+       "sub": "Slowly, twice. Once for the words, once for what they are actually asking of you."
+      },
+      {
+       "n": 4,
+       "head": "Journal",
+       "sub": "Answer the day's question, in your own handwriting, before you talk yourself out of the honest version."
+      },
+      {
+       "n": 5,
+       "head": "Set your intention and hand it over",
+       "sub": "Name what you are placing in His hands today. Then get up and go live the day."
+      }
+     ]
     },
     {
      "t": "text",
-     "v": "Two minutes. That is the whole drill. You will do it every day for thirty days and nothing gets added to it. On any day you miss the thirty minutes, you still do this."
+     "v": "Five minutes on a fast day. Twenty on a slow one. Nothing gets added to it for thirty days. On the day everything else falls apart, you still do this."
     },
     {
      "t": "grid",
-     "title": "The four shapes, and where they go next",
+     "title": "The five things, and where they go next",
      "cols": [
-      "Shape",
+      "Part",
       "What it becomes"
      ],
      "rows": [
       [
-       "Hollow",
-       "In Strong and Surrendered it is under load. In The Honest Room it is what your body does when somebody says a true thing to you and you stay."
+       "Invitation",
+       "In every program after this one, the room opens the same way — you just won't be the only one saying it."
       ],
       [
-       "Arch",
-       "In Still Waters it is how you sit to pray. It is also the hardest one to do in front of another person and you will find that out."
+       "Worship",
+       "In Still Waters this becomes the whole practice, extended past one song into real stillness."
       ],
       [
-       "Stacked",
-       "In Strong and Surrendered it is every carry. Everywhere else it is not performing."
+       "Scripture",
+       "In The Honest Room, Scripture is what steadies a woman while she looks at something true about herself."
       ],
       [
-       "Landing",
-       "In every program it is the same thing — you fell, and you are back the next morning without a speech."
+       "Intention",
+       "In Strong and Surrendered, this is the same motion applied to your body instead of your day — asking, then not white-knuckling the outcome."
       ]
      ]
     },
@@ -80,7 +87,7 @@
     },
     {
      "t": "text",
-     "v": "Read this now, while nothing has gone wrong. You will miss a day. Probably two. Every gymnast who ever learned a skill fell off it repeatedly, in public, and got back on it the same afternoon without a conversation about it."
+     "v": "Read this now, while nothing has gone wrong. You will miss a day. Probably several. The father in the story did not ask for the speech — he was already calling for the robe."
     },
     {
      "t": "versus",
@@ -89,9 +96,9 @@
       "head": "What you will make it mean",
       "items": [
        "I knew it.",
-       "This is the eleventh one.",
-       "I am not the kind of woman who finishes.",
-       "I will start again on the first of the month."
+       "I can't even keep a five-minute practice.",
+       "I'm not the kind of woman who follows through with God either.",
+       "I'll start again on the first of the month."
       ]
      },
      "right": {
@@ -99,106 +106,106 @@
       "items": [
        "I missed one.",
        "Return time was one day.",
-       "The pattern is Wednesdays.",
+       "Grace was already running toward me before I got back.",
        "I moved the slot to the morning."
       ]
      }
     },
     {
      "t": "steps",
-     "title": "The restart, in full",
+     "title": "The way back, in full",
      "items": [
       {
        "n": 1,
-       "head": "Mark the day you did",
-       "sub": "Do not hide the gap. A blank is honest and a hidden blank is not."
+       "head": "Mark the day honestly",
+       "sub": "Do not skip it quietly. A blank is honest and a hidden blank is not."
       },
       {
        "n": 2,
-       "head": "Four words",
-       "sub": "Post: missed one, back today. Exactly that. No reason — the reason is where the shame gets in."
+       "head": "Say four words",
+       "sub": "\"Missed one. Back today.\" No paragraph of reasons — the reasons are where the shame gets a foothold."
       },
       {
        "n": 3,
-       "head": "Do the two minutes",
-       "sub": "The four shapes happen on the day you fall. In whatever you are wearing. This is the landing and it is the actual skill."
+       "head": "Do the five things anyway",
+       "sub": "Right there, in whatever you are wearing. This is not a smaller version of the practice. It is the practice."
       },
       {
        "n": 4,
-       "head": "Go the next morning",
-       "sub": "Not a bigger session to make up for it. The ordinary one, at your time, as though nothing happened. Because nothing did."
+       "head": "Go the next morning, ordinary",
+       "sub": "The same five things, at your time, as though nothing happened — because as far as He's concerned, nothing did."
       }
      ]
     },
     {
      "t": "steps",
-     "title": "The body this week",
+     "title": "The practice this week",
      "items": [
       {
        "n": 1,
-       "head": "Thirty minutes daily",
-       "sub": "Your choice, your intensity, logged every night with the actual number on it."
+       "head": "Invite, out loud, daily",
+       "sub": "Every single day, before the song and before the page. Not thought. Spoken."
       },
       {
        "n": 2,
-       "head": "The four shapes, two minutes",
-       "sub": "All four, every day, before the thirty minutes. Never skipped."
+       "head": "Worship, one song",
+       "sub": "Played all the way through, before you ask for anything."
       },
       {
        "n": 3,
+       "head": "Scripture read twice",
+       "sub": "Slowly. Once for the words, once for what they ask of you."
+      },
+      {
+       "n": 4,
        "head": "One time of day, kept",
-       "sub": "The same slot, seven days running. This is the week's real assignment and it is not the movement."
-      },
-      {
-       "n": 4,
-       "head": "One written line, nightly",
-       "sub": "One sentence. Not a diary entry."
+       "sub": "The same slot, seven days running. This is the week's real assignment and it is not the praying."
       }
      ]
     },
     {
      "t": "steps",
-     "title": "The inner work — What You Promised in January",
+     "title": "The inner work — What You've Actually Asked For",
      "items": [
       {
        "n": 1,
        "head": "Ten minutes, on paper",
-       "sub": "Every promise you have made to yourself about your body in the last five years. All of them. Do not think, list."
+       "sub": "Every prayer you can remember praying about your life in the last five years. All of them. Do not think, list."
       },
       {
        "n": 2,
        "head": "Beside each one",
-       "sub": "How many days it lasted. A number, not a story."
+       "sub": "What happened. Answered, unanswered, or you honestly forgot you'd asked."
       },
       {
        "n": 3,
-       "head": "Circle the longest one",
-       "sub": "Not the best one. The one that ran longest before it stopped."
+       "head": "Circle the one you prayed the longest",
+       "sub": "Not the biggest one. The one you kept bringing back."
       },
       {
        "n": 4,
        "head": "One line underneath",
-       "sub": "What was happening on the day it stopped. Where you were standing. What you told yourself that night."
+       "sub": "What made you stop bringing it back. Where you were standing when you quietly gave up asking."
       }
      ]
     },
     {
      "t": "scripture",
-     "ref": "Luke 16:10",
-     "text": "Whoever is faithful in very little is also faithful in much.",
-     "why": "It is not a moral warning. It is a training principle, and it was written two thousand years before anybody wrote a progression chart."
+     "ref": "Psalm 46:10, KJV",
+     "text": "Be still, and know that I am God.",
+     "why": "Not a suggestion to relax. A command to stop performing long enough to notice who you are talking to."
     },
     {
      "t": "check",
      "title": "Done means",
      "items": [
-      "Seven days done, seven of seven, with a real number of minutes on each",
-      "The four shapes done all seven days, two minutes, all four, in order",
+      "Seven days shown up, seven of seven",
+      "The invitation spoken out loud all seven days",
       "A time of day written down and kept at least five of the seven",
-      "The promises page written in one sitting, with a number beside every line",
-      "Day seven's read-back done in one sitting"
+      "The prayers page written in one sitting, with an outcome beside every line",
+      "Day seven's log read back in one sitting"
      ],
-     "demo": "Say your time of day out loud, and say what you moved for on day four, without opening the app."
+     "demo": "Say your time of day out loud, and say what you asked God for on day four, without opening the app."
     },
     {
      "t": "rate",
@@ -208,45 +215,45 @@
     },
     {
      "t": "rate",
-     "q": "Can you name the four shapes without looking?",
-     "left": "I would get two",
-     "right": "All four, in order, right now"
+     "q": "Did you say the invitation out loud, or only think it?",
+     "left": "I thought it",
+     "right": "Every day, out loud"
     },
     {
      "t": "grid",
      "title": "When it doesn't work",
      "cols": [
-      "Where you cut the corner",
+      "Where the day got lost",
       "What you do"
      ],
      "rows": [
       [
        "You did not pick a time of day",
-       "This is the corner, and it is the only one that matters this week. Everything downstream fails here. Go and pick one now, out loud, and write it in ink."
+       "This is the corner, and it is the only one that matters this week. Everything downstream fails here. Pick one now, out loud, and write it in ink."
       ],
       [
-       "You did four big sessions instead of seven small ones",
-       "Four is not seven. Cut every session to thirty minutes and go every day. You are training a frequency, not a body, and the body comes free with it."
+       "You prayed silently instead of out loud",
+       "Silent is not the same practice. Say it with your mouth. Something changes when the words leave your body and you will not believe it until you do it."
       ],
       [
-       "You skipped the shapes because the thirty minutes felt like enough",
-       "The two minutes are the non-negotiable and the thirty are the flexible part. You have it backwards, and week three is where that shows."
+       "You skipped the worship song because you were in a hurry",
+       "The song is not decoration before the \"real\" prayer. It is what softens you enough to mean the rest of it. Do not cut it."
       ],
       [
        "You are already bored",
-       "Good. Boring is what daily looks like from the inside, and the fact that you expected it to feel like something is the exact belief this month is dismantling."
+       "Good. Boring is what daily looks like from the inside, and the fact that you expected it to feel like something every time is the exact belief this month is dismantling."
       ],
       [
-       "You are ill, travelling, or in pain",
-       "Lie on the floor and breathe for thirty minutes. Log it as that. It counts identically and nobody is grading the content."
+       "You are ill, traveling, or overwhelmed",
+       "The five things become one line each. Log it as that. It counts identically and nobody is grading the content."
       ]
      ]
     },
     {
      "t": "note",
      "tone": "warn",
-     "title": "Not every hard thing is a cut corner",
-     "v": "If the promises page brought up something bigger than a habit — old material arriving with your whole body attached — that is not a cut corner and I will not treat it as one. Keep the daily practice and take that to somebody licensed to hold it."
+     "title": "Not every hard thing is a corner to drill at",
+     "v": "If the prayers page brought up something bigger than a habit — old material arriving with your whole body attached — that is not a corner and I will not treat it as one. Keep the daily practice and take that to somebody licensed to hold it."
     }
    ]
   },
@@ -254,38 +261,38 @@
    "week_number": 2,
    "title": "Keep It",
    "verb": "prepare",
-   "principle": "progressive overload",
-   "opening_line": "Week two is where you meet the voice that has ended every one of these before, and it is not going to sound like an enemy. It is going to sound extremely reasonable.",
-   "stakes": "Skip the negotiation and you will believe, for another decade, that you are a woman who does not follow through — when what you actually are is a woman who has never once heard the sentence out loud.",
-   "pull_quote": "You are not lazy and you are not broken. You have been having a negotiation every morning that you did not know was happening.",
+   "principle": "abiding",
+   "opening_line": "Week two is where you meet the voice that has ended every good habit you have ever started with God, and it will not sound like an enemy. It will sound extremely reasonable.",
+   "stakes": "Skip the negotiation and you will believe, for another decade, that you are a woman who cannot keep a promise to God — when what you actually are is a woman who has never once heard the sentence out loud.",
+   "pull_quote": "You are not lazy and you are not spiritually shallow. You have been having a negotiation every morning that you did not know was happening.",
    "blocks": [
     {
      "t": "text",
-     "v": "Thirty minutes of anything you chose on purpose stays exactly as it was. The base does not change. What goes on top of it does."
+     "v": "The same five things, the same time, stays exactly as it was. The base does not change. What you notice about your resistance to it does."
     },
     {
      "t": "steps",
-     "title": "The body this week",
+     "title": "The practice this week",
      "items": [
       {
        "n": 1,
-       "head": "Thirty minutes daily",
-       "sub": "Same as last week. Same time."
+       "head": "Same five things, same time",
+       "sub": "The base does not change. What goes on top is your attention to it."
       },
       {
        "n": 2,
-       "head": "A little more, twice",
-       "sub": "Two sessions this week are harder than the same session last week. A hill, a heavier bag, five more minutes, one more round."
+       "head": "Catch the negotiation",
+       "sub": "The sentence your mind gives you for skipping today. Write it down, verbatim, the moment it arrives."
       },
       {
        "n": 3,
-       "head": "Carry something",
-       "sub": "Once. Heavy enough that you would rather not, far enough that you have to change hands."
+       "head": "Read Scripture even on the dry day",
+       "sub": "The day it feels like nothing. Especially that day."
       },
       {
        "n": 4,
-       "head": "The four shapes, two minutes",
-       "sub": "Every day. Nothing added."
+       "head": "The intention, said with your eyes open",
+       "sub": "Once this week, don't close your eyes to release it. Say it looking at the room you're actually standing in."
       }
      ]
     },
@@ -316,72 +323,42 @@
      ]
     },
     {
-     "t": "grid",
-     "title": "The five numbers — day 8 and day 28",
-     "cols": [
-      "The measurement",
-      "How you take it"
-     ],
-     "rows": [
-      [
-       "Sit-to-stands in 30 seconds",
-       "Count. One attempt."
-      ],
-      [
-       "Forearm plank",
-       "Seconds until the hips drop. Not seconds until it hurts."
-      ],
-      [
-       "Push-ups",
-       "Level and count. Wall, knees or floor — write which."
-      ],
-      [
-       "12-minute walk",
-       "Distance, and what your breathing is doing at minute nine."
-      ],
-      [
-       "Floor get-up",
-       "Points of contact on the way up. Hands and knees count."
-      ]
-     ]
-    },
-    {
      "t": "versus",
-     "title": "Taking a number, and performing one",
+     "title": "Performing steadfastness, and actually keeping it",
      "left": {
       "head": "Performing it",
       "items": [
-       "Training for it beforehand",
-       "Retaking the bad one",
-       "Warming up until you feel good about it",
-       "Writing down what you think you could do"
+       "Praying longer when you feel guilty",
+       "Skipping the hard day and calling it rest",
+       "Reading the verse without reading it twice",
+       "Writing what you think a \"good\" answer looks like"
       ]
      },
      "right": {
-      "head": "Taking it",
+      "head": "Keeping it",
       "items": [
-       "Warm up ten minutes and go",
-       "One attempt each, including the one you hate",
-       "Write it cold, immediately",
-       "Close the page until day twenty-eight"
+       "The same five minutes, every day, dry or not",
+       "Showing up especially on the day you'd rather not",
+       "Reading it twice even when nothing new comes",
+       "Writing the actual sentence, even the ungrateful one"
       ]
      }
     },
     {
      "t": "scripture",
-     "ref": "Proverbs 31:17",
-     "text": "She dresses herself with strength and makes her arms strong.",
-     "why": "The verb is makes. It is not a description of a woman who woke up like that."
+     "ref": "Proverbs 3:5–6, KJV",
+     "text": "Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths.",
+     "why": "Not a feeling. A decision, made daily, in all your ways — including the boring ones."
     },
     {
      "t": "check",
      "title": "Done means",
      "items": [
-      "Five baseline numbers written in the book, one attempt each, nothing retaken",
       "Three negotiation sentences collected in quotation marks",
-      "Two sessions written down as heavier than the same session last week",
-      "One thing carried far enough that you changed hands",
-      "Fourteen days done, and the shapes fourteen of fourteen"
+      "The same time of day kept, or honestly logged when it moved",
+      "One dry-day Scripture read without a feeling attached, and named as such",
+      "The intention said once with your eyes open, in the room",
+      "Fourteen days shown up, fourteen of fourteen"
      ],
      "demo": "Read your three negotiation sentences out loud, flat, standing, without laughing at the end of any of them."
     },
@@ -401,29 +378,29 @@
      "t": "grid",
      "title": "When it doesn't work",
      "cols": [
-      "Where you cut the corner",
+      "Where the day got lost",
       "What you do"
      ],
      "rows": [
       [
-       "You retook the baseline numbers",
-       "Then they are not numbers, they are a performance, and in three weeks you will have nothing to compare against. Take them again cold on day nine and write the first attempt."
-      ],
-      [
        "The negotiation never showed up in words",
-       "It is there and it is preverbal. Write what you did instead — the phone, the second coffee, the reorganised morning. The behaviour is the sentence."
-      ],
-      [
-       "You went heavier and now something hurts",
-       "Sharp, in a joint, one side only, still there tomorrow — that is pain and not effort. Stop that movement, take the range smaller, and go and see somebody with letters after their name."
+       "It is there and it is preverbal. Write what you did instead — the phone, the extra coffee, the reorganized morning. The behavior is the sentence."
       ],
       [
        "You are logging but not writing",
-       "The written line is half the product. Sixty seconds. Do not upgrade it into journalling, just answer the question."
+       "The written line is half the practice. Sixty seconds. Do not upgrade it into a journaling session, just answer the question."
       ],
       [
        "You missed a day",
-       "Four words, the two minutes, the ordinary session tomorrow. That is the entire protocol."
+       "Four words, the five things, the ordinary next morning. That is the entire protocol."
+      ],
+      [
+       "You are treating the invitation like a formality now",
+       "It got automatic before it got honest. Slow down and mean the words again, even if it takes longer than usual today."
+      ],
+      [
+       "The negotiation turned out to be about something much bigger than a quiet time",
+       "Very common in week two, and it is real. Keep the practice. Take the rest of it somewhere it can be properly held."
       ]
      ]
     }
@@ -433,46 +410,68 @@
    "week_number": 3,
    "title": "The Week You Miss",
    "verb": "surrender",
-   "principle": "falling is routine",
-   "opening_line": "I scheduled this week a year ago. If you have already fallen, you are on time.",
-   "stakes": "Skip this and the first miss of the rest of your life ends the practice — because you will still be carrying a private rule that says a broken streak is a verdict, and you will never once have tested it.",
-   "pull_quote": "Falling is not the interruption to the training. Falling is the training.",
+   "principle": "grace, not performance",
+   "opening_line": "I scheduled this week a year ago. If you have already missed a day, you are on time.",
+   "stakes": "Skip this and the first missed day of the rest of your life ends the practice — because you will still be carrying a private rule that says a broken practice is a verdict on your faith, and you will never once have tested whether that's actually true.",
+   "pull_quote": "Falling is not the interruption to walking with God. For most of us, it is most of the walking.",
    "blocks": [
-    {
-     "t": "figure",
-     "pose": "landing",
-     "label": "The landing",
-     "cue": "Drop off a low step. Feet flat, knees soft, chest up, still for one second at the bottom. Quiet feet. Ten a day, every day this week, including any day you miss everything else."
-    },
     {
      "t": "note",
      "tone": "note",
      "title": "Return time is the only number that matters",
-     "v": "Not the length of the streak. Not the total days. The gap, in days, between falling off and getting back on. A woman with a return time of one day will still be training in ten years. A woman with a perfect streak and no return protocol is one bad Wednesday from stopping altogether, and she has no idea."
+     "v": "Not the length of the streak. Not the total days. The gap, in days, between missing and coming back. A woman with a return time of one day will still be walking with God in ten years. A woman with a perfect record and no return plan is one bad Wednesday from stopping altogether, and she has no idea."
+    },
+    {
+     "t": "figure",
+     "pose": "exhale",
+     "label": "One long exhale",
+     "cue": "Before you begin, let your shoulders actually drop. The difference between arriving braced and arriving open. Daily this week."
+    },
+    {
+     "t": "versus",
+     "title": "The two things a missed day can be",
+     "left": {
+      "head": "A verdict",
+      "items": [
+       "I knew it.",
+       "I can't even keep this.",
+       "I'm not the kind of woman who follows through with God either.",
+       "I'll start again on the first of the month."
+      ]
+     },
+     "right": {
+      "head": "Grace",
+      "items": [
+       "I missed one.",
+       "I said four words.",
+       "He was already glad I came back.",
+       "The pattern is Wednesdays — I'll move the slot."
+      ]
+     }
     },
     {
      "t": "steps",
-     "title": "The body this week",
+     "title": "The practice this week",
      "items": [
       {
        "n": 1,
-       "head": "Ten landings, daily",
-       "sub": "Added to the four shapes, all seven days, including any day you miss everything else."
+       "head": "One long exhale before you begin, daily",
+       "sub": "Let your shoulders actually drop before you speak. The difference between arriving braced and arriving open."
       },
       {
        "n": 2,
-       "head": "Thirty minutes daily",
-       "sub": "Unchanged. Same time."
+       "head": "The five things, unchanged",
+       "sub": "Same time. Non-negotiable, and this is the week that phrase gets tested."
       },
       {
        "n": 3,
-       "head": "One session with no mirror and no clock",
-       "sub": "Cover the mirror. Leave the watch. Go by feel and find out how badly you need the instruments."
+       "head": "One day with no requests, only listening",
+       "sub": "Skip asking for anything. Read the Scripture, then sit in silence for a full minute before you write."
       },
       {
        "n": 4,
-       "head": "The four shapes",
-       "sub": "Every day. Non-negotiable, and this is the week that phrase gets tested."
+       "head": "Practice the return, on purpose",
+       "sub": "If nothing has gone wrong yet, miss on purpose one day this week and run the return protocol, so it is not the first time you've done it for real."
       }
      ]
     },
@@ -483,7 +482,7 @@
       {
        "n": 1,
        "head": "Write the four words now",
-       "sub": "Missed one, back today. In the book, before you need it."
+       "sub": "\"Missed one. Back today.\" In the book, before you need it."
       },
       {
        "n": 2,
@@ -493,32 +492,37 @@
       {
        "n": 3,
        "head": "Write what you will do at eleven at night",
-       "sub": "Specifically. Which two minutes, in what room, in what clothes."
+       "sub": "Specifically. Which of the five things, in what room, in what clothes."
       },
       {
        "n": 4,
        "head": "Write who you will tell",
-       "sub": "One name, or the Circle. A restart that nobody sees is one you can quietly cancel."
+       "sub": "One name, or the Circle. A return that nobody sees is one you can quietly cancel."
       }
      ]
+    },
+    {
+     "t": "scripture",
+     "ref": "Luke 15:20, KJV",
+     "text": "And he arose, and came to his father. But when he was yet a great way off, his father saw him, and had compassion, and ran, and fell on his neck, and kissed him.",
+     "why": "The father was watching for him before he ever turned around."
     },
     {
      "t": "check",
      "title": "Done means",
      "items": [
-      "Ten landings on all seven days, including any missed day",
       "The return plan written in full before day nineteen, all four steps",
-      "One session taken with no mirror, no clock and no numbers",
-      "Any miss left in the record, four words posted, and the return time written as a number",
-      "Twenty-one days honestly accounted for — no invented ones"
+      "One day taken with no requests, only listening, and what surfaced named",
+      "Any miss logged as a blank, four words said, and the return time written as a number",
+      "Twenty-one days honestly accounted for — no invented entries"
      ],
      "demo": "Say your return plan out loud from memory: the four words, the room, the clothes, and the name of the person you tell."
     },
     {
      "t": "rate",
      "q": "What do you do at eleven at night on a missed day?",
-     "left": "Bed, and start again Monday",
-     "right": "Two minutes, four words, bed"
+     "left": "Bed, and quietly decide to restart Monday",
+     "right": "The five things, four words, bed"
     },
     {
      "t": "rate",
@@ -530,37 +534,31 @@
      "t": "grid",
      "title": "When it doesn't work",
      "cols": [
-      "Where you cut the corner",
+      "Where the day got lost",
       "What you do"
      ],
      "rows": [
       [
-       "You have not fallen and you are treating that as the achievement",
-       "The streak is not the product. Write the return plan anyway, this week, while it is cheap. You are buying insurance and the premium goes up after the fire."
+       "You have not missed a day and you are treating that as the achievement",
+       "The unbroken record is not the point. Write the return plan anyway, this week, while it is cheap. You are buying the insurance before the fire."
       ],
       [
        "You fell and disappeared for four days",
-       "The falling was routine. The four days were the injury. Go back today, four words, no reason. Then write down what happened on day two that made day three easier to skip."
+       "The falling was ordinary. The four days were the injury. Go back today, four words, no reason. Then write down what happened on day two that made day three easier to skip."
       ],
       [
        "You posted the four words with a paragraph of explanation attached",
-       "The reason is where the shame gets in and a paragraph is an invitation to be forgiven. Four words. That is the whole discipline and it takes about nine seconds."
+       "The reason is where the shame gets in, and a paragraph is an invitation to be forgiven for something that was never a crime. Four words. That is the whole discipline."
       ],
       [
-       "You cannot do the landings — knees, ankles, pelvic floor",
-       "Step down instead of dropping, off a stair, one leg at a time, and take the same one-second stillness at the bottom. The stillness is the skill and the height never was."
+       "The no-requests day made you anxious with nothing to hold onto",
+       "That is the week working. Sit in it once more before Sunday and say nothing about it to anybody yet."
       ],
       [
-       "The no-mirror session made you anxious",
-       "That is the week working. Do it once more before Sunday and say nothing about it to anybody."
+       "What surfaced during the listening day was old and arrived with your whole body attached",
+       "That is not a lapse in discipline and it does not get drilled at. Keep the practice. Take that part to a licensed professional."
       ]
      ]
-    },
-    {
-     "t": "note",
-     "tone": "scope",
-     "title": "What is not a cut corner",
-     "v": "If what surfaced on the missed day was old and it arrived with your whole body attached, that is not a cut corner and it does not get drilled at. Keep the practice. Take that part to a licensed professional."
     }
    ]
   },
@@ -568,38 +566,44 @@
    "week_number": 4,
    "title": "Nine Days",
    "verb": "ask",
-   "principle": "witnessed work",
-   "opening_line": "Nine days, not seven. You are past the part where this is impressive and into the part where it is simply what you do.",
-   "stakes": "Skip these last nine and you will have spent a month proving something to yourself and then quit two days before the door opened — which is the specific way most women lose the thing they have already paid for.",
+   "principle": "witnessed asking",
+   "opening_line": "Nine days, not seven. You are past the part where this is new and into the part where it is simply what you do.",
+   "stakes": "Skip these last nine and you will have spent a month proving you can show up to God, and then quietly stop asking Him for anything — which is the specific way most women lose the second half of this practice.",
    "pull_quote": "Ask boldly. Prepare like it is coming. Then receive it without putting it down and running.",
    "blocks": [
     {
      "t": "text",
-     "v": "You cannot watch your own form. It was easy to change when somebody else saw it — easy, not brave. The seeing was the whole cost. The fixing was nothing. This is the week you let yourself be seen."
+     "v": "He gave a portion sized for one day, on purpose, and the asking is meant to happen again tomorrow. This is the week you say what you want out loud and let it be seen that you asked."
+    },
+    {
+     "t": "figure",
+     "pose": "stand",
+     "label": "Standing to ask",
+     "cue": "The ask is prayed out loud, standing, eyes open. Named and specific — not a private wish you never actually said."
     },
     {
      "t": "steps",
-     "title": "The body this week",
+     "title": "The practice this week",
      "items": [
       {
        "n": 1,
-       "head": "Load, twice",
-       "sub": "Two loaded sessions. Heavier or further than week two, written down both times."
+       "head": "The five things, nine of nine",
+       "sub": "Nothing added and nothing skipped, including on the day nothing feels like happening."
       },
       {
        "n": 2,
-       "head": "The compulsories, once",
-       "sub": "Floor and up, kneel and rise, lift, carry, stairs, overhead, stand, walk. All eight, one session, day twenty-five."
+       "head": "Ask specifically, out loud, once",
+       "sub": "Not a vague hope. A named thing, spoken with your eyes open."
       },
       {
        "n": 3,
-       "head": "One long one",
-       "sub": "Sixty minutes, conversational, day twenty-six. Longer than anything you have done this month."
+       "head": "Prepare like it's coming",
+       "sub": "Do one small, real thing this week that only makes sense if the answer is yes."
       },
       {
        "n": 4,
-       "head": "The four shapes",
-       "sub": "Every day. Nine of nine. Nothing added and nothing skipped."
+       "head": "One longer time with Him",
+       "sub": "A full hour this week instead of the usual five minutes — a real walk if that's what you have, praying the whole way, or an hour at the table with the book open."
       }
      ]
     },
@@ -610,7 +614,7 @@
       {
        "n": 1,
        "head": "Ten minutes, verbs only",
-       "sub": "What do you want to be able to do. Not have, not feel, not look like. Do. No ranking and no crossing out."
+       "sub": "What do you want God to do. Not a feeling, not a description of a better life. A verb. No ranking and no crossing out."
       },
       {
        "n": 2,
@@ -619,87 +623,45 @@
       },
       {
        "n": 3,
-       "head": "Write what you would have to become",
-       "sub": "Four lines, no more. Capacities, not adjectives."
+       "head": "Write what receiving it would actually require of you",
+       "sub": "Four lines, no more. What you'd have to do, not just feel."
       },
       {
        "n": 4,
-       "head": "Pray it out loud, once, standing",
-       "sub": "Named, specific, out loud, with your eyes open. God is for you and He is not vague. Neither should you be."
+       "head": "Pray it out loud, once, standing, eyes open",
+       "sub": "Named, specific. God is for you and He is not vague. Neither should you be."
       }
      ]
     },
     {
-     "t": "grid",
-     "title": "The eight compulsories",
-     "cols": [
-      "Pattern",
-      "Why it is on the list"
-     ],
-     "rows": [
-      [
-       "Floor and up",
-       "The one you lose first and notice last."
-      ],
-      [
-       "Kneel and rise",
-       "Every low cupboard, every child, every garden."
-      ],
-      [
-       "Lift something heavy",
-       "Off the ground, with your hips."
-      ],
-      [
-       "Carry it far",
-       "Groceries, water, a case, a child on a bad night."
-      ],
-      [
-       "Carry it up stairs",
-       "The one that decides whether you can live where you live."
-      ],
-      [
-       "Overhead onto a shelf",
-       "Shoulders that still go over your head at seventy-five."
-      ],
-      [
-       "Stand for a while",
-       "Four hours on your feet without your back deciding."
-      ],
-      [
-       "Walk",
-       "An hour, conversational, without planning around it."
-      ]
-     ]
-    },
-    {
      "t": "scripture",
-     "ref": "Matthew 6:11",
-     "text": "Give us this day our daily bread.",
-     "why": "Not this month's. Not this year's. He gave a portion sized for one day, on purpose, and the asking is meant to happen again tomorrow."
+     "ref": "James 1:17, KJV",
+     "text": "Every good gift and every perfect gift is from above, and cometh down from the Father of lights.",
+     "why": "Ask boldly because of who you're asking, not because of how well you've performed the month."
     },
     {
      "t": "check",
      "title": "Done means",
      "items": [
-      "Nine days done, nine of nine, with the shapes on every one",
+      "Nine days shown up, nine of nine",
       "One real thing posted in the Circle, in your own words, not the tidy version",
-      "One compliment received with thank you and then three seconds of silence",
+      "One thing prepared for as though the answer is coming",
       "The ask written, all four steps, and said out loud standing",
-      "Five numbers retaken cold on day twenty-eight, both columns on one page, nothing retaken"
+      "Thirty days honestly accounted for by day thirty"
      ],
-     "demo": "Say the thing you are asking for out loud, in one sentence, with no preamble and no joke on the end."
+     "demo": "Say the thing you are asking God for out loud, in one sentence, with no preamble and no joke on the end."
     },
     {
      "t": "rate",
-     "q": "Can you name what you want as a verb?",
-     "left": "To feel better in myself",
-     "right": "Carry my bags up two flights"
+     "q": "Can you name what you're asking for as a specific thing, not a feeling?",
+     "left": "To feel more at peace",
+     "right": "A named outcome, spoken plainly"
     },
     {
      "t": "rate",
-     "q": "What did you do the last time somebody said something good?",
-     "left": "Deflected inside two seconds",
-     "right": "Thank you, then three seconds"
+     "q": "Did you post the real version or the tidy one?",
+     "left": "I posted a good day",
+     "right": "Posted the thin one. Left it up"
     },
     {
      "t": "h",
@@ -707,7 +669,7 @@
     },
     {
      "t": "text",
-     "v": "You have the thirty days. That is the gate on all three programs and you are through it. Choose while it is still in your body."
+     "v": "You have the thirty days. That is the gate on all three programs and you are through it. Choose while it is still fresh."
     },
     {
      "t": "grid",
@@ -718,15 +680,15 @@
      ],
      "rows": [
       [
-       "You want to be strong, and the mirror has been the enemy for thirty years",
-       "Strong and Surrendered. Eight weeks. Gymnastics progressions turned on a grown woman's whole life."
+       "You want your body brought into this the same way your mornings just were — asking, preparing, receiving, without white-knuckling the outcome",
+       "Strong and Surrendered. Eight weeks. The same surrender applied to your body."
       ],
       [
-       "You cannot be still, you have downloaded three apps, and you read that as a discipline problem",
-       "Still Waters. Four weeks. Christian contemplative practice with a progression under it, because nobody ever gave you one."
+       "You want to stay in this stillness and go deeper into it, not add anything to it",
+       "Still Waters. Four weeks. Christian contemplative practice with a real progression under it."
       ],
       [
-       "You did the therapy, you can name the pattern in one clean sentence, and you are quietly furious that naming it changed nothing",
+       "You did the therapy, you can name the pattern in one clean sentence, and you're ready to bring it into the light with other women watching",
        "The Honest Room. Ten weeks, twelve seats, application required, and completed clinical work is a hard prerequisite alongside the thirty days."
       ],
       [
@@ -735,7 +697,7 @@
       ],
       [
        "You want to do it again",
-       "Do it again. Nobody in a gym finds a second cycle of the compulsories embarrassing. Second time through, take the numbers seriously and keep the same time of day."
+       "Do it again. Nobody finds a second thirty days embarrassing. Second time through, take the asking more seriously and keep the same time of day."
       ]
      ]
     },
@@ -743,21 +705,21 @@
      "t": "grid",
      "title": "When it doesn't work",
      "cols": [
-      "Where you cut the corner",
+      "Where the day got lost",
       "What you do"
      ],
      "rows": [
       [
-       "You cannot write a verb, only a feeling",
-       "Ask it differently. What could you do at thirty that you cannot do now, and which stairs would tell you. Concrete first, the feeling comes free."
+       "You cannot name a specific ask, only a feeling",
+       "Ask it differently. What would be different in your actual week if this were answered? Concrete first, the feeling comes free."
       ],
       [
        "You posted the tidy version",
-       "Everybody does, the first time. Post one more, today, and make it the thinnest day you have had this month. Nobody will do what you are afraid they will do."
+       "Everybody does, the first time. Post one more, today, and make it the thinnest day you've had this month. Nobody will react the way you're afraid they will."
       ],
       [
-       "You did not retake the numbers because you are afraid one went down",
-       "One probably did. Retake them anyway and write both columns. A number that went down in a month where you showed up twenty-nine times is telling you something useful and it is not about your character."
+       "You didn't prepare because you're afraid the answer is no",
+       "Prepare anyway, in something small. Preparing is not presuming — it's what asking boldly looks like with your hands."
       ],
       [
        "You are on day twenty-eight and quietly finished",
@@ -772,13 +734,19 @@
   {
    "day_number": 1,
    "week_number": 1,
-   "title": "Learn the four shapes",
+   "title": "Come as you are",
    "kind": "teaching",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "text",
-     "v": "Four shapes. Two minutes. You will do them every day for thirty days and nothing gets added to them."
+     "v": "Five things. A few minutes. You will do them every day for thirty days and nothing gets added to them."
+    },
+    {
+     "t": "figure",
+     "pose": "kneel",
+     "label": "Kneel, or sit",
+     "cue": "Whatever gets your body low enough tonight to mean it. Not a requirement — a way in, if you want it."
     },
     {
      "t": "steps",
@@ -786,18 +754,23 @@
      "items": [
       {
        "n": 1,
-       "head": "Four shapes, two minutes",
-       "sub": "Hollow, arch, stacked, landing. In that order. On the floor."
+       "head": "Invite the Spirit",
+       "sub": "Out loud: \"Come, Holy Spirit. I don't want to do this alone.\""
       },
       {
        "n": 2,
-       "head": "Thirty minutes",
-       "sub": "Anything you chose on purpose. Slow is fine. Short is not."
+       "head": "Play one worship song",
+       "sub": "All the way through."
       },
       {
        "n": 3,
-       "head": "Log it",
-       "sub": "Minutes, shapes, and one sentence."
+       "head": "Read Psalm 46:10, twice",
+       "sub": "Slowly. Then once more."
+      },
+      {
+       "n": 4,
+       "head": "Journal, then hand something over",
+       "sub": "One honest sentence. Then name what you're giving Him tonight, out loud."
       }
      ]
     },
@@ -805,15 +778,22 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Shapes done",
-      "Thirty minutes logged",
-      "Prompt answered"
+      "The Spirit invited out loud",
+      "One song played through",
+      "Psalm 46:10 read twice",
+      "The prompt answered"
      ],
-     "demo": "Tick them. Nobody is grading them."
+     "demo": "Say tomorrow, without looking, what you handed over tonight."
+    },
+    {
+     "t": "scripture",
+     "ref": "Psalm 46:10, KJV",
+     "text": "Be still, and know that I am God.",
+     "why": "Not a suggestion to relax. A command to stop performing long enough to notice who you are talking to."
     },
     {
      "t": "write",
-     "prompt": "What did you promise your body last January, and where were you standing when you broke it?",
+     "prompt": "What are you hoping God actually does in you over the next thirty days? Name it — don't soften it to sound reasonable.",
      "lines": 6
     },
     {
@@ -824,13 +804,13 @@
   {
    "day_number": 2,
    "week_number": 1,
-   "title": "The time of day",
+   "title": "Say it out loud",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "text",
-     "v": "A promise with no time on it is a wish with better lighting."
+     "v": "A prayer said only in your head is a wish wearing a disguise."
     },
     {
      "t": "steps",
@@ -838,18 +818,23 @@
      "items": [
       {
        "n": 1,
-       "head": "Write the time",
-       "sub": "In the book, in ink, before you move. Six-forty. After the school run. Whatever is true."
+       "head": "Invite, out loud, again",
+       "sub": "Same words or your own. Spoken, not thought."
       },
       {
        "n": 2,
-       "head": "Set the alarm",
-       "sub": "Seven days out, labelled with the words you will need to read at that hour."
+       "head": "Worship, out loud in the room",
+       "sub": "Not through earbuds. Let the room hear it, even if the room is just you."
       },
       {
        "n": 3,
-       "head": "Shapes, then thirty minutes",
-       "sub": "At that time, today. Prove it fits before you promise it."
+       "head": "Read Psalm 5:3, twice",
+       "sub": "Slowly."
+      },
+      {
+       "n": 4,
+       "head": "Journal, then hand it over",
+       "sub": "One sentence, then name what you're releasing."
       }
      ]
     },
@@ -857,21 +842,22 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "A time written in the book",
-      "Alarm set",
-      "Thirty minutes taken at that time"
+      "Invitation spoken",
+      "Worship played aloud, not in earbuds",
+      "Scripture read twice",
+      "Prompt answered"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
-     "t": "note",
-     "tone": "note",
-     "title": "In the book",
-     "v": "The time of day goes in the book, on the promise page, in ink."
+     "t": "scripture",
+     "ref": "Psalm 5:3, KJV",
+     "text": "My voice shalt thou hear in the morning, O LORD; in the morning will I direct my prayer unto thee, and will look up.",
+     "why": "The voice, not just the thought — spoken, and expecting to be heard."
     },
     {
      "t": "write",
-     "prompt": "What time did you pick, and what has to be true about your evening for it to survive?",
+     "prompt": "What songs have you actually been listening to that aren't singing to your soul? What could you play tomorrow instead?",
      "lines": 6
     },
     {
@@ -882,9 +868,9 @@
   {
    "day_number": 3,
    "week_number": 1,
-   "title": "Outside",
+   "title": "Read it twice",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "steps",
@@ -892,18 +878,23 @@
      "items": [
       {
        "n": 1,
-       "head": "Go outside",
-       "sub": "The whole thirty. Weather is not a reason and you know it."
+       "head": "Invite, then worship",
+       "sub": "In order, unhurried."
       },
       {
        "n": 2,
-       "head": "No headphones for the first ten",
-       "sub": "You are going to want to fill it. Do not."
+       "head": "Read Lamentations 3:22–23 slowly",
+       "sub": "Once for the words."
       },
       {
        "n": 3,
-       "head": "Shapes when you get back",
-       "sub": "On the floor, two minutes, before the shower."
+       "head": "Read it again",
+       "sub": "For what it's actually asking of you this time. Notice what's different the second time."
+      },
+      {
+       "n": 4,
+       "head": "Journal, then hand it over",
+       "sub": "What word caught you on the second read."
       }
      ]
     },
@@ -911,15 +902,22 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Thirty minutes outdoors",
-      "Ten of them in silence",
-      "Shapes done after"
+      "Scripture read twice, on purpose",
+      "What changed between the two reads, named",
+      "Prompt answered",
+      "Something handed over"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
+     "t": "scripture",
+     "ref": "Lamentations 3:22–23, KJV",
+     "text": "It is of the LORD's mercies that we are not consumed, because his compassions fail not. They are new every morning: great is thy faithfulness.",
+     "why": "New every morning — this practice does not run on yesterday's supply."
+    },
+    {
      "t": "write",
-     "prompt": "What arrived in the first ten minutes when there was nothing to listen to?",
+     "prompt": "Read the verse twice. What word or phrase caught you the second time that you missed the first?",
      "lines": 6
     },
     {
@@ -930,32 +928,28 @@
   {
    "day_number": 4,
    "week_number": 1,
-   "title": "The floor",
+   "title": "Write it down",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
-    {
-     "t": "text",
-     "v": "Getting off the floor is a skill and you have been quietly losing it since you were thirty."
-    },
     {
      "t": "steps",
      "title": "Do this, in this order",
      "items": [
       {
        "n": 1,
-       "head": "Get down and get up",
-       "sub": "Ten times. Any route. Count the points of contact you use on the last one."
+       "head": "The five things, in order",
+       "sub": "Nothing skipped."
       },
       {
        "n": 2,
-       "head": "The long stretch",
-       "sub": "Fifteen minutes on the floor. Hips, hamstrings, the front of the shoulders, ankles."
+       "head": "Finish the sentence on paper",
+       "sub": "\"God, I haven't told You that ___.\" Do not edit it before you write it."
       },
       {
        "n": 3,
-       "head": "Shapes",
-       "sub": "Then log."
+       "head": "Read it once, out loud",
+       "sub": "To the room, or under your breath. Then hand it over."
       }
      ]
     },
@@ -963,21 +957,21 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Ten get-ups",
-      "Fifteen minutes of floor",
-      "Shapes done"
+      "The unfinished sentence, finished honestly",
+      "Read aloud once",
+      "Something named and given over"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
-     "t": "note",
-     "tone": "note",
-     "title": "In the book",
-     "v": "The points-of-contact number goes on the workbook page in the book."
+     "t": "scripture",
+     "ref": "Psalm 27:4, KJV",
+     "text": "One thing have I desired of the LORD, that will I seek after; that I may dwell in the house of the LORD all the days of my life, to behold the beauty of the LORD, and to enquire in his temple.",
+     "why": "One thing, named plainly — not a list of everything at once."
     },
     {
      "t": "write",
-     "prompt": "How many points of contact on the last one, and what did you assume it would be?",
+     "prompt": "Finish, in writing, without editing it: \"God, I haven't told You that ___.\"",
      "lines": 6
     },
     {
@@ -988,9 +982,9 @@
   {
    "day_number": 5,
    "week_number": 1,
-   "title": "Slow",
+   "title": "Open hands",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "steps",
@@ -998,18 +992,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Conversational, the whole way",
-       "sub": "You should be able to talk in full sentences for thirty minutes. If you cannot, you are going too fast."
+       "head": "The five things",
+       "sub": "In order, at your time."
       },
       {
        "n": 2,
-       "head": "Do not check the time until the end",
-       "sub": "Not once."
+       "head": "Open your actual hands",
+       "sub": "Palms up, however that feels — standing, sitting, kneeling. Let your body say what your mouth is about to say."
       },
       {
        "n": 3,
-       "head": "Shapes, then log",
-       "sub": "Two minutes. Same as every day."
+       "head": "Name it and let go",
+       "sub": "Out loud, hands open, then close the book."
       }
      ]
     },
@@ -1017,15 +1011,21 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Thirty conversational minutes",
-      "No clock-checking",
-      "Shapes done"
+      "Hands physically opened during the intention",
+      "The thing named out loud",
+      "Prompt answered"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
+     "t": "scripture",
+     "ref": "Psalm 100:2, KJV",
+     "text": "Serve the LORD with gladness: come before his presence with singing.",
+     "why": "Gladness, not obligation — even on an ordinary Tuesday."
+    },
+    {
      "t": "write",
-     "prompt": "Where in your life are you going too fast to sustain it, and calling that commitment?",
+     "prompt": "What does serving God \"with gladness\" actually look like in your ordinary Tuesday, not your best Sunday?",
      "lines": 6
     },
     {
@@ -1036,13 +1036,13 @@
   {
    "day_number": 6,
    "week_number": 1,
-   "title": "The short day",
+   "title": "The day you don't feel it",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "text",
-     "v": "This is the day you have no time. It arrives every week for the rest of your life. Today you find out it fits anyway."
+     "v": "This is the day you don't feel like it. It arrives every week for the rest of your life. Today you find out the practice doesn't need the feeling to be real."
     },
     {
      "t": "steps",
@@ -1050,18 +1050,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Thirty minutes, in the worst window you have",
-       "sub": "The one with something either side of it. Do not clear the day."
+       "head": "Do the five things anyway",
+       "sub": "Especially because you don't feel like it. Feeling is not the qualifying condition."
       },
       {
        "n": 2,
-       "head": "Do not upgrade it",
-       "sub": "No extra, no making it count. Thirty exactly."
+       "head": "Notice the resistance, don't argue with it",
+       "sub": "Just name it in one word."
       },
       {
        "n": 3,
-       "head": "Shapes, then log",
-       "sub": "Two minutes. Before, not after."
+       "head": "Finish anyway",
+       "sub": "Same order, same few minutes."
       }
      ]
     },
@@ -1069,15 +1069,21 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Thirty minutes taken inside a full day",
-      "Nothing added to make it feel worthwhile",
-      "Shapes done"
+      "The five things done without the feeling behind them",
+      "The resistance named in one word",
+      "Finished anyway"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
+     "t": "scripture",
+     "ref": "Matthew 6:33, KJV",
+     "text": "But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.",
+     "why": "Seek first — before the feeling arrives, not after."
+    },
+    {
      "t": "write",
-     "prompt": "What did you have to say no to for thirty minutes, and who did you have to say it to?",
+     "prompt": "Today you didn't feel like showing up. Write what you did anyway, and what that tells you about faith versus feeling.",
      "lines": 6
     },
     {
@@ -1090,7 +1096,7 @@
    "week_number": 1,
    "title": "Seven",
    "kind": "milestone",
-   "minutes": 30,
+   "minutes": 15,
    "blocks": [
     {
      "t": "steps",
@@ -1098,8 +1104,8 @@
      "items": [
       {
        "n": 1,
-       "head": "Move first",
-       "sub": "Thirty minutes, your choice, your time. Then sit down."
+       "head": "The five things first",
+       "sub": "Then sit down."
       },
       {
        "n": 2,
@@ -1109,7 +1115,7 @@
       {
        "n": 3,
        "head": "Write one line in the book",
-       "sub": "What kind of woman wrote those seven days. One sentence, no hedging."
+       "sub": "What is God saying to you across the week — not in any single day, across all seven."
       }
      ]
     },
@@ -1117,7 +1123,7 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Seven of seven done",
+      "Seven of seven shown up",
       "All seven read back in one sitting",
       "One sentence written in the book"
      ],
@@ -1131,7 +1137,7 @@
     },
     {
      "t": "write",
-     "prompt": "Seven days. What do you know about yourself now that you did not know on Monday?",
+     "prompt": "Read all seven days back in one sitting. What is God saying to you across the week, not just in any single day?",
      "lines": 6
     },
     {
@@ -1142,13 +1148,13 @@
   {
    "day_number": 8,
    "week_number": 2,
-   "title": "Five numbers",
+   "title": "Same time",
    "kind": "session",
-   "minutes": 40,
+   "minutes": 10,
    "blocks": [
     {
      "t": "text",
-     "v": "Warm up first. One attempt at each. Nothing gets retaken, including the one you hate."
+     "v": "The base does not change this week. What goes on top of it is your attention to it."
     },
     {
      "t": "steps",
@@ -1156,23 +1162,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Warm up properly",
-       "sub": "Ten minutes. This is not part of the test."
+       "head": "The five things, at your time",
+       "sub": "Exactly as chosen."
       },
       {
        "n": 2,
-       "head": "Take all five, in order",
-       "sub": "Sit-to-stands in thirty seconds. Forearm plank, seconds until the hips drop. Push-ups, level and count. Twelve-minute walk, distance. Floor get-up, points of contact."
+       "head": "Write down whether it held",
+       "sub": "Same slot, or moved — and by how much."
       },
       {
        "n": 3,
-       "head": "Write them down cold",
-       "sub": "In the book, on the baseline page, immediately. No retakes and no commentary."
-      },
-      {
-       "n": 4,
-       "head": "Close the page",
-       "sub": "You will not look at it again until day twenty-eight."
+       "head": "One honest line",
+       "sub": "What would have to be true about your evening for that time to survive long-term."
       }
      ]
     },
@@ -1180,21 +1181,21 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "All five taken in one session",
-      "Written in the book",
-      "Nothing retaken"
+      "Time of day checked against the plan",
+      "Held or moved, written honestly",
+      "Prompt answered"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
-     "t": "note",
-     "tone": "note",
-     "title": "In the book",
-     "v": "The five numbers go in the book, on the baseline page. You will write the second column beside them on day twenty-eight."
+     "t": "scripture",
+     "ref": "Psalm 143:8, KJV",
+     "text": "Cause me to hear thy lovingkindness in the morning; for in thee do I trust: cause me to know the way wherein I should walk; for I lift up my soul unto thee.",
+     "why": "The morning is named on purpose — this is a keeping practice, not a one-time feeling."
     },
     {
      "t": "write",
-     "prompt": "When you wrote the number, where did the heat start?",
+     "prompt": "What time did you choose, and what has to be true about your evening for it to survive?",
      "lines": 6
     },
     {
@@ -1205,13 +1206,13 @@
   {
    "day_number": 9,
    "week_number": 2,
-   "title": "The negotiation",
+   "title": "The voice that talks you out of it",
    "kind": "teaching",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "text",
-     "v": "You are going to meet the voice that has ended every one of these before. It will not sound like an enemy. It will sound extremely reasonable."
+     "v": "You are going to meet the voice that has ended every good habit you have ever started with God. It will not sound like an enemy. It will sound extremely reasonable."
     },
     {
      "t": "steps",
@@ -1219,18 +1220,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Go at your time",
-       "sub": "Whatever it says."
+       "head": "Notice the moment resistance arrives",
+       "sub": "Before you sit down, not after."
       },
       {
        "n": 2,
        "head": "Catch the sentence",
-       "sub": "The moment it arrives, write it down verbatim in the book. Its words, not yours."
+       "sub": "Write it verbatim, in the book, its own words."
       },
       {
        "n": 3,
-       "head": "Go anyway",
-       "sub": "Do not win the argument. Just move while it is still talking."
+       "head": "Do the five things anyway",
+       "sub": "While it is still talking."
       }
      ]
     },
@@ -1239,8 +1240,8 @@
      "title": "Done means",
      "items": [
       "One sentence collected in quotation marks",
-      "Thirty minutes taken anyway",
-      "Shapes done"
+      "The five things done anyway",
+      "Prompt answered"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
@@ -1251,8 +1252,14 @@
      "v": "The sentence goes in the book, on the negotiation page. You are collecting three this week."
     },
     {
+     "t": "scripture",
+     "ref": "Proverbs 3:5–6, KJV",
+     "text": "Trust in the LORD with all thine heart; and lean not unto thine own understanding.",
+     "why": "Not a feeling. A decision, made daily."
+    },
+    {
      "t": "write",
-     "prompt": "Whose voice was it in?",
+     "prompt": "Write the exact sentence the voice used to talk you out of today's practice. Whose voice did it actually sound like?",
      "lines": 6
     },
     {
@@ -1263,9 +1270,9 @@
   {
    "day_number": 10,
    "week_number": 2,
-   "title": "A little more",
+   "title": "Doers, not hearers",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "steps",
@@ -1273,18 +1280,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Repeat a session from last week",
-       "sub": "The same one. Same route, same movements."
+       "head": "Read James 1:22 slowly",
+       "sub": "Twice."
       },
       {
        "n": 2,
-       "head": "Add one thing",
-       "sub": "Five minutes, one round, one hill, one increment. One. Not four."
+       "head": "Name one place",
+       "sub": "Where you hear the word and don't do it. One specific, ordinary place."
       },
       {
        "n": 3,
-       "head": "Write both numbers",
-       "sub": "Last week's and this week's, side by side, in the book."
+       "head": "Do one small thing about it today",
+       "sub": "Not the whole fix. One small, real thing."
       }
      ]
     },
@@ -1292,21 +1299,21 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "A repeated session",
-      "One increment added",
-      "Both numbers written"
+      "The verse read twice",
+      "One specific place named",
+      "One small act done"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
-     "t": "note",
-     "tone": "note",
-     "title": "In the book",
-     "v": "Both numbers go in the book, side by side."
+     "t": "scripture",
+     "ref": "James 1:22, KJV",
+     "text": "But be ye doers of the word, and not hearers only, deceiving your own selves.",
+     "why": "Hearing without doing is its own kind of self-deception."
     },
     {
      "t": "write",
-     "prompt": "How much more did you want to add, and what stopped you?",
+     "prompt": "Where in your life are you a hearer of the word and not a doer of it? Name one specific place.",
      "lines": 6
     },
     {
@@ -1317,9 +1324,9 @@
   {
    "day_number": 11,
    "week_number": 2,
-   "title": "Carry something",
+   "title": "Keep going when it's boring",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "steps",
@@ -1327,18 +1334,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Pick something heavy",
-       "sub": "Water, groceries, a loaded bag, a child. Heavy enough that you would rather not."
+       "head": "The five things, unremarkable",
+       "sub": "No extra effort to make today feel spiritual."
       },
       {
        "n": 2,
-       "head": "Carry it far",
-       "sub": "Far enough to change hands at least twice. Ribs down, whole foot, nothing shoved sideways."
+       "head": "Name one thing that hasn't produced anything yet",
+       "sub": "A prayer, an effort, a hope. Write it down."
       },
       {
        "n": 3,
-       "head": "Notice where it fails first",
-       "sub": "Grip, shoulder, breath, or will. One word in the book."
+       "head": "Leave it with Him, on paper",
+       "sub": "Without demanding a timeline."
       }
      ]
     },
@@ -1346,21 +1353,21 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "One loaded carry",
-      "Hands changed twice",
-      "One word written"
+      "An ordinary day's practice, done fully",
+      "One unproductive-feeling effort named",
+      "Left on the page, undemanded"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
-     "t": "note",
-     "tone": "note",
-     "title": "In the book",
-     "v": "The one word goes in the book."
+     "t": "scripture",
+     "ref": "Galatians 6:9, KJV",
+     "text": "And let us not be weary in well doing: for in due season we shall reap, if we faint not.",
+     "why": "Due season — not today, and not never."
     },
     {
      "t": "write",
-     "prompt": "What are you already carrying that nobody has ever offered to take?",
+     "prompt": "What has felt like well doing that hasn't produced anything yet? Write it down and leave it with God.",
      "lines": 6
     },
     {
@@ -1371,9 +1378,9 @@
   {
    "day_number": 12,
    "week_number": 2,
-   "title": "The hill",
+   "title": "Commit your way",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "steps",
@@ -1381,18 +1388,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Find a hill or a staircase",
-       "sub": "Real incline. Whatever your town has."
+       "head": "Read Psalm 37:5 twice",
+       "sub": "Slowly."
       },
       {
        "n": 2,
-       "head": "Go up it repeatedly for twenty minutes",
-       "sub": "Slow is fine. Stopping is fine. Turning around is not."
+       "head": "Name one thing you are holding, not committing",
+       "sub": "Be specific — a decision, a relationship, a fear."
       },
       {
        "n": 3,
-       "head": "Nose-breathe as long as you can",
-       "sub": "Note the minute it breaks. Write it down."
+       "head": "Say the word \"commit\" out loud, once",
+       "sub": "About that thing. Then leave your hands open for a moment before you move on."
       }
      ]
     },
@@ -1400,9 +1407,9 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Twenty minutes of climbing",
-      "The minute your breathing broke, written",
-      "Shapes done"
+      "The verse read twice",
+      "One held-not-committed thing named",
+      "The word said out loud"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
@@ -1410,11 +1417,17 @@
      "t": "note",
      "tone": "note",
      "title": "In the book",
-     "v": "The minute goes in the book."
+     "v": "The name of the thing goes in the book."
+    },
+    {
+     "t": "scripture",
+     "ref": "Psalm 37:5, KJV",
+     "text": "Commit thy way unto the LORD; trust also in him; and he shall bring it to pass.",
+     "why": "Committing is a verb, done with your hands, not just felt."
     },
     {
      "t": "write",
-     "prompt": "What did you say to yourself at minute fourteen?",
+     "prompt": "What are you carrying that you haven't actually committed to Him — you're holding it and calling it surrendered?",
      "lines": 6
     },
     {
@@ -1425,32 +1438,28 @@
   {
    "day_number": 13,
    "week_number": 2,
-   "title": "The honest half-hour",
+   "title": "The race",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
-    {
-     "t": "text",
-     "v": "Today is boring. That is the dose."
-    },
     {
      "t": "steps",
      "title": "Do this, in this order",
      "items": [
       {
        "n": 1,
-       "head": "Thirty minutes, unremarkable",
-       "sub": "No hill, no load, no music that makes you feel like the main character."
+       "head": "Read Hebrews 12:1 twice",
+       "sub": "Note the word \"weight\" — not sin, just weight."
       },
       {
        "n": 2,
-       "head": "Do not shorten it",
-       "sub": "Not by two minutes. Not by ninety seconds."
+       "head": "Name one weight",
+       "sub": "Something slowing you that isn't even wrong. A commitment, a worry, a comparison."
       },
       {
        "n": 3,
-       "head": "Log the actual number",
-       "sub": "If it was twenty-six, log twenty-six."
+       "head": "Write what it would look like to lay it down for one day",
+       "sub": "Just today. Not forever."
       }
      ]
     },
@@ -1458,15 +1467,20 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Thirty minutes exactly",
-      "Nothing added and nothing shaved",
-      "The honest number logged"
+      "One \"weight\" named, distinct from sin",
+      "One concrete way to lay it down today, written"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
+     "t": "scripture",
+     "ref": "Hebrews 12:1, KJV",
+     "text": "Let us lay aside every weight, and the sin which doth so easily beset us, and let us run with patience the race that is set before us.",
+     "why": "A weight is not a sin. Both slow you, and only one needs repenting of."
+    },
+    {
      "t": "write",
-     "prompt": "Where else in your life do you shave the last four minutes and call it done?",
+     "prompt": "Name the \"weight\" Hebrews 12 talks about — not sin, just weight. What is slowing your race that isn't even wrong?",
      "lines": 6
     },
     {
@@ -1479,7 +1493,7 @@
    "week_number": 2,
    "title": "Fourteen",
    "kind": "milestone",
-   "minutes": 30,
+   "minutes": 15,
    "blocks": [
     {
      "t": "steps",
@@ -1487,12 +1501,12 @@
      "items": [
       {
        "n": 1,
-       "head": "Move first",
-       "sub": "Thirty minutes, your time."
+       "head": "The five things first",
+       "sub": "Then sit down."
       },
       {
        "n": 2,
-       "head": "Read the three sentences out loud",
+       "head": "Read the three negotiation sentences out loud",
        "sub": "Standing, flat, no laugh at the end. All three."
       },
       {
@@ -1506,7 +1520,7 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Fourteen of fourteen done",
+      "Fourteen of fourteen shown up",
       "The three sentences read aloud standing",
       "One line written in the book"
      ],
@@ -1516,11 +1530,11 @@
      "t": "note",
      "tone": "note",
      "title": "In the book",
-     "v": "The three sentences and the line are in the book. The read-back is yours alone."
+     "v": "The sentences and the line are in the book. The read-back is yours alone."
     },
     {
      "t": "write",
-     "prompt": "Halfway. What has already changed that you were not expecting?",
+     "prompt": "Read your three sentences out loud, standing. What do these three have in common?",
      "lines": 6
     },
     {
@@ -1531,13 +1545,19 @@
   {
    "day_number": 15,
    "week_number": 3,
-   "title": "The landing",
+   "title": "The father runs",
    "kind": "teaching",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "text",
-     "v": "I scheduled this week a year ago. If you have already fallen, you are on time."
+     "v": "I scheduled this week a year ago. If you have already missed a day, you are on time."
+    },
+    {
+     "t": "figure",
+     "pose": "exhale",
+     "label": "One long exhale",
+     "cue": "Before you begin. Let your shoulders actually drop."
     },
     {
      "t": "steps",
@@ -1545,18 +1565,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Ten landings",
-       "sub": "Off a low step. Feet flat, knees soft, chest up. Still for one second at the bottom. Quiet."
+       "head": "Read Luke 15:20 twice",
+       "sub": "Slowly. Notice who moves first."
       },
       {
        "n": 2,
-       "head": "Then the shapes, then the thirty",
-       "sub": "In that order."
+       "head": "The five things, in order",
+       "sub": "Then sit with what you just read."
       },
       {
        "n": 3,
-       "head": "Say the sentence out loud",
-       "sub": "Falling is routine. Once, standing. It will feel stupid and it is not."
+       "head": "Say it out loud, once",
+       "sub": "\"Falling is not the end of the story.\" It will feel strange and it is not."
       }
      ]
     },
@@ -1564,16 +1584,21 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Ten landings",
-      "Shapes",
-      "Thirty minutes",
+      "The verse read twice",
+      "The five things done",
       "The sentence said aloud"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
+     "t": "scripture",
+     "ref": "Luke 15:20, KJV",
+     "text": "When he was yet a great way off, his father saw him, and had compassion, and ran.",
+     "why": "The father was watching for him before he ever turned around."
+    },
+    {
      "t": "write",
-     "prompt": "What was the last thing you quit, and how many days passed before you decided it was over?",
+     "prompt": "Write about the last time you \"came to yourself\" the way the prodigal son did. What did God's actual response look like, not what you assumed it would be?",
      "lines": 6
     },
     {
@@ -1586,7 +1611,7 @@
    "week_number": 3,
    "title": "Four words",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "steps",
@@ -1600,12 +1625,12 @@
       {
        "n": 2,
        "head": "Name the thin day",
-       "sub": "Look back at fifteen days. Write the weekday."
+       "sub": "Look back at fifteen days. Write the weekday most likely to slip."
       },
       {
        "n": 3,
        "head": "Post the four words as a drill",
-       "sub": "In the Circle, today, with nothing wrong. Missed one, back today. Say you are drilling it. Everybody else is too."
+       "sub": "In the Circle, today, with nothing wrong. \"Missed one, back today.\" Say you're drilling it — others are too."
       }
      ]
     },
@@ -1626,8 +1651,14 @@
      "v": "The plan goes in the book, on the return-plan page. The post goes in the Circle."
     },
     {
+     "t": "scripture",
+     "ref": "Joel 2:25, KJV",
+     "text": "And I will restore to you the years that the locust hath eaten, the cankerworm, and the caterpiller, and the palmerworm, my great army which I sent among you.",
+     "why": "Restoration named specifically — the lost time itself, not just a feeling."
+    },
+    {
      "t": "write",
-     "prompt": "What would you have to believe about yourself for a missed day to mean nothing?",
+     "prompt": "Write the four words you'll say when you miss a day. Then write who you'll tell.",
      "lines": 6
     },
     {
@@ -1638,32 +1669,28 @@
   {
    "day_number": 17,
    "week_number": 3,
-   "title": "Return time",
+   "title": "Restore the joy",
    "kind": "teaching",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
-    {
-     "t": "text",
-     "v": "Return time is the only number that matters. Not the length of the streak. The gap, in days, between falling off and getting back on."
-    },
     {
      "t": "steps",
      "title": "Do this, in this order",
      "items": [
       {
        "n": 1,
-       "head": "Open your record",
-       "sub": "Find every blank or thin day in seventeen days."
+       "head": "Read Psalm 51:12 twice",
+       "sub": "Slowly."
       },
       {
        "n": 2,
-       "head": "Count the gaps",
-       "sub": "Days between each thin one and the next full one. Write the numbers in the book."
+       "head": "Name when the joy quietly went missing",
+       "sub": "Not a dramatic fall — a Tuesday when it just got flat."
       },
       {
        "n": 3,
-       "head": "Circle the biggest gap",
-       "sub": "That number is your actual training age. Not the streak."
+       "head": "Ask, out loud, for it back",
+       "sub": "Specifically, by name, not in general terms."
       }
      ]
     },
@@ -1671,21 +1698,21 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Every gap counted",
-      "Numbers in the book",
-      "The biggest one circled"
+      "The verse read twice",
+      "A specific moment named",
+      "The request said out loud"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
-     "t": "note",
-     "tone": "note",
-     "title": "In the book",
-     "v": "The gaps and the circled number go in the book."
+     "t": "scripture",
+     "ref": "Psalm 51:12, KJV",
+     "text": "Restore unto me the joy of thy salvation.",
+     "why": "Joy can be asked for by name, not just waited for."
     },
     {
      "t": "write",
-     "prompt": "What is the longest you have ever gone between falling down and getting up, in any part of your life?",
+     "prompt": "What joy has quietly gone missing since the last time you felt close to God? Be specific about when.",
      "lines": 6
     },
     {
@@ -1696,9 +1723,9 @@
   {
    "day_number": 18,
    "week_number": 3,
-   "title": "No mirror, no clock",
+   "title": "I shall arise",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "steps",
@@ -1706,18 +1733,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Cover the mirror",
-       "sub": "A towel over it. Before you start."
+       "head": "One day, no requests, only listening",
+       "sub": "Read the Scripture, then sit in real silence for a full minute before you write."
       },
       {
        "n": 2,
-       "head": "Leave the watch on the side",
-       "sub": "No timing, no distance, no count."
+       "head": "Read Micah 7:8 twice",
+       "sub": "After the silence."
       },
       {
        "n": 3,
-       "head": "Move by feel for what you think is thirty minutes",
-       "sub": "Then check. Write the two numbers, what you guessed and what it was."
+       "head": "Write what surfaced in the silence, plainly",
+       "sub": "No editing it into something tidier."
       }
      ]
     },
@@ -1725,21 +1752,21 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Mirror covered",
-      "Nothing measured during",
-      "Both numbers written after"
+      "A full minute of real silence taken",
+      "The verse read twice after",
+      "What surfaced, written plainly"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
-     "t": "note",
-     "tone": "note",
-     "title": "In the book",
-     "v": "The two numbers go in the book."
+     "t": "scripture",
+     "ref": "Micah 7:8, KJV",
+     "text": "Rejoice not against me, O mine enemy: when I fall, I shall arise; when I sit in darkness, the LORD shall be a light unto me.",
+     "why": "Arising is stated as fact, not hope."
     },
     {
      "t": "write",
-     "prompt": "How far off were you, and what does it tell you about how much of this you have been outsourcing?",
+     "prompt": "Where have you already fallen this month, and have you actually gotten back up, or just stopped talking about it?",
      "lines": 6
     },
     {
@@ -1750,9 +1777,9 @@
   {
    "day_number": 19,
    "week_number": 3,
-   "title": "The second attempt",
+   "title": "Near to the brokenhearted",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "steps",
@@ -1760,18 +1787,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Go back to something you were bad at",
-       "sub": "Day four's get-ups, day twelve's hill, the push-up level you did not like."
+       "head": "Read Psalm 34:18 twice",
+       "sub": "Slowly."
       },
       {
        "n": 2,
-       "head": "Do it again, deliberately",
-       "sub": "Same thing, no adjustments to make it easier."
+       "head": "Name one thing you've been managing instead of bringing to Him",
+       "sub": "Specifically, not in general terms."
       },
       {
        "n": 3,
-       "head": "Write one word for the difference",
-       "sub": "Not the number. The feeling in your body when you started."
+       "head": "Bring it, today, in one sentence",
+       "sub": "Out loud or on the page."
       }
      ]
     },
@@ -1779,20 +1806,21 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "The same hard thing, done a second time",
-      "One word written"
+      "The verse read twice",
+      "One managed thing named",
+      "Brought to Him in one sentence"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
-     "t": "note",
-     "tone": "note",
-     "title": "In the book",
-     "v": "The word goes in the book."
+     "t": "scripture",
+     "ref": "Psalm 34:18, KJV",
+     "text": "The LORD is nigh unto them that are of a broken heart; and saveth such as be of a contrite spirit.",
+     "why": "Nigh — near, not distant and waiting for you to get it together first."
     },
     {
      "t": "write",
-     "prompt": "Where in your life do you only ever attempt things once?",
+     "prompt": "What is broken in you right now that you've been managing instead of bringing to Him?",
      "lines": 6
     },
     {
@@ -1803,9 +1831,9 @@
   {
    "day_number": 20,
    "week_number": 3,
-   "title": "Cut corners",
+   "title": "A new thing",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "steps",
@@ -1813,18 +1841,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Move first",
-       "sub": "Thirty minutes, at your time."
+       "head": "Read Isaiah 43:18–19 twice",
+       "sub": "Slowly."
       },
       {
        "n": 2,
-       "head": "Then audit twenty days",
-       "sub": "Where have you been shaving? Minutes, shapes, the written line, the honest number."
+       "head": "Name one \"former thing\" you keep rehearsing",
+       "sub": "An old failure, an old label, an old ending."
       },
       {
        "n": 3,
-       "head": "Write the three corners",
-       "sub": "Plainly, in the book. No apology and no plan attached."
+       "head": "Write one line about what might be springing up",
+       "sub": "That you haven't named yet. Guess if you have to."
       }
      ]
     },
@@ -1832,21 +1860,21 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Twenty minutes of honest audit",
-      "Three corners written",
-      "Nothing promised about them yet"
+      "The verse read twice",
+      "One former thing named",
+      "One guess at the new thing written"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
-     "t": "note",
-     "tone": "note",
-     "title": "In the book",
-     "v": "The three corners go in the book."
+     "t": "scripture",
+     "ref": "Isaiah 43:18–19, KJV",
+     "text": "Remember ye not the former things, neither consider the things of old. Behold, I will do a new thing; now it shall spring forth; shall ye not know it?",
+     "why": "The new thing is already springing forth — the question is whether you'll notice it."
     },
     {
      "t": "write",
-     "prompt": "The little things when you cut corners show. Where will yours show first?",
+     "prompt": "What \"former thing\" is God asking you to stop rehearsing? What new thing might be springing up that you haven't named yet?",
      "lines": 6
     },
     {
@@ -1859,7 +1887,7 @@
    "week_number": 3,
    "title": "Twenty-one",
    "kind": "milestone",
-   "minutes": 30,
+   "minutes": 15,
    "blocks": [
     {
      "t": "steps",
@@ -1867,8 +1895,8 @@
      "items": [
       {
        "n": 1,
-       "head": "Move, then sit",
-       "sub": "Thirty minutes first. Always."
+       "head": "The five things first",
+       "sub": "Then sit down."
       },
       {
        "n": 2,
@@ -1878,7 +1906,7 @@
       {
        "n": 3,
        "head": "Write your return time as one number",
-       "sub": "On the front page of the workbook, where you will see it. That number is what you are taking into the last stretch."
+       "sub": "On the front page of the workbook, where you will see it. That number is what you're taking into the last stretch."
       }
      ]
     },
@@ -1886,7 +1914,7 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Twenty-one days accounted for, honestly",
+      "Twenty-one days honestly accounted for",
       "All of it read back",
       "Return time written on the front page"
      ],
@@ -1900,7 +1928,7 @@
     },
     {
      "t": "write",
-     "prompt": "Three weeks. What is different about the way you enter a room?",
+     "prompt": "Read all twenty-one days back, blanks included. What is different about how you talk to God now versus day one?",
      "lines": 6
     },
     {
@@ -1911,13 +1939,13 @@
   {
    "day_number": 22,
    "week_number": 4,
-   "title": "Nine, not seven",
+   "title": "Ask",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "text",
-     "v": "Nine days, not seven. You are past the part where this is impressive and into the part where it is simply what you do."
+     "v": "Nine days, not seven. You are past the part where this is new and into the part where it is simply what you do."
     },
     {
      "t": "steps",
@@ -1925,18 +1953,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Count forward",
-       "sub": "Write today's date and day thirty's date in the book. Look at both."
+       "head": "Read Matthew 7:7 twice",
+       "sub": "Slowly."
       },
       {
        "n": 2,
-       "head": "Thirty minutes, ordinary",
-       "sub": "Nothing special about today on purpose."
+       "head": "Name one specific thing, out loud",
+       "sub": "Not vague. A verb, a person, a date if you have one."
       },
       {
        "n": 3,
-       "head": "Write one line",
-       "sub": "What you would have told yourself on day twenty-eight if nobody had warned you."
+       "head": "Write it down where you'll see it again",
+       "sub": "On the front of the workbook, near your return time."
       }
      ]
     },
@@ -1944,21 +1972,21 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Both dates written",
-      "Thirty minutes",
-      "One line in the book"
+      "The verse read twice",
+      "One specific ask named out loud",
+      "Written down visibly"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
-     "t": "note",
-     "tone": "note",
-     "title": "In the book",
-     "v": "The dates and the line go in the book."
+     "t": "scripture",
+     "ref": "Matthew 7:7, KJV",
+     "text": "Ask, and it shall be given you; seek, and ye shall find; knock, and it shall be opened unto you.",
+     "why": "Three verbs, all active — asking is not passive waiting."
     },
     {
      "t": "write",
-     "prompt": "What do you usually do in the last ten percent of something?",
+     "prompt": "What have you stopped asking God for because you got tired of asking? Ask for it again, in writing.",
      "lines": 6
     },
     {
@@ -1969,9 +1997,9 @@
   {
    "day_number": 23,
    "week_number": 4,
-   "title": "Post the real one",
+   "title": "Make it known",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "steps",
@@ -1979,18 +2007,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Move first",
-       "sub": "Thirty minutes."
+       "head": "Read Philippians 4:6 twice",
+       "sub": "Slowly."
       },
       {
        "n": 2,
-       "head": "Post the true version",
-       "sub": "In the Circle. The number, the mood, what you almost did instead. No tidying."
+       "head": "Post the true version of your month, in the Circle",
+       "sub": "The number of missed days, the mood, what you almost quit at. No tidying."
       },
       {
        "n": 3,
-       "head": "Leave it up",
-       "sub": "Do not edit it, do not add a joke to the end, do not delete it at eleven."
+       "head": "Turn today's anxious thing into a written request",
+       "sub": "Instead of a worry, on the same page."
       }
      ]
     },
@@ -1998,15 +2026,20 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "One unedited post",
-      "Left up overnight",
-      "Shapes done"
+      "One unedited post left up",
+      "One worry rewritten as a request"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
+     "t": "scripture",
+     "ref": "Philippians 4:6, KJV",
+     "text": "Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God.",
+     "why": "Made known — spoken plainly, not just carried silently."
+    },
+    {
      "t": "write",
-     "prompt": "What were you afraid they would think, and has any woman in that feed ever thought it about anybody else?",
+     "prompt": "Write the thing you're anxious about right now, plainly, then write it again as a request instead of a worry.",
      "lines": 6
     },
     {
@@ -2017,9 +2050,9 @@
   {
    "day_number": 24,
    "week_number": 4,
-   "title": "Thank you, then stop",
+   "title": "Delight",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "steps",
@@ -2027,18 +2060,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Move",
-       "sub": "Thirty minutes."
+       "head": "Read Psalm 37:4 twice",
+       "sub": "Slowly."
       },
       {
        "n": 2,
-       "head": "Comment on three other women",
-       "sub": "By name, with a specific detail. You are doing amazing does not count."
+       "head": "Write the true desire under the safe ones",
+       "sub": "The practical answer, then underneath it, the one you actually want."
       },
       {
        "n": 3,
-       "head": "When somebody says something good to you",
-       "sub": "Say thank you. Then count three seconds of silence before you say anything else. Write down what happened in your chest."
+       "head": "Say the true one out loud, once",
+       "sub": "Even if it embarrasses you a little."
       }
      ]
     },
@@ -2046,21 +2079,20 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Three named comments",
-      "One compliment received without deflection",
-      "One line about what your chest did"
+      "The safe desire and the true one both written",
+      "The true one said aloud"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
-     "t": "note",
-     "tone": "note",
-     "title": "In the book",
-     "v": "The line goes in the book. The comments go in the Circle."
+     "t": "scripture",
+     "ref": "Psalm 37:4, KJV",
+     "text": "Delight thyself also in the LORD; and he shall give thee the desires of thine heart.",
+     "why": "The desires of your heart — not the ones that sound impressive to say out loud."
     },
     {
      "t": "write",
-     "prompt": "Which is yours — the redirect, the diminish, or the laugh? Write the exact words you use.",
+     "prompt": "What is the actual desire of your heart under all the practical ones? Write the true one, not the safe one.",
      "lines": 6
     },
     {
@@ -2071,9 +2103,9 @@
   {
    "day_number": 25,
    "week_number": 4,
-   "title": "The compulsories",
-   "kind": "session",
-   "minutes": 40,
+   "title": "Thoughts of peace",
+   "kind": "practice",
+   "minutes": 10,
    "blocks": [
     {
      "t": "steps",
@@ -2081,18 +2113,18 @@
      "items": [
       {
        "n": 1,
-       "head": "All eight, one session",
-       "sub": "Floor and up. Kneel and rise. Lift something heavy. Carry it far. Carry it upstairs. Something overhead onto a shelf. Stand for a while. Walk."
+       "head": "Read Jeremiah 29:11 twice",
+       "sub": "Slowly."
       },
       {
        "n": 2,
-       "head": "Do not rush them",
-       "sub": "Forty minutes is fine. This one is allowed to run long."
+       "head": "Write what you believe God's plan for you actually is",
+       "sub": "Before you re-read the verse."
       },
       {
        "n": 3,
-       "head": "Mark the two that were hardest",
-       "sub": "In the book. Those are what you take into the next program."
+       "head": "Compare the two, honestly",
+       "sub": "Where do they agree, where do they not."
       }
      ]
     },
@@ -2100,20 +2132,20 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "All eight patterns done in one session",
-      "The two hardest marked in the book"
+      "Your own belief written first, unprompted",
+      "Compared honestly to the verse"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
-     "t": "note",
-     "tone": "note",
-     "title": "In the book",
-     "v": "The two marks go in the book."
+     "t": "scripture",
+     "ref": "Jeremiah 29:11, KJV",
+     "text": "For I know the thoughts that I think toward you, saith the LORD, thoughts of peace, and not of evil, to give you an expected end.",
+     "why": "His thoughts toward you are named plainly here, not left to guess."
     },
     {
      "t": "write",
-     "prompt": "Which of the eight will you need most at seventy-five, and which stairs are you thinking of?",
+     "prompt": "What do you believe God's plans for you actually are? Write it, then compare it honestly to what Jeremiah 29:11 says.",
      "lines": 6
     },
     {
@@ -2124,13 +2156,15 @@
   {
    "day_number": 26,
    "week_number": 4,
-   "title": "The long one, and the ask",
+   "title": "Believe you receive",
    "kind": "session",
    "minutes": 60,
    "blocks": [
     {
-     "t": "text",
-     "v": "Ask boldly. Prepare like it is coming. Then receive it without putting it down and running."
+     "t": "figure",
+     "pose": "walk",
+     "label": "An hour with Him",
+     "cue": "A real walk if you have one, praying the whole way, or an hour at the table with the book open. Longer than your usual few minutes, on purpose."
     },
     {
      "t": "steps",
@@ -2138,18 +2172,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Sixty minutes, conversational",
-       "sub": "Slower than you want. No podcast for the first twenty or the last ten."
+       "head": "One hour with Him",
+       "sub": "A real walk if you have one, praying the whole way, or an hour at the table with the book open."
       },
       {
        "n": 2,
-       "head": "At minute five, say it out loud",
-       "sub": "The thing you have been waiting on. Out loud, to God, walking. Then carry it without solving it."
+       "head": "At some point, say your ask out loud again",
+       "sub": "The one from day twenty-two. Notice if it's changed."
       },
       {
        "n": 3,
-       "head": "When you get home, write the ask",
-       "sub": "Verbs only, ten minutes. Circle the one that tightened your chest. Then say it out loud, standing, eyes open."
+       "head": "Write the ask in full",
+       "sub": "All four steps of the inner work, ending standing, eyes open."
       }
      ]
     },
@@ -2157,9 +2191,9 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Sixty minutes on your feet",
-      "The ask written in four steps",
-      "Said out loud standing"
+      "A full hour taken",
+      "The ask said out loud again and compared to day twenty-two",
+      "The ask written in four steps"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
@@ -2170,8 +2204,14 @@
      "v": "The ask goes in the book, on the ask page."
     },
     {
+     "t": "scripture",
+     "ref": "Mark 11:24, KJV",
+     "text": "What things soever ye desire, when ye pray, believe that ye receive them, and ye shall have them.",
+     "why": "Believing precedes seeing — that is the order given here, not the reverse."
+    },
+    {
      "t": "write",
-     "prompt": "Minute thirty-eight. Where were you, what did you want, and what did you do with the wanting?",
+     "prompt": "Write one thing you're asking God for and believing you've already received, before you see it.",
      "lines": 6
     },
     {
@@ -2184,7 +2224,7 @@
    "week_number": 4,
    "title": "Prepare like it is coming",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "steps",
@@ -2192,13 +2232,13 @@
      "items": [
       {
        "n": 1,
-       "head": "Thirty minutes",
+       "head": "The five things",
        "sub": "Ordinary, at your time."
       },
       {
        "n": 2,
        "head": "Do one thing that only makes sense if the answer is yes",
-       "sub": "Book it, clear it, buy the thing, make the call, put it in the calendar. Small and real."
+       "sub": "Book it, clear it, make the call, put it in the calendar. Small and real."
       },
       {
        "n": 3,
@@ -2223,8 +2263,14 @@
      "v": "The line goes in the book."
     },
     {
+     "t": "scripture",
+     "ref": "1 Thessalonians 5:16–18, KJV",
+     "text": "Rejoice evermore. Pray without ceasing. In every thing give thanks: for this is the will of God in Christ Jesus concerning you.",
+     "why": "Thanks given before the outcome arrives is its own kind of preparing."
+    },
+    {
      "t": "write",
-     "prompt": "What have you been asking for while quietly arranging your life around it not arriving?",
+     "prompt": "What would it look like to give thanks for something you're currently frustrated about? Write the thanks anyway.",
      "lines": 6
     },
     {
@@ -2235,9 +2281,9 @@
   {
    "day_number": 28,
    "week_number": 4,
-   "title": "The repeat",
+   "title": "Search me",
    "kind": "milestone",
-   "minutes": 40,
+   "minutes": 15,
    "blocks": [
     {
      "t": "steps",
@@ -2245,23 +2291,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Warm up properly",
-       "sub": "Ten minutes. Same as day eight."
+       "head": "Read Psalm 139:23–24 twice",
+       "sub": "Slowly, and mean it before you read on."
       },
       {
        "n": 2,
-       "head": "Take all five again, cold",
-       "sub": "Same order, one attempt each, nothing retaken."
+       "head": "Ask Him, out loud, to search you",
+       "sub": "Then sit for two full minutes writing nothing."
       },
       {
        "n": 3,
-       "head": "Write the second column",
-       "sub": "Beside the first, on the same page. Both columns visible at once."
-      },
-      {
-       "n": 4,
-       "head": "Sit with the page for two full minutes",
-       "sub": "Writing nothing. Then one sentence, with no well in it."
+       "head": "Write what surfaced",
+       "sub": "Plainly, even if it's uncomfortable. No tidying."
       }
      ]
     },
@@ -2269,10 +2310,9 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Five numbers retaken cold",
-      "Both columns on one page",
-      "Two silent minutes",
-      "One sentence with no hedge in it"
+      "The verse read and prayed, not just read",
+      "Two silent minutes taken",
+      "What surfaced written honestly"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
@@ -2280,11 +2320,17 @@
      "t": "note",
      "tone": "note",
      "title": "In the book",
-     "v": "The second column goes in the book, beside the first, on the baseline page."
+     "v": "Written here in the book."
+    },
+    {
+     "t": "scripture",
+     "ref": "Psalm 139:23–24, KJV",
+     "text": "Search me, O God, and know my heart: try me, and know my thoughts: And see if there be any wicked way in me, and lead me in the way everlasting.",
+     "why": "A prayer that invites correction, not just comfort."
     },
     {
      "t": "write",
-     "prompt": "Both columns. What do these numbers say about you, and say it without a single well.",
+     "prompt": "Ask God to search you, and write down whatever comes up, even if it's uncomfortable.",
      "lines": 6
     },
     {
@@ -2295,13 +2341,13 @@
   {
    "day_number": 29,
    "week_number": 4,
-   "title": "The one nobody talks about",
+   "title": "I shall not want",
    "kind": "practice",
-   "minutes": 30,
+   "minutes": 10,
    "blocks": [
     {
      "t": "text",
-     "v": "There is nothing in today. That is what makes it the hardest day of the month."
+     "v": "There is nothing dramatic in today. That is what makes it the hardest day of the month."
     },
     {
      "t": "steps",
@@ -2309,18 +2355,18 @@
      "items": [
       {
        "n": 1,
-       "head": "Thirty minutes",
-       "sub": "Your time. Your choice. Nothing added, nothing special."
+       "head": "The five things",
+       "sub": "Your time, your choice. Nothing added, nothing special."
       },
       {
        "n": 2,
-       "head": "The shapes",
-       "sub": "Two minutes. Twenty-ninth time."
+       "head": "Read Psalm 23:1 twice",
+       "sub": "Slowly."
       },
       {
        "n": 3,
-       "head": "Log it",
-       "sub": "One sentence. Then close the app and go to bed."
+       "head": "Name one thing you've been providing for yourself instead of trusting Him for",
+       "sub": "Specifically."
       }
      ]
     },
@@ -2328,15 +2374,21 @@
      "t": "check",
      "title": "Done means",
      "items": [
-      "Thirty minutes",
-      "Shapes",
-      "Logged"
+      "The five things",
+      "The verse read twice",
+      "One thing named"
      ],
      "demo": "Tick them. Nobody is grading them."
     },
     {
+     "t": "scripture",
+     "ref": "Psalm 23:1, KJV",
+     "text": "The LORD is my shepherd; I shall not want.",
+     "why": "The shortest sentence you'll read this month, and the hardest to actually believe."
+    },
+    {
      "t": "write",
-     "prompt": "Nothing happened today. Write four sentences about it anyway.",
+     "prompt": "Where have you been striving instead of trusting that the Lord is your shepherd? Name the specific thing you keep trying to provide for yourself.",
      "lines": 6
     },
     {
@@ -2347,13 +2399,13 @@
   {
    "day_number": 30,
    "week_number": 4,
-   "title": "Qualified",
+   "title": "Daily bread",
    "kind": "milestone",
-   "minutes": 30,
+   "minutes": 15,
    "blocks": [
     {
      "t": "text",
-     "v": "Thirty days ago you did not trust your own word. You now have thirty days that argue with you, and you cannot cross-examine a record."
+     "v": "Thirty days ago you weren't sure anyone was listening. You now have thirty entries where you spoke first, and He was already there for every one of them."
     },
     {
      "t": "steps",
@@ -2361,8 +2413,8 @@
      "items": [
       {
        "n": 1,
-       "head": "Move first",
-       "sub": "Thirty minutes. Then the shapes. Then sit down."
+       "head": "The five things first",
+       "sub": "Then sit down."
       },
       {
        "n": 2,
@@ -2377,7 +2429,7 @@
       {
        "n": 4,
        "head": "Choose the door",
-       "sub": "The three doors are on the week page. Do it tonight, while the thirty days are still in your body."
+       "sub": "The three doors are on the week page. Do it tonight, while the thirty days are still fresh."
       }
      ]
     },
@@ -2386,7 +2438,6 @@
      "title": "Done means",
      "items": [
       "Thirty days accounted for, honestly",
-      "Both columns of numbers on one page",
       "The card written",
       "One door chosen"
      ],
@@ -2399,8 +2450,14 @@
      "v": "The card and the door go in the book. The thirty days stay here, and nobody can take them off you."
     },
     {
+     "t": "scripture",
+     "ref": "Matthew 6:11, KJV",
+     "text": "Give us this day our daily bread.",
+     "why": "Not this month's. Not this year's. A portion sized for one day, on purpose — and the asking is meant to happen again tomorrow."
+    },
+    {
      "t": "write",
-     "prompt": "Thirty days, in one sentence. No hedging, no well, no joke on the end.",
+     "prompt": "Read all thirty days back. Write one sentence — no hedging — about who asked for bread on day one, and who is asking now.",
      "lines": 6
     },
     {
