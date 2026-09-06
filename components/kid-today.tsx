@@ -7,7 +7,7 @@ import type { LearningItem } from '@/lib/types'
  * A nine-year-old's Today. Big, warm, short. Stars for things done — a
  * count she can watch grow, never a streak she can lose.
  */
-export function KidToday({ name, items, mealsToday, starsThisWeek }: { name: string; items: LearningItem[]; mealsToday: number; starsThisWeek: number }) {
+export function KidToday({ name, items, mealsToday, starsThisWeek, programs = [] }: { name: string; items: LearningItem[]; mealsToday: number; starsThisWeek: number; programs?: { slug: string; title: string }[] }) {
   const rows: TodoRow[] = items.map((i) => ({ key: i.id, kind: 'link', href: '/app/learning', label: i.title, hint: i.subject, done: Boolean(i.doneToday) }))
   rows.push({ key: 'food', kind: 'link', href: '/app/nutrition/log', label: 'Tell me what you ate', hint: mealsToday ? `${mealsToday} logged — nice` : 'breakfast, lunch, snacks, dinner', done: mealsToday > 0 })
   const done = rows.filter((r) => r.done).length
@@ -29,7 +29,10 @@ export function KidToday({ name, items, mealsToday, starsThisWeek }: { name: str
 
       <TodayChecklist rows={rows} />
 
-      <Link href="/app/learning" className="flex h-[60px] items-center justify-center rounded-2xl bg-primary text-[19px] font-bold text-primary-foreground">Open my learning</Link>
+      {programs.map((p) => (
+        <Link key={p.slug} href={`/app/program/${p.slug}`} className="flex h-[60px] items-center justify-center rounded-2xl bg-primary text-[19px] font-bold text-primary-foreground">{p.title}</Link>
+      ))}
+      <Link href="/app/learning" className={programs.length ? 'text-center text-[15px] font-semibold text-muted-foreground underline underline-offset-[3px]' : 'flex h-[60px] items-center justify-center rounded-2xl bg-primary text-[19px] font-bold text-primary-foreground'}>Open my learning</Link>
     </div>
   )
 }

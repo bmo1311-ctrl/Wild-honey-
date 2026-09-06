@@ -4,7 +4,8 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Check, Pencil, Trash2, UserPlus, X } from 'lucide-react'
-import { addHouseholdMember, createChildAccess, removeHouseholdMember, updateHouseholdMember } from '@/app/actions'
+import { addHouseholdMember, createChildAccess, getChildPermissions, removeHouseholdMember, setChildPermissions, updateHouseholdMember } from '@/app/actions'
+import { COURSES } from '@/lib/courses'
 import type { HouseholdMember } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -26,6 +27,24 @@ export function HouseholdManager({ members }: { members: HouseholdMember[] }) {
   const [access, setAccess] = useState<string | null>(null)
   const [pin, setPin] = useState('')
   const [issued, setIssued] = useState<{ name: string; code: string } | null>(null)
+  const [permsFor, setPermsFor] = useState<string | null>(null)
+  const [perms, setPerms] = useState<{ circle: boolean; program: string[] }>({ circle: false, program: [] })
+
+  function openPerms(id: string) {
+    setPermsFor(id)
+    startTransition(async () => setPerms(await getChildPermissions(id)))
+  }
+  function savePerms(id: string) {
+    startTransition(async () => {
+      const res = await setChildPermissions(id, perms)
+      if ('error' in res && res.error) {
+        toast.error(res.error)
+        return
+      }
+      toast.success('Saved')
+      setPermsFor(null)
+    })
+  }
 
   function giveAccess(id: string, name: string) {
     startTransition(async () => {
@@ -153,6 +172,9 @@ export function HouseholdManager({ members }: { members: HouseholdMember[] }) {
                     {(m as { child_user_id?: string | null }).child_user_id ? 'reset PIN' : 'give her the app'}
                   </button>
                 )}
+                {!m.is_self && (m as { child_user_id?: string | null }).child_user_id && (
+                  <button type="button" onClick={() => openPerms(m.id)} className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold">what she can see</button>
+                )}
                 {!m.is_self && (
                   <button type="button" onClick={() => setConfirming(m.id)} aria-label={`Remove ${m.name}`} className="shrink-0 p-1.5 text-muted-foreground">
                     <Trash2 className="h-4 w-4" />
@@ -170,6 +192,25 @@ export function HouseholdManager({ members }: { members: HouseholdMember[] }) {
           <p className="mt-1 text-[13px] text-muted-foreground text-pretty">She signs in at <span className="font-semibold text-foreground">/kid</span> with your family code and a four-digit PIN. No email, nothing public, no Circle. Everything she logs shows up here for you.</p>
           <input value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))} inputMode="numeric" placeholder="pick a 4-digit PIN" className="mt-3 h-12 w-full rounded-xl bg-background px-3 text-center text-xl tracking-[0.3em] outline-none ring-1 ring-border" />
           <button type="button" onClick={() => giveAccess(m.id, m.name)} disabled={pending || pin.length !== 4} className="mt-2 h-11 w-full rounded-xl bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50">Create her sign-in</button>
+        </div>
+      ) : null })()}
+
+      {permsFor && (() => { const m = members.find((x) => x.id === permsFor); return m ? (
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <p className="font-serif text-[17px] font-semibold">What {m.name} can see</p>
+          <p className="mt-1 text-[13px] text-muted-foreground text-pretty">Off by default. The Circle is a feed of adults who can read and reply to her posts; her name there will not open a page about her.</p>
+          <button type="button" onClick={() => setPerms({ ...perms, circle: !perms.circle })} className={cn('mt-3 flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left ring-1', perms.circle ? 'bg-mindset-pillar text-white ring-transparent' : 'ring-border')}>
+            <span className="text-sm font-medium">The Circle and discussions</span><span className={cn('text-xs', perms.circle ? 'text-white/80' : 'text-muted-foreground')}>{perms.circle ? 'on' : 'off'}</span>
+          </button>
+          {COURSES.map((c) => { const on = perms.program.includes(c.slug); return (
+            <button key={c.slug} type="button" onClick={() => setPerms({ ...perms, program: on ? perms.program.filter((s) => s !== c.slug) : [...perms.program, c.slug] })} className={cn('mt-2 flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left ring-1', on ? 'bg-mindset-pillar text-white ring-transparent' : 'ring-border')}>
+              <span className="text-sm font-medium">{c.title}</span><span className={cn('text-xs', on ? 'text-white/80' : 'text-muted-foreground')}>{on ? 'on' : 'off'}</span>
+            </button>
+          ) })}
+          <div className="mt-3 flex gap-2">
+            <button type="button" onClick={() => savePerms(m.id)} disabled={pending} className="h-11 flex-1 rounded-xl bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50">Save</button>
+            <button type="button" onClick={() => setPermsFor(null)} className="h-11 rounded-xl bg-muted px-4 text-sm font-medium">Cancel</button>
+          </div>
         </div>
       ) : null })()}
 

@@ -11,7 +11,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const me = await getSessionProfile()
   if (me?.id === id) redirect('/app/profile')
   const member = await getPublicProfile(id)
-  if (!member) notFound()
+  if (!member || member.is_child) notFound()
 
   const show = member.profile_show ?? {}
   const [recipes, days, wins] = await Promise.all([

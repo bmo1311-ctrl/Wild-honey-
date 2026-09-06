@@ -1,5 +1,20 @@
-/** What a child's app is: her day, her learning, her food, and her. Nothing social, nothing adult. */
-export const KID_ROUTES = ['/app', '/app/learning', '/app/nutrition/log', '/app/kid-me']
-export function kidAllowed(path: string): boolean {
-  return KID_ROUTES.some((r) => path === r || (r !== '/app' && path.startsWith(r + '/'))) || path.startsWith('/app/nutrition/log')
+export interface ChildPermissions {
+  circle?: boolean
+  program?: string[]
+}
+
+/**
+ * A child's app: her day, her learning, her food, and her — plus whatever
+ * her parent has switched on: the Circle, and specific courses.
+ */
+export function kidAllowed(path: string, perms: ChildPermissions = {}): boolean {
+  const always = ['/app', '/app/learning', '/app/nutrition/log', '/app/kid-me', '/app/checkin']
+  if (always.some((r) => path === r || path.startsWith(r + '/'))) return true
+  if (perms.circle && (path.startsWith('/app/circle') || path.startsWith('/app/members'))) return true
+  if (perms.program?.length) {
+    if (path === '/app/program' || path.startsWith('/app/program?')) return true
+    const m = path.match(/^\/app\/program\/([^/?]+)/)
+    if (m && perms.program.includes(m[1])) return true
+  }
+  return false
 }

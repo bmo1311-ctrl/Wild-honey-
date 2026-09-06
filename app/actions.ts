@@ -2705,3 +2705,29 @@ export async function lookupFamily(familyCode: string) {
 export async function childCredentials(memberId: string, familyCode: string, pin: string) {
   return { email: childEmail(memberId), password: childPassword(familyCode.trim().toUpperCase(), pin) }
 }
+
+/** What a parent has opened for a child. Circle and specific courses; off by default. */
+export async function setChildPermissions(memberId: string, perms: { circle?: boolean; program?: string[] }) {
+  const { supabase, user } = await requireUser()
+  const { data: m } = await supabase.from('household_members').select('child_user_id').eq('id', memberId).eq('owner_id', user.id).maybeSingle()
+  if (!m?.child_user_id) return { error: 'She needs her own sign-in first.' }
+  const admin = createServiceClient()
+  const { error } = await admin
+    .from('profiles')
+    .update({ child_permissions: { circle: Boolean(perms.circle), program: (perms.program ?? []).filter((s) => typeof s === 'string') } })
+    .eq('id', m.child_user_id)
+    .eq('guardian_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/household')
+  return { ok: true }
+}
+
+export async function getChildPermissions(memberId: string) {
+  const { supabase, user } = await requireUser()
+  const { data: m } = await supabase.from('household_members').select('child_user_id').eq('id', memberId).eq('owner_id', user.id).maybeSingle()
+  if (!m?.child_user_id) return { circle: false, program: [] as string[] }
+  const admin = createServiceClient()
+  const { data } = await admin.from('profiles').select('child_permissions').eq('id', m.child_user_id).maybeSingle()
+  const p = (data?.child_permissions ?? {}) as { circle?: boolean; program?: string[] }
+  return { circle: Boolean(p.circle), program: p.program ?? [] }
+}

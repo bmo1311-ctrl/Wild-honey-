@@ -68,6 +68,7 @@ export interface Profile {
   color_season?: 'winter' | 'spring' | 'summer' | 'autumn' | null
   is_child?: boolean
   guardian_id?: string | null
+  child_permissions?: { circle?: boolean; program?: string[] } | null
 }
 
 /** The columns of profiles another member is allowed to see. */
@@ -80,6 +81,7 @@ export interface PublicProfile {
   bio: string | null
   profile_show: { recipes?: boolean; progress?: boolean; wins?: boolean } | null
   color_season: string | null
+  is_child?: boolean
   created_at: string
 }
 

@@ -44,8 +44,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </header>
       <main className="mx-auto max-w-2xl px-5 py-6">{children}</main>
-      {profile.is_child ? <KidNav /> : <BottomNav />}
-      {profile.is_child && <KidGate />}
+      {profile.is_child ? <KidNav perms={profile.child_permissions ?? {}} /> : <BottomNav />}
+      {profile.is_child && <KidGate perms={profile.child_permissions ?? {}} />}
       <TzCookie />
     </div>
   )

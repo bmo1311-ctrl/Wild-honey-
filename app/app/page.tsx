@@ -40,7 +40,8 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     const scope = await getOwnerScope()
     const [items, nutrition] = await Promise.all([getLearningItems(scope?.childMemberId ?? null), getTodayNutrition(scope?.childMemberId ?? null)])
     const stars = items.filter((i) => i.doneToday).length + (nutrition.loggedMeals.length > 0 ? 1 : 0)
-    return <KidToday name={me.name?.split(' ')[0] ?? 'there'} items={items} mealsToday={nutrition.loggedMeals.length} starsThisWeek={stars} />
+    const programs = (me.child_permissions?.program ?? []).map((slug) => getCourse(slug)).filter((c): c is NonNullable<typeof c> => Boolean(c)).map((c) => ({ slug: c.slug, title: c.title }))
+    return <KidToday name={me.name?.split(' ')[0] ?? 'there'} items={items} mealsToday={nutrition.loggedMeals.length} starsThisWeek={stars} programs={programs} />
   }
   const [{ slug, enrollment, currentDay, completedDays, otherSlugs }, profile, activityDates, checkin, nutrition, habits, habitLogs] = await Promise.all([
     getActiveCourseState(preferred),
