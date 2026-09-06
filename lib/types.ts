@@ -48,6 +48,8 @@ export interface Profile {
   timezone: string | null
   season: Season | null
   faith_preference: FaithPreference | null
+  /** Optional and private. Only ever used to raise ingredient cautions. */
+  life_stage: 'pregnant' | 'trying' | 'breastfeeding' | 'none' | null
   communication_style: CommunicationStyle | null
   wake_time: string | null
   bedtime: string | null
@@ -626,4 +628,43 @@ export interface LearningItem {
   created_at: string
   /** filled in by the read helper */
   doneToday?: boolean
+}
+
+// ---- Beauty routines ----
+
+/** Which routine a product belongs to. Mirrors Domain in lib/actives.ts. */
+export type BeautyDomain = 'skin' | 'hair' | 'nails' | 'body'
+
+/** A product in the shared library, built from what members scan. */
+export interface BeautyProduct {
+  id: string
+  barcode: string | null
+  name: string
+  brand: string | null
+  domain: BeautyDomain
+  category: string | null
+  actives: string[]
+  ingredients_raw: string | null
+  image_url: string | null
+  source: string
+  verified: boolean
+  created_at: string
+}
+
+/** One product on one member's shelf. */
+export interface MemberProduct {
+  id: string
+  user_id: string
+  product_id: string | null
+  custom_name: string | null
+  domain: BeautyDomain
+  category: string | null
+  actives: string[]
+  time_of_day: 'am' | 'pm' | 'both' | null
+  frequency_per_week: number | null
+  in_use: boolean
+  notes: string | null
+  created_at: string
+  /** Joined from the library when product_id is set. */
+  product?: BeautyProduct | null
 }

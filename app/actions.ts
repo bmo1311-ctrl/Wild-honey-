@@ -3,6 +3,7 @@
 import { asTier, meets } from '@/lib/access'
 import { courseAllowList } from '@/lib/kid'
 import { revalidatePath } from 'next/cache'
+import { detectActives } from '@/lib/actives'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
@@ -2954,5 +2955,116 @@ export async function updateFoodItem(input: {
     await supabase.from('meal_logs').update({ nutrients: scaleNutrients(nutrients as NutrientMap, factor) }).eq('id', r.id)
   }
   revalidatePath('/app/nutrition/log')
+  return { ok: true }
+}
+
+// ============================================================
+// Beauty routines
+//
+// The shared library grows from what members add: the first person to enter a
+// product leaves it there for everyone. Her own shelf stays hers.
+// ============================================================
+
+/**
+ * Put a product on her shelf, adding it to the shared library if it is new.
+ *
+ * Actives can arrive three ways — read off a scanned ingredient list, read off
+ * a photographed label, or ticked by hand. All three land here the same way.
+ */
+export async function addBeautyProduct(input: {
+  name: string
+  brand?: string
+  domain?: string
+  category?: string
+  actives?: string[]
+  ingredientsRaw?: string
+  barcode?: string
+  timeOfDay?: 'am' | 'pm' | 'both'
+  frequencyPerWeek?: number
+}) {
+  const { supabase, user } = await requireUser()
+  const name = input.name.trim()
+  if (!name) return { error: 'What is it called?' }
+
+  const domain = input.domain ?? 'skin'
+  // Anything readable off the label beats anything typed, so merge the two.
+  const detected = input.ingredientsRaw ? detectActives(input.ingredientsRaw) : []
+  const actives = [...new Set([...(input.actives ?? []), ...detected])]
+
+  let productId: string | null = null
+
+  // A barcode makes it the same product for everyone, so reuse the library row.
+  if (input.barcode) {
+    const { data: existing } = await supabase
+      .from('beauty_products')
+      .select('id')
+      .eq('barcode', input.barcode)
+      .maybeSingle()
+    if (existing) {
+      productId = existing.id
+    } else {
+      const { data: created, error } = await supabase
+        .from('beauty_products')
+        .insert({
+          barcode: input.barcode,
+          name,
+          brand: input.brand?.trim() || null,
+          domain,
+          category: input.category ?? null,
+          actives,
+          ingredients_raw: input.ingredientsRaw ?? null,
+          source: input.ingredientsRaw ? 'label' : 'scan',
+          created_by: user.id,
+        })
+        .select('id')
+        .single()
+      if (error) return { error: error.message }
+      productId = created.id
+    }
+  }
+
+  const { error } = await supabase.from('member_products').insert({
+    user_id: user.id,
+    product_id: productId,
+    custom_name: productId ? null : name,
+    domain,
+    category: input.category ?? null,
+    actives,
+    time_of_day: input.timeOfDay ?? null,
+    frequency_per_week: input.frequencyPerWeek ?? null,
+  })
+  if (error) return { error: error.message }
+
+  revalidatePath('/app/protocols')
+  return { ok: true }
+}
+
+/** Take something off the shelf without losing the history of it. */
+export async function removeBeautyProduct(memberProductId: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase
+    .from('member_products')
+    .update({ in_use: false })
+    .eq('id', memberProductId)
+    .eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/protocols')
+  return { ok: true }
+}
+
+/**
+ * Set the life stage that drives ingredient cautions.
+ *
+ * Optional, private, and used for nothing else. Passing 'none' clears it.
+ */
+export async function setLifeStage(stage: 'pregnant' | 'trying' | 'breastfeeding' | 'none') {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase
+    .from('profiles')
+    .update({ life_stage: stage === 'none' ? null : stage })
+    .eq('id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/protocols')
+  revalidatePath('/app/profile')
   return { ok: true }
 }

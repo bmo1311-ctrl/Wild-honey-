@@ -1,37 +1,85 @@
 import { ProtocolCard } from '@/components/protocol-card'
 import { ProtocolTracker } from '@/components/protocol-tracker'
-import { getActiveEnrollment, getEnrollmentCompletions, getTodayCheckin } from '@/lib/data'
+import { RoutineShelf } from '@/components/routine-shelf'
+import {
+  getActiveEnrollment,
+  getEnrollmentCompletions,
+  getMemberProducts,
+  getSessionProfile,
+  getTodayCheckin,
+} from '@/lib/data'
 import { PROTOCOLS, getProtocol, suggestProtocol } from '@/lib/protocols'
+import type { ShelfItem } from '@/lib/routine'
 import { FeatureOff } from '@/components/feature-off'
 import { FEATURES } from '@/lib/features'
 
+/**
+ * Two different things live here, and keeping them apart matters.
+ *
+ * Resets are time-boxed — five days, then done. Routines never end: they are
+ * rebuilt every time she buys something, and they change with the season and
+ * her cycle. Treating a skincare routine as a five-day protocol would have
+ * fought the model forever.
+ */
 export default async function ProtocolsPage() {
   if (!FEATURES.protocols) return <FeatureOff />
 
-  const [enrollment, todayCheckin] = await Promise.all([getActiveEnrollment(), getTodayCheckin()])
+  const [enrollment, todayCheckin, products, profile] = await Promise.all([
+    getActiveEnrollment(),
+    getTodayCheckin(),
+    getMemberProducts('skin'),
+    getSessionProfile(),
+  ])
   const completions = enrollment ? await getEnrollmentCompletions(enrollment.id) : []
   const activeProtocol = enrollment ? getProtocol(enrollment.protocol_slug) : null
   const suggestedSlug = suggestProtocol(todayCheckin)
 
+  const shelf: ShelfItem[] = products.map((p) => ({
+    id: p.id,
+    name: p.custom_name ?? p.product?.name ?? 'a product',
+    category: p.category ?? p.product?.category ?? null,
+    actives: p.actives?.length ? p.actives : (p.product?.actives ?? []),
+    timeOfDay: p.time_of_day,
+    frequencyPerWeek: p.frequency_per_week,
+  }))
+
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-10">
       <div>
         <h1 className="font-serif text-3xl font-semibold">Protocols</h1>
-        <p className="mt-1 text-sm text-muted-foreground text-pretty">structured, multi-day resets for whatever your body needs right now.</p>
+        <p className="mt-1 text-sm text-muted-foreground text-pretty">
+          resets for a season that needs one, routines for the things you do anyway.
+        </p>
       </div>
 
-      {enrollment && activeProtocol && (
-        <ProtocolTracker enrollment={enrollment} protocol={activeProtocol} completions={completions} />
-      )}
+      {/* Routines — ongoing, rebuilt from what she owns. */}
+      <section>
+        <h2 className="font-serif text-lg font-semibold">Skin</h2>
+        <p className="mb-4 mt-0.5 text-sm text-muted-foreground text-pretty">
+          your products, in the order they actually go on.
+        </p>
+        <RoutineShelf shelf={shelf} lifeStage={profile?.life_stage ?? null} />
+      </section>
 
-      <div>
-        <h2 className="mb-3 font-serif text-lg font-semibold">{enrollment ? 'other protocols' : 'choose a protocol'}</h2>
+      {/* Resets — time-boxed, and they end. */}
+      <section>
+        <h2 className="font-serif text-lg font-semibold">Resets</h2>
+        <p className="mb-4 mt-0.5 text-sm text-muted-foreground text-pretty">
+          a few days of small changes, for when something needs turning around.
+        </p>
+
+        {enrollment && activeProtocol && (
+          <div className="mb-4">
+            <ProtocolTracker enrollment={enrollment} protocol={activeProtocol} completions={completions} />
+          </div>
+        )}
+
         <div className="grid gap-4 sm:grid-cols-2">
           {PROTOCOLS.filter((p) => p.slug !== enrollment?.protocol_slug).map((p) => (
             <ProtocolCard key={p.slug} protocol={p} suggested={!enrollment && p.slug === suggestedSlug} />
           ))}
         </div>
-      </div>
+      </section>
     </div>
   )
 }

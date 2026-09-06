@@ -3,6 +3,9 @@ import { accessFor, asTier, meets, type Access, type Requirement } from '@/lib/a
 import { courseAllowList } from '@/lib/kid'
 import { createClient } from '@/lib/supabase/server'
 import type {
+  BeautyDomain,
+  BeautyProduct,
+  MemberProduct,
   Checkin,
   Challenge,
   CircleFeedItem,
@@ -1609,4 +1612,40 @@ export async function requireTier(required: Requirement, from: string): Promise<
   const access = await getAccess()
   if (!meets(access.tier, required)) redirect(`/app/membership?from=${from}`)
   return access
+}
+
+// ---- Beauty routines ----
+
+/** Everything on her shelf, with the library row joined when there is one. */
+export async function getMemberProducts(domain?: BeautyDomain): Promise<MemberProduct[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  let q = supabase
+    .from('member_products')
+    .select('*, product:beauty_products(*)')
+    .eq('user_id', user.id)
+    .eq('in_use', true)
+    .order('created_at', { ascending: true })
+  if (domain) q = q.eq('domain', domain)
+  return (ok(await q) as MemberProduct[]) ?? []
+}
+
+/** Look a product up in the shared library by its barcode. */
+export async function findProductByBarcode(barcode: string): Promise<BeautyProduct | null> {
+  const supabase = await createClient()
+  const data = ok(await supabase.from('beauty_products').select('*').eq('barcode', barcode).maybeSingle())
+  return (data as BeautyProduct) ?? null
+}
+
+/** Search the shared library by name, so she can pick instead of retyping. */
+export async function searchBeautyProducts(term: string, domain?: BeautyDomain): Promise<BeautyProduct[]> {
+  const clean = term.trim()
+  if (clean.length < 2) return []
+  const supabase = await createClient()
+  let q = supabase.from('beauty_products').select('*').ilike('name', `%${clean}%`).limit(12)
+  if (domain) q = q.eq('domain', domain)
+  return (ok(await q) as BeautyProduct[]) ?? []
 }
