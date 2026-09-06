@@ -9,7 +9,7 @@ import type { LearningItem } from '@/lib/types'
  */
 export function KidToday({ name, items, mealsToday, starsThisWeek, programs = [], earned = 0 }: { name: string; items: LearningItem[]; mealsToday: number; starsThisWeek: number; programs?: { slug: string; title: string }[]; earned?: number }) {
   const rows: TodoRow[] = items.map((i) => ({ key: i.id, kind: 'link', href: '/app/learning', label: i.title, hint: i.subject, done: Boolean(i.doneToday) }))
-  rows.push({ key: 'food', kind: 'link', href: '/app/nutrition/log', label: 'Tell me what you ate', hint: mealsToday ? `${mealsToday} logged — nice` : 'breakfast, lunch, snacks, dinner', done: mealsToday > 0 })
+  rows.push({ key: 'food', kind: 'link', href: '/app/kid-food', label: 'Tell me what you ate', hint: mealsToday ? `${mealsToday} logged — nice` : 'breakfast, lunch, snacks, dinner', done: mealsToday > 0 })
   const done = rows.filter((r) => r.done).length
 
   return (

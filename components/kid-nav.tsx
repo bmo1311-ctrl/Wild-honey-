@@ -13,7 +13,7 @@ export function KidNav({ perms }: { perms: ChildPermissions }) {
     { href: '/app', label: 'Today', icon: Sun },
     ...(perms.program?.length ? [{ href: '/app/program', label: 'Program', icon: BookOpen }] : []),
     { href: '/app/learning', label: 'Learning', icon: GraduationCap },
-    { href: '/app/nutrition/log', label: 'Food', icon: Apple },
+    { href: '/app/kid-food', label: 'Food', icon: Apple },
     { href: '/app/kid-money', label: 'Earn', icon: Coins },
     ...(perms.circle ? [{ href: '/app/circle', label: 'Circle', icon: Users }] : []),
     { href: '/app/kid-me', label: 'Me', icon: Smile },

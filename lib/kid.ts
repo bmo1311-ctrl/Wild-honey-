@@ -8,7 +8,7 @@ export interface ChildPermissions {
  * her parent has switched on: the Circle, and specific courses.
  */
 export function kidAllowed(path: string, perms: ChildPermissions = {}): boolean {
-  const always = ['/app', '/app/learning', '/app/nutrition/log', '/app/kid-me', '/app/kid-money', '/app/checkin']
+  const always = ['/app', '/app/learning', '/app/kid-food', '/app/nutrition/log', '/app/kid-me', '/app/kid-money', '/app/checkin']
   if (always.some((r) => path === r || path.startsWith(r + '/'))) return true
   if (perms.circle && (path.startsWith('/app/circle') || path.startsWith('/app/members'))) return true
   if (perms.program?.length) {
