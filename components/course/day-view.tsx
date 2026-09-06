@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Blocks } from '@/components/course/blocks'
 import { DoneButton } from '@/components/course/done-button'
-import { pillarsOf, splitMilestone } from '@/lib/courses'
+import { pillarsOf, splitMilestone, type Pillar4 } from '@/lib/courses'
 import { PillarDots } from '@/components/course/pillar-dots'
 import type { Course, CourseDay, CourseWriting } from '@/lib/courses'
 import type { Checkin } from '@/lib/types'
@@ -21,6 +21,7 @@ export function DayView({
   doneAt,
   part,
   showNav = true,
+  pillars: pillarsProp,
 }: {
   course: Course
   day: CourseDay
@@ -30,6 +31,7 @@ export function DayView({
   doneAt: string | null
   part?: 1 | 2
   showNav?: boolean
+  pillars?: Pillar4[]
 }) {
   const split = day.kind === 'milestone' ? splitMilestone(day.blocks) : null
   const twoPart = split !== null
@@ -52,8 +54,8 @@ export function DayView({
         <h1 className={cn('mt-1.5 font-serif font-semibold leading-[1.1] text-balance', twoPart ? 'text-[31px]' : 'text-[29px]')}>{day.title}</h1>
         <p className="mt-1.5 flex items-center gap-2 text-sm text-muted-foreground">
           {day.kind} · {day.minutes} min
-          <PillarDots pillars={pillarsOf(day.blocks)} size="md" />
-          <span className="text-xs">{pillarsOf(day.blocks).join(' · ').toLowerCase()}</span>
+          <PillarDots pillars={pillarsProp ?? pillarsOf(day.blocks)} size="md" />
+          <span className="text-xs">{(pillarsProp ?? pillarsOf(day.blocks)).join(' · ').toLowerCase()}</span>
         </p>
 
         {twoPart && (

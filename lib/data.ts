@@ -1066,6 +1066,16 @@ export async function getLearningItems(memberId: string | null): Promise<Learnin
   return items.map((i) => ({ ...i, doneToday: doneIds.has(i.id) }))
 }
 
+// ---- Course day pillars (admin-set) ----
+
+export async function getDayPillars(slug: string): Promise<Record<number, 'Body' | 'Identity' | 'Mindset' | 'Faith'>> {
+  const supabase = await createClient()
+  const data = ok(await supabase.from('course_day_pillars').select('day_number, pillar').eq('course_slug', slug))
+  const out: Record<number, 'Body' | 'Identity' | 'Mindset' | 'Faith'> = {}
+  for (const r of (data as { day_number: number; pillar: 'Body' | 'Identity' | 'Mindset' | 'Faith' }[]) ?? []) out[r.day_number] = r.pillar
+  return out
+}
+
 // ---- Kid rewards ----
 
 export interface KidReward {
@@ -1086,6 +1096,7 @@ export interface KidEarning {
   amount: number
   date: string
   status: 'pending' | 'approved' | 'paid' | 'declined'
+  note?: string | null
 }
 
 export async function getKidRewards(memberId: string): Promise<{ rewards: KidReward[]; earnings: KidEarning[]; balance: { waiting: number; ready: number; paid: number } }> {

@@ -139,7 +139,15 @@ export function pillarsOf(blocks: Block[]): Pillar4[] {
     if (b.t === 'scripture') out.add('Faith')
     if (b.t === 'quote' && /god|lord|pray|faith|scripture|psalm|jesus/i.test(b.v)) out.add('Faith')
   }
-  return (['Body', 'Identity', 'Mindset', 'Faith'] as Pillar4[]).filter((p) => out.has(p))
+  const list = (['Body', 'Identity', 'Mindset', 'Faith'] as Pillar4[]).filter((p) => out.has(p))
+  // a body-first course: a day that reads as nothing in particular is a Body day
+  return list.length ? list : ['Body']
+}
+
+/** The pillar to show for a day: what an admin set, else what the blocks say. */
+export function pillarOfDay(day: CourseDay, overrides: Record<number, Pillar4>): Pillar4[] {
+  const set = overrides[day.day_number]
+  return set ? [set] : pillarsOf(day.blocks)
 }
 
 /**

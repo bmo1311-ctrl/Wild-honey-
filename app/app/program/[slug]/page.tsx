@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
-import { getCourse, pillarsOf, weekOfDay, type Pillar4 } from '@/lib/courses'
+import { getCourse, pillarOfDay, weekOfDay, type Pillar4 } from '@/lib/courses'
 import { PillarDots } from '@/components/course/pillar-dots'
 import { PillarFilter } from '@/components/course/pillar-filter'
-import { getCourseState } from '@/lib/data'
+import { getCourseState, getDayPillars } from '@/lib/data'
 import { StartCourseButton } from '@/components/course/start-course-button'
 import { cn } from '@/lib/utils'
 
@@ -14,7 +14,7 @@ export default async function CourseOverviewPage({ params, searchParams }: { par
   const course = getCourse(slug)
   if (!course) notFound()
 
-  const { enrollment, currentDay, completedDays } = await getCourseState(slug)
+  const [{ enrollment, currentDay, completedDays }, overrides] = await Promise.all([getCourseState(slug), getDayPillars(slug)])
 
   if (!enrollment || currentDay === null) {
     return (
@@ -40,7 +40,7 @@ export default async function CourseOverviewPage({ params, searchParams }: { par
   const done = completedDays.length
   const pct = Math.round((done / course.length_days) * 100)
   const currentWeek = weekOfDay(course, currentDay)
-  const byDay = new Map(course.days.map((d) => [d.day_number, pillarsOf(d.blocks)]))
+  const byDay = new Map(course.days.map((d) => [d.day_number, pillarOfDay(d, overrides)]))
   const counts: Record<string, number> = {}
   for (const ps of byDay.values()) for (const p of ps) counts[p] = (counts[p] ?? 0) + 1
   const filtered = pillar ? course.days.filter((d) => byDay.get(d.day_number)?.includes(pillar as Pillar4)) : []

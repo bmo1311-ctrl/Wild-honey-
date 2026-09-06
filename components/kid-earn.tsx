@@ -1,6 +1,6 @@
 'use client'
 
-import { useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Check, Coins } from 'lucide-react'
@@ -13,15 +13,21 @@ const money = (n: number) => `$${Number(n).toFixed(Number(n) % 1 ? 2 : 0)}`
 export function KidEarn({ rewards, earnings, balance }: { rewards: KidReward[]; earnings: KidEarning[]; balance: { waiting: number; ready: number; paid: number } }) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
+  const [claiming, setClaiming] = useState<KidReward | null>(null)
+  const [note, setNote] = useState('')
+  const declined = earnings.filter((e) => e.status === 'declined').length
+  const decided = earnings.filter((e) => e.status !== 'pending').length
 
   function claim(r: KidReward) {
     startTransition(async () => {
-      const res = await claimKidReward(r.id)
+      const res = await claimKidReward(r.id, note)
       if ('error' in res && res.error) {
         toast.error(res.error)
         return
       }
       toast.success(`Nice! ${money(r.amount)} — waiting for a grown-up to say yes`)
+      setClaiming(null)
+      setNote('')
       router.refresh()
     })
   }
@@ -56,7 +62,7 @@ export function KidEarn({ rewards, earnings, balance }: { rewards: KidReward[]; 
                 </span>
                 <span className="shrink-0 font-serif text-[18px] font-semibold">{money(r.amount)}</span>
                 {!r.learning_item_id && (
-                  <button type="button" disabled={pending || r.claimed} onClick={() => claim(r)} className={cn('h-10 shrink-0 rounded-xl px-3 text-sm font-bold', r.claimed ? 'bg-muted text-muted-foreground' : 'bg-primary text-primary-foreground')}>
+                  <button type="button" disabled={pending || r.claimed} onClick={() => { setClaiming(r); setNote('') }} className={cn('h-10 shrink-0 rounded-xl px-3 text-sm font-bold', r.claimed ? 'bg-muted text-muted-foreground' : 'bg-primary text-primary-foreground')}>
                     {r.claimed ? <Check className="h-4 w-4" /> : 'I did it!'}
                   </button>
                 )}
@@ -65,6 +71,22 @@ export function KidEarn({ rewards, earnings, balance }: { rewards: KidReward[]; 
           </ul>
         )}
       </section>
+
+      {claiming && (
+        <div className="rounded-2xl border-2 border-primary bg-card p-4">
+          <p className="font-serif text-[18px] font-semibold">{claiming.title}</p>
+          <p className="mt-1 text-[14px] text-muted-foreground">What did you do? A few words — your grown-up reads this before saying yes.</p>
+          <input value={note} onChange={(e) => setNote(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && claim(claiming)} placeholder="I read two chapters of…" className="mt-3 h-12 w-full rounded-xl bg-background px-3 text-base outline-none ring-1 ring-border focus-visible:ring-2 focus-visible:ring-primary/40" autoFocus />
+          <div className="mt-2 flex gap-2">
+            <button type="button" disabled={pending || note.trim().length < 3} onClick={() => claim(claiming)} className="h-12 flex-1 rounded-xl bg-primary text-[16px] font-bold text-primary-foreground disabled:opacity-50">Send it</button>
+            <button type="button" onClick={() => setClaiming(null)} className="h-12 rounded-xl bg-muted px-4 text-sm font-semibold">Not yet</button>
+          </div>
+        </div>
+      )}
+
+      {decided > 0 && (
+        <p className="text-center text-[13px] text-muted-foreground">{decided - declined} of {decided} said yes{declined ? ` · ${declined} said no` : ''}. Being honest keeps the yeses coming.</p>
+      )}
 
       {earnings.length > 0 && (
         <section>

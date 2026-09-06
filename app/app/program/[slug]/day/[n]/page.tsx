@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { DayView } from '@/components/course/day-view'
-import { getCourse, getDay } from '@/lib/courses'
-import { getCompletedDays, getEnrollment, getTodayCheckin, getWritings } from '@/lib/data'
+import { getCourse, getDay, pillarOfDay } from '@/lib/courses'
+import { getCompletedDays, getDayPillars, getEnrollment, getTodayCheckin, getWritings } from '@/lib/data'
 import type { CourseWriting } from '@/lib/courses'
 
 export default async function CourseDayPage({
@@ -22,10 +22,11 @@ export default async function CourseDayPage({
   const enrollment = await getEnrollment(slug)
   if (!enrollment) redirect(`/app/program/${slug}`)
 
-  const [writings, completed, checkin] = await Promise.all([
+  const [writings, completed, checkin, overrides] = await Promise.all([
     getWritings(dayNumber, slug),
     getCompletedDays(slug),
     getTodayCheckin(),
+    getDayPillars(slug),
   ])
   const saved = new Map<number, CourseWriting>(writings.map((w) => [w.prompt_index, w]))
 
@@ -38,6 +39,7 @@ export default async function CourseDayPage({
       done={completed.includes(dayNumber)}
       doneAt={null}
       part={part === '2' ? 2 : 1}
+      pillars={pillarOfDay(day, overrides)}
     />
   )
 }

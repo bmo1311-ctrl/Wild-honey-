@@ -2781,8 +2781,9 @@ export async function archiveKidReward(id: string) {
 }
 
 /** The child says she did it. It waits for a parent. */
-export async function claimKidReward(rewardId: string) {
+export async function claimKidReward(rewardId: string, note: string) {
   const { supabase, ownerId, childMemberId } = await requireOwner()
+  if (note.trim().length < 3) return { error: 'Say what you did, in a few words.' }
   const { data: r } = await supabase.from('kid_rewards').select('*').eq('id', rewardId).maybeSingle()
   if (!r) return { error: 'That reward is gone.' }
   const memberId = childMemberId ?? (r.member_id as string)
@@ -2794,6 +2795,7 @@ export async function claimKidReward(rewardId: string) {
     amount: r.amount,
     date: await localToday(),
     status: 'pending',
+    note: note.trim().slice(0, 240),
   })
   if (error) return { error: error.code === '23505' ? 'Already claimed for now.' : error.message }
   revalidatePath('/app/kid-money')
@@ -2803,7 +2805,7 @@ export async function claimKidReward(rewardId: string) {
 
 export async function setKidEarningStatus(id: string, status: 'approved' | 'paid' | 'declined') {
   const { supabase, user } = await requireUser()
-  const { error } = await supabase.from('kid_earnings').update({ status }).eq('id', id).eq('owner_id', user.id)
+  const { error } = await supabase.from('kid_earnings').update({ status, decided_at: new Date().toISOString() }).eq('id', id).eq('owner_id', user.id)
   if (error) return { error: error.message }
   revalidatePath('/app/household')
   revalidatePath('/app/kid-money')
@@ -2817,5 +2819,20 @@ export async function payAllKidEarnings(memberId: string) {
   if (error) return { error: error.message }
   revalidatePath('/app/household')
   revalidatePath('/app/kid-money')
+  return { ok: true }
+}
+
+/** Admin: set which pillar a course day belongs to. Empty clears it back to what the blocks say. */
+export async function setDayPillar(slug: string, dayNumber: number, pillar: string | null) {
+  const { supabase, user } = await requireUser()
+  const { data: me } = await supabase.from('profiles').select('is_admin').eq('id', user.id).maybeSingle()
+  if (!me?.is_admin) return { error: 'Admins only.' }
+  const q = pillar
+    ? supabase.from('course_day_pillars').upsert({ course_slug: slug, day_number: dayNumber, pillar }, { onConflict: 'course_slug,day_number' })
+    : supabase.from('course_day_pillars').delete().eq('course_slug', slug).eq('day_number', dayNumber)
+  const { error } = await q
+  if (error) return { error: error.message }
+  revalidatePath(`/app/program/${slug}`)
+  revalidatePath('/admin/course')
   return { ok: true }
 }

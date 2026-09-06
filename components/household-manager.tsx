@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Check, Pencil, Trash2, UserPlus, X } from 'lucide-react'
 import { addHouseholdMember, addKidReward, archiveKidReward, createChildAccess, getChildPermissions, payAllKidEarnings, removeHouseholdMember, setChildPermissions, setKidEarningStatus, updateHouseholdMember } from '@/app/actions'
 import type { KidEarning, KidReward } from '@/lib/data'
+import { rewardIdeas } from '@/lib/kid-reward-ideas'
 import { COURSES } from '@/lib/courses'
 import type { HouseholdMember } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -211,7 +212,7 @@ export function HouseholdManager({ members, rewards = {} }: { members: Household
               <div className="mb-2 flex items-center justify-between"><span className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">Waiting on you</span><button type="button" onClick={() => startTransition(async () => { await payAllKidEarnings(m.id); router.refresh() })} className="rounded-full bg-primary px-3 py-1 text-[11px] font-bold text-primary-foreground">Pay all {money(r.balance.waiting + r.balance.ready)}</button></div>
               <ul className="flex flex-col gap-1.5">
                 {r.earnings.filter((e) => e.status === 'pending' || e.status === 'approved').slice(0, 8).map((e) => (
-                  <li key={e.id} className="flex items-center gap-2 text-[13.5px]"><span className="w-10 text-[11px] text-muted-foreground">{e.date.slice(5)}</span><span className="min-w-0 flex-1 truncate">{e.title}</span><span className="font-semibold">{money(e.amount)}</span>
+                  <li key={e.id} className="flex items-center gap-2 text-[13.5px]"><span className="w-10 text-[11px] text-muted-foreground">{e.date.slice(5)}</span><span className="min-w-0 flex-1"><span className="block truncate">{e.title}</span>{(e as { note?: string | null }).note && <span className="block truncate text-[11.5px] italic text-muted-foreground">&ldquo;{(e as { note?: string | null }).note}&rdquo;</span>}</span><span className="font-semibold">{money(e.amount)}</span>
                     {e.status === 'pending' && <button type="button" onClick={() => startTransition(async () => { await setKidEarningStatus(e.id, 'approved'); router.refresh() })} className="rounded-full bg-card px-2 py-0.5 text-[11px] font-semibold ring-1 ring-border">yes</button>}
                     <button type="button" onClick={() => startTransition(async () => { await setKidEarningStatus(e.id, 'paid'); router.refresh() })} className="rounded-full bg-card px-2 py-0.5 text-[11px] font-semibold ring-1 ring-border">paid</button>
                     <button type="button" onClick={() => startTransition(async () => { await setKidEarningStatus(e.id, 'declined'); router.refresh() })} aria-label="decline" className="px-1 text-muted-foreground">×</button>
@@ -225,8 +226,16 @@ export function HouseholdManager({ members, rewards = {} }: { members: Household
               <li key={rw.id} className="flex items-center gap-2 text-[14px]"><span className="min-w-0 flex-1 truncate">{rw.title} <span className="text-[11px] text-muted-foreground">· {rw.cadence}</span></span><span className="font-semibold">{money(rw.amount)}</span><button type="button" onClick={() => startTransition(async () => { await archiveKidReward(rw.id); router.refresh() })} aria-label="remove" className="px-1 text-muted-foreground">×</button></li>
             ))}
           </ul>
+          <div className="mt-3">
+            <p className="mb-1.5 text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">Ideas — tap to add</p>
+            <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+              {rewardIdeas(m.birth_year ? new Date().getFullYear() - m.birth_year : null).filter((i) => !(r?.rewards ?? []).some((x) => x.title.toLowerCase() === i.title.toLowerCase())).map((i) => (
+                <button key={i.title} type="button" disabled={pending} onClick={() => startTransition(async () => { await addKidReward({ memberId: m.id, title: i.title, amount: i.amount, cadence: i.cadence }); router.refresh() })} className="shrink-0 rounded-2xl border border-border bg-background px-3 py-2 text-left disabled:opacity-50"><span className="block text-[13px] font-semibold">{i.title}</span><span className="block text-[11px] text-muted-foreground">{money(i.amount)} · {i.cadence}</span></button>
+              ))}
+            </div>
+          </div>
           <div className="mt-3 flex flex-col gap-2">
-            <input value={nr.title} onChange={(e) => setNr({ ...nr, title: e.target.value })} placeholder="e.g. Read for 20 minutes" className={field} />
+            <input value={nr.title} onChange={(e) => setNr({ ...nr, title: e.target.value })} placeholder="or your own — e.g. Feed the dog" className={field} />
             <div className="flex gap-2">
               <input value={nr.amount} onChange={(e) => setNr({ ...nr, amount: e.target.value })} inputMode="decimal" placeholder="$" className="h-11 w-24 rounded-xl bg-background px-3 text-base outline-none ring-1 ring-border" />
               {(['daily', 'weekly', 'once'] as const).map((c) => (<button key={c} type="button" onClick={() => setNr({ ...nr, cadence: c })} className={cn('h-11 flex-1 rounded-xl text-[12px] font-medium', nr.cadence === c ? 'bg-mindset-pillar text-white' : 'bg-muted text-muted-foreground')}>{c}</button>))}

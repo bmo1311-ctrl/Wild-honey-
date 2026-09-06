@@ -14,6 +14,7 @@ const LINKS = [
   { href: '/admin/workouts', label: 'Workouts' },
   { href: '/admin/recipes', label: 'Recipes' },
   { href: '/admin/challenges', label: 'Challenges' },
+  { href: '/admin/course', label: 'Course days' },
   { href: '/admin/resources', label: 'Resources' },
   { href: '/admin/questions', label: 'Questions' },
   { href: '/admin/reports', label: 'Reports' },
