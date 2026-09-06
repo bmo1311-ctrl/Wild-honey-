@@ -2345,6 +2345,12 @@ export async function toggleLearningItem(itemId: string) {
   }
   const { error } = await supabase.from('learning_completions').insert({ owner_id: user.id, item_id: itemId, date: today })
   if (error) return { error: error.message }
+  // a reward tied to this item is earned the moment it is ticked
+  const { data: reward } = await supabase.from('kid_rewards').select('*').eq('learning_item_id', itemId).eq('active', true).maybeSingle()
+  if (reward) {
+    await supabase.from('kid_earnings').insert({ owner_id: user.id, member_id: reward.member_id, reward_id: reward.id, title: reward.title, amount: reward.amount, date: today, status: 'pending' })
+    revalidatePath('/app/kid-money')
+  }
   await bumpStreak(user.id)
   revalidatePath('/app/learning')
   revalidatePath('/app')
@@ -2730,4 +2736,72 @@ export async function getChildPermissions(memberId: string) {
   const { data } = await admin.from('profiles').select('child_permissions').eq('id', m.child_user_id).maybeSingle()
   const p = (data?.child_permissions ?? {}) as { circle?: boolean; program?: string[] }
   return { circle: Boolean(p.circle), program: p.program ?? [] }
+}
+
+// ---- Kid rewards ----
+
+export async function addKidReward(input: { memberId: string; title: string; amount: number; cadence?: string; learningItemId?: string | null }) {
+  const { supabase, user } = await requireUser()
+  if (!input.title.trim()) return { error: 'What is it for?' }
+  if (!(input.amount > 0)) return { error: 'How much is it worth?' }
+  const { error } = await supabase.from('kid_rewards').insert({
+    owner_id: user.id,
+    member_id: input.memberId,
+    title: input.title.trim(),
+    amount: input.amount,
+    cadence: input.cadence ?? 'daily',
+    learning_item_id: input.learningItemId ?? null,
+  })
+  if (error) return { error: error.message }
+  revalidatePath('/app/household')
+  revalidatePath('/app/kid-money')
+  return { ok: true }
+}
+
+export async function archiveKidReward(id: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('kid_rewards').update({ active: false }).eq('id', id).eq('owner_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/household')
+  return { ok: true }
+}
+
+/** The child says she did it. It waits for a parent. */
+export async function claimKidReward(rewardId: string) {
+  const { supabase, ownerId, childMemberId } = await requireOwner()
+  const { data: r } = await supabase.from('kid_rewards').select('*').eq('id', rewardId).maybeSingle()
+  if (!r) return { error: 'That reward is gone.' }
+  const memberId = childMemberId ?? (r.member_id as string)
+  const { error } = await supabase.from('kid_earnings').insert({
+    owner_id: ownerId,
+    member_id: memberId,
+    reward_id: r.id,
+    title: r.title,
+    amount: r.amount,
+    date: await localToday(),
+    status: 'pending',
+  })
+  if (error) return { error: error.code === '23505' ? 'Already claimed for now.' : error.message }
+  revalidatePath('/app/kid-money')
+  revalidatePath('/app/household')
+  return { ok: true }
+}
+
+export async function setKidEarningStatus(id: string, status: 'approved' | 'paid' | 'declined') {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('kid_earnings').update({ status }).eq('id', id).eq('owner_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/household')
+  revalidatePath('/app/kid-money')
+  return { ok: true }
+}
+
+/** Approve and pay everything ready for one child in one go. */
+export async function payAllKidEarnings(memberId: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('kid_earnings').update({ status: 'paid' }).eq('owner_id', user.id).eq('member_id', memberId).in('status', ['pending', 'approved'])
+  if (error) return { error: error.message }
+  revalidatePath('/app/household')
+  revalidatePath('/app/kid-money')
+  return { ok: true }
 }

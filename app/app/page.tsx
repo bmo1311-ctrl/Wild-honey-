@@ -14,6 +14,7 @@ import { QuickAddHabit } from '@/components/quick-add-habit'
 import {
   getActiveCourseState,
   getActivityDates,
+  getKidRewards,
   getLearningItems,
   getMeasurements,
   getMoney,
@@ -38,10 +39,14 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
   const me = await getSessionProfile()
   if (me?.is_child) {
     const scope = await getOwnerScope()
-    const [items, nutrition] = await Promise.all([getLearningItems(scope?.childMemberId ?? null), getTodayNutrition(scope?.childMemberId ?? null)])
+    const [items, nutrition, kid] = await Promise.all([
+      getLearningItems(scope?.childMemberId ?? null),
+      getTodayNutrition(scope?.childMemberId ?? null),
+      scope?.childMemberId ? getKidRewards(scope.childMemberId) : Promise.resolve(null),
+    ])
     const stars = items.filter((i) => i.doneToday).length + (nutrition.loggedMeals.length > 0 ? 1 : 0)
     const programs = (me.child_permissions?.program ?? []).map((slug) => getCourse(slug)).filter((c): c is NonNullable<typeof c> => Boolean(c)).map((c) => ({ slug: c.slug, title: c.title }))
-    return <KidToday name={me.name?.split(' ')[0] ?? 'there'} items={items} mealsToday={nutrition.loggedMeals.length} starsThisWeek={stars} programs={programs} />
+    return <KidToday name={me.name?.split(' ')[0] ?? 'there'} items={items} mealsToday={nutrition.loggedMeals.length} starsThisWeek={stars} programs={programs} earned={(kid?.balance.waiting ?? 0) + (kid?.balance.ready ?? 0)} />
   }
   const [{ slug, enrollment, currentDay, completedDays, otherSlugs }, profile, activityDates, checkin, nutrition, habits, habitLogs] = await Promise.all([
     getActiveCourseState(preferred),

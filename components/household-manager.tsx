@@ -4,7 +4,8 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Check, Pencil, Trash2, UserPlus, X } from 'lucide-react'
-import { addHouseholdMember, createChildAccess, getChildPermissions, removeHouseholdMember, setChildPermissions, updateHouseholdMember } from '@/app/actions'
+import { addHouseholdMember, addKidReward, archiveKidReward, createChildAccess, getChildPermissions, payAllKidEarnings, removeHouseholdMember, setChildPermissions, setKidEarningStatus, updateHouseholdMember } from '@/app/actions'
+import type { KidEarning, KidReward } from '@/lib/data'
 import { COURSES } from '@/lib/courses'
 import type { HouseholdMember } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -16,7 +17,7 @@ function ageFrom(birthYear: number | null): string {
 }
 
 /** Add, rename and remove the people you're tracking. */
-export function HouseholdManager({ members }: { members: HouseholdMember[] }) {
+export function HouseholdManager({ members, rewards = {} }: { members: HouseholdMember[]; rewards?: Record<string, { rewards: KidReward[]; earnings: KidEarning[]; balance: { waiting: number; ready: number; paid: number } }> }) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
   const [adding, setAdding] = useState(false)
@@ -28,6 +29,9 @@ export function HouseholdManager({ members }: { members: HouseholdMember[] }) {
   const [pin, setPin] = useState('')
   const [issued, setIssued] = useState<{ name: string; code: string } | null>(null)
   const [permsFor, setPermsFor] = useState<string | null>(null)
+  const [rewardsFor, setRewardsFor] = useState<string | null>(null)
+  const [nr, setNr] = useState({ title: '', amount: '', cadence: 'daily' })
+  const money = (n: number) => `$${Number(n).toFixed(Number(n) % 1 ? 2 : 0)}`
   const [perms, setPerms] = useState<{ circle: boolean; program: string[] }>({ circle: false, program: [] })
 
   function openPerms(id: string) {
@@ -176,6 +180,9 @@ export function HouseholdManager({ members }: { members: HouseholdMember[] }) {
                   <button type="button" onClick={() => openPerms(m.id)} className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold">what she can see</button>
                 )}
                 {!m.is_self && (
+                  <button type="button" onClick={() => setRewardsFor(rewardsFor === m.id ? null : m.id)} className="shrink-0 rounded-full bg-primary/20 px-2.5 py-1 text-[11px] font-semibold">earn{rewards[m.id]?.balance.waiting ? ` · ${money(rewards[m.id].balance.waiting)} waiting` : ''}</button>
+                )}
+                {!m.is_self && (
                   <button type="button" onClick={() => setConfirming(m.id)} aria-label={`Remove ${m.name}`} className="shrink-0 p-1.5 text-muted-foreground">
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -192,6 +199,40 @@ export function HouseholdManager({ members }: { members: HouseholdMember[] }) {
           <p className="mt-1 text-[13px] text-muted-foreground text-pretty">She signs in at <span className="font-semibold text-foreground">/kid</span> with your family code and a four-digit PIN. No email, nothing public, no Circle. Everything she logs shows up here for you.</p>
           <input value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))} inputMode="numeric" placeholder="pick a 4-digit PIN" className="mt-3 h-12 w-full rounded-xl bg-background px-3 text-center text-xl tracking-[0.3em] outline-none ring-1 ring-border" />
           <button type="button" onClick={() => giveAccess(m.id, m.name)} disabled={pending || pin.length !== 4} className="mt-2 h-11 w-full rounded-xl bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50">Create her sign-in</button>
+        </div>
+      ) : null })()}
+
+      {rewardsFor && (() => { const m = members.find((x) => x.id === rewardsFor); const r = rewards[rewardsFor]; return m ? (
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <p className="font-serif text-[17px] font-semibold">{m.name} earns</p>
+          <p className="mt-1 text-[13px] text-muted-foreground text-pretty">Set what a thing is worth. She taps "I did it", you say yes, you pay her. Tie a reward to a Learning item and it counts itself when she ticks it.</p>
+          {r && r.earnings.some((e) => e.status === 'pending' || e.status === 'approved') && (
+            <div className="mt-3 rounded-xl bg-muted p-3">
+              <div className="mb-2 flex items-center justify-between"><span className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">Waiting on you</span><button type="button" onClick={() => startTransition(async () => { await payAllKidEarnings(m.id); router.refresh() })} className="rounded-full bg-primary px-3 py-1 text-[11px] font-bold text-primary-foreground">Pay all {money(r.balance.waiting + r.balance.ready)}</button></div>
+              <ul className="flex flex-col gap-1.5">
+                {r.earnings.filter((e) => e.status === 'pending' || e.status === 'approved').slice(0, 8).map((e) => (
+                  <li key={e.id} className="flex items-center gap-2 text-[13.5px]"><span className="w-10 text-[11px] text-muted-foreground">{e.date.slice(5)}</span><span className="min-w-0 flex-1 truncate">{e.title}</span><span className="font-semibold">{money(e.amount)}</span>
+                    {e.status === 'pending' && <button type="button" onClick={() => startTransition(async () => { await setKidEarningStatus(e.id, 'approved'); router.refresh() })} className="rounded-full bg-card px-2 py-0.5 text-[11px] font-semibold ring-1 ring-border">yes</button>}
+                    <button type="button" onClick={() => startTransition(async () => { await setKidEarningStatus(e.id, 'paid'); router.refresh() })} className="rounded-full bg-card px-2 py-0.5 text-[11px] font-semibold ring-1 ring-border">paid</button>
+                    <button type="button" onClick={() => startTransition(async () => { await setKidEarningStatus(e.id, 'declined'); router.refresh() })} aria-label="decline" className="px-1 text-muted-foreground">×</button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <ul className="mt-3 flex flex-col gap-1.5">
+            {(r?.rewards ?? []).map((rw) => (
+              <li key={rw.id} className="flex items-center gap-2 text-[14px]"><span className="min-w-0 flex-1 truncate">{rw.title} <span className="text-[11px] text-muted-foreground">· {rw.cadence}</span></span><span className="font-semibold">{money(rw.amount)}</span><button type="button" onClick={() => startTransition(async () => { await archiveKidReward(rw.id); router.refresh() })} aria-label="remove" className="px-1 text-muted-foreground">×</button></li>
+            ))}
+          </ul>
+          <div className="mt-3 flex flex-col gap-2">
+            <input value={nr.title} onChange={(e) => setNr({ ...nr, title: e.target.value })} placeholder="e.g. Read for 20 minutes" className={field} />
+            <div className="flex gap-2">
+              <input value={nr.amount} onChange={(e) => setNr({ ...nr, amount: e.target.value })} inputMode="decimal" placeholder="$" className="h-11 w-24 rounded-xl bg-background px-3 text-base outline-none ring-1 ring-border" />
+              {(['daily', 'weekly', 'once'] as const).map((c) => (<button key={c} type="button" onClick={() => setNr({ ...nr, cadence: c })} className={cn('h-11 flex-1 rounded-xl text-[12px] font-medium', nr.cadence === c ? 'bg-mindset-pillar text-white' : 'bg-muted text-muted-foreground')}>{c}</button>))}
+            </div>
+            <button type="button" disabled={pending || !nr.title.trim() || !(Number(nr.amount) > 0)} onClick={() => startTransition(async () => { const res = await addKidReward({ memberId: m.id, title: nr.title, amount: Number(nr.amount), cadence: nr.cadence }); if ('error' in res && res.error) { toast.error(res.error); return } setNr({ title: '', amount: '', cadence: 'daily' }); router.refresh() })} className="h-11 rounded-xl bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50">Add a way to earn</button>
+          </div>
         </div>
       ) : null })()}
 

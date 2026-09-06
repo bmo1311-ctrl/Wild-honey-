@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Apple, BookOpen, GraduationCap, Smile, Sun, Users } from 'lucide-react'
+import { Apple, BookOpen, Coins, GraduationCap, Smile, Sun, Users } from 'lucide-react'
 import type { ChildPermissions } from '@/lib/kid'
 import { cn } from '@/lib/utils'
 
@@ -14,9 +14,10 @@ export function KidNav({ perms }: { perms: ChildPermissions }) {
     ...(perms.program?.length ? [{ href: '/app/program', label: 'Program', icon: BookOpen }] : []),
     { href: '/app/learning', label: 'Learning', icon: GraduationCap },
     { href: '/app/nutrition/log', label: 'Food', icon: Apple },
+    { href: '/app/kid-money', label: 'Earn', icon: Coins },
     ...(perms.circle ? [{ href: '/app/circle', label: 'Circle', icon: Users }] : []),
     { href: '/app/kid-me', label: 'Me', icon: Smile },
-  ].slice(0, 6)
+  ].filter((t, i, arr) => arr.length <= 6 || t.label !== 'Me')
   return (
     <nav aria-label="Primary" className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur-sm">
       <ul className="mx-auto flex max-w-2xl items-stretch justify-between px-1 py-2">

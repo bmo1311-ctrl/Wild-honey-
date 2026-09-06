@@ -1066,6 +1066,45 @@ export async function getLearningItems(memberId: string | null): Promise<Learnin
   return items.map((i) => ({ ...i, doneToday: doneIds.has(i.id) }))
 }
 
+// ---- Kid rewards ----
+
+export interface KidReward {
+  id: string
+  member_id: string
+  title: string
+  amount: number
+  cadence: 'daily' | 'weekly' | 'once'
+  learning_item_id: string | null
+  active: boolean
+  /** filled in: claimed already in the current cadence window */
+  claimed?: boolean
+}
+export interface KidEarning {
+  id: string
+  reward_id: string | null
+  title: string
+  amount: number
+  date: string
+  status: 'pending' | 'approved' | 'paid' | 'declined'
+}
+
+export async function getKidRewards(memberId: string): Promise<{ rewards: KidReward[]; earnings: KidEarning[]; balance: { waiting: number; ready: number; paid: number } }> {
+  const supabase = await createClient()
+  const today = await localToday()
+  const weekAgo = new Date(Date.parse(today) - 6 * 86_400_000).toISOString().slice(0, 10)
+  const [rewards, earnings] = await Promise.all([
+    supabase.from('kid_rewards').select('*').eq('member_id', memberId).eq('active', true).order('created_at').then(ok),
+    supabase.from('kid_earnings').select('*').eq('member_id', memberId).order('date', { ascending: false }).limit(200).then(ok),
+  ])
+  const es = (earnings as KidEarning[]) ?? []
+  const rs = ((rewards as KidReward[]) ?? []).map((r) => ({
+    ...r,
+    claimed: es.some((e) => e.reward_id === r.id && e.status !== 'declined' && (r.cadence === 'once' || (r.cadence === 'daily' ? e.date === today : e.date >= weekAgo))),
+  }))
+  const sum = (st: KidEarning['status']) => es.filter((e) => e.status === st).reduce((s, e) => s + Number(e.amount), 0)
+  return { rewards: rs, earnings: es, balance: { waiting: sum('pending'), ready: sum('approved'), paid: sum('paid') } }
+}
+
 // ---- Who owns the rows ----
 
 /**
