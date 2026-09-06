@@ -64,12 +64,7 @@ export default async function ProtocolsPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="font-serif text-3xl font-semibold">Protocols</h1>
-        <p className="mt-1 text-sm text-muted-foreground text-pretty">
-          resets for a season that needs one, routines for the things you do anyway.
-        </p>
-      </div>
+      <h1 className="font-serif text-3xl font-semibold">Protocols</h1>
 
       {/* Nothing set up anywhere yet — ask before assuming. */}
       {!area ? (
@@ -77,11 +72,6 @@ export default async function ProtocolsPage({
       ) : (
         <>
           <ProtocolNav active={area.key} counts={counts} />
-
-          <div>
-            <h2 className="font-serif text-lg font-semibold">{area.label}</h2>
-            <p className="mt-0.5 text-sm text-muted-foreground text-pretty">{area.blurb}</p>
-          </div>
 
           {area.key === 'resets' ? (
             <ResetsArea enrollment={enrollment} todayCheckin={todayCheckin} />
@@ -139,17 +129,6 @@ function BeautyArea({
 
   return (
     <div className="flex flex-col gap-5">
-      {/*
-        Where we stand on ingredients, said once. "Clean" is unregulated — any
-        brand can print it, and plenty charge for the word.
-      */}
-      <p className="rounded-2xl bg-muted p-4 text-sm leading-relaxed text-pretty">
-        <span className="font-medium">effective, transparent, affordable.</span>{' '}
-        &ldquo;clean&rdquo; has no legal meaning — any brand can print it, and many charge you for
-        the word. what matters is what is actually in the bottle, at a strength that does
-        something, at a price you can keep paying.
-      </p>
-
       {tonight && <TonightCard plan={tonight} doneToday={doneTonight} />}
 
       <RoutineShelf

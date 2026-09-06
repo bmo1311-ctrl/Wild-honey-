@@ -205,10 +205,7 @@ export function RoutineShelf({
   return (
     <div className="flex flex-col gap-6">
       {shelf.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-pretty">
-          add what you already use and the order sorts itself out — morning, evening, and what
-          shouldn&rsquo;t share a night.
-        </p>
+        <p className="text-sm text-muted-foreground">add what you use. the order sorts itself.</p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           <RoutineColumn title="morning" icon={<Sun className="h-4 w-4" />} steps={am.steps} onRemove={handleRemove} />
@@ -249,7 +246,7 @@ export function RoutineShelf({
       {/* Life stage — optional, private, and only ever used for cautions. */}
       <div className="rounded-2xl bg-card p-4 ring-1 ring-border">
         <Label className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
-          anything I should watch for?
+anything to avoid?
         </Label>
         <div className="mt-2 flex flex-wrap gap-2">
           {STAGES.map((s) => (
@@ -265,9 +262,8 @@ export function RoutineShelf({
             </button>
           ))}
         </div>
-        <p className="mt-2 text-[0.7rem] leading-relaxed text-muted-foreground text-pretty">
-          only used to flag ingredients worth asking your doctor or midwife about. never shared,
-          never shown to anyone else.
+        <p className="mt-2 text-[0.7rem] text-muted-foreground text-pretty">
+          private. only used to flag ingredients worth asking your doctor about.
         </p>
       </div>
 
@@ -349,9 +345,7 @@ export function RoutineShelf({
                 rows={4}
                 placeholder="aqua, glycerin, niacinamide, retinol…"
               />
-              <p className="text-[0.7rem] text-muted-foreground text-pretty">
-                copy it from wherever you found it — yuka, the shop&rsquo;s page, or the back of the box.
-              </p>
+              <p className="text-[0.7rem] text-muted-foreground">from yuka, the shop&rsquo;s page, or the bottle.</p>
               <div className="flex gap-2">
                 <Button onClick={applyPaste} disabled={!pasted.trim()} className="h-9 flex-1">
                   read it
@@ -373,7 +367,7 @@ export function RoutineShelf({
           )}
 
           <div className="flex flex-col gap-1.5">
-            <Label>what&rsquo;s in it? (tick any you know)</Label>
+            <Label>what&rsquo;s in it?</Label>
             <div className="flex flex-wrap gap-2">
               {ACTIVES.map((a) => (
                 <button
@@ -388,7 +382,7 @@ export function RoutineShelf({
                 </button>
               ))}
             </div>
-            <p className="text-[0.7rem] text-muted-foreground">leave it blank if you&rsquo;re not sure — it still goes in the right place.</p>
+            <p className="text-[0.7rem] text-muted-foreground">skip if you&rsquo;re not sure.</p>
           </div>
           <div className="flex gap-2">
             <Button onClick={handleAdd} disabled={pending} className="h-10 flex-1">

@@ -15,9 +15,7 @@ import { AREAS } from '@/lib/domains'
 export function ProtocolChooser() {
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-muted-foreground text-pretty">
-        what are you tending?
-      </p>
+      <p className="text-sm text-muted-foreground">what are you tending?</p>
       <div className="grid gap-3 sm:grid-cols-2">
         {AREAS.map((area) => (
           <Link
