@@ -1,6 +1,7 @@
 import { CircleCard } from '@/components/circle-card'
 import { CommunityPostCard } from '@/components/community-post-card'
 import { CommunityComposer } from '@/components/community-composer'
+import { PraiseReportCard } from '@/components/praise-report-card'
 import { HoneycombMark } from '@/components/logo'
 import { getUnifiedCircleFeed, getSessionProfile } from '@/lib/data'
 
@@ -17,6 +18,7 @@ export default async function CirclePage() {
         </p>
       </div>
 
+      <PraiseReportCard />
       <CommunityComposer />
 
       {feed.length === 0 ? (

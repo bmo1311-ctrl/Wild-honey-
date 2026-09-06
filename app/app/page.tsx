@@ -112,7 +112,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
 
   return (
     <div className="flex flex-col gap-6">
-      <header>
+      <header className="honey-glow -mx-5 -mt-6 px-5 pb-4 pt-6">
         <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
           {new Date().toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}
         </p>

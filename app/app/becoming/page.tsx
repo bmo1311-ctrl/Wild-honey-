@@ -52,7 +52,7 @@ export default async function BecomingPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <header>
+      <header className="honey-glow -mx-5 -mt-6 px-5 pb-4 pt-6">
         <h1 className="font-serif text-[29px] font-semibold leading-[1.1]">Your becoming</h1>
         <p className="mt-1.5 text-[15px] leading-[1.5] text-pretty text-muted-foreground">
           what you&rsquo;ve actually done, in your own words and numbers.

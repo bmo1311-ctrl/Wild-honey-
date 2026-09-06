@@ -38,6 +38,8 @@
   --color-icy-blue-line: var(--icy-blue-line);
   --color-honey-glow: var(--honey-glow);
   --color-pink: var(--pink);
+  --color-baby-pink: var(--baby-pink);
+  --color-baby-pink-deep: var(--baby-pink-deep);
   --color-honey-foreground: var(--honey-foreground);
   --color-body-pillar: var(--pillar-body);
   --color-identity-pillar: var(--pillar-identity);
@@ -66,6 +68,8 @@
   --icy-blue-line: oklch(0.82 0.09 235);
   --honey-glow: oklch(0.9 0.12 76);
   --pink: oklch(0.53 0.14 38);
+  --baby-pink: oklch(0.83 0.11 352);      /* bright, cool, the one primary action */
+  --baby-pink-deep: oklch(0.6 0.17 352);  /* ink-safe pink for focus rings and small text */
 
   /* the app's semantic variables, mapped onto them */
   --background: var(--bg);
@@ -74,8 +78,8 @@
   --card-foreground: var(--ink);
   --popover: var(--surface);
   --popover-foreground: var(--ink);
-  --primary: var(--icy-blue-deep);
-  --primary-foreground: oklch(0.99 0.003 250);
+  --primary: var(--baby-pink);
+  --primary-foreground: var(--ink);
   --secondary: var(--icy-blue-tint);
   --secondary-foreground: var(--ink);
   --muted: oklch(0.96 0.008 250);
@@ -85,7 +89,7 @@
   --destructive: oklch(0.55 0.2 25);
   --border: var(--line);
   --input: var(--line);
-  --ring: var(--icy-blue-deep);
+  --ring: var(--baby-pink-deep);
 
   --honey: var(--icy-blue);
   --honey-foreground: oklch(0.99 0.003 250);
@@ -108,39 +112,56 @@
 
 .dark {
   color-scheme: dark;
-  /* Bright Winter, dark mode — same cool palette as light mode, just inverted. No warm/beige tones. */
-  --background: oklch(0.16 0.015 255);
-  --foreground: oklch(0.97 0.005 240);
-  --card: oklch(0.21 0.015 255);
-  --card-foreground: oklch(0.97 0.005 240);
-  --popover: oklch(0.21 0.015 255);
-  --popover-foreground: oklch(0.97 0.005 240);
-  --primary: oklch(0.62 0.24 25);
-  --primary-foreground: oklch(0.99 0.003 240);
-  --secondary: oklch(0.26 0.02 250);
-  --secondary-foreground: oklch(0.95 0.01 240);
-  --muted: oklch(0.24 0.015 250);
-  --muted-foreground: oklch(0.72 0.02 245);
-  --accent: oklch(0.32 0.08 225);
-  --accent-foreground: oklch(0.97 0.01 240);
-  --destructive: oklch(0.62 0.24 25);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.62 0.24 25);
+  /* Bright Winter after dark — same cool tokens, inverted */
+  --ink: oklch(0.95 0.008 250);
+  --ink-soft: oklch(0.7 0.015 255);
+  --bg: oklch(0.17 0.015 262);
+  --surface: oklch(0.21 0.015 262);
+  --line: oklch(0.3 0.012 258);
+  --icy-blue: oklch(0.72 0.16 235);
+  --icy-blue-deep: oklch(0.72 0.14 240);
+  --icy-blue-tint: oklch(0.27 0.05 240);
+  --icy-blue-line: oklch(0.45 0.09 235);
+  --honey-glow: oklch(0.85 0.12 76);
+  --pink: oklch(0.72 0.13 38);
+  --baby-pink: oklch(0.8 0.12 352);
+  --baby-pink-deep: oklch(0.72 0.15 352);
 
-  --honey: oklch(0.78 0.12 225);
-  --honey-foreground: oklch(0.16 0.02 250);
+  --background: var(--bg);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+  --primary: var(--baby-pink);
+  --primary-foreground: oklch(0.17 0.015 262);
+  --secondary: var(--icy-blue-tint);
+  --secondary-foreground: var(--ink);
+  --muted: oklch(0.25 0.012 260);
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--icy-blue-tint);
+  --accent-foreground: var(--icy-blue-deep);
+  --destructive: oklch(0.65 0.2 25);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--baby-pink-deep);
 
-  --pillar-body: oklch(0.65 0.16 155);
-  --pillar-identity: oklch(0.62 0.24 25);
-  --pillar-mindset: oklch(0.62 0.18 255);
-  --pillar-faith: oklch(0.62 0.2 335);
+  --honey: var(--icy-blue);
+  --honey-foreground: oklch(0.17 0.015 262);
 
-  --chart-1: oklch(0.62 0.24 25);
-  --chart-2: oklch(0.65 0.16 155);
-  --chart-3: oklch(0.62 0.18 255);
-  --chart-4: oklch(0.62 0.2 335);
-  --chart-5: oklch(0.72 0.02 245);
+  --pillar-body: oklch(0.65 0.16 165);
+  --pillar-identity: var(--pink);
+  --pillar-mindset: var(--icy-blue-deep);
+  --pillar-faith: oklch(0.65 0.2 335);
+
+  --chart-1: var(--icy-blue-deep);
+  --chart-2: oklch(0.65 0.16 165);
+  --chart-3: var(--pink);
+  --chart-4: oklch(0.65 0.2 335);
+  --chart-5: var(--ink-soft);
+
+  --founder: var(--ink);
+  --founder-foreground: oklch(0.17 0.015 262);
 }
 
 @layer base {
@@ -204,4 +225,9 @@
   --honey-foreground: oklch(0.2 0.05 70);
   --muted: oklch(0.955 0.02 70);
   --border: oklch(0.89 0.025 70);
+}
+
+/* honey-glow: a warm radial wash, low alpha, placed by hand where a screen should feel lit */
+.honey-glow {
+  background-image: radial-gradient(120% 90% at 0% 0%, color-mix(in oklch, var(--honey-glow), transparent 72%), transparent 60%);
 }
