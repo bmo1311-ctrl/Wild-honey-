@@ -1649,3 +1649,27 @@ export async function searchBeautyProducts(term: string, domain?: BeautyDomain):
   if (domain) q = q.eq('domain', domain)
   return (ok(await q) as BeautyProduct[]) ?? []
 }
+
+/** The last few weeks of what she actually did, for the day tracker. */
+export async function getRoutineLog(days = 30): Promise<{ memberProductId: string | null; ritualSlug: string | null; date: string }[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const since = new Date()
+  since.setDate(since.getDate() - days)
+  const data = ok(
+    await supabase
+      .from('routine_log')
+      .select('member_product_id, ritual_slug, date')
+      .eq('user_id', user.id)
+      .gte('date', since.toISOString().slice(0, 10))
+      .order('date', { ascending: false }),
+  ) as { member_product_id: string | null; ritual_slug: string | null; date: string }[] | null
+  return (data ?? []).map((r) => ({
+    memberProductId: r.member_product_id,
+    ritualSlug: r.ritual_slug,
+    date: r.date,
+  }))
+}

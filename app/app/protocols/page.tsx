@@ -1,15 +1,19 @@
 import { ProtocolCard } from '@/components/protocol-card'
 import { ProtocolTracker } from '@/components/protocol-tracker'
 import { RoutineShelf } from '@/components/routine-shelf'
+import { TonightCard } from '@/components/tonight-card'
 import {
   getActiveEnrollment,
   getEnrollmentCompletions,
   getMemberProducts,
+  getRoutineLog,
   getSessionProfile,
   getTodayCheckin,
 } from '@/lib/data'
 import { PROTOCOLS, getProtocol, suggestProtocol } from '@/lib/protocols'
 import type { ShelfItem } from '@/lib/routine'
+import { planTonight } from '@/lib/tonight'
+import { localToday } from '@/lib/today'
 import { FeatureOff } from '@/components/feature-off'
 import { FEATURES } from '@/lib/features'
 
@@ -24,11 +28,13 @@ import { FEATURES } from '@/lib/features'
 export default async function ProtocolsPage() {
   if (!FEATURES.protocols) return <FeatureOff />
 
-  const [enrollment, todayCheckin, products, profile] = await Promise.all([
+  const [enrollment, todayCheckin, products, profile, log, today] = await Promise.all([
     getActiveEnrollment(),
     getTodayCheckin(),
     getMemberProducts('skin'),
     getSessionProfile(),
+    getRoutineLog(30),
+    localToday(),
   ])
   const completions = enrollment ? await getEnrollmentCompletions(enrollment.id) : []
   const activeProtocol = enrollment ? getProtocol(enrollment.protocol_slug) : null
@@ -42,6 +48,15 @@ export default async function ProtocolsPage() {
     timeOfDay: p.time_of_day,
     frequencyPerWeek: p.frequency_per_week,
   }))
+
+  const tonight = shelf.length > 0 ? planTonight({ shelf, log, today, allergies: profile?.allergies }) : null
+  const doneTonight = log.some(
+    (l) =>
+      l.date === today &&
+      (tonight?.kind === 'treatment'
+        ? l.memberProductId === tonight.treatment?.id
+        : l.ritualSlug === tonight?.ritual?.slug),
+  )
 
   return (
     <div className="flex flex-col gap-10">
@@ -58,6 +73,11 @@ export default async function ProtocolsPage() {
         <p className="mb-4 mt-0.5 text-sm text-muted-foreground text-pretty">
           your products, in the order they actually go on.
         </p>
+        {tonight && (
+          <div className="mb-5">
+            <TonightCard plan={tonight} doneToday={doneTonight} />
+          </div>
+        )}
         <RoutineShelf shelf={shelf} lifeStage={profile?.life_stage ?? null} />
       </section>
 

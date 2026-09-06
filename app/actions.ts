@@ -3068,3 +3068,28 @@ export async function setLifeStage(stage: 'pregnant' | 'trying' | 'breastfeeding
   revalidatePath('/app/profile')
   return { ok: true }
 }
+
+/**
+ * Mark tonight done.
+ *
+ * This is the whole point of the day tracker — without a record of what
+ * happened, "the right night" is guesswork. One row per thing per night, so
+ * tapping twice is harmless.
+ */
+export async function logRoutineDone(input: { memberProductId?: string; ritualSlug?: string; slot?: 'am' | 'pm' }) {
+  const { supabase, user } = await requireUser()
+  if (!input.memberProductId && !input.ritualSlug) return { error: 'Nothing to log.' }
+  const { error } = await supabase.from('routine_log').upsert(
+    {
+      user_id: user.id,
+      member_product_id: input.memberProductId ?? null,
+      ritual_slug: input.ritualSlug ?? null,
+      slot: input.slot ?? 'pm',
+      date: await localToday(),
+    },
+    { onConflict: 'user_id,member_product_id,ritual_slug,slot,date', ignoreDuplicates: true },
+  )
+  if (error) return { error: error.message }
+  revalidatePath('/app/protocols')
+  return { ok: true }
+}

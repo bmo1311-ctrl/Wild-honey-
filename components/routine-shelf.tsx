@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { Plus, Sun, Moon, X, AlertTriangle, Info } from 'lucide-react'
+import { Plus, Sun, Moon, X, AlertTriangle, Info, ScanLine } from 'lucide-react'
 import { addBeautyProduct, removeBeautyProduct, setLifeStage } from '@/app/actions'
 import { ACTIVES } from '@/lib/actives'
 import { buildRoutines, findGaps, type ShelfItem } from '@/lib/routine'
@@ -10,6 +10,7 @@ import type { LifeStage } from '@/lib/actives'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { BarcodeScanner } from '@/components/barcode-scanner'
 
 const CATEGORIES = [
   'cleanser',
@@ -39,6 +40,10 @@ export function RoutineShelf({
   lifeStage: LifeStage
 }) {
   const [adding, setAdding] = useState(false)
+  const [scanning, setScanning] = useState(false)
+  const [scanNote, setScanNote] = useState<string | null>(null)
+  const [barcode, setBarcode] = useState<string | null>(null)
+  const [ingredients, setIngredients] = useState<string | null>(null)
   const [name, setName] = useState('')
   const [category, setCategory] = useState('serum')
   const [picked, setPicked] = useState<string[]>([])
@@ -51,19 +56,56 @@ export function RoutineShelf({
     setPicked((p) => (p.includes(key) ? p.filter((k) => k !== key) : [...p, key]))
   }
 
+  /** A scan fills the form in rather than saving behind her back. */
+  async function handleScanned(code: string) {
+    setScanning(false)
+    setBarcode(code)
+    try {
+      const res = await fetch(`/api/beauty/lookup?barcode=${encodeURIComponent(code)}`)
+      const data = await res.json()
+      if (data.found) {
+        const p = data.product
+        setName([p.brand, p.name].filter(Boolean).join(' ').trim() || p.name || '')
+        setPicked(p.actives ?? [])
+        setIngredients(p.ingredients_raw ?? null)
+        setScanNote(
+          p.actives?.length
+            ? 'found it, and read the label. check the details before you add it.'
+            : 'found it, but the ingredients aren’t listed — tick anything you know.',
+        )
+      } else {
+        setScanNote('not in the database yet. add it here and you’ll be the one who put it there.')
+      }
+      setAdding(true)
+    } catch {
+      setScanNote('couldn’t reach the product database. you can still add it by hand.')
+      setAdding(true)
+    }
+  }
+
   function handleAdd() {
     if (!name.trim()) {
       toast.error('What is it called?')
       return
     }
     startTransition(async () => {
-      const res = await addBeautyProduct({ name, category, actives: picked, domain: 'skin' })
+      const res = await addBeautyProduct({
+        name,
+        category,
+        actives: picked,
+        domain: 'skin',
+        barcode: barcode ?? undefined,
+        ingredientsRaw: ingredients ?? undefined,
+      })
       if (res?.error) {
         toast.error(res.error)
         return
       }
       setName('')
       setPicked([])
+      setBarcode(null)
+      setIngredients(null)
+      setScanNote(null)
       setAdding(false)
       toast.success('On your shelf.')
     })
@@ -154,8 +196,11 @@ export function RoutineShelf({
         </p>
       </div>
 
+      {scanning && <BarcodeScanner onFound={handleScanned} onCancel={() => setScanning(false)} />}
+
       {adding ? (
         <div className="flex flex-col gap-3 rounded-2xl bg-card p-5 ring-1 ring-border">
+          {scanNote && <p className="text-sm text-muted-foreground text-pretty">{scanNote}</p>}
           <div className="flex flex-col gap-1.5">
             <Label>what is it?</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. the ordinary niacinamide" className="h-11" />
@@ -202,10 +247,18 @@ export function RoutineShelf({
           </div>
         </div>
       ) : (
-        <Button onClick={() => setAdding(true)} variant="outline" className="self-start rounded-full">
-          <Plus className="mr-1.5 h-4 w-4" />
-          add a product
-        </Button>
+        !scanning && (
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setScanning(true)} className="rounded-full">
+              <ScanLine className="mr-1.5 h-4 w-4" />
+              scan a product
+            </Button>
+            <Button onClick={() => setAdding(true)} variant="outline" className="rounded-full">
+              <Plus className="mr-1.5 h-4 w-4" />
+              add by hand
+            </Button>
+          </div>
+        )
       )}
     </div>
   )
