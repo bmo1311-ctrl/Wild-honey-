@@ -51,7 +51,7 @@ export function FoodLogger({
   const [multi, setMulti] = useState<Record<string, number>>({})
   const [building, setBuilding] = useState(false)
   const [editing, setEditing] = useState(false)
-  const [ed, setEd] = useState({ caffeine: '', water: '' })
+  const [ed, setEd] = useState({ caffeine: '', water: '', sugar: '' })
   const [mealName, setMealName] = useState('')
   const [q, setQ] = useState('')
   const [picked, setPicked] = useState<FoodItem | null>(null)
@@ -59,7 +59,7 @@ export function FoodLogger({
   const [custom, setCustom] = useState(false)
   const [pending, startTransition] = useTransition()
 
-  const [c, setC] = useState({ name: '', size: '100', unit: 'g', cal: '', pro: '', carb: '', fat: '', caffeine: '', water: '' })
+  const [c, setC] = useState({ name: '', size: '100', unit: 'g', cal: '', pro: '', carb: '', fat: '', caffeine: '', water: '', sugar: '' })
 
   const matches = useMemo(() => {
     const t = q.trim().toLowerCase()
@@ -118,6 +118,7 @@ export function FoodLogger({
         fat: Number(c.fat) || 0,
         caffeineMg: c.caffeine.trim() === '' ? null : Number(c.caffeine),
         waterMl: c.water.trim() === '' ? null : Number(c.water),
+        sugarG: c.sugar.trim() === '' ? null : Number(c.sugar),
       })
       if ('error' in saved && saved.error) {
         toast.error(saved.error)
@@ -132,7 +133,7 @@ export function FoodLogger({
       }
       toast.success(`${c.name} saved and logged`)
       setCustom(false)
-      setC({ name: '', size: '100', unit: 'g', cal: '', pro: '', carb: '', fat: '', caffeine: '', water: '' })
+      setC({ name: '', size: '100', unit: 'g', cal: '', pro: '', carb: '', fat: '', caffeine: '', water: '', sugar: '' })
     })
   }
 
@@ -396,8 +397,8 @@ export function FoodLogger({
               {picked.user_id && (
                 <div className="mt-3">
                   {!editing ? (
-                    <button type="button" onClick={() => { setEditing(true); const n = (picked.nutrients ?? {}) as Record<string, number>; setEd({ caffeine: n.caffeine_mg != null ? String(n.caffeine_mg) : '', water: n.water_ml != null ? String(n.water_ml) : '' }) }} className="text-sm font-medium text-muted-foreground underline underline-offset-[3px]">
-                      edit this food — caffeine, water
+                    <button type="button" onClick={() => { setEditing(true); const n = (picked.nutrients ?? {}) as Record<string, number>; setEd({ caffeine: n.caffeine_mg != null ? String(n.caffeine_mg) : '', water: n.water_ml != null ? String(n.water_ml) : '', sugar: n.sugar_g != null ? String(n.sugar_g) : '' }) }} className="text-sm font-medium text-muted-foreground underline underline-offset-[3px]">
+                      edit this food — sugar, caffeine, water
                     </button>
                   ) : (
                     <div className="rounded-xl border border-border p-3">
@@ -405,9 +406,10 @@ export function FoodLogger({
                       <div className="grid grid-cols-2 gap-2">
                         <input value={ed.caffeine} onChange={(e) => setEd({ ...ed, caffeine: e.target.value })} inputMode="decimal" placeholder="caffeine mg" className={field} />
                         <input value={ed.water} onChange={(e) => setEd({ ...ed, water: e.target.value })} inputMode="decimal" placeholder="water ml" className={field} />
+                        <input value={ed.sugar} onChange={(e) => setEd({ ...ed, sugar: e.target.value })} inputMode="decimal" placeholder="sugar g" className={field} />
                       </div>
                       <div className="mt-2 flex gap-2">
-                        <button type="button" disabled={pending} onClick={() => startTransition(async () => { const res = await updateFoodItem({ id: picked.id, caffeineMg: ed.caffeine.trim() === '' ? null : Number(ed.caffeine), waterMl: ed.water.trim() === '' ? null : Number(ed.water) }); if ('error' in res && res.error) { toast.error(res.error); return } toast.success('Updated — today\'s logs of it too'); setEditing(false); setPicked({ ...picked, nutrients: { ...((picked.nutrients ?? {}) as Record<string, number>), ...(ed.caffeine.trim() ? { caffeine_mg: Number(ed.caffeine) } : {}), ...(ed.water.trim() ? { water_ml: Number(ed.water) } : {}) } }) })} className="h-10 flex-1 rounded-xl bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50">Save</button>
+                        <button type="button" disabled={pending} onClick={() => startTransition(async () => { const res = await updateFoodItem({ id: picked.id, caffeineMg: ed.caffeine.trim() === '' ? null : Number(ed.caffeine), waterMl: ed.water.trim() === '' ? null : Number(ed.water), sugarG: ed.sugar.trim() === '' ? null : Number(ed.sugar) }); if ('error' in res && res.error) { toast.error(res.error); return } toast.success('Updated — today\'s logs of it too'); setEditing(false); setPicked({ ...picked, nutrients: { ...((picked.nutrients ?? {}) as Record<string, number>), ...(ed.caffeine.trim() ? { caffeine_mg: Number(ed.caffeine) } : {}), ...(ed.water.trim() ? { water_ml: Number(ed.water) } : {}), ...(ed.sugar.trim() ? { sugar_g: Number(ed.sugar) } : {}) } }) })} className="h-10 flex-1 rounded-xl bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50">Save</button>
                         <button type="button" onClick={() => setEditing(false)} className="h-10 rounded-xl bg-muted px-3 text-sm">Cancel</button>
                       </div>
                     </div>
@@ -455,8 +457,9 @@ export function FoodLogger({
             <div className="grid grid-cols-2 gap-2">
               <input value={c.caffeine} onChange={(e) => setC({ ...c, caffeine: e.target.value })} inputMode="decimal" placeholder="caffeine mg" className={field} />
               <input value={c.water} onChange={(e) => setC({ ...c, water: e.target.value })} inputMode="decimal" placeholder={c.unit.toLowerCase() === 'ml' ? `water ml (defaults to ${c.size})` : 'water ml'} className={field} />
+              <input value={c.sugar} onChange={(e) => setC({ ...c, sugar: e.target.value })} inputMode="decimal" placeholder="sugar g" className={field} />
             </div>
-            <p className="text-xs text-muted-foreground">caffeine and water count toward hydration. a drink in ml is treated as water unless you say otherwise.</p>
+            <p className="text-xs text-muted-foreground">sugar counts against a daily limit. caffeine and water count toward hydration; a drink in ml is treated as water unless you say otherwise.</p>
             <button
               type="button"
               onClick={submitCustom}

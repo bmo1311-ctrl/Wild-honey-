@@ -2130,6 +2130,7 @@ export async function saveFoodItem(input: {
   fat: number
   waterMl?: number | null
   caffeineMg?: number | null
+  sugarG?: number | null
 }) {
   const { supabase, user } = await requireUser()
   if (!input.name.trim()) return { error: 'Give it a name first.' }
@@ -2143,6 +2144,7 @@ export async function saveFoodItem(input: {
   }
   if (water != null) nutrients.water_ml = round1(water)
   if (input.caffeineMg != null) nutrients.caffeine_mg = round1(input.caffeineMg)
+  if (input.sugarG != null) nutrients.sugar_g = round1(input.sugarG)
   const { data, error } = await supabase
     .from('food_items')
     .insert({
@@ -2842,6 +2844,7 @@ export async function updateFoodItem(input: {
   id: string
   caffeineMg?: number | null
   waterMl?: number | null
+  sugarG?: number | null
   calories?: number | null
   protein?: number | null
   carbs?: number | null
@@ -2859,6 +2862,7 @@ export async function updateFoodItem(input: {
   }
   setN('caffeine_mg', input.caffeineMg)
   setN('water_ml', input.waterMl)
+  setN('sugar_g', input.sugarG)
   if (input.calories != null) { patch.calories = round1(input.calories); nutrients.calories = round1(input.calories) }
   if (input.protein != null) { patch.protein_g = round1(input.protein); nutrients.protein_g = round1(input.protein) }
   if (input.carbs != null) { patch.carbs_g = round1(input.carbs); nutrients.carbs_g = round1(input.carbs) }

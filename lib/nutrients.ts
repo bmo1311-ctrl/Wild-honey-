@@ -30,7 +30,7 @@ export const NUTRIENTS: NutrientDef[] = [
   { key: 'carbs_g', label: 'Carbs', unit: 'g', target: null, group: 'macro' },
   { key: 'fat_g', label: 'Fat', unit: 'g', target: null, group: 'macro' },
   { key: 'fiber_g', label: 'Fibre', unit: 'g', target: 28, group: 'macro' },
-  { key: 'sugar_g', label: 'Sugar', unit: 'g', target: null, group: 'macro' },
+  { key: 'sugar_g', label: 'Sugar', unit: 'g', target: 25, group: 'macro' },
   { key: 'sat_fat_g', label: 'Saturated fat', unit: 'g', target: 20, group: 'macro' },
 
   { key: 'water_ml', label: 'Water', unit: 'ml', target: 2700, group: 'hydration' },
