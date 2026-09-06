@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { Plus, Sun, Moon, X, AlertTriangle, Info, ScanLine, ClipboardPaste, Loader2 } from 'lucide-react'
+import { Plus, Sun, Moon, X, AlertTriangle, Info, ScanLine, ClipboardPaste, Loader2, Search } from 'lucide-react'
 import { addBeautyProduct, removeBeautyProduct, setLifeStage } from '@/app/actions'
-import { ACTIVES, detectActives, getActive } from '@/lib/actives'
+import { ACTIVES, detectActives, getActive, guessCategory } from '@/lib/actives'
 import { buildRoutines, findGaps, type ShelfItem } from '@/lib/routine'
 import type { LifeStage } from '@/lib/actives'
 import { Button } from '@/components/ui/button'
@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { BarcodeScanner } from '@/components/barcode-scanner'
+import type { SearchHit } from '@/app/api/beauty/search/route'
 
 const CATEGORIES = [
   'cleanser',
@@ -52,6 +53,8 @@ export function RoutineShelf({
   const [pasted, setPasted] = useState('')
   const [looking, setLooking] = useState(false)
   const formRef = useRef<HTMLDivElement>(null)
+  const [hits, setHits] = useState<SearchHit[]>([])
+  const [searching, setSearching] = useState(false)
   const [pending, startTransition] = useTransition()
 
   const { am, pm } = useMemo(() => buildRoutines(shelf, lifeStage), [shelf, lifeStage])
@@ -60,6 +63,50 @@ export function RoutineShelf({
   useEffect(() => {
     if (adding) formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }, [adding])
+
+  /**
+   * Search as she types. This is the path most people will use: the bottle in
+   * her hand always has a name, even when the box is long gone.
+   */
+  useEffect(() => {
+    const term = name.trim()
+    if (!adding || term.length < 3 || barcode) {
+      setHits([])
+      return
+    }
+    let cancelled = false
+    const timer = setTimeout(async () => {
+      setSearching(true)
+      try {
+        const res = await fetch(`/api/beauty/search?q=${encodeURIComponent(term)}`)
+        const data = await res.json()
+        if (!cancelled) setHits(data.hits ?? [])
+      } catch {
+        if (!cancelled) setHits([])
+      } finally {
+        if (!cancelled) setSearching(false)
+      }
+    }, 350)
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+    }
+  }, [name, adding, barcode])
+
+  /** Picking a result fills everything in at once. */
+  function chooseHit(hit: SearchHit) {
+    setName([hit.brand, hit.name].filter(Boolean).join(' ').trim())
+    setPicked(hit.actives ?? [])
+    setIngredients(hit.ingredients_raw)
+    setBarcode(hit.barcode)
+    setCategory(guessCategory(`${hit.brand ?? ''} ${hit.name}`) ?? category)
+    setHits([])
+    setScanNote(
+      hit.actives?.length
+        ? `read its ingredients: ${hit.actives.map((a) => getActive(a)?.label ?? a).join(', ').toLowerCase()}.`
+        : 'no ingredient list on this one — tick anything you know.',
+    )
+  }
 
   function toggleActive(key: string) {
     setPicked((p) => (p.includes(key) ? p.filter((k) => k !== key) : [...p, key]))
@@ -246,7 +293,45 @@ export function RoutineShelf({
           )}
           <div className="flex flex-col gap-1.5">
             <Label>what is it?</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. the ordinary niacinamide" className="h-11" />
+            <Input
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value)
+                const guess = guessCategory(e.target.value)
+                if (guess) setCategory(guess)
+              }}
+              placeholder="start typing — cerave, the ordinary…"
+              className="h-11"
+            />
+            {searching && (
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                looking…
+              </p>
+            )}
+            {hits.length > 0 && (
+              <ul className="flex flex-col overflow-hidden rounded-xl ring-1 ring-border">
+                {hits.map((h, i) => (
+                  <li key={`${h.barcode ?? h.name}-${i}`}>
+                    <button
+                      type="button"
+                      onClick={() => chooseHit(h)}
+                      className="flex w-full flex-col items-start gap-0.5 border-b border-border bg-background px-3 py-2.5 text-left last:border-0 hover:bg-muted"
+                    >
+                      <span className="text-sm">
+                        {h.brand ? <span className="text-muted-foreground">{h.brand} </span> : null}
+                        {h.name}
+                      </span>
+                      <span className="text-[0.65rem] text-muted-foreground">
+                        {h.actives.length
+                          ? h.actives.map((a) => getActive(a)?.label ?? a).join(', ').toLowerCase()
+                          : 'no ingredients listed'}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           <div className="flex flex-col gap-1.5">
             <Label>what kind?</Label>
@@ -324,13 +409,13 @@ export function RoutineShelf({
       ) : (
         !scanning && (
           <div className="flex flex-wrap gap-2">
-            <Button onClick={() => setScanning(true)} className="rounded-full">
-              <ScanLine className="mr-1.5 h-4 w-4" />
-              scan a product
+            <Button onClick={() => setAdding(true)} className="rounded-full">
+              <Search className="mr-1.5 h-4 w-4" />
+              find a product
             </Button>
-            <Button onClick={() => setAdding(true)} variant="outline" className="rounded-full">
-              <Plus className="mr-1.5 h-4 w-4" />
-              add by hand
+            <Button onClick={() => setScanning(true)} variant="outline" className="rounded-full">
+              <ScanLine className="mr-1.5 h-4 w-4" />
+              scan a barcode
             </Button>
           </div>
         )

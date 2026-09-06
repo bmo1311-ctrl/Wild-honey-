@@ -225,3 +225,33 @@ export function findLifeStageCautions(activeKeys: string[], stage: LifeStage): C
       message: `${a.label} is commonly avoided ${when}.${a.pregnancyNote ? ` ${a.pregnancyNote}` : ''} Worth confirming with your doctor or midwife before you keep using it.`,
     }))
 }
+
+/**
+ * Guess what kind of product it is from its name.
+ *
+ * Saves her a dropdown she would otherwise have to think about, and she can
+ * always change it. Wrong guesses are cheap; a required field is not.
+ */
+const CATEGORY_HINTS: [RegExp, string][] = [
+  // Order matters: what a product DOES beats what it is suspended in.
+  // "Retinol 0.5% in Squalane" is a treatment, not an oil.
+  [/\b(spf|sunscreen|sun cream|uv filter)\b/i, 'spf'],
+  [/\b(cleanser|cleansing|face wash|foaming|micellar)\b/i, 'cleanser'],
+  [/\b(retinol|retinal|retinoid|tretinoin|adapalene|benzoyl|spot treatment|acne)\b/i, 'treatment'],
+  [/\b(exfoliant|peel|scrub|resurfac|aha|bha)\b/i, 'exfoliant'],
+  [/\b(glycolic|lactic|salicylic|mandelic)\b.*\b(toner|toning|solution|essence)\b/i, 'toner'],
+  [/\b(glycolic|lactic|salicylic|mandelic)\b/i, 'exfoliant'],
+  [/\beye\b/i, 'eye'],
+  [/\b(toner|toning|tonic)\b/i, 'toner'],
+  [/\bessence\b/i, 'essence'],
+  [/\b(serum|ampoule|booster|concentrate)\b/i, 'serum'],
+  [/\b(oil|squalane|rosehip|jojoba)\b/i, 'oil'],
+  [/\b(cream|lotion|moistur|balm|hydrat|emulsion)\b/i, 'moisturizer'],
+]
+
+export function guessCategory(name: string): string | null {
+  for (const [pattern, category] of CATEGORY_HINTS) {
+    if (pattern.test(name)) return category
+  }
+  return null
+}
