@@ -59,7 +59,7 @@
   /* Bright Winter — her tokens, verbatim */
   --ink: oklch(0.18 0.02 265);
   --ink-soft: oklch(0.48 0.018 262);
-  --bg: oklch(0.965 0.075 100);           /* Bright Winter lemon — clear, bright, softened; the outer ground */
+  --bg: oklch(0.968 0.06 100);            /* Bright Winter lemon — clear, bright, softened; the outer ground */
   --surface: oklch(1 0 0);                /* neutral white — every card and panel sits on this */
   --line: oklch(0.9 0.012 95);
   --icy-blue: oklch(0.68 0.17 235);
