@@ -11,6 +11,8 @@ import { localHour, localToday } from '@/lib/today'
 import { CourseSwitcher } from '@/components/course/course-switcher'
 import { buildActivity, consistency, streaksFrom } from '@/lib/activity'
 import { QuickAddHabit } from '@/components/quick-add-habit'
+import { NoticeLine } from '@/components/notice-line'
+import { pickNotice } from '@/lib/noticing'
 import { getAccess,
   getActiveCourseState,
   getActivityDates,
@@ -23,7 +25,9 @@ import { getAccess,
   getRecentHabitLogs,
   getBaselineVitality,
   getMyGoals,
+  getMyCommitments,
   getRecentCheckins,
+  getRecentWins,
   getSessionProfile,
   getTodayCheckin,
   getTodayNutrition,
@@ -68,7 +72,28 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
   const pct = course ? Math.round((completedDays.length / course.length_days) * 100) : 0
   const loggedHabitIds = new Set(habitLogs.filter((l) => l.date === today).map((l) => l.habit_id))
 
-  const [baseline, goals, recentCheckins, measurements, money] = await Promise.all([getBaselineVitality(), getMyGoals(), getRecentCheckins(30), getMeasurements(), getMoney()])
+  const [baseline, goals, recentCheckins, measurements, money, commitments, wins] = await Promise.all([
+    getBaselineVitality(),
+    getMyGoals(),
+    getRecentCheckins(30),
+    getMeasurements(),
+    getMoney(),
+    getMyCommitments(),
+    getRecentWins(10),
+  ])
+
+  // One true sentence, or nothing. Built from what she has actually done.
+  const notice = pickNotice({
+    firstName: profile?.name?.split(' ')[0] ?? null,
+    checkins: [...recentCheckins].reverse(),
+    habits,
+    habitLogs,
+    wins,
+    commitments,
+    activeDays: [...new Set(Object.values(activityDates).flat())].sort().reverse(),
+    currentProgram: course && currentDay ? { title: course.title, day: currentDay, length: course.length_days } : null,
+    today,
+  })
   const lastWeigh = measurements[measurements.length - 1]?.date ?? null
   const lastMoney = money.entries[0]?.date ?? null
   const since = (d: string | null) => (d ? Math.floor((Date.parse(today) - Date.parse(d)) / 86_400_000) : null)
@@ -138,6 +163,8 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
           {profile?.name ? `Morning, ${profile.name.split(' ')[0]}` : 'Today'}
         </h1>
       </header>
+
+      <NoticeLine notice={notice} />
 
       <section className="grid grid-cols-4 gap-2">
         {stats.map((s) => (
