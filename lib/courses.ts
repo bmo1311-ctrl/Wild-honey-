@@ -121,6 +121,27 @@ export function splitMilestone(blocks: Block[]): { part1: Block[]; part2: Block[
   return { part1: blocks.slice(0, cut), part2: blocks.slice(cut) }
 }
 
+export type Pillar4 = 'Body' | 'Identity' | 'Mindset' | 'Faith'
+
+/**
+ * Which pillars a day works in, read off its blocks. The course JSON does not
+ * label days, but the block types say what she is doing: shapes and the log
+ * are Body, a written answer is Mindset, a self-rating or a "done means"
+ * check is Identity, scripture is Faith. A day can be several.
+ */
+export function pillarsOf(blocks: Block[]): Pillar4[] {
+  const out = new Set<Pillar4>()
+  for (const b of blocks) {
+    if (b.t === 'figure' || b.t === 'log') out.add('Body')
+    if (b.t === 'steps' && /shape|walk|squat|carry|session|train|floor|minutes/i.test(JSON.stringify(b))) out.add('Body')
+    if (b.t === 'write') out.add('Mindset')
+    if (b.t === 'rate' || b.t === 'check') out.add('Identity')
+    if (b.t === 'scripture') out.add('Faith')
+    if (b.t === 'quote' && /god|lord|pray|faith|scripture|psalm|jesus/i.test(b.v)) out.add('Faith')
+  }
+  return (['Body', 'Identity', 'Mindset', 'Faith'] as Pillar4[]).filter((p) => out.has(p))
+}
+
 /**
  * Stable identity for a saveable block within a day, used as prompt_index.
  * It is the block's position in the day's blocks array, so a write, a check

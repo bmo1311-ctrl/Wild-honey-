@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Blocks } from '@/components/course/blocks'
 import { DoneButton } from '@/components/course/done-button'
-import { splitMilestone } from '@/lib/courses'
+import { pillarsOf, splitMilestone } from '@/lib/courses'
+import { PillarDots } from '@/components/course/pillar-dots'
 import type { Course, CourseDay, CourseWriting } from '@/lib/courses'
 import type { Checkin } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -49,8 +50,10 @@ export function DayView({
           Week {day.week_number} · Day {day.day_number}
         </p>
         <h1 className={cn('mt-1.5 font-serif font-semibold leading-[1.1] text-balance', twoPart ? 'text-[31px]' : 'text-[29px]')}>{day.title}</h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">
+        <p className="mt-1.5 flex items-center gap-2 text-sm text-muted-foreground">
           {day.kind} · {day.minutes} min
+          <PillarDots pillars={pillarsOf(day.blocks)} size="md" />
+          <span className="text-xs">{pillarsOf(day.blocks).join(' · ').toLowerCase()}</span>
         </p>
 
         {twoPart && (

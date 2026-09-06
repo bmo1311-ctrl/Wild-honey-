@@ -2128,9 +2128,21 @@ export async function saveFoodItem(input: {
   protein: number
   carbs: number
   fat: number
+  waterMl?: number | null
+  caffeineMg?: number | null
 }) {
   const { supabase, user } = await requireUser()
   if (!input.name.trim()) return { error: 'Give it a name first.' }
+  // a drink measured in ml is mostly water unless she says otherwise
+  const water = input.waterMl ?? (input.servingUnit.toLowerCase() === 'ml' ? input.servingSize : null)
+  const nutrients: Record<string, number> = {
+    calories: round1(input.calories),
+    protein_g: round1(input.protein),
+    carbs_g: round1(input.carbs),
+    fat_g: round1(input.fat),
+  }
+  if (water != null) nutrients.water_ml = round1(water)
+  if (input.caffeineMg != null) nutrients.caffeine_mg = round1(input.caffeineMg)
   const { data, error } = await supabase
     .from('food_items')
     .insert({
@@ -2142,6 +2154,8 @@ export async function saveFoodItem(input: {
       protein_g: round1(input.protein),
       carbs_g: round1(input.carbs),
       fat_g: round1(input.fat),
+      nutrients,
+      category: input.servingUnit.toLowerCase() === 'ml' ? 'drink' : null,
     })
     .select('id')
     .maybeSingle()

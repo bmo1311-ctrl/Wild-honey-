@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Check, ChevronRight } from 'lucide-react'
 import { Blocks } from '@/components/course/blocks'
-import { daysInWeek, getCourse, getWeek } from '@/lib/courses'
+import { daysInWeek, getCourse, getWeek, pillarsOf } from '@/lib/courses'
+import { PillarDots } from '@/components/course/pillar-dots'
 import { getCompletedDays } from '@/lib/data'
 import { cn } from '@/lib/utils'
 
@@ -48,7 +49,7 @@ export default async function CourseWeekPage({ params }: { params: Promise<{ slu
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-medium">{d.title}</span>
-                  <span className="block text-xs text-muted-foreground">{d.kind} · {d.minutes} min</span>
+                  <span className="flex items-center gap-2 text-xs text-muted-foreground">{d.kind} · {d.minutes} min <PillarDots pillars={pillarsOf(d.blocks)} /></span>
                 </span>
                 <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
               </Link>

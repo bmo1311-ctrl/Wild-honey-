@@ -1,13 +1,16 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
-import { getCourse, weekOfDay } from '@/lib/courses'
+import { getCourse, pillarsOf, weekOfDay, type Pillar4 } from '@/lib/courses'
+import { PillarDots } from '@/components/course/pillar-dots'
+import { PillarFilter } from '@/components/course/pillar-filter'
 import { getCourseState } from '@/lib/data'
 import { StartCourseButton } from '@/components/course/start-course-button'
 import { cn } from '@/lib/utils'
 
-export default async function CourseOverviewPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function CourseOverviewPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ pillar?: string }> }) {
   const { slug } = await params
+  const { pillar } = await searchParams
   const course = getCourse(slug)
   if (!course) notFound()
 
@@ -37,6 +40,10 @@ export default async function CourseOverviewPage({ params }: { params: Promise<{
   const done = completedDays.length
   const pct = Math.round((done / course.length_days) * 100)
   const currentWeek = weekOfDay(course, currentDay)
+  const byDay = new Map(course.days.map((d) => [d.day_number, pillarsOf(d.blocks)]))
+  const counts: Record<string, number> = {}
+  for (const ps of byDay.values()) for (const p of ps) counts[p] = (counts[p] ?? 0) + 1
+  const filtered = pillar ? course.days.filter((d) => byDay.get(d.day_number)?.includes(pillar as Pillar4)) : []
 
   return (
     <div className="flex flex-col gap-6">
@@ -79,7 +86,24 @@ export default async function CourseOverviewPage({ params }: { params: Promise<{
         </div>
       </section>
 
-      <section className="flex flex-col gap-2.5">
+      <PillarFilter counts={counts} />
+
+      {pillar && (
+        <section>
+          <h2 className="mb-2 text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">{filtered.length} {pillar} {filtered.length === 1 ? 'day' : 'days'}</h2>
+          <div className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card">
+            {filtered.map((d, i) => (
+              <Link key={d.day_number} href={`/app/program/${slug}/day/${d.day_number}`} className={cn('flex items-center gap-3 px-4 py-3', i > 0 && 'border-t border-border')}>
+                <span className={cn('flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[11px] font-bold', completedDays.includes(d.day_number) ? 'bg-mindset-pillar text-white' : 'bg-muted text-muted-foreground')}>{d.day_number}</span>
+                <span className="min-w-0 flex-1"><span className="block truncate text-[15px] font-medium">{d.title}</span><span className="block text-xs text-muted-foreground">week {d.week_number} · {d.kind} · {d.minutes} min</span></span>
+                <PillarDots pillars={byDay.get(d.day_number) ?? []} />
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className={cn('flex flex-col gap-2.5', pillar && 'hidden')}>
         {course.week_list.map((w) => {
           // days come from their own week_number — week four of Daily Bread is nine days
           const days = course.days.filter((d) => d.week_number === w.week_number)
@@ -105,8 +129,9 @@ export default async function CourseOverviewPage({ params }: { params: Promise<{
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[15px] font-semibold text-pretty">{w.title}</span>
-                <span className="mt-0.5 block text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                <span className="mt-0.5 flex items-center gap-2 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
                   {w.verb} · {days.length} days
+                  <PillarDots pillars={[...new Set(days.flatMap((d) => byDay.get(d.day_number) ?? []))] as Pillar4[]} />
                 </span>
                 {isCurrent && <span className="mt-1 block text-xs text-primary">day {currentDay} · you are here</span>}
               </span>

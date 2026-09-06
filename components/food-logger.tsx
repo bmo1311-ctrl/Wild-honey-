@@ -3,7 +3,7 @@
 import { useMemo, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { Check, Plus, Search, Trash2, X } from 'lucide-react'
-import { deleteMealGroup, deleteMealLog, deleteSavedMeal, logFood, logFoods, saveFoodItem, saveMeal } from '@/app/actions'
+import { deleteMealGroup, deleteMealLog, deleteSavedMeal, logFoods, saveFoodItem, saveMeal } from '@/app/actions'
 import type { SavedMeal } from '@/lib/data'
 import type { FoodItem } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -57,7 +57,7 @@ export function FoodLogger({
   const [custom, setCustom] = useState(false)
   const [pending, startTransition] = useTransition()
 
-  const [c, setC] = useState({ name: '', size: '100', unit: 'g', cal: '', pro: '', carb: '', fat: '' })
+  const [c, setC] = useState({ name: '', size: '100', unit: 'g', cal: '', pro: '', carb: '', fat: '', caffeine: '', water: '' })
 
   const matches = useMemo(() => {
     const t = q.trim().toLowerCase()
@@ -114,29 +114,23 @@ export function FoodLogger({
         protein: Number(c.pro) || 0,
         carbs: Number(c.carb) || 0,
         fat: Number(c.fat) || 0,
+        caffeineMg: c.caffeine.trim() === '' ? null : Number(c.caffeine),
+        waterMl: c.water.trim() === '' ? null : Number(c.water),
       })
       if ('error' in saved && saved.error) {
         toast.error(saved.error)
         return
       }
-      const res = await logFood({
-        foodItemId: saved.id,
-        customName: c.name,
-        quantity: size,
-        unit: c.unit,
-        calories: Number(c.cal) || 0,
-        protein: Number(c.pro) || 0,
-        carbs: Number(c.carb) || 0,
-        fat: Number(c.fat) || 0,
-        memberId,
-      })
+      const res = saved.id
+        ? await logFoods([{ foodItemId: saved.id, quantity: size }], undefined, memberId)
+        : ({ error: 'Saved, but could not log it.' } as { error: string })
       if ('error' in res && res.error) {
         toast.error(res.error)
         return
       }
       toast.success(`${c.name} saved and logged`)
       setCustom(false)
-      setC({ name: '', size: '100', unit: 'g', cal: '', pro: '', carb: '', fat: '' })
+      setC({ name: '', size: '100', unit: 'g', cal: '', pro: '', carb: '', fat: '', caffeine: '', water: '' })
     })
   }
 
@@ -435,6 +429,11 @@ export function FoodLogger({
                 />
               ))}
             </div>
+            <div className="grid grid-cols-2 gap-2">
+              <input value={c.caffeine} onChange={(e) => setC({ ...c, caffeine: e.target.value })} inputMode="decimal" placeholder="caffeine mg" className={field} />
+              <input value={c.water} onChange={(e) => setC({ ...c, water: e.target.value })} inputMode="decimal" placeholder={c.unit.toLowerCase() === 'ml' ? `water ml (defaults to ${c.size})` : 'water ml'} className={field} />
+            </div>
+            <p className="text-xs text-muted-foreground">caffeine and water count toward hydration. a drink in ml is treated as water unless you say otherwise.</p>
             <button
               type="button"
               onClick={submitCustom}
