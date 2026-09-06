@@ -1127,6 +1127,37 @@ export async function getUsualFoods(limit = 8, memberId?: string | null): Promis
   return [...seen.values()].sort((a, b) => b.timesLogged - a.timesLogged).slice(0, limit)
 }
 
+export interface SavedMeal {
+  id: string
+  name: string
+  items: { food_item_id: string; quantity: number }[]
+  /** resolved for display */
+  foods: { food: FoodItem; quantity: number }[]
+  calories: number
+  protein: number
+}
+
+/** Her saved combinations, foods resolved, totals computed. */
+export async function getSavedMeals(memberId?: string | null): Promise<SavedMeal[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  let q = supabase.from('saved_meals').select('*').eq('user_id', user.id)
+  q = memberId ? q.eq('member_id', memberId) : q.is('member_id', null)
+  const meals = (ok(await q.order('created_at', { ascending: false })) as { id: string; name: string; items: { food_item_id: string; quantity: number }[] }[]) ?? []
+  if (meals.length === 0) return []
+  const ids = [...new Set(meals.flatMap((m) => m.items.map((i) => i.food_item_id)))]
+  const foods = (ok(await supabase.from('food_items').select('*').in('id', ids)) as FoodItem[]) ?? []
+  const byId = new Map(foods.map((f) => [f.id, f]))
+  return meals.map((m) => {
+    const resolved = m.items.flatMap((i) => (byId.get(i.food_item_id) ? [{ food: byId.get(i.food_item_id)!, quantity: i.quantity }] : []))
+    const tot = (k: 'calories' | 'protein_g') => resolved.reduce((s, r) => s + (r.food[k] * r.quantity) / (r.food.serving_size || 1), 0)
+    return { id: m.id, name: m.name, items: m.items, foods: resolved, calories: Math.round(tot('calories')), protein: Math.round(tot('protein_g')) }
+  })
+}
+
 // ---- Strong and Surrendered (the course) ----
 
 /** The member's enrollment, or null if she hasn't started. */

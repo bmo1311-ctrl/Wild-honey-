@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ChevronLeft, Settings2 } from 'lucide-react'
 import { FoodLogScreen } from '@/components/food-log-screen'
-import { getCurrentCyclePhase, getFoodItems, getHouseholdMembers, getSessionProfile, getTodayNutrition, getUsualFoods } from '@/lib/data'
+import { getCurrentCyclePhase, getFoodItems, getHouseholdMembers, getSavedMeals, getSessionProfile, getTodayNutrition, getUsualFoods } from '@/lib/data'
 import { applyCycle, phaseFromDates, phaseLabel, type CyclePhaseKey } from '@/lib/cycle'
 import { NutrientRings } from '@/components/nutrient-rings'
 import { NutrientPanel } from '@/components/nutrient-panel'
@@ -18,12 +18,13 @@ export default async function LogFoodPage({ searchParams }: { searchParams: Prom
   const self = members.find((m) => m.is_self)
   // null means the account holder; anyone else is logged against their id.
   const memberId = member && member !== self?.id && members.some((m) => m.id === member) ? member : null
-  const [foods, nutrition, usual, profile, loggedPhase] = await Promise.all([
+  const [foods, nutrition, usual, profile, loggedPhase, savedMeals] = await Promise.all([
     getFoodItems(),
     getTodayNutrition(memberId),
     getUsualFoods(8, memberId),
     getSessionProfile(),
     getCurrentCyclePhase(),
+    getSavedMeals(memberId),
   ])
 
   const p = profile as (typeof profile & {
@@ -78,9 +79,13 @@ export default async function LogFoodPage({ searchParams }: { searchParams: Prom
       unit?: string | null
       calories?: number | null
       protein_g?: number | null
+      group_id?: string | null
+      meal_name?: string | null
     }
     return {
       id: m.id,
+      groupId: row.group_id ?? null,
+      mealName: row.meal_name ?? null,
       name: row.custom_name ?? m.recipe?.title ?? 'meal',
       quantity: row.quantity ?? null,
       unit: row.unit ?? null,
@@ -139,6 +144,7 @@ export default async function LogFoodPage({ searchParams }: { searchParams: Prom
         usual={usual}
         members={members.map((m) => ({ id: m.id, name: m.name, is_self: m.is_self }))}
         memberId={memberId}
+        savedMeals={savedMeals}
       />
 
       <Link href="/app/nutrition" className="text-center text-sm font-medium text-mindset-pillar underline underline-offset-[3px]">

@@ -2159,7 +2159,10 @@ export async function logFoods(
   entries: { foodItemId: string; quantity: number }[],
   mealSlot?: string,
   memberId?: string | null,
+  mealName?: string | null,
 ) {
+  // several foods logged together share a group so the day shows one meal
+  const groupId = entries.length > 1 || mealName ? crypto.randomUUID() : null
   const { supabase, user } = await requireUser()
   if (entries.length === 0) return { error: 'Nothing selected.' }
 
@@ -2187,6 +2190,8 @@ export async function logFoods(
         fat_g: round1(f.fat_g * factor),
         meal_slot: mealSlot ?? null,
         member_id: memberId ?? null,
+        group_id: groupId,
+        meal_name: mealName?.trim() || null,
         date: today,
         servings: 1,
       },
@@ -2569,5 +2574,41 @@ export async function deleteMoneyEntry(id: string) {
   const { error } = await supabase.from('money_entries').delete().eq('id', id).eq('user_id', user.id)
   if (error) return { error: error.message }
   revalidatePath('/app/money')
+  return { ok: true }
+}
+
+// ---- Saved meals ----
+
+export async function saveMeal(input: { name: string; items: { foodItemId: string; quantity: number }[]; memberId?: string | null }) {
+  const { supabase, user } = await requireUser()
+  if (!input.name.trim()) return { error: 'Name the meal.' }
+  if (input.items.length === 0) return { error: 'Pick the foods first.' }
+  const { error } = await supabase.from('saved_meals').insert({
+    user_id: user.id,
+    member_id: input.memberId ?? null,
+    name: input.name.trim(),
+    items: input.items.map((i) => ({ food_item_id: i.foodItemId, quantity: i.quantity })),
+  })
+  if (error) return { error: error.message }
+  revalidatePath('/app/nutrition/log')
+  return { ok: true }
+}
+
+export async function deleteSavedMeal(id: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('saved_meals').delete().eq('id', id).eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/nutrition/log')
+  return { ok: true }
+}
+
+/** Delete every row of a logged meal at once. */
+export async function deleteMealGroup(groupId: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('meal_logs').delete().eq('group_id', groupId).eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/nutrition/log')
+  revalidatePath('/app/nutrition')
+  revalidatePath('/app')
   return { ok: true }
 }

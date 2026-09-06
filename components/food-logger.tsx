@@ -3,12 +3,15 @@
 import { useMemo, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { Check, Plus, Search, Trash2, X } from 'lucide-react'
-import { deleteMealLog, logFood, logFoods, saveFoodItem } from '@/app/actions'
+import { deleteMealGroup, deleteMealLog, deleteSavedMeal, logFood, logFoods, saveFoodItem, saveMeal } from '@/app/actions'
+import type { SavedMeal } from '@/lib/data'
 import type { FoodItem } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
 interface LoggedRow {
   id: string
+  groupId?: string | null
+  mealName?: string | null
   name: string
   quantity: number | null
   unit: string | null
@@ -35,7 +38,9 @@ export function FoodLogger({
   members = [],
   memberId = null,
   onSwitchMember,
+  savedMeals = [],
 }: {
+  savedMeals?: SavedMeal[]
   foods: FoodItem[]
   logged: LoggedRow[]
   usual: UsualFood[]
@@ -44,6 +49,8 @@ export function FoodLogger({
   onSwitchMember?: (id: string | null) => void
 }) {
   const [multi, setMulti] = useState<Record<string, number>>({})
+  const [building, setBuilding] = useState(false)
+  const [mealName, setMealName] = useState('')
   const [q, setQ] = useState('')
   const [picked, setPicked] = useState<FoodItem | null>(null)
   const [amount, setAmount] = useState('')
@@ -75,17 +82,8 @@ export function FoodLogger({
   function submitPicked() {
     if (!picked || !scaled) return
     startTransition(async () => {
-      const res = await logFood({
-        foodItemId: picked.id,
-        customName: picked.name,
-        quantity: Number(amount),
-        unit: picked.serving_unit,
-        calories: scaled.calories,
-        protein: scaled.protein,
-        carbs: scaled.carbs,
-        fat: scaled.fat,
-        memberId,
-      })
+      // logFoods scales the whole nutrient map — vitamins and minerals included — not just the four macros
+      const res = await logFoods([{ foodItemId: picked.id, quantity: Number(amount) }], undefined, memberId)
       if ('error' in res && res.error) {
         toast.error(res.error)
         return
@@ -162,16 +160,29 @@ export function FoodLogger({
     })
   }
 
-  function logSelected() {
+  function logSelected(save = false) {
     const entries = Object.entries(multi).map(([foodItemId, quantity]) => ({ foodItemId, quantity }))
     startTransition(async () => {
-      const res = await logFoods(entries, undefined, memberId)
+      if (save) {
+        if (!mealName.trim()) {
+          toast.error('Give the meal a name.')
+          return
+        }
+        const saved = await saveMeal({ name: mealName, items: entries, memberId })
+        if ('error' in saved && saved.error) {
+          toast.error(saved.error)
+          return
+        }
+      }
+      const res = await logFoods(entries, undefined, memberId, save ? mealName : null)
       if ('error' in res && res.error) {
         toast.error(res.error)
         return
       }
-      toast.success(`${entries.length} logged`)
+      toast.success(save ? `${mealName} saved and logged` : `${entries.length} logged as one meal`)
       setMulti({})
+      setBuilding(false)
+      setMealName('')
     })
   }
 
@@ -216,7 +227,9 @@ export function FoodLogger({
         <section>
           <div className="mb-2 flex items-baseline justify-between">
             <h2 className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">Your usual</h2>
-            <span className="text-xs text-muted-foreground">tap to log · hold to build a meal</span>
+            <button type="button" onClick={() => { setBuilding((b) => !b); setMulti({}) }} className={cn('rounded-full px-3 py-1 text-xs font-semibold', building ? 'bg-mindset-pillar text-white' : 'bg-muted text-muted-foreground')}>
+              {building ? 'Cancel' : 'Build a meal'}
+            </button>
           </div>
           <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
             {usual.map((u) => {
@@ -226,13 +239,9 @@ export function FoodLogger({
                   key={u.food.id}
                   type="button"
                   disabled={pending}
-                  onClick={() => (selectedCount > 0 ? toggleMulti(u) : quickLog(u))}
-                  onContextMenu={(e) => {
-                    e.preventDefault()
-                    toggleMulti(u)
-                  }}
+                  onClick={() => (building ? toggleMulti(u) : quickLog(u))}
                   className={cn(
-                    'shrink-0 rounded-2xl border px-3.5 py-2.5 text-left transition-colors disabled:opacity-50',
+                    'shrink-0 select-none rounded-2xl border px-3.5 py-2.5 text-left transition-colors disabled:opacity-50 [-webkit-touch-callout:none]',
                     picked ? 'border-transparent bg-mindset-pillar text-white' : 'border-border bg-card',
                   )}
                 >
@@ -244,22 +253,51 @@ export function FoodLogger({
               )
             })}
           </div>
-          {selectedCount > 0 && (
-            <button
-              type="button"
-              onClick={logSelected}
-              disabled={pending}
-              className="mt-2 h-[52px] w-full rounded-2xl bg-primary text-[17px] font-bold text-primary-foreground disabled:opacity-50"
-            >
-              Log {selectedCount} {selectedCount === 1 ? 'item' : 'items'} together
-            </button>
+          {building && (
+            <div className="mt-2 flex flex-col gap-2 rounded-2xl border border-border bg-card p-3">
+              <p className="text-[13px] text-muted-foreground">{selectedCount === 0 ? 'tap the foods that go in it' : `${selectedCount} in the bowl`}</p>
+              <input value={mealName} onChange={(e) => setMealName(e.target.value)} placeholder="name it — Breakfast bowl" className="h-11 w-full rounded-xl bg-background px-3 text-base outline-none ring-1 ring-border focus-visible:ring-2 focus-visible:ring-primary/40" />
+              <div className="flex gap-2">
+                <button type="button" onClick={() => logSelected(true)} disabled={pending || selectedCount === 0} className="h-11 flex-1 rounded-xl bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50">Save & log</button>
+                <button type="button" onClick={() => logSelected(false)} disabled={pending || selectedCount === 0} className="h-11 flex-1 rounded-xl bg-muted text-sm font-semibold disabled:opacity-50">Just log once</button>
+              </div>
+            </div>
           )}
+        </section>
+      )}
+
+      {savedMeals.length > 0 && !building && (
+        <section>
+          <h2 className="mb-2 text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">Your meals</h2>
+          <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
+            {savedMeals.map((m) => (
+              <div key={m.id} className="flex shrink-0 items-stretch overflow-hidden rounded-2xl border border-border bg-card">
+                <button type="button" disabled={pending} onClick={() => startTransition(async () => { const r = await logFoods(m.items.map((i) => ({ foodItemId: i.food_item_id, quantity: i.quantity })), undefined, memberId, m.name); if ('error' in r && r.error) toast.error(r.error); else toast.success(`${m.name} logged`) })} className="px-3.5 py-2.5 text-left disabled:opacity-50">
+                  <span className="block text-[14px] font-semibold">{m.name}</span>
+                  <span className="block text-[12px] text-muted-foreground">{m.foods.length} foods · {m.calories} cal · {m.protein}g protein</span>
+                </button>
+                <button type="button" onClick={() => startTransition(async () => { await deleteSavedMeal(m.id) })} aria-label={`Remove ${m.name}`} className="border-l border-border px-2 text-muted-foreground"><X className="h-3.5 w-3.5" /></button>
+              </div>
+            ))}
+          </div>
         </section>
       )}
 
       {logged.length > 0 && (
         <ul className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card">
-          {logged.map((l, i) => (
+          {groupLogged(logged).map((g, i) => g.rows.length > 1 || g.mealName ? (
+            <li key={g.key} className={cn('px-4 py-3', i > 0 && 'border-t border-border')}>
+              <div className="flex items-center gap-3">
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[15px] font-semibold">{g.mealName ?? 'Meal'}</span>
+                  <span className="block text-[12.5px] text-muted-foreground">{Math.round(g.calories)} cal · {Math.round(g.protein)}g protein · {g.rows.length} foods</span>
+                </span>
+                <button type="button" onClick={() => startTransition(async () => { await deleteMealGroup(g.key) })} aria-label={`Remove ${g.mealName ?? 'meal'}`} className="p-1.5 text-muted-foreground"><Trash2 className="h-4 w-4" /></button>
+              </div>
+              <p className="mt-1 truncate text-[12px] text-muted-foreground">{g.rows.map((r) => r.name).join(' · ')}</p>
+            </li>
+          ) : (
+            g.rows.map((l) => (
             <li key={l.id} className={cn('flex items-center gap-3 px-4 py-3', i > 0 && 'border-t border-border')}>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-[15px] font-medium">{l.name}</span>
@@ -271,6 +309,7 @@ export function FoodLogger({
                 <Trash2 className="h-4 w-4" />
               </button>
             </li>
+            ))
           ))}
         </ul>
       )}
@@ -410,4 +449,22 @@ export function FoodLogger({
       )}
     </div>
   )
+}
+
+/** Rows logged together become one entry; singles stay singles. Order preserved. */
+function groupLogged(rows: LoggedRow[]) {
+  const out: { key: string; mealName: string | null; rows: LoggedRow[]; calories: number; protein: number }[] = []
+  const idx = new Map<string, number>()
+  for (const r of rows) {
+    const key = r.groupId ?? r.id
+    if (!idx.has(key)) {
+      idx.set(key, out.length)
+      out.push({ key, mealName: r.mealName ?? null, rows: [], calories: 0, protein: 0 })
+    }
+    const g = out[idx.get(key)!]
+    g.rows.push(r)
+    g.calories += r.calories ?? 0
+    g.protein += r.protein ?? 0
+  }
+  return out
 }
