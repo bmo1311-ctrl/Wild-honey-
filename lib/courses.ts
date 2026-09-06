@@ -1,5 +1,7 @@
 import strongAndSurrendered from '@/lib/courses/strong-and-surrendered.json'
 import dailyBread from '@/lib/courses/daily-bread.json'
+import stillWaters from '@/lib/courses/still-waters.json'
+import theHonestRoom from '@/lib/courses/the-honest-room.json'
 
 /** Block types, exactly as they appear in the course JSON. */
 export type Block =
@@ -58,6 +60,8 @@ export interface Course {
 export const COURSES: Course[] = [
   strongAndSurrendered as unknown as Course,
   dailyBread as unknown as Course,
+  stillWaters as unknown as Course,
+  theHonestRoom as unknown as Course,
 ]
 
 export function getCourse(slug: string): Course | null {

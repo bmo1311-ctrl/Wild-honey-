@@ -1,0 +1,1770 @@
+{
+ "slug": "the-honest-room",
+ "title": "The Honest Room",
+ "subtitle": "Ten weeks to say the sentence you've been carrying, and stop performing the woman who never has to.",
+ "length_days": 40,
+ "weeks": 10,
+ "week_list": [
+  {
+   "week_number": 1,
+   "title": "The Room",
+   "verb": "prepare",
+   "principle": "conditioning before skill",
+   "opening_line": "Eleven women are going to look at you for two hours and not one of them is going to try to help you.",
+   "stakes": "Skip this and you spend ten weeks in a room you are still auditioning for, saying the second-truest thing every single time.",
+   "pull_quote": "Advice is how a room gets away from a woman. It looks like care and it is an exit.",
+   "blocks": [
+    {
+     "t": "h",
+     "v": "The four rules of the room"
+    },
+    {
+     "t": "grid",
+     "title": "What holds the room together",
+     "cols": ["Rule", "What it actually is"],
+     "rows": [
+      ["No advice", "Advice is how a room avoids a woman without anybody noticing."],
+      ["No rescuing", "The silence is where she says the second half of it."],
+      ["No joke on the end", "The joke takes it back and a polite room lets you."],
+      ["It stays here", "You cannot be honest in a room that leaks."]
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "Ephesians 4:25",
+     "text": "Putting away falsehood, let each of you speak the truth with his neighbor, for we are members one of another.",
+     "why": "The reason given is not integrity. It is membership."
+    },
+    {
+     "t": "steps",
+     "title": "The inner work — The Rooms You Perform In",
+     "items": [
+      { "n": 1, "head": "Name your last three rooms", "sub": "Any three rooms you performed in this week — kitchen, office, group chat." },
+      { "n": 2, "head": "Who was in each one", "sub": "And which version of you walked in." },
+      { "n": 3, "head": "Circle the widest gap", "sub": "Between the version that walked in and the true one." },
+      { "n": 4, "head": "Write one sentence", "sub": "What should have been said in that room instead." },
+      { "n": 5, "head": "Say it aloud alone", "sub": "In the room where it belonged, or the closest room you have." },
+      { "n": 6, "head": "Bring it to session unimproved", "sub": "Not the polished version. The one you actually wrote." }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The four rules read aloud once",
+      "The six-step inner work done in one sitting",
+      "One plain sentence said in session, under twelve words",
+      "Seven daily logs",
+      "One hedging incident named by name"
+     ],
+     "demo": "Say the sentence in under twelve words, no preamble, no joke on the end, eyes up."
+    }
+   ]
+  },
+  {
+   "week_number": 2,
+   "title": "The Inventory",
+   "verb": "prepare",
+   "principle": "compulsories before optionals",
+   "opening_line": "You have a story about every one of your patterns, and the story is the thing keeping it alive.",
+   "stakes": "Skip the flat inventory and you keep mistaking the story for the fix — insight without a flat line changes nothing.",
+   "pull_quote": "Insight is the reason you can name it. It is also, precisely, the reason you have not stopped.",
+   "blocks": [
+    {
+     "t": "h",
+     "v": "The story, and the flat line"
+    },
+    {
+     "t": "grid",
+     "title": "Cut every pattern down to one sentence",
+     "cols": ["Pattern", "The flat one-line version"],
+     "rows": [
+      ["Over-explaining", "I keep talking after the answer is finished."],
+      ["The pre-emptive apology", "I say sorry before I ask for anything."],
+      ["The disappearing act", "I stop answering people for four days at a time."],
+      ["Managing the room", "I watch faces and adjust until nobody is uncomfortable."],
+      ["The tap-out", "I make a joke the second somebody gets close."]
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "James 1:23-24",
+     "text": "For if anyone is a hearer of the word and not a doer, he is like a man who looks intently at his natural face in a mirror. For he looks at himself and goes away and at once forgets what he was like.",
+     "why": "Naming a pattern in the mirror and being changed by it are two different acts."
+    },
+    {
+     "t": "steps",
+     "title": "The inner work — The Flat Inventory",
+     "items": [
+      { "n": 1, "head": "Twenty minutes, flat list", "sub": "Every known pattern you have. Do not think, list." },
+      { "n": 2, "head": "One line each", "sub": "No \"because.\" Say it and stop." },
+      { "n": 3, "head": "Cut every reason", "sub": "Go back through and delete every explanation you snuck in." },
+      { "n": 4, "head": "Count them", "sub": "Write the number at the top of the page." },
+      { "n": 5, "head": "Circle the one someone else pays for", "sub": "Not the one that costs you the most. The one that costs somebody else." },
+      { "n": 6, "head": "Read the whole list aloud, standing", "sub": "Flat, no explanation, start to finish." }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The flat list written in one sitting, number at the top",
+      "Every line cut down to one sentence, no \"because\"",
+      "One line circled — the one someone else pays for",
+      "The whole list read aloud standing"
+     ],
+     "demo": "Read any three lines aloud, flat, in under fifteen seconds, no explanation."
+    }
+   ]
+  },
+  {
+   "week_number": 3,
+   "title": "The Pause",
+   "verb": "receive",
+   "principle": "spotting",
+   "opening_line": "You have never once let a correction land — you have been answering them before they finished arriving.",
+   "stakes": "Skip the pause and every correction you're ever offered keeps costing the giver more than it costs you, until nobody offers you one again.",
+   "pull_quote": "A correction is cheap for you and expensive for the woman giving it. You have had that backwards your whole adult life.",
+   "blocks": [
+    {
+     "t": "h",
+     "v": "The three seconds"
+    },
+    {
+     "t": "grid",
+     "title": "What you've been doing, and what you do this week",
+     "cols": ["What she does", "What you do this week"],
+     "rows": [
+      ["She finishes the sentence, you start talking on her last word", "Close your mouth and count three."],
+      ["It stings and you supply context immediately", "Feel it. Say nothing."],
+      ["You think she's wrong, you correct the correction", "Say thank you and take it home."],
+      ["She's right and you agree loudly and perform the change", "One word. Thank you. Stop."],
+      ["Nobody says anything and you fill it in two seconds", "Let the silence run out."]
+     ]
+    },
+    {
+     "t": "figure",
+     "pose": "seated",
+     "label": "The pause",
+     "cue": "Three seconds of silence before you answer. Count them."
+    },
+    {
+     "t": "scripture",
+     "ref": "Proverbs 27:6",
+     "text": "Faithful are the wounds of a friend.",
+     "why": "A wound that comes from someone who stayed is not the same thing as an injury."
+    },
+    {
+     "t": "scripture",
+     "ref": "Proverbs 15:31",
+     "text": "The ear that listens to life-giving reproof will dwell among the wise."
+    },
+    {
+     "t": "steps",
+     "title": "The inner work — Receiving",
+     "items": [
+      { "n": 1, "head": "Write the dreaded sentence", "sub": "The correction you're most afraid somebody will finally say to you." },
+      { "n": 2, "head": "Ask for one specific thing", "sub": "One woman. One thing she actually sees." },
+      { "n": 3, "head": "Three seconds, then thank you", "sub": "No defense, no explanation." },
+      { "n": 4, "head": "Twenty-four hours, no reply", "sub": "Let it sit before you respond to her at all." },
+      { "n": 5, "head": "Write what it cost her", "sub": "To say it to you in the first place." },
+      { "n": 6, "head": "Compare her sentence to your dreaded one", "sub": "Write down how far apart they actually were." }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The dreaded sentence written before you asked",
+      "One specific thing asked for and received",
+      "Twenty-four hours held with no reply",
+      "The comparison written — dreaded sentence versus the real one"
+     ],
+     "demo": "Take a correction in front of eleven women — three seconds, eyes up, thank you, and nothing else for the rest of the minute."
+    }
+   ]
+  },
+  {
+   "week_number": 4,
+   "title": "The Performance",
+   "verb": "surrender",
+   "principle": "body awareness",
+   "opening_line": "The woman you perform is built for an audience that left years ago, and most of them would not recognize the act as being about them.",
+   "stakes": "Keep running the performance and you'll spend the rest of your life auditioning for people who are no longer watching.",
+   "pull_quote": "Not laying down a pattern. Laying down an audience.",
+   "blocks": [
+    {
+     "t": "h",
+     "v": "The performances, and their tells"
+    },
+    {
+     "t": "grid",
+     "title": "Five performances and the body's tell",
+     "cols": ["Performance", "The tell"],
+     "rows": [
+      ["The competent one", "Plan offered unasked. Voice drops and speeds up at once."],
+      ["The easy one", "Joke on the last word of the hard thing. Face moves before mouth does."],
+      ["The grateful one", "Reframes into a lesson while still bleeding. Chin lifts, shoulders rise."],
+      ["The fine one", "Says \"fine\" twice in one answer. Hands go flat and still."],
+      ["The deep one", "Insight delivered fluently in the room's vocabulary. Eyes go to middle distance and stay."]
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "Galatians 1:10",
+     "text": "For am I now seeking the approval of man, or of God? Or am I trying to please man? If I were still trying to please man, I would not be a servant of Christ."
+    },
+    {
+     "t": "steps",
+     "title": "The inner work — The Audience",
+     "items": [
+      { "n": 1, "head": "Name your four performances", "sub": "The ones you actually run." },
+      { "n": 2, "head": "One real person each was built for", "sub": "Name her." },
+      { "n": 3, "head": "The year", "sub": "When each performance started." },
+      { "n": 4, "head": "Mark still-here or gone", "sub": "Is she still in your life, watching?" },
+      { "n": 5, "head": "The cost to run each one", "sub": "What it takes out of you." },
+      { "n": 6, "head": "Retire one, standing", "sub": "Say out loud: \"I built this for you and you are not here.\" Then say what you'll do instead." }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Four performances named, with the person and the year for each",
+      "One marked still-here or gone, honestly",
+      "One performance retired out loud, standing",
+      "What you'll do instead, written down"
+     ],
+     "demo": "Stop mid-sentence in front of eleven women, name the performance you're running, and say the true version straight."
+    }
+   ]
+  },
+  {
+   "week_number": 5,
+   "title": "The Sentence",
+   "verb": "surrender",
+   "principle": "progressions",
+   "opening_line": "There is one sentence you have never said out loud to anybody, and you knew which one it was before you finished reading this line.",
+   "stakes": "Carry it one more year and it keeps costing you exactly what it's cost you every year so far — this is the week that ends.",
+   "pull_quote": "It is almost never a confession. It is usually small, usually old, and its whole power is that it has never once been outside your body.",
+   "blocks": [
+    {
+     "t": "h",
+     "v": "What the sentence usually is"
+    },
+    {
+     "t": "grid",
+     "title": "Five properties, and why they matter",
+     "cols": ["Property", "Why it matters"],
+     "rows": [
+      ["Short — under twelve words", "If it is long, you are still building the case for it."],
+      ["Not a confession", "More often something you want, or something you believe about yourself."],
+      ["No \"because\"", "Say it and stop."],
+      ["Costly to write", "Chest tightens while your hand is still moving. The only reliable test."],
+      ["Old", "You have been carrying it years, not weeks."]
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "Psalm 32:3",
+     "text": "For when I kept silent, my bones wasted away through my groaning all day long."
+    },
+    {
+     "t": "scripture",
+     "ref": "1 John 1:7",
+     "text": "But if we walk in the light, as he is in the light, we have fellowship with one another."
+    },
+    {
+     "t": "steps",
+     "title": "The inner work — The Sentence",
+     "items": [
+      { "n": 1, "head": "Write ten candidates", "sub": "Every sentence you've never said out loud." },
+      { "n": 2, "head": "Mark the physical one", "sub": "The one your body reacted to while writing it." },
+      { "n": 3, "head": "Cut it to twelve words", "sub": "No more." },
+      { "n": 4, "head": "Carry it a day untouched", "sub": "Don't reread it. Don't edit it." },
+      { "n": 5, "head": "Say it alone, standing", "sub": "Out loud, to an empty room." },
+      { "n": 6, "head": "Say it once in the room", "sub": "Eyes up. Then hold three seconds of silence with no rescue." }
+     ]
+    },
+    {
+     "t": "note",
+     "tone": "scope",
+     "title": "This week's page is not shared",
+     "v": "This week's journal entries are not posted to the Circle. The design protects you rather than surfaces you — write it as honestly as you need to, knowing it stays yours."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "A note on this week's teaching",
+     "v": "Brooke's own worked examples for this week — a specific sentence she's heard someone say out loud, and a specific freeze she's watched happen in a room — are still pending from the source material. Rather than invent them, this week runs on the framework and the inner-work steps alone, which are complete."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Ten candidate sentences written",
+      "One marked as physical, cut to twelve words",
+      "Said alone, standing, out loud",
+      "Said once in the room, eyes up, three seconds held"
+     ],
+     "demo": "Say the sentence in twelve words or fewer, eyes up, and hold three seconds of silence while the room does nothing."
+    }
+   ]
+  },
+  {
+   "week_number": 6,
+   "title": "The Morning After",
+   "verb": "surrender",
+   "principle": "falling is routine",
+   "opening_line": "Eleven women arrive wanting to update the room on last week, and the update is the take-back wearing a nice coat.",
+   "stakes": "Skip naming the take-back, and the sentence you finally said last week quietly un-says itself — and you will have said it for nothing.",
+   "pull_quote": "You are not going to be punished for it. You are going to have to live with having said it.",
+   "blocks": [
+    {
+     "t": "h",
+     "v": "The take-back"
+    },
+    {
+     "t": "text",
+     "v": "The take-back is not weakness and not a decision. It is the fastest reflex you own and it is faster than your thinking."
+    },
+    {
+     "t": "scripture",
+     "ref": "Matthew 5:37",
+     "text": "Let what you say be simply 'Yes' or 'No'; anything more than this comes from evil.",
+     "why": "The clarifying message you want to send is the \"anything more.\" Taking the words back doesn't un-believe them. It only leaves you holding both."
+    },
+    {
+     "t": "scripture",
+     "ref": "Psalm 116:10",
+     "text": "I believed, even when I spoke: I was greatly afflicted."
+    },
+    {
+     "t": "figure",
+     "pose": "kneel",
+     "label": "The return",
+     "cue": "You flinched. Come back and say it again straight, same night."
+    },
+    {
+     "t": "steps",
+     "title": "The take-back log",
+     "items": [
+      { "n": 1, "head": "One tick, every time", "sub": "Every time you reach to make the sentence smaller." },
+      { "n": 2, "head": "Three words", "sub": "Where you were standing when you reached for it." },
+      { "n": 3, "head": "No clarifying message", "sub": "The urge to send \"what I meant was\" is the take-back. Let it pass." },
+      { "n": 4, "head": "Say it again straight", "sub": "Same night if you can. Same voice, no softening." }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The take-back log kept all week, honestly, even a high number",
+      "No clarifying message sent about last week's sentence",
+      "One take-back said straight again, same night",
+      "Session six walked into without an update on last week"
+     ],
+     "demo": "Walk into session and say nothing about last week — no update, no reference, no joke about it. Answer the first question in your own plain voice."
+    }
+   ]
+  },
+  {
+   "week_number": 7,
+   "title": "The Ask",
+   "verb": "ask",
+   "principle": "repetition to automaticity",
+   "opening_line": "Every woman here is running a rule she never agreed to out loud, in somebody else's voice, and has been calling it common sense for thirty years.",
+   "stakes": "Skip the ask and you keep mistaking a rule you never agreed to for common sense — for another thirty years.",
+   "pull_quote": "Ask boldly. Then walk out and prepare like it is coming.",
+   "blocks": [
+    {
+     "t": "h",
+     "v": "The rule you never agreed to"
+    },
+    {
+     "t": "text",
+     "v": "The lie is not a thought, it is a skill — ten thousand clean reps, no coach needed any more. You do not argue with a drilled thing. You out-rep it."
+    },
+    {
+     "t": "scripture",
+     "ref": "James 4:2",
+     "text": "You do not have, because you do not ask."
+    },
+    {
+     "t": "scripture",
+     "ref": "Matthew 7:9-11",
+     "text": "Or which one of you, if his son asks him for bread, will give him a stone? ... how much more will your Father who is in heaven give good things to those who ask him!",
+     "why": "He does not say you asked badly. He says the request was never made. Children ask for a named thing."
+    },
+    {
+     "t": "steps",
+     "title": "The inner work — The Ask",
+     "items": [
+      { "n": 1, "head": "Write the rule, in quotation marks", "sub": "In the voice it arrives in." },
+      { "n": 2, "head": "Disagree with it, standing", "sub": "Once, out loud." },
+      { "n": 3, "head": "Write ten wants, by hand", "sub": "No ranking, no crossing out." },
+      { "n": 4, "head": "Cut to one", "sub": "Specific, nameable, dateable." },
+      { "n": 5, "head": "Strip every hedge", "sub": "No \"maybe,\" no \"if it's okay.\"" },
+      { "n": 6, "head": "Ask it out loud, standing, alone", "sub": "Before the session." }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The rule written in quotation marks, with the year you agreed to it",
+      "Ten wants written by hand, cut to one",
+      "Every hedge stripped from the final ask",
+      "The ask said out loud, alone, before session"
+     ],
+     "demo": "Say the ask in the room, standing, one sentence with a named thing, no preamble, no hedge, no joke, hold three seconds."
+    }
+   ]
+  },
+  {
+   "week_number": 8,
+   "title": "The Outside Eye",
+   "verb": "receive",
+   "principle": "spotting",
+   "opening_line": "Eleven women have been watching one woman for two months and every one of them can see the thing she cannot.",
+   "stakes": "Skip learning to receive, and you'll spend the rest of your life handing everything good back unopened.",
+   "pull_quote": "Receiving is the verb almost nobody in here has.",
+   "blocks": [
+    {
+     "t": "h",
+     "v": "What she can't see"
+    },
+    {
+     "t": "scripture",
+     "ref": "1 Corinthians 4:7",
+     "text": "What do you have that you did not receive?",
+     "why": "Everything you are proud of arrived in somebody's hands."
+    },
+    {
+     "t": "scripture",
+     "ref": "Proverbs 27:17",
+     "text": "Iron sharpens iron, and one man sharpens another.",
+     "why": "Both pieces of iron lose something. Sharpening is not free for either of them."
+    },
+    {
+     "t": "figure",
+     "pose": "circle",
+     "label": "Eyes up",
+     "cue": "Keep your eyes up while you say the hard thing, and while she says hers."
+    },
+    {
+     "t": "steps",
+     "title": "The sealed paragraph",
+     "items": [
+      { "n": 1, "head": "Write what you expect the room to say", "sub": "Including the unflattering guess you wouldn't repeat. Fold the page." },
+      { "n": 2, "head": "Say your ask, standing", "sub": "Stay standing through the whole round." },
+      { "n": 3, "head": "Receive one specific thing from each woman", "sub": "A date or a detail — \"you're doing amazing\" does not count." },
+      { "n": 4, "head": "Open the sealed paragraph", "sub": "Mark what the room saw that you couldn't." },
+      { "n": 5, "head": "Name your two verbs", "sub": "Of ask, prepare, surrender, receive — which two are yours, and which two you've avoided." }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The sealed paragraph written before the round, honestly",
+      "One specific thing received from each woman, or from each person in your Alone version",
+      "The sealed paragraph opened and compared",
+      "Your two avoided verbs named"
+     ],
+     "demo": "Take a true good thing said about you in front of eleven women — thank you, eyes up, three seconds — without explaining, correcting, or handing one back to be polite."
+    }
+   ]
+  },
+  {
+   "week_number": 9,
+   "title": "The Repair",
+   "verb": "surrender",
+   "principle": "foundational shapes",
+   "opening_line": "Half this room went and had it. Half has a name, a date, and no nerve.",
+   "stakes": "Skip the repair, and the sentence you finally said stays a private win instead of becoming a real conversation with the person it was actually for.",
+   "pull_quote": "Unspotted is the point. No room, no facilitator, no eleven women — one kitchen, one person, four shapes under full load.",
+   "blocks": [
+    {
+     "t": "h",
+     "v": "The twelve words"
+    },
+    {
+     "t": "scripture",
+     "ref": "Matthew 5:23-24",
+     "text": "Leave your gift there before the altar and go. First be reconciled to your brother, and then come and offer your gift.",
+     "why": "The instruction interrupts the worship, not the other way round."
+    },
+    {
+     "t": "scripture",
+     "ref": "Romans 12:18",
+     "text": "If possible, so far as it depends on you, live peaceably with all.",
+     "why": "Two limits in one sentence, and both of them are mercy."
+    },
+    {
+     "t": "steps",
+     "title": "The inner work — The Repair",
+     "items": [
+      { "n": 1, "head": "Retrieve the name from week three", "sub": "Who has been trying to tell you something for a year." },
+      { "n": 2, "head": "Write the twelve-word sentence, by hand", "sub": "The one you need to say to her." },
+      { "n": 3, "head": "Two columns", "sub": "What is actually yours, and what was never yours." },
+      { "n": 4, "head": "Name the outcome you're holding out for", "sub": "And what you'll do without it." },
+      { "n": 5, "head": "Fix a date and have the conversation", "sub": "The sentence inside the first four minutes." },
+      { "n": 6, "head": "Write three lines the same night", "sub": "The cost, what your body did, what's true now that wasn't true this morning." }
+     ]
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "If she's gone",
+     "v": "If the person is no longer alive or is not safe to approach, standing and saying the twelve words out loud in the room is the whole rep, and not a lesser one."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The twelve-word sentence written by hand before the conversation",
+      "The two columns completed honestly",
+      "The conversation had, or the standing version done in full",
+      "Three lines written the same night"
+     ],
+     "demo": "Have the hard conversation outside the room, unwatched, then come back able to repeat verbatim what was said."
+    }
+   ]
+  },
+  {
+   "week_number": 10,
+   "title": "Go And Get It",
+   "verb": "prepare",
+   "principle": "progressions",
+   "opening_line": "On Monday there is no room, no eleven women, and nothing arranged to hold what she built here.",
+   "stakes": "Skip the closing work and everything you built in this room stays a ten-week memory instead of the shape your life keeps taking.",
+   "pull_quote": "Every place the sole of your foot treads. Given already, and still requiring feet. Go and put your shoes on.",
+   "blocks": [
+    {
+     "t": "h",
+     "v": "What closes, and what doesn't"
+    },
+    {
+     "t": "text",
+     "v": "Unspotted is not abandonment. It is what a progression is for."
+    },
+    {
+     "t": "scripture",
+     "ref": "Joshua 1:3",
+     "text": "Every place that the sole of your foot will tread upon I have given to you."
+    },
+    {
+     "t": "scripture",
+     "ref": "Philippians 3:13-14",
+     "text": "Forgetting what lies behind and straining forward to what lies ahead, I press on toward the goal for the prize of the upward call of God in Christ Jesus.",
+     "why": "Given, past tense, already decided — and still requiring feet."
+    },
+    {
+     "t": "steps",
+     "title": "The closing work",
+     "items": [
+      { "n": 1, "head": "Read your week-one page like a stranger", "sub": "Write a paragraph back to yourself." },
+      { "n": 2, "head": "Count the log aloud to another person", "sub": "Say the number of days out loud." },
+      { "n": 3, "head": "Name two things left unresolved", "sub": "On purpose. Not everything closes." },
+      { "n": 4, "head": "Ask one woman to be your outside eye", "sub": "By name, out loud." },
+      { "n": 5, "head": "Write the week you'd keep in your worst month", "sub": "Then cut one thing from it." },
+      { "n": 6, "head": "Fix one calendar date", "sub": "The next real step toward your ask." }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The week-one page reread and answered as a stranger would",
+      "The log counted aloud, to a real person",
+      "Two things named as deliberately unresolved",
+      "One outside eye asked, by name",
+      "One calendar date fixed"
+     ],
+     "demo": "Stand in front of eleven women, say the ask and its date in one sentence, eyes up. Take what the room hands back with thank you and three seconds. Walk out without explaining."
+    }
+   ]
+  }
+ ],
+ "days": [
+  {
+   "day_number": 1,
+   "week_number": 1,
+   "title": "The Sentence That Cost Me",
+   "kind": "teaching",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "I stayed in friendships that weren't honest with me. Long after I knew it — the small lies, the things happening behind my back, the loyalty that only worked to my face — I stayed. I called it being loving. It was being slow."
+    },
+    {
+     "t": "text",
+     "v": "There was a sentence I owed more than one woman I called close, and I never once said it plainly: I know you are not being honest with me, and I am staying anyway. I didn't say those words out loud. What I did instead was smaller and cost more — I made the excuse for her before she asked me to. Every time I answered, I was saying the sentence without saying it."
+    },
+    {
+     "t": "text",
+     "v": "It cost me years. Not a season — years, plural, of my time and attention going to people who were not fully with me. Every year I spent re-learning that lesson was a year I did not spend on the friendships that were honest the whole time."
+    },
+    {
+     "t": "text",
+     "v": "For years I was also in a relationship that came with restraints I never said out loud. I couldn't be social, couldn't be part of a community, couldn't just be around people. I told myself it was fine. I never said the sentence: this is not okay, and it is getting worse."
+    },
+    {
+     "t": "text",
+     "v": "I had a business, and it was doing well. Then the restraints living in my marriage started living in my company, and I watched something I had built start to come apart, and I still didn't say it. The last restraint was the biggest: he wanted me to stop working altogether. So I did. Then, once the business was gone and I was home, he told me he had wanted that on purpose — and that he didn't want to be together anymore. Silence didn't protect any of it. It just delayed the loss and let it grow while I wasn't looking."
+    },
+    {
+     "t": "h",
+     "v": "Naming it is not stopping it"
+    },
+    {
+     "t": "text",
+     "v": "Being able to name a pattern is not the same as being able to stop it. You can know exactly what you do, say it fluently in a therapist's vocabulary, and still do it again next Tuesday. This room is not for naming. You already know how to name things. This room is for doing the thing you named, in front of people, on a day it costs you something."
+    },
+    {
+     "t": "write",
+     "prompt": "Where in your own life have you been saying a hard sentence without ever saying it out loud — making the excuse for someone before they asked, staying quiet while something got worse? Name the sentence you actually owe, and who it's owed to.",
+     "lines": 6
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 2,
+   "week_number": 1,
+   "title": "The Rooms You Perform In",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Advice is how a room gets away from a woman. It looks like care and it is an exit."
+    },
+    {
+     "t": "steps",
+     "title": "Start the inner work",
+     "items": [
+      { "n": 1, "head": "Name your last three rooms", "sub": "Any three rooms you performed in this week." },
+      { "n": 2, "head": "Who was in each one", "sub": "And which version of you walked in." },
+      { "n": 3, "head": "Circle the widest gap", "sub": "Between the version that walked in and the true one." }
+     ]
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "A note on this week's teaching",
+     "v": "The full origin story behind this thesis — a specific timeline of Brooke's own naming-versus-stopping gap, and a specific non-gym example of an outside eye catching something she couldn't see herself — is still pending from the source material. Rather than invent it, this day runs on the thesis and the framework alone, which are complete and real."
+    },
+    {
+     "t": "write",
+     "prompt": "Who taught you that being useful was the price of being welcome?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 3,
+   "week_number": 1,
+   "title": "Say It Unimproved",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Finish the inner work",
+     "items": [
+      { "n": 1, "head": "Write one sentence", "sub": "What should have been said in that room instead." },
+      { "n": 2, "head": "Say it aloud, alone", "sub": "In the room where it belonged, or the closest room you have." },
+      { "n": 3, "head": "Bring it unimproved", "sub": "Not the polished version. The one you actually wrote." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "Write down the sentence you said out loud alone this week. Then write what you were afraid would happen if somebody heard it.",
+     "lines": 6
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 4,
+   "week_number": 1,
+   "title": "The Plain Sentence",
+   "kind": "session",
+   "minutes": 25,
+   "blocks": [
+    {
+     "t": "figure",
+     "pose": "stand",
+     "label": "The plain sentence",
+     "cue": "Say it with no hedge, no preamble, and no joke on the end."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The four rules read aloud once",
+      "The six-step inner work done in one sitting",
+      "One plain sentence said, under twelve words",
+      "Seven daily logs",
+      "One hedging incident named by name"
+     ],
+     "demo": "Say the sentence in under twelve words, no preamble, no joke on the end, eyes up."
+    },
+    {
+     "t": "rate",
+     "q": "Where in your standing is the second-truest thing, and when did it become automatic?",
+     "left": "It's the only thing I say",
+     "right": "I noticed it and said the real one"
+    },
+    {
+     "t": "write",
+     "prompt": "Where in your life is the second-truest thing your standard setting, and when did it become automatic?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 5,
+   "week_number": 2,
+   "title": "The Story and the Flat Line",
+   "kind": "teaching",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "You have a story about every one of your patterns, and the story is the thing keeping it alive."
+    },
+    {
+     "t": "text",
+     "v": "Insight is the reason you can name it. It is also, precisely, the reason you have not stopped."
+    },
+    {
+     "t": "grid",
+     "title": "Cut every pattern down to one sentence",
+     "cols": ["Pattern", "The flat one-line version"],
+     "rows": [
+      ["Over-explaining", "I keep talking after the answer is finished."],
+      ["The pre-emptive apology", "I say sorry before I ask for anything."],
+      ["The disappearing act", "I stop answering people for four days at a time."],
+      ["Managing the room", "I watch faces and adjust until nobody is uncomfortable."],
+      ["The tap-out", "I make a joke the second somebody gets close."]
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "James 1:23-24",
+     "text": "For if anyone is a hearer of the word and not a doer, he is like a man who looks intently at his natural face in a mirror. For he looks at himself and goes away and at once forgets what he was like.",
+     "why": "Naming a pattern in the mirror and being changed by it are two different acts."
+    },
+    {
+     "t": "write",
+     "prompt": "What have you called progress that was actually just a better description of the same pattern?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 6,
+   "week_number": 2,
+   "title": "The Flat List",
+   "kind": "practice",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Start the inner work — The Flat Inventory",
+     "items": [
+      { "n": 1, "head": "Twenty minutes, flat list", "sub": "Every known pattern you have. Do not think, list." },
+      { "n": 2, "head": "One line each", "sub": "No \"because.\" Say it and stop." },
+      { "n": 3, "head": "Cut every reason", "sub": "Go back through and delete every explanation you snuck in." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "What number is at the top of your page, and what did you feel writing it?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 7,
+   "week_number": 2,
+   "title": "Circle One, Read It Aloud",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Finish the inner work",
+     "items": [
+      { "n": 1, "head": "Count them", "sub": "Write the number at the top of the page." },
+      { "n": 2, "head": "Circle the one someone else pays for", "sub": "Not the one that costs you the most. The one that costs somebody else." },
+      { "n": 3, "head": "Read the whole list aloud, standing", "sub": "Flat, no explanation, start to finish." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "Who pays for the line you circled, and what have they already paid?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 8,
+   "week_number": 2,
+   "title": "Fifteen Seconds, Flat",
+   "kind": "session",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The flat list written in one sitting, number at the top",
+      "Every line cut down to one sentence, no \"because\"",
+      "One line circled — the one someone else pays for",
+      "The whole list read aloud standing"
+     ],
+     "demo": "Read any three lines aloud, flat, in under fifteen seconds, no explanation."
+    },
+    {
+     "t": "rate",
+     "q": "Did your voice change on any line while you wrote it?",
+     "left": "No, they all read the same",
+     "right": "Yes, and I know which one"
+    },
+    {
+     "t": "write",
+     "prompt": "Which line's voice changed on you while you wrote it?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 9,
+   "week_number": 3,
+   "title": "The Three Seconds",
+   "kind": "teaching",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "You have never once let a correction land — you have been answering them before they finished arriving."
+    },
+    {
+     "t": "text",
+     "v": "A correction is cheap for you and expensive for the woman giving it. You have had that backwards your whole adult life."
+    },
+    {
+     "t": "grid",
+     "title": "What you've been doing, and what you do this week",
+     "cols": ["What she does", "What you do this week"],
+     "rows": [
+      ["She finishes the sentence, you start talking on her last word", "Close your mouth and count three."],
+      ["It stings and you supply context immediately", "Feel it. Say nothing."],
+      ["You think she's wrong, you correct the correction", "Say thank you and take it home."],
+      ["She's right and you agree loudly and perform the change", "One word. Thank you. Stop."],
+      ["Nobody says anything and you fill it in two seconds", "Let the silence run out."]
+     ]
+    },
+    {
+     "t": "figure",
+     "pose": "seated",
+     "label": "The pause",
+     "cue": "Three seconds of silence before you answer. Count them."
+    },
+    {
+     "t": "scripture",
+     "ref": "Proverbs 27:6",
+     "text": "Faithful are the wounds of a friend."
+    },
+    {
+     "t": "scripture",
+     "ref": "Proverbs 15:31",
+     "text": "The ear that listens to life-giving reproof will dwell among the wise."
+    },
+    {
+     "t": "write",
+     "prompt": "Who taught you that correction was a verdict, and not information?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 10,
+   "week_number": 3,
+   "title": "The Dreaded Sentence",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "This is not an unfilled gap — it's real: the correction Brooke didn't let land, and the one she did, later, are pending from the source material. Rather than invent them, this day runs on the exercise alone."
+    },
+    {
+     "t": "steps",
+     "title": "Start the inner work — Receiving",
+     "items": [
+      { "n": 1, "head": "Write the dreaded sentence", "sub": "The correction you're most afraid somebody will finally say to you." },
+      { "n": 2, "head": "Ask for one specific thing", "sub": "One woman. One thing she actually sees." },
+      { "n": 3, "head": "Three seconds, then thank you", "sub": "No defense, no explanation." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "Write your dreaded sentence, then hers, side by side. Sit with the distance between them.",
+     "lines": 6
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 11,
+   "week_number": 3,
+   "title": "Twenty-Four Hours",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Finish the inner work",
+     "items": [
+      { "n": 1, "head": "Twenty-four hours, no reply", "sub": "Let it sit before you respond to her at all." },
+      { "n": 2, "head": "Write what it cost her", "sub": "To say it to you in the first place." },
+      { "n": 3, "head": "Compare her sentence to your dreaded one", "sub": "Write down how far apart they actually were." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "What did she risk to say it? What has silence cost the people around you, when you wouldn't let a correction land?",
+     "lines": 6
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 12,
+   "week_number": 3,
+   "title": "Take the Correction",
+   "kind": "session",
+   "minutes": 25,
+   "blocks": [
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The dreaded sentence written before you asked",
+      "One specific thing asked for and received",
+      "Twenty-four hours held with no reply",
+      "The comparison written — dreaded sentence versus the real one"
+     ],
+     "demo": "Take a correction in front of eleven women — three seconds, eyes up, thank you, and nothing else for the rest of the minute."
+    },
+    {
+     "t": "write",
+     "prompt": "Where did it land in your body, and what did you want to do instead of what you did?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 13,
+   "week_number": 4,
+   "title": "The Performances and Their Tells",
+   "kind": "teaching",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "The woman you perform is built for an audience that left years ago, and most of them would not recognize the act as being about them."
+    },
+    {
+     "t": "text",
+     "v": "Not laying down a pattern. Laying down an audience."
+    },
+    {
+     "t": "grid",
+     "title": "Five performances and the body's tell",
+     "cols": ["Performance", "The tell"],
+     "rows": [
+      ["The competent one", "Plan offered unasked. Voice drops and speeds up at once."],
+      ["The easy one", "Joke on the last word of the hard thing. Face moves before mouth does."],
+      ["The grateful one", "Reframes into a lesson while still bleeding. Chin lifts, shoulders rise."],
+      ["The fine one", "Says \"fine\" twice in one answer. Hands go flat and still."],
+      ["The deep one", "Insight delivered fluently in the room's vocabulary. Eyes go to middle distance and stay."]
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "Galatians 1:10",
+     "text": "For am I now seeking the approval of man, or of God? Or am I trying to please man? If I were still trying to please man, I would not be a servant of Christ."
+    },
+    {
+     "t": "write",
+     "prompt": "Describe the body tell you caught this week — where in your body a performance showed itself before your mind noticed.",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 14,
+   "week_number": 4,
+   "title": "The Audience",
+   "kind": "practice",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Start the inner work — The Audience",
+     "items": [
+      { "n": 1, "head": "Name your four performances", "sub": "The ones you actually run." },
+      { "n": 2, "head": "One real person each was built for", "sub": "Name her." },
+      { "n": 3, "head": "The year", "sub": "When each performance started." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "Write to the one no longer in your life — the one you're still performing for.",
+     "lines": 6
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 15,
+   "week_number": 4,
+   "title": "Retire One, Standing",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Finish the inner work",
+     "items": [
+      { "n": 1, "head": "Mark still-here or gone", "sub": "Is she still in your life, watching?" },
+      { "n": 2, "head": "The cost to run each one", "sub": "What it takes out of you." },
+      { "n": 3, "head": "Retire one, standing", "sub": "Say out loud: \"I built this for you and you are not here.\" Then say what you'll do instead." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "What has the performance actually gotten you? Be fair to it before you retire it.",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 16,
+   "week_number": 4,
+   "title": "The True Version, Straight",
+   "kind": "session",
+   "minutes": 25,
+   "blocks": [
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Four performances named, with the person and the year for each",
+      "One marked still-here or gone, honestly",
+      "One performance retired out loud, standing",
+      "What you'll do instead, written down"
+     ],
+     "demo": "Stop mid-sentence in front of eleven women, name the performance you're running, and say the true version straight."
+    },
+    {
+     "t": "write",
+     "prompt": "Who has never met the real woman, and for how long?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 17,
+   "week_number": 5,
+   "title": "What the Sentence Usually Is",
+   "kind": "teaching",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "There is one sentence you have never said out loud to anybody, and you knew which one it was before you finished reading this line."
+    },
+    {
+     "t": "text",
+     "v": "It is almost never a confession. It is usually small, usually old, and its whole power is that it has never once been outside your body."
+    },
+    {
+     "t": "grid",
+     "title": "Five properties, and why they matter",
+     "cols": ["Property", "Why it matters"],
+     "rows": [
+      ["Short — under twelve words", "If it is long, you are still building the case for it."],
+      ["Not a confession", "More often something you want, or something you believe about yourself."],
+      ["No \"because\"", "Say it and stop."],
+      ["Costly to write", "Chest tightens while your hand is still moving. The only reliable test."],
+      ["Old", "You have been carrying it years, not weeks."]
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "Psalm 32:3",
+     "text": "For when I kept silent, my bones wasted away through my groaning all day long."
+    },
+    {
+     "t": "scripture",
+     "ref": "1 John 1:7",
+     "text": "But if we walk in the light, as he is in the light, we have fellowship with one another."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "A note on this week's teaching",
+     "v": "A worked example of the sentence itself and of the freeze that can happen right before it's said are still pending from the source material. Rather than invent them, this week runs on the framework and the inner-work steps alone."
+    },
+    {
+     "t": "write",
+     "prompt": "Write ten candidate sentences — everything you've never said out loud to anybody. Don't rank them yet.",
+     "lines": 8
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 18,
+   "week_number": 5,
+   "title": "Mark the Physical One",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Continue the inner work — The Sentence",
+     "items": [
+      { "n": 1, "head": "Mark the physical one", "sub": "The one your body reacted to while writing it." },
+      { "n": 2, "head": "Cut it to twelve words", "sub": "No more." },
+      { "n": 3, "head": "Carry it a day untouched", "sub": "Don't reread it. Don't edit it." }
+     ]
+    },
+    {
+     "t": "note",
+     "tone": "scope",
+     "title": "This page is not shared",
+     "v": "This week's journal entries are not posted to the Circle. Write it as honestly as you need to."
+    },
+    {
+     "t": "write",
+     "prompt": "Write the sentence and the year you began carrying it.",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 19,
+   "week_number": 5,
+   "title": "Say It Alone",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Finish the inner work",
+     "items": [
+      { "n": 1, "head": "Say it alone, standing", "sub": "Out loud, to an empty room." },
+      { "n": 2, "head": "Prepare to say it once in the room", "sub": "Eyes up. Then hold three seconds of silence with no rescue." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "What did you believe would happen if it were heard? Describe the specific scene you've been avoiding.",
+     "lines": 6
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 20,
+   "week_number": 5,
+   "title": "Three Seconds, No Rescue",
+   "kind": "session",
+   "minutes": 25,
+   "blocks": [
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Ten candidate sentences written",
+      "One marked as physical, cut to twelve words",
+      "Said alone, standing, out loud",
+      "Said once in the room, eyes up, three seconds held"
+     ],
+     "demo": "Say the sentence in twelve words or fewer, eyes up, and hold three seconds of silence while the room does nothing."
+    },
+    {
+     "t": "write",
+     "prompt": "Describe the three seconds after you said it — your shoulders, throat, hands. Not the room's reaction. Yours.",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 21,
+   "week_number": 6,
+   "title": "The Take-Back",
+   "kind": "teaching",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Eleven women arrive wanting to update the room on last week, and the update is the take-back wearing a nice coat."
+    },
+    {
+     "t": "text",
+     "v": "The take-back is not weakness and not a decision. It is the fastest reflex you own and it is faster than your thinking."
+    },
+    {
+     "t": "scripture",
+     "ref": "Matthew 5:37",
+     "text": "Let what you say be simply 'Yes' or 'No'; anything more than this comes from evil.",
+     "why": "The clarifying message you want to send is the \"anything more.\" Taking the words back doesn't un-believe them. It only leaves you holding both."
+    },
+    {
+     "t": "scripture",
+     "ref": "Psalm 116:10",
+     "text": "I believed, even when I spoke: I was greatly afflicted."
+    },
+    {
+     "t": "figure",
+     "pose": "kneel",
+     "label": "The return",
+     "cue": "You flinched. Come back and say it again straight, same night."
+    },
+    {
+     "t": "write",
+     "prompt": "Where were you standing each time this week you reached to make last week's sentence smaller? Name the rooms.",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 22,
+   "week_number": 6,
+   "title": "The Take-Back Log",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Keep the log",
+     "items": [
+      { "n": 1, "head": "One tick, every time", "sub": "Every time you reach to make the sentence smaller." },
+      { "n": 2, "head": "Three words", "sub": "Where you were standing when you reached for it." },
+      { "n": 3, "head": "No clarifying message", "sub": "The urge to send \"what I meant was\" is the take-back. Let it pass." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "Who is the clarifying message actually for? Write her name and what she would have to think of you.",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 23,
+   "week_number": 6,
+   "title": "Say It Straight Again",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Finish the practice",
+     "items": [
+      { "n": 1, "head": "Say it again straight", "sub": "Same night if you can. Same voice, no softening." },
+      { "n": 2, "head": "Count your log", "sub": "A high number is not failure — it's data." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "What is different in your house now that the sentence is outside your body?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 24,
+   "week_number": 6,
+   "title": "No Update on Last Week",
+   "kind": "session",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The take-back log kept all week, honestly, even a high number",
+      "No clarifying message sent about last week's sentence",
+      "One take-back said straight again, same night",
+      "Session walked into without an update on last week"
+     ],
+     "demo": "Walk into session and say nothing about last week — no update, no reference, no joke about it. Answer the first question in your own plain voice."
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 25,
+   "week_number": 7,
+   "title": "The Rule You Never Agreed To",
+   "kind": "teaching",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Every woman here is running a rule she never agreed to out loud, in somebody else's voice, and has been calling it common sense for thirty years."
+    },
+    {
+     "t": "text",
+     "v": "The lie is not a thought, it is a skill — ten thousand clean reps, no coach needed any more. You do not argue with a drilled thing. You out-rep it."
+    },
+    {
+     "t": "scripture",
+     "ref": "James 4:2",
+     "text": "You do not have, because you do not ask."
+    },
+    {
+     "t": "scripture",
+     "ref": "Matthew 7:9-11",
+     "text": "Or which one of you, if his son asks him for bread, will give him a stone? ... how much more will your Father who is in heaven give good things to those who ask him!",
+     "why": "He does not say you asked badly. He says the request was never made. Children ask for a named thing."
+    },
+    {
+     "t": "write",
+     "prompt": "Write the rule running your life, in quotation marks, in the voice it arrives in. Then write the year you agreed to it.",
+     "lines": 6
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 26,
+   "week_number": 7,
+   "title": "Ten Wants, By Hand",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Continue the inner work — The Ask",
+     "items": [
+      { "n": 1, "head": "Disagree with the rule, standing", "sub": "Once, out loud." },
+      { "n": 2, "head": "Write ten wants, by hand", "sub": "No ranking, no crossing out." },
+      { "n": 3, "head": "Cut to one", "sub": "Specific, nameable, dateable." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "Circle the want you'd be most embarrassed to admit.",
+     "lines": 4
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 27,
+   "week_number": 7,
+   "title": "Strip Every Hedge",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Finish the inner work",
+     "items": [
+      { "n": 1, "head": "Strip every hedge", "sub": "No \"maybe,\" no \"if it's okay.\"" },
+      { "n": 2, "head": "Ask it out loud, standing, alone", "sub": "Before the session." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "Write the ask, what you're afraid the answer is, and what you'll do the next morning either way.",
+     "lines": 6
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 28,
+   "week_number": 7,
+   "title": "Ask Boldly",
+   "kind": "session",
+   "minutes": 25,
+   "blocks": [
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The rule written in quotation marks, with the year you agreed to it",
+      "Ten wants written by hand, cut to one",
+      "Every hedge stripped from the final ask",
+      "The ask said out loud, alone, before session"
+     ],
+     "demo": "Say the ask in the room, standing, one sentence with a named thing, no preamble, no hedge, no joke, hold three seconds."
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 29,
+   "week_number": 8,
+   "title": "What She Can't See",
+   "kind": "teaching",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Eleven women have been watching one woman for two months and every one of them can see the thing she cannot."
+    },
+    {
+     "t": "text",
+     "v": "Receiving is the verb almost nobody in here has."
+    },
+    {
+     "t": "scripture",
+     "ref": "1 Corinthians 4:7",
+     "text": "What do you have that you did not receive?",
+     "why": "Everything you are proud of arrived in somebody's hands."
+    },
+    {
+     "t": "scripture",
+     "ref": "Proverbs 27:17",
+     "text": "Iron sharpens iron, and one man sharpens another.",
+     "why": "Both pieces of iron lose something. Sharpening is not free for either of them."
+    },
+    {
+     "t": "figure",
+     "pose": "circle",
+     "label": "Eyes up",
+     "cue": "Keep your eyes up while you say the hard thing, and while she says hers."
+    },
+    {
+     "t": "write",
+     "prompt": "What have you been calling humility, and what year did you start calling it that?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 30,
+   "week_number": 8,
+   "title": "The Sealed Paragraph",
+   "kind": "practice",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "The sealed paragraph",
+     "items": [
+      { "n": 1, "head": "Write what you expect the room to say", "sub": "Including the unflattering guess you wouldn't repeat. Fold the page." },
+      { "n": 2, "head": "Say your ask, standing", "sub": "Stay standing through the whole round." },
+      { "n": 3, "head": "Receive one specific thing from each woman", "sub": "A date or a detail — \"you're doing amazing\" does not count." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "Which of the eleven have you been arguing with in your head since Tuesday?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 31,
+   "week_number": 8,
+   "title": "Name Your Two Verbs",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Finish the sealed paragraph",
+     "items": [
+      { "n": 1, "head": "Open the sealed paragraph", "sub": "Mark what the room saw that you couldn't." },
+      { "n": 2, "head": "Name your two verbs", "sub": "Of ask, prepare, surrender, receive — which two are yours, and which two you've avoided." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "Which two verbs are yours, and which two have you avoided your whole adult life?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 32,
+   "week_number": 8,
+   "title": "Thank You, Eyes Up",
+   "kind": "session",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The sealed paragraph written before the round, honestly",
+      "One specific thing received from each woman, or from each person in your Alone version",
+      "The sealed paragraph opened and compared",
+      "Your two avoided verbs named"
+     ],
+     "demo": "Take a true good thing said about you in front of eleven women — thank you, eyes up, three seconds — without explaining, correcting, or handing one back to be polite."
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 33,
+   "week_number": 9,
+   "title": "The Twelve Words",
+   "kind": "teaching",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Half this room went and had it. Half has a name, a date, and no nerve."
+    },
+    {
+     "t": "text",
+     "v": "Unspotted is the point. No room, no facilitator, no eleven women — one kitchen, one person, four shapes under full load."
+    },
+    {
+     "t": "scripture",
+     "ref": "Matthew 5:23-24",
+     "text": "Leave your gift there before the altar and go. First be reconciled to your brother, and then come and offer your gift.",
+     "why": "The instruction interrupts the worship, not the other way round."
+    },
+    {
+     "t": "scripture",
+     "ref": "Romans 12:18",
+     "text": "If possible, so far as it depends on you, live peaceably with all.",
+     "why": "Two limits in one sentence, and both of them are mercy."
+    },
+    {
+     "t": "write",
+     "prompt": "Retrieve the name from your week-three page. What has she been trying to tell you for a year?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 34,
+   "week_number": 9,
+   "title": "What's Actually Yours",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Continue the inner work — The Repair",
+     "items": [
+      { "n": 1, "head": "Write the twelve-word sentence, by hand", "sub": "The one you need to say to her." },
+      { "n": 2, "head": "Two columns", "sub": "What is actually yours, and what was never yours." }
+     ]
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "title": "If she's gone",
+     "v": "If the person is no longer alive or is not safe to approach, standing and saying the twelve words out loud in the room is the whole rep, and not a lesser one."
+    },
+    {
+     "t": "write",
+     "prompt": "Name the outcome you're holding out for, and what you'll do without it.",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 35,
+   "week_number": 9,
+   "title": "Fix a Date",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Have the conversation",
+     "items": [
+      { "n": 1, "head": "Fix a date", "sub": "The sentence inside the first four minutes." },
+      { "n": 2, "head": "Write three lines the same night", "sub": "The cost, what your body did, what's true now that wasn't true this morning." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "What did you actually say, word for word, before you improved it in your memory?",
+     "lines": 6
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 36,
+   "week_number": 9,
+   "title": "What's True Tonight",
+   "kind": "session",
+   "minutes": 25,
+   "blocks": [
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The twelve-word sentence written by hand before the conversation",
+      "The two columns completed honestly",
+      "The conversation had, or the standing version done in full",
+      "Three lines written the same night"
+     ],
+     "demo": "Have the hard conversation outside the room, unwatched, then come back able to repeat verbatim what was said."
+    },
+    {
+     "t": "write",
+     "prompt": "What is true tonight that wasn't true this morning?",
+     "lines": 4
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 37,
+   "week_number": 10,
+   "title": "What Closes, and What Doesn't",
+   "kind": "teaching",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "On Monday there is no room, no eleven women, and nothing arranged to hold what she built here."
+    },
+    {
+     "t": "text",
+     "v": "Unspotted is not abandonment. It is what a progression is for."
+    },
+    {
+     "t": "scripture",
+     "ref": "Joshua 1:3",
+     "text": "Every place that the sole of your foot will tread upon I have given to you."
+    },
+    {
+     "t": "scripture",
+     "ref": "Philippians 3:13-14",
+     "text": "Forgetting what lies behind and straining forward to what lies ahead, I press on toward the goal for the prize of the upward call of God in Christ Jesus.",
+     "why": "Given, past tense, already decided — and still requiring feet."
+    },
+    {
+     "t": "write",
+     "prompt": "Read your week-one page like a stranger would. Write a paragraph back to yourself.",
+     "lines": 6
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 38,
+   "week_number": 10,
+   "title": "Two Things Left Unresolved",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "The closing work, continued",
+     "items": [
+      { "n": 1, "head": "Count the log aloud to another person", "sub": "Say the number of days out loud." },
+      { "n": 2, "head": "Name two things left unresolved", "sub": "On purpose. Not everything closes." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "What two things are you leaving deliberately unresolved, and why those two?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 39,
+   "week_number": 10,
+   "title": "Ask Your Outside Eye",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "steps",
+     "title": "Finish the closing work",
+     "items": [
+      { "n": 1, "head": "Ask one woman to be your outside eye", "sub": "By name, out loud." },
+      { "n": 2, "head": "Write the week you'd keep in your worst month", "sub": "Then cut one thing from it." },
+      { "n": 3, "head": "Fix one calendar date", "sub": "The next real step toward your ask." }
+     ]
+    },
+    {
+     "t": "write",
+     "prompt": "Who did you ask, and what did you cut from the week you'd keep?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  },
+  {
+   "day_number": 40,
+   "week_number": 10,
+   "title": "Go and Put Your Shoes On",
+   "kind": "milestone",
+   "minutes": 30,
+   "blocks": [
+    {
+     "t": "quote",
+     "v": "Every place the sole of your foot treads. Given already, and still requiring feet. Go and put your shoes on."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The week-one page reread and answered as a stranger would",
+      "The log counted aloud, to a real person",
+      "Two things named as deliberately unresolved",
+      "One outside eye asked, by name",
+      "One calendar date fixed"
+     ],
+     "demo": "Stand in front of eleven women, say the ask and its date in one sentence, eyes up. Take what the room hands back with thank you and three seconds. Walk out without explaining."
+    },
+    {
+     "t": "write",
+     "prompt": "What is the one sentence you want to be repeating to yourself on an ordinary Tuesday, months from now?",
+     "lines": 5
+    },
+    { "t": "log" }
+   ]
+  }
+ ]
+}

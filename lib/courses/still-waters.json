@@ -1,0 +1,2239 @@
+{
+ "slug": "still-waters",
+ "title": "Still Waters",
+ "subtitle": "Four weeks of prayer and breath, learning to be still enough to hear God.",
+ "length_days": 28,
+ "weeks": 4,
+ "week_list": [
+  {
+   "week_number": 1,
+   "title": "Settling the Body",
+   "verb": "prepare",
+   "principle": "conditioning before skill",
+   "opening_line": "Your attention is not yours right now, and you can have it back in ninety seconds with nothing but your own breath.",
+   "stakes": "Skip this week and everything after it fails. You'll be doing a body practice with your mind, which is like opening a door by thinking about the handle.",
+   "pull_quote": "You cannot give away something you are not holding.",
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Nobody built you a room, and nobody gave you a progression. Both are fixable in four weeks, and neither is a fact about your character. This week is the progression: the body that can hold silence, before you ask it to sit in silence."
+    },
+    {
+     "t": "steps",
+     "title": "The four shapes — the whole program",
+     "items": [
+      {
+       "n": 1,
+       "head": "The long exhale",
+       "sub": "Out longer than in. Four in, six out. Nasal, unforced, no holding."
+      },
+      {
+       "n": 2,
+       "head": "The anchor",
+       "sub": "One point of contact, chosen before you sit. Both feet on the floor, or the ribs, or one word. One."
+      },
+      {
+       "n": 3,
+       "head": "The return",
+       "sub": "You notice you left. You come back on the next exhale. No commentary and no apology."
+      },
+      {
+       "n": 4,
+       "head": "The open hand",
+       "sub": "Palms up on your thighs for three breaths before you stand."
+      }
+     ]
+    },
+    {
+     "t": "grid",
+     "title": "The shapes, and what they are in you",
+     "cols": [
+      "Shape",
+      "The body",
+      "What it is in you"
+     ],
+     "rows": [
+      [
+       "The long exhale",
+       "Out longer than in",
+       "Taking your hands off it"
+      ],
+      [
+       "The anchor",
+       "One point of contact, chosen in advance",
+       "Something to come back to that isn't your own thinking"
+      ],
+      [
+       "The return",
+       "Noticing you left, coming back without commentary",
+       "Turning around, which is all repentance ever meant"
+      ],
+      [
+       "The open hand",
+       "Palms up on the thighs",
+       "Receiving instead of gripping"
+      ]
+     ]
+    },
+    {
+     "t": "versus",
+     "title": "How stillness is usually taught, and how it is trained",
+     "left": {
+      "head": "The way you were taught",
+      "items": [
+       "Day one is ten minutes of silence",
+       "No prerequisite, no progression, no shapes",
+       "You are graded on how peaceful it felt",
+       "When it fails, the diagnosis is your discipline"
+      ]
+     },
+     "right": {
+      "head": "The way a gymnast is trained",
+      "items": [
+       "Day one is one shape, drilled, for two minutes",
+       "Nothing is attempted until what is under it is automatic",
+       "You are graded on whether you came back",
+       "When it fails, the question is which prerequisite went soft"
+      ]
+     }
+    },
+    {
+     "t": "text",
+     "v": "Body first, because the body is the door. Attention second, because attention is the offering. Him third, because He is the point. Three words: settle, gather, give."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Seven days of thirty minutes of movement logged",
+      "The sit done on at least five of seven days, same chair, roughly the same hour",
+      "The chair chosen and an object on it",
+      "The Attention Audit on paper, both columns, both sentences read out loud",
+      "Seven evening logs, read back on day seven",
+      "The anchor named out loud on day one and unchanged all week"
+     ],
+     "demo": "Cold, with no warm-up — take your hands from cool to warm in ninety seconds of long exhales, then name your anchor out loud without pausing to pick."
+    }
+   ]
+  },
+  {
+   "week_number": 2,
+   "title": "Giving It Away On Purpose",
+   "verb": "ask",
+   "principle": "repetition to automaticity",
+   "opening_line": "A settled body with nowhere to point is a nap. This week you give your attention to Him, by name, out loud.",
+   "stakes": "Skip this week and you finish the program calmer and exactly as alone as it found you, which you can get free on your phone.",
+   "pull_quote": "The wandering is not the failure. The returning is the practice, and every wander hands you another rep.",
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Prayer is address. Somebody is there. The wandering mind is not the enemy in this room — the commentary you run about it is."
+    },
+    {
+     "t": "steps",
+     "title": "Choosing the phrase",
+     "items": [
+      {
+       "n": 1,
+       "head": "The real answer",
+       "sub": "What do I most need to be true right now. One sentence, and not the noble version."
+      },
+      {
+       "n": 2,
+       "head": "His name for it",
+       "sub": "Shepherd. Father. Provider. Rock. The One who sees. Whatever is honest."
+      },
+      {
+       "n": 3,
+       "head": "Build it",
+       "sub": "Half on the inhale, usually who He is. Half on the exhale, usually what you are doing or asking. Under nine words total."
+      },
+      {
+       "n": 4,
+       "head": "Say it ten times, out loud, on the breath",
+       "sub": "In the kitchen. Not in your head. If it is clunky in the mouth it will be abandoned by Thursday."
+      }
+     ]
+    },
+    {
+     "t": "grid",
+     "title": "This week — what you do, how long, when you reach for it",
+     "cols": [
+      "The practice",
+      "How long",
+      "When you reach for it"
+     ],
+     "rows": [
+      [
+       "Coherent breathing",
+       "2 minutes",
+       "The first two minutes of every sit, to level out"
+      ],
+      [
+       "Breath prayer",
+       "6 to 7 minutes",
+       "Daily, one phrase, all seven days"
+      ],
+      [
+       "Lectio divina",
+       "15 minutes",
+       "Twice this week, out loud, on Psalm 23:1-4"
+      ],
+      [
+       "The phrase on its own",
+       "3 breaths",
+       "Any time it arrives uninvited — a red light, a meeting, four in the morning"
+      ]
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Seven days of thirty minutes of movement logged",
+      "The ten-minute sit on at least five of seven days",
+      "One phrase, written on a card, used all week — one, not three",
+      "Lectio done twice, on paper, with the caught word written down both times",
+      "Seven evening logs and a day-seven read-back with one place circled"
+     ],
+     "demo": "Sit ten minutes and tally your returns on paper afterward. Most women land between fifteen and sixty. Then say your phrase on the breath, twice, cold and out loud, without the card."
+    }
+   ]
+  },
+  {
+   "week_number": 3,
+   "title": "What Comes Up, and How to Stay",
+   "verb": "surrender",
+   "principle": "spotting — assisted before unassisted",
+   "opening_line": "Silence is not peace. Silence is an amplifier, and around day twelve you find out what it has been covering.",
+   "stakes": "Skip this week and you get four calm weeks and the same locked door. Stay in it and something you have been carrying gets set down.",
+   "pull_quote": "You are not staying with it alone, and the move is not I can handle this. The move is I don't have to leave, because I'm not the one holding it.",
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Staying is not grit. It is a trained skill, built entirely on the return — because the return is the way back, and without it, staying with what comes up is just going under and calling it depth."
+    },
+    {
+     "t": "steps",
+     "title": "The five steps — the way back, in a chair",
+     "items": [
+      {
+       "n": 1,
+       "head": "Notice you want to leave",
+       "sub": "The dread, the weight, the wave of get-out-of-this-chair. Name that it has arrived."
+      },
+      {
+       "n": 2,
+       "head": "Name it in three words, out loud",
+       "sub": "Grief. The list. Restlessness. The thing. Whatever it is, plainly."
+      },
+      {
+       "n": 3,
+       "head": "Feet and hands",
+       "sub": "Feet flat, hands open. Four long exhales."
+      },
+      {
+       "n": 4,
+       "head": "Say it to Him plainly",
+       "sub": "I have been carrying this. You are not carrying it alone."
+      },
+      {
+       "n": 5,
+       "head": "Ninety more seconds, then stop",
+       "sub": "Stopping on purpose is as much of the skill as staying."
+      }
+     ]
+    },
+    {
+     "t": "note",
+     "tone": "scope",
+     "v": "Silence surfaces things — that is not a side effect, it is the mechanism, and it is why this works. Some of what comes up in a quiet room is not a cut corner and must never be treated like one. Grief is not a gap in your training. Old material arriving with your whole body attached to it is not a gap in your training. Panic is not a gap in your training. That belongs in a licensed room with a person trained for it, and needing that is normal — it is not a failure of the practice and it is not a failure of you. A cut corner is boring and it responds; you close it and the thing eases within a few days. The other kind arrives at full size, has its own history, and after a week of doing everything right it is exactly the same size.",
+     "title": "The one thing this practice will not drill at"
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Seven days of movement logged, four of them outdoors",
+      "The fifteen-minute practice on at least five of seven days",
+      "The long work done — all eight steps, including the ordinary task afterward",
+      "The cost written by hand and read out loud, standing",
+      "The five steps run at least once with a number written down",
+      "Four words sent to the group the day after the long work"
+     ],
+     "demo": "The five steps from memory, out loud, at speed, cold — no looking. Then name the moment this week you wanted to leave and didn't, and how long you stayed past it."
+    }
+   ]
+  },
+  {
+   "week_number": 4,
+   "title": "Building Your Own Room",
+   "verb": "receive",
+   "principle": "falling is routine — the repair is written in advance",
+   "opening_line": "You have had a room built for you for three weeks. This week you find out how it was made, and you build one that stands up when nobody is holding the clock but you.",
+   "stakes": "Skip this and you bought four nice weeks — and eleven weeks from now you will file that away as more evidence in the case you are building against yourself. Do it and you own a practice for the rest of your life.",
+   "pull_quote": "Everyone can keep a floor for eleven days. The women still praying next spring are the ones who had a plan for the Wednesday they didn't.",
+   "blocks": [
+    {
+     "t": "text",
+     "v": "The room was never mine. Somebody else decides when it starts and stops, holds the clock, is responsible for what comes next — so the part of you that is permanently on duty gets to stand down. This week you build that room for yourself."
+    },
+    {
+     "t": "steps",
+     "title": "Your rule of life",
+     "items": [
+      {
+       "n": 1,
+       "head": "Write the heading first",
+       "sub": "This has to survive my worst week. Look at it the whole time you write the rest."
+      },
+      {
+       "n": 2,
+       "head": "The daily floor",
+       "sub": "What, how long, where, and a clock time. Could you do it on the worst day of last year? If no, halve it. If still no, halve it again."
+      },
+      {
+       "n": 3,
+       "head": "The four-minute version",
+       "sub": "Written separately, one sentence. Yours will be close to: extended exhales, the phrase, one line to Him."
+      },
+      {
+       "n": 4,
+       "head": "The weekly beam",
+       "sub": "One longer practice, with a named day and a named hour. No hour named means you have a wish, not a beam."
+      },
+      {
+       "n": 5,
+       "head": "The repair",
+       "sub": "One sentence, written before you need it, ending: and I say nothing to anyone about the gap."
+      },
+      {
+       "n": 6,
+       "head": "The witness",
+       "sub": "One woman by name, and the group feed. Both, not either."
+      },
+      {
+       "n": 7,
+       "head": "The card",
+       "sub": "Copy the floor, the four-minute version, the beam and the repair onto one card. Nothing else fits."
+      }
+     ]
+    },
+    {
+     "t": "grid",
+     "title": "This week — what you do, how long, when you reach for it",
+     "cols": [
+      "The practice",
+      "How long",
+      "When you reach for it"
+     ],
+     "rows": [
+      [
+       "Twenty minutes with an anchor word",
+       "20 minutes",
+       "Three times this week, one of them outside"
+      ],
+      [
+       "Your floor, exactly as written",
+       "10 minutes",
+       "The other four days — this is the test drive"
+      ],
+      [
+       "The four-minute version",
+       "4 minutes",
+       "The day everything is on fire. Not a downgrade — the design working"
+      ],
+      [
+       "The repair",
+       "4 minutes",
+       "The day after you miss. Say it once, log it, say nothing else about the gap"
+      ]
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Seven days of movement logged",
+      "Three twenty-minute sits, one of them outdoors",
+      "The card exists in your handwriting — floor, four-minute version, beam, repair",
+      "The witness set up — one woman told by name, and the card posted to the feed",
+      "The decision written with a date on it, and one person told",
+      "The milestone reflection filled in"
+     ],
+     "demo": "Run your own room start to finish, unassisted — your clock, your sequence, twenty minutes of silence with your anchor word, palms down and palms up, one line written. Then read your card out loud, standing, as far as you can get from memory."
+    }
+   ]
+  }
+ ],
+ "days": [
+  {
+   "day_number": 1,
+   "week_number": 1,
+   "title": "Come As You Are",
+   "kind": "teaching",
+   "minutes": 12,
+   "blocks": [
+    {
+     "t": "h",
+     "v": "Four Minutes"
+    },
+    {
+     "t": "text",
+     "v": "God took everything. That's not a figure of speech — material things left my hands, until there wasn't much left to hold onto. I had built a life around what I owned and what I could point to, and I hadn't noticed how much ego was propping up the whole structure until the structure was gone. I'd known God since I was a kid. Never doubted Him, always called myself a Christian. But knowing Him and being humbled by Him turned out to be two different rooms, and I had never actually been in the second one."
+    },
+    {
+     "t": "text",
+     "v": "There was nothing productive to do about it. No workout that fixes it. No goal to set and hit. I could not earn my way out and I could not perform my way past it, and performing was the only language I had ever really spoken. All that was left underneath it was the pain itself, with no project to turn it into."
+    },
+    {
+     "t": "text",
+     "v": "I did not handle it well. I did not sit with it because I had learned how to be still — I sat with it because I had run out of other options, and I was bad at it the whole way through. It was never discipline. Two things were missing, both structural, both fixable in four weeks, and neither of them anything to do with your character. Nobody built you a room. And nobody gave you a progression. The next four weeks are those two things."
+    },
+    {
+     "t": "h",
+     "v": "The four shapes"
+    },
+    {
+     "t": "text",
+     "v": "Four shapes. Four weeks. Nothing gets added, and when something goes wrong in week three we go back and find out which of the four went soft."
+    },
+    {
+     "t": "figure",
+     "pose": "seated",
+     "label": "Move the chair",
+     "cue": "An actual chair in an actual room. Not the bed. Not the sofa you watch things on. Go and move it now."
+    },
+    {
+     "t": "steps",
+     "title": "Tonight — four minutes",
+     "items": [
+      {
+       "n": 1,
+       "head": "Move the chair",
+       "sub": "An actual chair in an actual room. Not the bed. Not the sofa you watch things on."
+      },
+      {
+       "n": 2,
+       "head": "Feet flat, palms up",
+       "sub": "Sit forward off the back of it. Both feet on the floor. Hands open on your thighs, palms turned up."
+      },
+      {
+       "n": 3,
+       "head": "Ten long exhales",
+       "sub": "In through the nose for four. Out through the nose for six. Count ten, then stop counting."
+      },
+      {
+       "n": 4,
+       "head": "Say His name",
+       "sub": "Out loud, in the empty room. Four words is plenty. Then get up."
+      }
+     ]
+    },
+    {
+     "t": "text",
+     "v": "Nothing mystical happened. Your attention came back into your hands and you gave it away on purpose. That is the whole first practice, and it is not a watered-down version of anything. It is a rep."
+    },
+    {
+     "t": "scripture",
+     "ref": "Psalm 46:10, KJV",
+     "text": "Be still, and know that I am God.",
+     "why": "Not a suggestion to relax. A command to stop performing long enough to notice who you are talking to."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "A chair moved, in an actual room",
+      "Ten long exhales, counted",
+      "His name said out loud"
+     ],
+     "demo": "Say tomorrow, without looking, what chair you chose and what you said."
+    },
+    {
+     "t": "write",
+     "prompt": "What are you hoping God actually does in you over the next four weeks? Name it — don't soften it to sound reasonable.",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 2,
+   "week_number": 1,
+   "title": "Five Minutes",
+   "kind": "practice",
+   "minutes": 10,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Five minutes on a fast day. Nothing gets added to it for four weeks. Same chair, same hour, feet flat, hands down on your thighs, spine tall and not military."
+    },
+    {
+     "t": "figure",
+     "pose": "exhale",
+     "label": "The long exhale",
+     "cue": "Out longer than in. Four in, six out, through the nose. No holding this week at all."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Slow-down, five minutes",
+       "sub": "Shoulders back three times. Arms overhead and dropped on an audible sigh, six times. Forward fold, knees soft. Jaw open wide, three times."
+      },
+      {
+       "n": 2,
+       "head": "The sit, five minutes",
+       "sub": "Same chair, same hour, feet flat, hands down on your thighs, spine tall."
+      },
+      {
+       "n": 3,
+       "head": "Out longer than in",
+       "sub": "Four in, six out, through the nose. Twenty breaths is about four minutes."
+      },
+      {
+       "n": 4,
+       "head": "One line, then palms up",
+       "sub": "Say His name out loud in the empty room. Then turn your hands over for three breaths before you stand."
+      }
+     ]
+    },
+    {
+     "t": "text",
+     "v": "Half of what gets sold as spiritual experience is a woman finally exhaling properly for the first time in a decade and not having the vocabulary for it. I would rather you had the vocabulary. Then when something actually happens between you and God, you will know the difference, and so will I."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The slow-down sequence done",
+      "Five minutes sat, same chair",
+      "Ten to twenty long exhales, no holding",
+      "His name said out loud, then palms up"
+     ],
+     "demo": "Say out loud what your chair, your hour, and your anchor are, without checking the app."
+    },
+    {
+     "t": "write",
+     "prompt": "Write the actual sentence you say to yourself about why you are bad at praying. Then write who taught it to you.",
+     "lines": 5
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 3,
+   "week_number": 1,
+   "title": "The Attention Audit",
+   "kind": "practice",
+   "minutes": 25,
+   "blocks": [
+    {
+     "t": "h",
+     "v": "A page split down the middle"
+    },
+    {
+     "t": "text",
+     "v": "Your attention is not yours right now, and you can have it back in ninety seconds with nothing but your own breath. Today's work is on paper, once, twenty-five minutes, with the phone out of the room — the phone is the subject of this exercise and should not be in it."
+    },
+    {
+     "t": "steps",
+     "title": "The Attention Audit",
+     "items": [
+      {
+       "n": 1,
+       "head": "Draw the line",
+       "sub": "A page split down the middle. Left column, where it actually went. Right column, where you chose to put it."
+      },
+      {
+       "n": 2,
+       "head": "Take yesterday",
+       "sub": "Not a good day. Yesterday. Hour by hour, waking to sleeping, into the left column. Include the scrolling and the imaginary argument."
+      },
+      {
+       "n": 3,
+       "head": "Move only what you chose",
+       "sub": "Go back through and move to the right column anything you chose in advance. Chose. Not was fine with."
+      },
+      {
+       "n": 4,
+       "head": "Look at the ratio",
+       "sub": "For one full minute. Do not fix anything and do not make a plan."
+      },
+      {
+       "n": 5,
+       "head": "Two sentences",
+       "sub": "The thing I gave the most attention to yesterday was ___. The thing I would have chosen to give it to was ___."
+      },
+      {
+       "n": 6,
+       "head": "Read them out loud, standing",
+       "sub": "Guilt is unworkable. A ratio on a page is a problem, and a problem is workable."
+      }
+     ]
+    },
+    {
+     "t": "text",
+     "v": "Do not skip the sit for this. Five minutes first, then the page."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Both columns filled, honestly",
+      "Both sentences written",
+      "Both sentences read out loud, standing"
+     ],
+     "demo": "Say your ratio out loud without looking at the page — mostly mine, or mostly taken."
+    },
+    {
+     "t": "write",
+     "prompt": "The thing I gave the most attention to yesterday was ___. The thing I would have chosen to give it to was ___.",
+     "lines": 4
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 4,
+   "week_number": 1,
+   "title": "Four and Eight",
+   "kind": "practice",
+   "minutes": 10,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "The exhale is the brake. Your heart speeds slightly on the way in and slows on the way out — you can feel it with two fingers on your wrist. Longer out than in is mechanically more braking than accelerating, and inside six or eight breaths it comes down."
+    },
+    {
+     "t": "figure",
+     "pose": "exhale",
+     "label": "Four and eight",
+     "cue": "Only once four and six is easy. If eight leaves you gasping it is too long — go back to four and six. Dizzy or tingly means stop and breathe normally. This is not a test you can fail."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Slow-down, five minutes",
+       "sub": "Same sequence as day two."
+      },
+      {
+       "n": 2,
+       "head": "The sit, five minutes",
+       "sub": "Same chair, same hour."
+      },
+      {
+       "n": 3,
+       "head": "Lengthen if comfortable",
+       "sub": "Try four in, eight out. If it's easy, stay there today. If not, four and six is a full practice."
+      },
+      {
+       "n": 4,
+       "head": "Watch your hands",
+       "sub": "Two minutes in, notice temperature. No conclusion needed — just notice."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The sit done, same chair",
+      "Four-and-eight tried, or four-and-six kept if eight was too much",
+      "Hands noticed, not judged"
+     ],
+     "demo": "Say out loud which count you used today and why."
+    },
+    {
+     "t": "write",
+     "prompt": "Your hands got warm at some point this week, or they will. What are you doing right before it happens, and what do you notice first?",
+     "lines": 4
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 5,
+   "week_number": 1,
+   "title": "Check Your Hands",
+   "kind": "practice",
+   "minutes": 10,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Around minute three, most hands warm, because blood goes back out to your fingers instead of being held in the middle of you. That is physiology, and it is an enormous thing — it settles the body so your attention becomes yours again."
+    },
+    {
+     "t": "figure",
+     "pose": "exhale",
+     "label": "Warm hands",
+     "cue": "At minute three, without moving, notice the temperature and weight of your hands. That is the whole instruction."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Slow-down, five minutes",
+       "sub": ""
+      },
+      {
+       "n": 2,
+       "head": "The sit, five minutes",
+       "sub": "Four in, six out — or four and eight if that's where you landed yesterday."
+      },
+      {
+       "n": 3,
+       "head": "At minute three, check your hands",
+       "sub": "Temperature. Weight. The pulse in the fingertips, if you can find it."
+      },
+      {
+       "n": 4,
+       "head": "One line, out loud",
+       "sub": "Thank you for a body that does this without being asked."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The sit done",
+      "Hands checked at minute three, specifically",
+      "The line said out loud"
+     ],
+     "demo": "Say what your hands did today, in one sentence, without checking your log."
+    },
+    {
+     "t": "write",
+     "prompt": "Your hands got warm at some point this week. What were you doing, what did you notice first, and what did you think it meant?",
+     "lines": 4
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 6,
+   "week_number": 1,
+   "title": "Same Chair, Harder Day",
+   "kind": "practice",
+   "minutes": 10,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Read this now, while nothing has gone wrong: you will miss a day, or want to. Falling is routine. A missed sit is a landing, not a verdict. Nobody is ever asked to account for a gap."
+    },
+    {
+     "t": "versus",
+     "title": "What a hard day is",
+     "left": {
+      "head": "What you will make it mean",
+      "items": [
+       "I knew it.",
+       "I can't even keep a five-minute practice.",
+       "I'm not the kind of woman who follows through with God either."
+      ]
+     },
+     "right": {
+      "head": "What it actually is",
+      "items": [
+       "I sat on a hard day.",
+       "That's the whole rep.",
+       "Falling is what this is built to absorb."
+      ]
+     }
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Sit anyway",
+       "sub": "Same chair, same hour, whatever the day has been. This is not a smaller version of the practice. It is the practice."
+      },
+      {
+       "n": 2,
+       "head": "If it's all you have, do this",
+       "sub": "The five things become one line each. It counts identically and nobody is grading the content."
+      },
+      {
+       "n": 3,
+       "head": "Say it plainly",
+       "sub": "I'm here anyway. Then the ten exhales."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Sat, even though today was harder",
+      "No accounting given to anyone about the gap or the difficulty"
+     ],
+     "demo": "Say out loud whether today was easy or hard — and that it counts exactly the same either way."
+    },
+    {
+     "t": "write",
+     "prompt": "What have you been outrunning lately? Do not explain it. One line, then close the book. We come back to it in week three.",
+     "lines": 2
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 7,
+   "week_number": 1,
+   "title": "Read It Back",
+   "kind": "milestone",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "h",
+     "v": "Falling is routine"
+    },
+    {
+     "t": "text",
+     "v": "Seven days ago you weren't sure you could sit still for five minutes. Read the week back tonight, blanks included, in one sitting."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "The sit first",
+       "sub": "Then sit down to read."
+      },
+      {
+       "n": 2,
+       "head": "Read all seven days back",
+       "sub": "In one sitting. It takes about ten minutes."
+      },
+      {
+       "n": 3,
+       "head": "Say the architecture back in three words",
+       "sub": "Settle, gather, give."
+      },
+      {
+       "n": 4,
+       "head": "Name your anchor out loud, without pausing to pick",
+       "sub": "Feet, ribs, or your one word — the same one all week."
+      }
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "Mark 1:35",
+     "text": "Very early in the morning, while it was still dark, He went out to a solitary place and prayed.",
+     "why": "If it was load-bearing for Him it is not a luxury for you."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Seven days of thirty minutes of movement logged",
+      "The sit done on at least five of seven days, same chair, same hour",
+      "The chair chosen and an object on it",
+      "The Attention Audit read out loud, both sentences",
+      "Seven evening logs read back in one sitting",
+      "The anchor named out loud, unchanged all week"
+     ],
+     "demo": "Cold, with no warm-up — take your hands from cool to warm in ninety seconds of long exhales, then name your anchor out loud without pausing to pick. Write the time it took."
+    },
+    {
+     "t": "rate",
+     "q": "How much of your attention was in your own hands this week?",
+     "left": "Taken from me all day",
+     "right": "Mine, and I gave it on purpose"
+    },
+    {
+     "t": "write",
+     "prompt": "The architecture, in three words. Then: what has actually changed about your five minutes since day one?",
+     "lines": 4
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 8,
+   "week_number": 2,
+   "title": "Build the Phrase",
+   "kind": "teaching",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "h",
+     "v": "Prayer is address"
+    },
+    {
+     "t": "text",
+     "v": "Somebody is there. That is the whole week. A settled body with nowhere to point is a nap — this week you give your attention to Him, by name, out loud, and find out what to do when it runs off."
+    },
+    {
+     "t": "steps",
+     "title": "Choosing the phrase",
+     "items": [
+      {
+       "n": 1,
+       "head": "The real answer",
+       "sub": "Top of a page. What do I most need to be true right now. One sentence, and not the noble version."
+      },
+      {
+       "n": 2,
+       "head": "His name for it",
+       "sub": "Underneath. Shepherd. Father. Provider. Rock. The One who sees. Whatever is honest."
+      },
+      {
+       "n": 3,
+       "head": "Build it",
+       "sub": "Half on the inhale, usually who He is. Half on the exhale, usually what you are doing or asking. Under nine words total."
+      },
+      {
+       "n": 4,
+       "head": "Say it ten times, out loud, on the breath",
+       "sub": "In the kitchen. Not in your head. If it is clunky in the mouth it will be abandoned by Thursday."
+      },
+      {
+       "n": 5,
+       "head": "Rewrite it if it is lovely",
+       "sub": "The true one is almost always plainer, shorter and slightly embarrassing. A phrase you would put on a wall will not be there in week three."
+      },
+      {
+       "n": 6,
+       "head": "Card on the chair",
+       "sub": "Write the final version out. Say it once, standing, before you set it down."
+      }
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "Matthew 6:7-8",
+     "text": "Do not keep babbling. Your Father knows what you need before you ask Him.",
+     "why": "The permission slip for the whole week — volume of words was never the currency."
+    },
+    {
+     "t": "text",
+     "v": "Today, after you build the phrase: five minutes of even breathing only, no prayer yet. Get the rhythm into the body before you put words on it."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The four questions answered, on paper",
+      "One phrase, under nine words, said ten times out loud",
+      "The card written and set on the chair"
+     ],
+     "demo": "Say your phrase out loud, cold, without the card."
+    },
+    {
+     "t": "write",
+     "prompt": "Write your phrase, then write what it cost you to admit you needed that particular thing to be true.",
+     "lines": 4
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 9,
+   "week_number": 2,
+   "title": "Ten Minutes",
+   "kind": "practice",
+   "minutes": 10,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "A phrase can go on top of a body that is already settled — otherwise it becomes a sedative you use on yourself instead of an address to Someone."
+    },
+    {
+     "t": "figure",
+     "pose": "seated",
+     "label": "Breath prayer",
+     "cue": "One phrase, half on the inhale, half on the exhale. Do not count during the prayer — counting and praying is one job too many."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Slow-down, abbreviated",
+       "sub": "Three minutes. Shoulders, arms overhead and dropped with sound, forward fold, jaw."
+      },
+      {
+       "n": 2,
+       "head": "Coherent breathing",
+       "sub": "Two minutes. Five in, five out, through the nose, even and unforced."
+      },
+      {
+       "n": 3,
+       "head": "Breath prayer",
+       "sub": "Six or seven minutes. Your phrase, on the breath."
+      },
+      {
+       "n": 4,
+       "head": "Palms up before you stand",
+       "sub": "Three breaths, non-negotiable now."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The ten minutes done, in order",
+      "The phrase used, not a new one",
+      "Palms up before standing"
+     ],
+     "demo": "Say your phrase on the breath, twice, cold."
+    },
+    {
+     "t": "write",
+     "prompt": "Speaking or listening — which is harder for you in prayer? Now ask the same question about the people in your house, and see if the answer changes.",
+     "lines": 5
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 10,
+   "week_number": 2,
+   "title": "Lectio, First Sitting",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "h",
+     "v": "Six verses you think you know"
+    },
+    {
+     "t": "text",
+     "v": "Read four times, slowly, with real silence between. Silent lectio turns into study every time — read it out loud."
+    },
+    {
+     "t": "steps",
+     "title": "Lectio divina — Psalm 23:1-4",
+     "items": [
+      {
+       "n": 1,
+       "head": "Just hear it",
+       "sub": "The passage read aloud, then a minute of quiet."
+      },
+      {
+       "n": 2,
+       "head": "The word that catches",
+       "sub": "Read again. Then sit with only that word and the breath."
+      },
+      {
+       "n": 3,
+       "head": "What is it touching",
+       "sub": "This week, in your actual life, not in general."
+      },
+      {
+       "n": 4,
+       "head": "Stop reading, be with Him about it",
+       "sub": "No words needed. Closes with the passage once more."
+      }
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "Psalm 23:1-4, KJV",
+     "text": "The LORD is my shepherd; I shall not want. He maketh me to lie down in green pastures: he leadeth me beside the still waters. He restoreth my soul: he leadeth me in the paths of righteousness for his name's sake. Yea, though I walk through the valley of the shadow of death, I will fear no evil: for thou art with me; thy rod and thy staff they comfort me.",
+     "why": "Six verses you think you know until you read them four times, slowly."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The passage read aloud, four times",
+      "One word caught and sat with",
+      "What it's touching written down"
+     ],
+     "demo": "Say the word that caught, and what it's touching, without opening the book."
+    },
+    {
+     "t": "write",
+     "prompt": "Lectio, first sitting. The word that caught, and what it is touching in your life this week.",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 11,
+   "week_number": 2,
+   "title": "Count the Returns",
+   "kind": "practice",
+   "minutes": 10,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "The wandering mind is not the enemy in this room — the commentary you run about it is. Notice without commentary. Do not chase it and do not wrestle it. Return on the next exhale. Add nothing to that, especially not an apology."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "The full ten minutes",
+       "sub": "Slow-down three, coherent two, breath prayer six or seven, three palms-up breaths."
+      },
+      {
+       "n": 2,
+       "head": "Tally on paper",
+       "sub": "Every time you notice you left, make a mark. Do not stop to judge it — just mark it and return."
+      },
+      {
+       "n": 3,
+       "head": "Count afterward",
+       "sub": "An honest number. Most women land between fifteen and sixty."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The ten minutes done",
+      "Returns tallied on paper, not estimated afterward"
+     ],
+     "demo": "Say your number out loud, and say how you feel about the number — not just the number."
+    },
+    {
+     "t": "write",
+     "prompt": "Sit ten minutes and tally your returns on paper afterward. Write the honest number, then write how you feel about it.",
+     "lines": 3
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 12,
+   "week_number": 2,
+   "title": "Where It Goes",
+   "kind": "practice",
+   "minutes": 10,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "When the phrase arrives on its own — a red light, a meeting, four in the morning — stop what you can and take three breaths with it. That is how it becomes portable."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "The full ten minutes",
+       "sub": ""
+      },
+      {
+       "n": 2,
+       "head": "Notice the pattern",
+       "sub": "Not everywhere your mind goes — the same three or four places, most days."
+      },
+      {
+       "n": 3,
+       "head": "If the phrase shows up uninvited",
+       "sub": "Three breaths with it, then carry on."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The ten minutes done",
+      "The three or four recurring places named"
+     ],
+     "demo": "Name, out loud, the place your mind goes most — without softening it."
+    },
+    {
+     "t": "write",
+     "prompt": "Where does your mind go? Not everywhere — track it. Same three or four places. What do they have in common?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 13,
+   "week_number": 2,
+   "title": "Lectio, Second Sitting",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Same passage, read again. See if a different word catches this time — it usually does, because you are not the same woman who sat with it four days ago."
+    },
+    {
+     "t": "scripture",
+     "ref": "Psalm 23:1-4, KJV",
+     "text": "The LORD is my shepherd; I shall not want. He maketh me to lie down in green pastures: he leadeth me beside the still waters. He restoreth my soul.",
+     "why": "The same six verses, a second time — notice what's different in you, not in the text."
+    },
+    {
+     "t": "steps",
+     "title": "Lectio divina, second sitting",
+     "items": [
+      {
+       "n": 1,
+       "head": "Just hear it, again",
+       "sub": "Read aloud, then a minute of quiet."
+      },
+      {
+       "n": 2,
+       "head": "The word that catches this time",
+       "sub": "It may be the same one. It usually isn't."
+      },
+      {
+       "n": 3,
+       "head": "What is it touching now",
+       "sub": "Write it down, even if it repeats last time's answer."
+      },
+      {
+       "n": 4,
+       "head": "Be with Him about it",
+       "sub": "No words needed."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The passage read aloud four times",
+      "The second word written down"
+     ],
+     "demo": "Say the second word, and whether it surprised you."
+    },
+    {
+     "t": "write",
+     "prompt": "Lectio, second sitting. The word that caught this time, and what it is touching.",
+     "lines": 4
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 14,
+   "week_number": 2,
+   "title": "Read the Tally",
+   "kind": "milestone",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Fourteen days in. You gave your attention away all week to people and objects that never asked permission — and this week you gave some of it back, on purpose, to Him."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "The sit first",
+       "sub": ""
+      },
+      {
+       "n": 2,
+       "head": "Read all seven evening logs back",
+       "sub": "In one sitting."
+      },
+      {
+       "n": 3,
+       "head": "Circle the place your mind went most this week",
+       "sub": "You found it yourself over seven days — now name it plainly."
+      },
+      {
+       "n": 4,
+       "head": "Say your phrase, cold, without the card",
+       "sub": ""
+      }
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "Matthew 6:7-8",
+     "text": "Do not keep babbling. Your Father knows what you need before you ask Him.",
+     "why": "Volume of words was never the currency — presence was."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Seven days of thirty minutes of movement logged",
+      "The ten-minute sit on at least five of seven days",
+      "One phrase, used all week, not three",
+      "Lectio done twice, the caught word written both times",
+      "Seven evening logs read back, one place circled"
+     ],
+     "demo": "Say your phrase on the breath, twice, cold and out loud, without the card. If you have to go find the card, it is not in you yet."
+    },
+    {
+     "t": "rate",
+     "q": "Did this week feel like an exercise, or like Someone was there?",
+     "left": "An exercise I performed",
+     "right": "A Person I spoke to"
+    },
+    {
+     "t": "write",
+     "prompt": "If I really believed Someone was in the room while I prayed, I would stop ___ and I would start ___.",
+     "lines": 4
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 15,
+   "week_number": 3,
+   "title": "Pad by the Chair",
+   "kind": "teaching",
+   "minutes": 22,
+   "blocks": [
+    {
+     "t": "h",
+     "v": "Silence is an amplifier"
+    },
+    {
+     "t": "text",
+     "v": "Not peace. Around this point in the program you find out what the quiet has been covering. Nothing has gone wrong. This is the practice working."
+    },
+    {
+     "t": "steps",
+     "title": "The five steps — the way back, in a chair",
+     "items": [
+      {
+       "n": 1,
+       "head": "Notice you want to leave",
+       "sub": "Dread, a weight in your chest, a wave of get-out-of-this-chair."
+      },
+      {
+       "n": 2,
+       "head": "Name it in three words, out loud",
+       "sub": "Grief. Restlessness. The list. The thing. Whichever is yours."
+      },
+      {
+       "n": 3,
+       "head": "Feet and hands",
+       "sub": "Feet flat, hands open. Four long exhales."
+      },
+      {
+       "n": 4,
+       "head": "Say it to Him plainly",
+       "sub": "I have been carrying this and I am putting it down in front of you."
+      },
+      {
+       "n": 5,
+       "head": "Ninety more seconds, then stop",
+       "sub": "Stopping on purpose is as much of the skill as staying."
+      }
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "Matthew 11:28",
+     "text": "Come to me, all who are weary and burdened, and I will give you rest.",
+     "why": "One word does the work: come. He does not say fix it and then come."
+    },
+    {
+     "t": "text",
+     "v": "Tonight: pad and pen beside the chair. Learn the five steps by heart and say them out loud three times before you sit."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The five steps said out loud three times",
+      "Pad and pen placed beside the chair",
+      "The sit done — slow-down three, body scan five, sit seven"
+     ],
+     "demo": "Say the five steps from memory, cold, no looking."
+    },
+    {
+     "t": "write",
+     "prompt": "Which of the four is yours — grief, restlessness, the list, or the thing? How did you know within a second?",
+     "lines": 4
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 16,
+   "week_number": 3,
+   "title": "The Body Scan",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "figure",
+     "pose": "seated",
+     "label": "The body scan",
+     "cue": "Eight stops, feet upward. One question at each — what is true here. Nothing is a real answer."
+    },
+    {
+     "t": "steps",
+     "title": "The body scan",
+     "items": [
+      {
+       "n": 1,
+       "head": "Eight stops, feet upward",
+       "sub": "Feet, calves and knees, thighs and hips, belly, chest, hands and arms, shoulders and throat, jaw and face."
+      },
+      {
+       "n": 2,
+       "head": "One question at every stop",
+       "sub": "What is true here."
+      },
+      {
+       "n": 3,
+       "head": "Nothing is a real answer",
+       "sub": "No relaxing instruction, no letting anything soften. This is inventory, not repair."
+      },
+      {
+       "n": 4,
+       "head": "One full breath through the whole body",
+       "sub": "Then — this is where my life is happening, and I have not been home in a while."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "All eight stops done",
+      "No stop skipped, even the ones that felt like nothing"
+     ],
+     "demo": "Name, out loud, which stop had the most in it today."
+    },
+    {
+     "t": "write",
+     "prompt": "What does wanting to leave feel like physically? Where in your body does the exit begin, and is it the same place every time?",
+     "lines": 5
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 17,
+   "week_number": 3,
+   "title": "Write the List Down",
+   "kind": "practice",
+   "minutes": 10,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "The list that arrives in a quiet room is a bodyguard, and it shows up when something quieter is about to get through. It is not a to-do list. Write it down, three words per item, and go back to the breath."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Slow-down and body scan, eight minutes",
+       "sub": ""
+      },
+      {
+       "n": 2,
+       "head": "The sit, seven minutes",
+       "sub": "Run the five steps every time you want out — you may run them several times in this sit."
+      },
+      {
+       "n": 3,
+       "head": "The pad beside the chair",
+       "sub": "Every time the list arrives, write it down in three words, then go back to the breath."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The list written, three words per item, not elaborated",
+      "The breath returned to every time"
+     ],
+     "demo": "Read the list back out loud — it gets shorter by Friday, and that is the point."
+    },
+    {
+     "t": "write",
+     "prompt": "The three words you said out loud when you named what came up. Then write what you were afraid would happen if you said them.",
+     "lines": 5
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 18,
+   "week_number": 3,
+   "title": "The Long Work",
+   "kind": "session",
+   "minutes": 40,
+   "blocks": [
+    {
+     "t": "h",
+     "v": "Twelve minutes on the timer"
+    },
+    {
+     "t": "text",
+     "v": "Read the line you wrote and closed the book on, back in week one. Read it once, out loud. Then settle first — do not skip the settling into the writing. It is the tether."
+    },
+    {
+     "t": "note",
+     "tone": "scope",
+     "v": "Silence surfaces things. That is not a side effect, it is the mechanism. If what surfaces today is grief, or old material arriving with your whole body attached to it, that is not a cut corner and this list will not close it. That belongs in a licensed room with a person trained for it, and needing that is normal — it is not a failure of the practice and it is not a failure of you.",
+     "title": "Before you begin"
+    },
+    {
+     "t": "steps",
+     "title": "The long work, in full",
+     "items": [
+      {
+       "n": 1,
+       "head": "Read the line",
+       "sub": "From week one's journal. Out loud, once."
+      },
+      {
+       "n": 2,
+       "head": "Settle first",
+       "sub": "Slow-down three minutes, body scan five. Do not skip these into the writing."
+      },
+      {
+       "n": 3,
+       "head": "Twelve minutes on the timer",
+       "sub": "Feet on the floor. Let it be in the room with you. Not thinking about it — that is analysis, and analysis is how you have kept it at arm's length."
+      },
+      {
+       "n": 4,
+       "head": "Run the five steps every time you want out",
+       "sub": "You may run them nine times in twelve minutes. Nine is a good number."
+      },
+      {
+       "n": 5,
+       "head": "Stop when the timer goes",
+       "sub": "Even mid-sentence. Especially mid-sentence. Stopping on purpose is as much of the skill as staying."
+      },
+      {
+       "n": 6,
+       "head": "Write, by hand",
+       "sub": "One question only — what did it cost me to keep outrunning it. Hours, people, rooms you did not walk into."
+      },
+      {
+       "n": 7,
+       "head": "Read it standing, out loud",
+       "sub": "Then say it plainly to Him. I have been carrying this and I am putting it down in front of you. I am not picking it back up today."
+      },
+      {
+       "n": 8,
+       "head": "Something ordinary with your hands",
+       "sub": "Twenty minutes. Dishes, weeding, a walk. Not the phone. This is how a body comes back down."
+      }
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "Psalm 62:8",
+     "text": "Pour out your heart before Him. God is a refuge for us.",
+     "why": "Pour out — not tidy up, not resolve, not present it well."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "All eight steps done, including the ordinary task afterward",
+      "The cost written by hand and read out loud, standing",
+      "The five steps run at least once, with a number written down"
+     ],
+     "demo": "Say the five steps from memory, then name the moment today you wanted to leave and didn't, and how long you stayed past it."
+    },
+    {
+     "t": "write",
+     "prompt": "What has it cost me to keep outrunning it? Hours. People. Rooms I did not walk into. Not what happened, not whose fault. The cost.",
+     "lines": 10
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 19,
+   "week_number": 3,
+   "title": "Six Words",
+   "kind": "practice",
+   "minutes": 10,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Text one woman the day after the long work. Six words is enough. Did mine. Still standing. See you Thursday."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "The sit",
+       "sub": "Fifteen minutes, in the week's usual order."
+      },
+      {
+       "n": 2,
+       "head": "Six words, sent",
+       "sub": "To one woman from this program. No explanation attached."
+      },
+      {
+       "n": 3,
+       "head": "Something ordinary with your hands, if you haven't already",
+       "sub": ""
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The six words sent, to a named woman",
+      "The sit done"
+     ],
+     "demo": "Say the six words out loud before you send them."
+    },
+    {
+     "t": "write",
+     "prompt": "Six words sent to one woman, and who you told. What made you choose her?",
+     "lines": 3
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 20,
+   "week_number": 3,
+   "title": "Palms Down, Palms Up",
+   "kind": "practice",
+   "minutes": 10,
+   "blocks": [
+    {
+     "t": "figure",
+     "pose": "seated",
+     "label": "Palms down, palms up",
+     "cue": "Ninety seconds to close every sit. Three exhales naming what you are setting down. Three naming what you are receiving."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "The sit, in the week's order",
+       "sub": ""
+      },
+      {
+       "n": 2,
+       "head": "Palms down, three exhales",
+       "sub": "Name out loud what you are setting down."
+      },
+      {
+       "n": 3,
+       "head": "Palms up, three exhales",
+       "sub": "Name out loud what you are receiving."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Both halves done, out loud, not silently",
+      "Something specific named each time, not a category"
+     ],
+     "demo": "Say what you set down and what you received today, without checking your log."
+    },
+    {
+     "t": "write",
+     "prompt": "Palms down — what I am setting down today. Palms up — what I am receiving.",
+     "lines": 4
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 21,
+   "week_number": 3,
+   "title": "Read It Back",
+   "kind": "milestone",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "Silence is not peace. Silence is an amplifier, and this week you found out what it had been covering — and stayed, at least once, past the moment you wanted to leave."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "The sit first",
+       "sub": ""
+      },
+      {
+       "n": 2,
+       "head": "Read the week back",
+       "sub": "All seven evening logs, in one sitting."
+      },
+      {
+       "n": 3,
+       "head": "Circle what appeared more than twice",
+       "sub": "Grief, restlessness, the list, or the thing — whichever kept showing up."
+      },
+      {
+       "n": 4,
+       "head": "Say the five steps from memory, cold",
+       "sub": ""
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Seven days of movement logged, four of them outdoors",
+      "The fifteen-minute practice on at least five of seven days",
+      "The long work done, all eight steps",
+      "The cost written and read out loud, standing",
+      "Four words sent to the group the day after the long work"
+     ],
+     "demo": "Name the moment this week you wanted to leave and didn't — what it felt like physically, what you said out loud, and how long you stayed past it. Not the feeling. The skill."
+    },
+    {
+     "t": "rate",
+     "q": "Can you be in a room with the hard thing without leaving?",
+     "left": "I am out in under a minute",
+     "right": "I stay, and I choose when to stop"
+    },
+    {
+     "t": "write",
+     "prompt": "The thing I most don't want to be true is ___. Write it, then stay in the chair one more minute before you close the book.",
+     "lines": 4
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 22,
+   "week_number": 4,
+   "title": "Write the Rule",
+   "kind": "teaching",
+   "minutes": 45,
+   "blocks": [
+    {
+     "t": "h",
+     "v": "This has to survive my worst week"
+    },
+    {
+     "t": "text",
+     "v": "You have had a room built for you for three weeks. Now you find out how it was made. Everyone can keep a floor for eleven days — the women still praying next spring are the ones who had a plan for the Wednesday they didn't."
+    },
+    {
+     "t": "steps",
+     "title": "Your rule of life",
+     "items": [
+      {
+       "n": 1,
+       "head": "Write the heading first",
+       "sub": "This has to survive my worst week. Look at it the whole time you write the rest."
+      },
+      {
+       "n": 2,
+       "head": "The daily floor",
+       "sub": "What, how long, where, and a clock time. Then ask if you could do it on the worst day of last year. If no, halve it. If still no, halve it again."
+      },
+      {
+       "n": 3,
+       "head": "The four-minute version",
+       "sub": "Written separately, in one sentence. Extended exhales, the phrase eight times, one line to Him. Yours will be close to that."
+      },
+      {
+       "n": 4,
+       "head": "The weekly beam",
+       "sub": "One longer practice, with a named day and a named hour. If you cannot name the hour you do not have a beam, you have a wish."
+      },
+      {
+       "n": 5,
+       "head": "The repair",
+       "sub": "One sentence, written before you need it, including the clause — and I say nothing to anyone about the gap."
+      }
+     ]
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "v": "I have never once had a woman come back and tell me her floor was too small. Halve whatever you wrote — small is what survives.",
+     "title": "On halving"
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The heading written first",
+      "The daily floor written and halved at least once",
+      "The four-minute version written as one sentence",
+      "The weekly beam named with a day and an hour",
+      "The repair sentence written, ending with the no-accounting clause"
+     ],
+     "demo": "Read your floor out loud. Could you do it on the worst day of last year — yes, without thinking about it?"
+    },
+    {
+     "t": "write",
+     "prompt": "The daily floor: what, how long, where, and a clock time. Could I do this on the worst day of last year? If you hesitated, halve it now. Then, the four-minute version, in one sentence.",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 23,
+   "week_number": 4,
+   "title": "Twenty Minutes",
+   "kind": "practice",
+   "minutes": 25,
+   "blocks": [
+    {
+     "t": "h",
+     "v": "The longest sit of the program"
+    },
+    {
+     "t": "text",
+     "v": "You are ready for it. All four shapes are in your body now, not just in your notes."
+    },
+    {
+     "t": "figure",
+     "pose": "seated",
+     "label": "Twenty minutes",
+     "cue": "One word, said once, as consent — not a chant. You return to it only when you notice you have gone somewhere."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Slow-down, then the long exhale",
+       "sub": "Three minutes standing, then two minutes of four in and eight out until the hands go warm."
+      },
+      {
+       "n": 2,
+       "head": "The word, said once",
+       "sub": "One word as consent. Not repeated. You touch it again only when you notice you've left."
+      },
+      {
+       "n": 3,
+       "head": "Twenty minutes of silence",
+       "sub": ""
+      },
+      {
+       "n": 4,
+       "head": "Palms down, palms up",
+       "sub": "Ninety seconds to close."
+      }
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "Psalm 23:2-3",
+     "text": "He makes me lie down. He leads me beside still waters. He restores my soul.",
+     "why": "Read the verbs — not one of them is yours. Sometimes being made to stop is the mercy."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Twenty minutes completed",
+      "The word used once, not chanted",
+      "Palms down, palms up done to close"
+     ],
+     "demo": "Say what the last five minutes of the twenty were like, without checking a clock."
+    },
+    {
+     "t": "write",
+     "prompt": "What did I find out in the silence that I would not have found out any other way?",
+     "lines": 6
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 24,
+   "week_number": 4,
+   "title": "Set Up the Witness",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "One woman, by name, and your card in the group feed. Both, not either. Most women never ask, and are astonished how fast the answer is yes."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Ask one woman today",
+       "sub": "Six words a week is the ask. Send it now, not tonight."
+      },
+      {
+       "n": 2,
+       "head": "Post your card, as far as written so far, to the feed",
+       "sub": ""
+      },
+      {
+       "n": 3,
+       "head": "Run your floor exactly as written today",
+       "sub": "Not the twenty minutes — the daily floor, as a test drive."
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "One woman told by name",
+      "The card posted to the feed",
+      "The daily floor run as written"
+     ],
+     "demo": "Say who your witness is and what she agreed to, out loud."
+    },
+    {
+     "t": "write",
+     "prompt": "The witness — one woman by name, and my card in the group feed. The thing I did today to make it real.",
+     "lines": 3
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 25,
+   "week_number": 4,
+   "title": "Outdoors",
+   "kind": "practice",
+   "minutes": 25,
+   "blocks": [
+    {
+     "t": "figure",
+     "pose": "kneel",
+     "label": "One outdoors",
+     "cue": "Early, jacket on, feet on the ground, at an hour when nobody wants anything from you."
+    },
+    {
+     "t": "text",
+     "v": "One of the three twenty-minute sits this week happens outside. Not both crammed into the last two days — spread them out."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Go outside",
+       "sub": "Early, jacket if you need it, feet on actual ground."
+      },
+      {
+       "n": 2,
+       "head": "Slow-down and long exhale, same as always",
+       "sub": ""
+      },
+      {
+       "n": 3,
+       "head": "Twenty minutes with your anchor word",
+       "sub": ""
+      },
+      {
+       "n": 4,
+       "head": "Palms down, palms up, out loud",
+       "sub": ""
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The sit done outdoors",
+      "Twenty minutes completed"
+     ],
+     "demo": "Say one thing you noticed outside that you would not have noticed in the chair."
+    },
+    {
+     "t": "write",
+     "prompt": "What I do when there is no chair — three portable practices, and when I would reach for each.",
+     "lines": 5
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 26,
+   "week_number": 4,
+   "title": "The Decision",
+   "kind": "practice",
+   "minutes": 15,
+   "blocks": [
+    {
+     "t": "text",
+     "v": "The thing from week three — what you found out in the long work. This is where you decide what you will do about it in your actual life, with a date."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "The daily floor, run as written",
+       "sub": ""
+      },
+      {
+       "n": 2,
+       "head": "Write the decision",
+       "sub": "What, and by when."
+      },
+      {
+       "n": 3,
+       "head": "Tell one person, today, not by Friday",
+       "sub": ""
+      }
+     ]
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "The decision written with a date",
+      "One person told, by name"
+     ],
+     "demo": "Say the decision and the date out loud, to the person you told, or as though they were in the room."
+    },
+    {
+     "t": "write",
+     "prompt": "The decision — the one thing from week three. What, and by when? Who did I tell?",
+     "lines": 4
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 27,
+   "week_number": 4,
+   "title": "Twenty, the Third Time",
+   "kind": "session",
+   "minutes": 25,
+   "blocks": [
+    {
+     "t": "h",
+     "v": "Unassisted"
+    },
+    {
+     "t": "text",
+     "v": "Run your own room start to finish, with nobody's voice in it. Your clock, your sequence, your anchor word. If you can do this, you do not need anybody's voice on a recording any more, and that was always the assignment."
+    },
+    {
+     "t": "figure",
+     "pose": "seated",
+     "label": "Unassisted",
+     "cue": "No guidance. Your clock, your sequence, twenty minutes, your anchor word, palms down and palms up."
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "Slow-down and long exhale, on your own clock",
+       "sub": ""
+      },
+      {
+       "n": 2,
+       "head": "The word, said once",
+       "sub": ""
+      },
+      {
+       "n": 3,
+       "head": "Twenty minutes, no voice returning",
+       "sub": ""
+      },
+      {
+       "n": 4,
+       "head": "Palms down, palms up, one line written afterward",
+       "sub": ""
+      }
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "1 Kings 19:11-12, KJV",
+     "text": "And after the earthquake a fire; but the LORD was not in the fire: and after the fire a still small voice.",
+     "why": "The wind, the earthquake, the fire, then the low whisper — spoken to a man who had just been fed and made to sleep. The body first, then the quiet, then the voice. This whole program is four thousand years old."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Twenty minutes run unassisted, no audio",
+      "One line written afterward"
+     ],
+     "demo": "Say what was different about running it yourself, compared to being guided."
+    },
+    {
+     "t": "write",
+     "prompt": "Write the sentence you would say to a woman on day nine who has decided she is undisciplined. Write it like you love her.",
+     "lines": 5
+    },
+    {
+     "t": "log"
+    }
+   ]
+  },
+  {
+   "day_number": 28,
+   "week_number": 4,
+   "title": "Read the Card Out Loud, Standing",
+   "kind": "milestone",
+   "minutes": 20,
+   "blocks": [
+    {
+     "t": "h",
+     "v": "Four weeks ago"
+    },
+    {
+     "t": "text",
+     "v": "Four weeks ago, five minutes was unbearable. Tonight, read your card out loud, standing, as far as you can get from memory. Floor, four-minute version, beam, repair. No preamble and no apology — if you catch yourself apologizing for it, read it again."
+    },
+    {
+     "t": "note",
+     "tone": "note",
+     "v": "Brooke's spoken blessing for the end of this program — the words she says over a room on the last night — has not been recorded yet. Until it is, this closing day stands on the card itself and on what four weeks of sitting have actually built in you.",
+     "title": "Pending"
+    },
+    {
+     "t": "steps",
+     "title": "Do this, in this order",
+     "items": [
+      {
+       "n": 1,
+       "head": "The sit first, using your own floor",
+       "sub": ""
+      },
+      {
+       "n": 2,
+       "head": "Read all four weeks back",
+       "sub": "In one sitting. It takes about fifteen minutes."
+      },
+      {
+       "n": 3,
+       "head": "Read your card out loud, standing",
+       "sub": "Floor, four-minute version, beam, repair. No preamble, no apology."
+      },
+      {
+       "n": 4,
+       "head": "Palms up, three breaths",
+       "sub": "Say thank you out loud. Actually say it."
+      }
+     ]
+    },
+    {
+     "t": "scripture",
+     "ref": "Psalm 23:2-3",
+     "text": "He makes me lie down. He leads me beside still waters. He restores my soul.",
+     "why": "The verbs were never yours. Being made to stop was the mercy, from day one to today."
+    },
+    {
+     "t": "check",
+     "title": "Done means",
+     "items": [
+      "Seven days of movement logged",
+      "Three twenty-minute sits, one of them outdoors",
+      "The card written in your own handwriting",
+      "The witness set up — one woman told, and the card posted",
+      "The decision written with a date, and one person told",
+      "The milestone reflection filled in"
+     ],
+     "demo": "Read your card out loud, standing, as far as you can get from memory. If you can do this, you do not need anybody's voice in the room any more."
+    },
+    {
+     "t": "rate",
+     "q": "Will this exist in your life in six months?",
+     "left": "It ends when the program ends",
+     "right": "It is mine now, card and all"
+    },
+    {
+     "t": "write",
+     "prompt": "What changed? What am I proud of? What is different that nobody else would notice? Who am I becoming? Then: in a year, if this is still true of me, I'll be a woman who ___.",
+     "lines": 10
+    },
+    {
+     "t": "log"
+    }
+   ]
+  }
+ ]
+}
