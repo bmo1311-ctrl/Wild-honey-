@@ -1,5 +1,6 @@
 import { LearningScreen } from '@/components/learning-screen'
-import { getHouseholdMembers, getLearningItems, getOwnerScope } from '@/lib/data'
+import { LockedArea } from '@/components/locked'
+import { getAccess, getHouseholdMembers, getLearningItems, getOwnerScope } from '@/lib/data'
 
 /**
  * Homeschool at home: what each person is working through, ticked off day by
@@ -7,6 +8,8 @@ import { getHouseholdMembers, getLearningItems, getOwnerScope } from '@/lib/data
  */
 export default async function LearningPage({ searchParams }: { searchParams: Promise<{ member?: string }> }) {
   const { member } = await searchParams
+  const access = await getAccess()
+  if (!access.paid) return <LockedArea title="Learning" subtitle="what everyone at home is working through." blurb="A board per person, daily and weekly lists, and a sign-in of her own for your child. Part of The Circle." from="learning" />
   const scope = await getOwnerScope()
   const members = scope?.childMemberId ? [] : await getHouseholdMembers()
   const activeId = scope?.childMemberId ?? (member && members.some((m) => m.id === member) ? member : (members[0]?.id ?? null))

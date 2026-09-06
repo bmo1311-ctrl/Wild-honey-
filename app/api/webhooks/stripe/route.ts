@@ -3,6 +3,13 @@ import { createServiceClient } from '@/lib/supabase/service'
 import { stripeConfigured, getStripe } from '@/lib/stripe'
 import type Stripe from 'stripe'
 
+// Which tier each recurring price buys, so a plan change in the billing
+// portal lands on the profile without a second checkout.
+const TIER_BY_PRICE: Record<string, string> = {
+  ...(process.env.STRIPE_PRICE_CIRCLE ? { [process.env.STRIPE_PRICE_CIRCLE]: 'circle' } : {}),
+  ...(process.env.STRIPE_PRICE_INNER_CIRCLE ? { [process.env.STRIPE_PRICE_INNER_CIRCLE]: 'inner-circle' } : {}),
+}
+
 // Stripe needs the raw body to verify the webhook signature, so this route
 // must not be parsed as JSON by Next.js. App Router route handlers get the
 // raw body via req.text() by default, so no extra config is needed here.
@@ -92,15 +99,25 @@ export async function POST(req: Request) {
       .eq('stripe_subscription_id', sub.id)
       .maybeSingle()
 
-    if (membership) {
-      const active = sub.status === 'active' || sub.status === 'trialing'
-      await supabase
-        .from('memberships')
-        .update({ status: sub.status, current_period_end: new Date(sub.current_period_end * 1000).toISOString() })
-        .eq('stripe_subscription_id', sub.id)
-
+    const userId = membership?.user_id ?? sub.metadata?.userId
+    if (userId) {
+      // past_due keeps access while Stripe retries the card; canceled, unpaid
+      // and expired close the door.
+      const active = sub.status === 'active' || sub.status === 'trialing' || sub.status === 'past_due'
+      const priceId = sub.items.data[0]?.price?.id
+      const tier = (priceId && TIER_BY_PRICE[priceId]) || sub.metadata?.tier || null
+      if (membership) {
+        await supabase
+          .from('memberships')
+          .update({ status: sub.status, current_period_end: new Date(sub.current_period_end * 1000).toISOString(), ...(tier ? { tier } : {}) })
+          .eq('stripe_subscription_id', sub.id)
+      } else if (tier) {
+        await supabase.from('memberships').insert({ user_id: userId, tier, stripe_subscription_id: sub.id, status: sub.status })
+      }
       if (!active) {
-        await supabase.from('profiles').update({ membership_tier: 'free' }).eq('id', membership.user_id)
+        await supabase.from('profiles').update({ membership_tier: 'free' }).eq('id', userId)
+      } else if (tier) {
+        await supabase.from('profiles').update({ membership_tier: tier }).eq('id', userId)
       }
     }
   }

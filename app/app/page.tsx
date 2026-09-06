@@ -11,7 +11,7 @@ import { localHour, localToday } from '@/lib/today'
 import { CourseSwitcher } from '@/components/course/course-switcher'
 import { buildActivity, consistency, streaksFrom } from '@/lib/activity'
 import { QuickAddHabit } from '@/components/quick-add-habit'
-import {
+import { getAccess,
   getActiveCourseState,
   getActivityDates,
   getKidRewards,
@@ -97,7 +97,9 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     },
   ]
 
+  const access = await getAccess()
   const rows = todayRows({
+    tier: access.tier,
     courseDay: day ? { number: day.day_number, title: day.title, kind: day.kind, minutes: day.minutes } : null,
     courseDayDone: dayDone,
     checkedInToday: Boolean(checkin),

@@ -35,7 +35,7 @@ export default async function ProfilePage() {
         <div className="rounded-2xl border border-dashed border-border bg-card p-5 text-center">
           <p className="font-serif text-lg font-semibold">unlock The Circle</p>
           <p className="mt-1 text-sm text-muted-foreground text-pretty">
-            premium prompts, the full archive, and early access to retreats.
+            both programs, Watch, recipes and meal plans, every workout, Freedom, and posting in the Circle.
           </p>
           <Link
             href="/app/membership"

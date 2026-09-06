@@ -31,7 +31,10 @@ You don't need to know how to code to get this running. Follow these steps in or
 2. Go to **Developers → API keys**. Copy the **Secret key** and **Publishable key** into `.env.local`.
 3. Go to **Product catalog → Add product**. Create one product per membership tier ("The Circle", "Inner Circle"), each with a **recurring monthly price**. Copy each price's ID (starts with `price_`) into `STRIPE_PRICE_CIRCLE` and `STRIPE_PRICE_INNER_CIRCLE`.
 4. Go to **Developers → Webhooks → Add endpoint**. Set the URL to `https://YOUR-DOMAIN/api/webhooks/stripe`. Select these events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`. Copy the **Signing secret** into `STRIPE_WEBHOOK_SECRET`.
-5. Add all the same variables to Vercel (Project Settings → Environment Variables) so they work in production, not just on your computer.
+5. Add all the same variables to Vercel (Project Settings → Environment Variables) so they work in production, not just on your computer. Redeploy after adding them.
+6. Optional: set `STRIPE_TRIAL_DAYS` (for example `7`) to give new members a free trial.
+
+What membership opens: both programs, Watch, recipes and meal plans, grocery and pantry, every workout, Freedom, Learning and child sign-ins, and posting in the Circle. Free members keep Today, food logging, Body, check-ins, habits and reading the Circle. Inner Circle adds Ask the experts. You can grant or change anyone's tier by hand from Admin → Members.
 
 Digital products (like the Module One journal PDF) don't need a Stripe Price set up individually — the admin dashboard lets you set a price directly and Stripe checkout will use it automatically.
 

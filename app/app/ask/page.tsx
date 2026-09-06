@@ -1,12 +1,15 @@
 import { HelpCircle } from 'lucide-react'
 import { AskExpertForm } from '@/components/ask-expert-form'
 import { PILLAR_META, relativeTime } from '@/lib/pillars'
-import { getMyQuestions, getPublicAnsweredQuestions } from '@/lib/data'
+import { getAccess, getMyQuestions, getPublicAnsweredQuestions } from '@/lib/data'
 import { FeatureOff } from '@/components/feature-off'
+import { LockedArea } from '@/components/locked'
 import { FEATURES } from '@/lib/features'
 
 export default async function AskExpertPage() {
   if (!FEATURES.expertQA) return <FeatureOff />
+  const access = await getAccess()
+  if (!access.inner) return <LockedArea title="Ask" subtitle="a question to the experts, and every public answer." blurb="Put your question to the experts and read everything they have answered. Part of Inner Circle." from="ask" tier="inner-circle" />
 
   const [mine, publicQA] = await Promise.all([getMyQuestions(), getPublicAnsweredQuestions()])
   const otherPublic = publicQA.filter((q) => !mine.some((m) => m.id === q.id))

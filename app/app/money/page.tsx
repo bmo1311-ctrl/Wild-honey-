@@ -1,7 +1,8 @@
 import { Check } from 'lucide-react'
 import { MoneyAccounts } from '@/components/money-accounts'
 import { MoneyQuickAdd } from '@/components/money-quick-add'
-import { getMoney } from '@/lib/data'
+import { LockedArea } from '@/components/locked'
+import { getAccess, getMoney } from '@/lib/data'
 import { debtFreeDate, fmtMoney, freedomPath, monthSummary, netWorth, runwayMonths } from '@/lib/money'
 import { cn } from '@/lib/utils'
 
@@ -11,6 +12,8 @@ import { cn } from '@/lib/utils'
  * does not tell her what to invest in.
  */
 export default async function MoneyPage() {
+  const access = await getAccess()
+  if (!access.paid) return <LockedArea title="Freedom" subtitle="know your numbers, then move them." blurb="Accounts, the weekly log, net worth, runway, your debt-free date and the seven-step path. Private, always. Part of The Circle." from="money" />
   const { accounts, entries, goals } = await getMoney()
   const nw = netWorth(accounts)
   const month = monthSummary(entries)

@@ -1,5 +1,6 @@
 'use server'
 
+import { asTier, meets } from '@/lib/access'
 import { courseAllowList } from '@/lib/kid'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
@@ -21,6 +22,23 @@ async function requireOwner() {
   const { data: m } = await supabase.from('household_members').select('id').eq('child_user_id', user.id).maybeSingle()
   return { supabase, user, ownerId: p.guardian_id as string, childMemberId: (m?.id as string | undefined) ?? null }
 }
+
+/**
+ * Paid, with a child inheriting her guardian's membership — the same rule as
+ * is_paid() in the database. Pages show the door; this is the lock on it.
+ */
+async function paidUser(supabase: Awaited<ReturnType<typeof createClient>>, userId: string): Promise<boolean> {
+  const { data: me } = await supabase.from('profiles').select('membership_tier, is_child, guardian_id').eq('id', userId).maybeSingle()
+  if (!me) return false
+  let tier: string | null | undefined = me.membership_tier
+  if (me.is_child && me.guardian_id) {
+    const { data: g } = await supabase.from('public_profiles').select('membership_tier').eq('id', me.guardian_id).maybeSingle()
+    tier = (g as { membership_tier?: string | null } | null)?.membership_tier
+  }
+  return meets(asTier(tier), 'circle')
+}
+
+const SHARE_LOCKED = 'Sharing in the Circle is part of membership. Join to post, comment and react.'
 
 async function requireUser() {
   const supabase = await createClient()
@@ -88,6 +106,7 @@ async function bumpStreak(userId: string) {
 
 export async function toggleReaction(entryId: string) {
   const { supabase, user } = await requireUser()
+  if (!(await paidUser(supabase, user.id))) return { error: SHARE_LOCKED }
   const { data: existing } = await supabase
     .from('reactions')
     .select('id')
@@ -109,6 +128,7 @@ export async function toggleReaction(entryId: string) {
 
 export async function addComment(entryId: string, text: string) {
   const { supabase, user } = await requireUser()
+  if (!(await paidUser(supabase, user.id))) return { error: SHARE_LOCKED }
   const trimmed = text.trim()
   if (!trimmed) return { error: 'Comment cannot be empty.' }
   const { error } = await supabase
@@ -162,6 +182,7 @@ async function isFounderOrAdmin(supabase: any, userId: string) {
 
 export async function createCommunityPost(input: { text: string; imageUrl?: string; pillar?: string }) {
   const { supabase, user } = await requireUser()
+  if (!(await paidUser(supabase, user.id))) return { error: SHARE_LOCKED }
   const text = input.text.trim()
   if (!text) return { error: 'Write something first.' }
   const { error } = await supabase.from('community_posts').insert({
@@ -177,6 +198,7 @@ export async function createCommunityPost(input: { text: string; imageUrl?: stri
 
 export async function toggleCommunityReaction(postId: string) {
   const { supabase, user } = await requireUser()
+  if (!(await paidUser(supabase, user.id))) return { error: SHARE_LOCKED }
   const { data: existing } = await supabase
     .from('community_reactions')
     .select('id')
@@ -195,6 +217,7 @@ export async function toggleCommunityReaction(postId: string) {
 
 export async function addCommunityComment(postId: string, text: string) {
   const { supabase, user } = await requireUser()
+  if (!(await paidUser(supabase, user.id))) return { error: SHARE_LOCKED }
   const trimmed = text.trim()
   if (!trimmed) return { error: 'Comment cannot be empty.' }
   const { error } = await supabase.from('community_comments').insert({ post_id: postId, user_id: user.id, text: trimmed })
@@ -1968,6 +1991,7 @@ export async function enrollInCourse(slug: string = COURSE_SLUG) {
   const { data: me } = await supabase.from('profiles').select('is_child, child_permissions').eq('id', user.id).maybeSingle()
   const allowed = courseAllowList(me as unknown as { is_child?: boolean | null; child_permissions?: { program?: string[] } | null } | null)
   if (allowed && !allowed.includes(slug)) return { error: 'That program is not turned on for you yet.' }
+  if (!(await paidUser(supabase, user.id))) return { error: 'Programs are part of The Circle. Join to begin.' }
   const { error } = await supabase
     .from('course_enrollments')
     .upsert(
@@ -2699,6 +2723,7 @@ export async function createChildAccess(memberId: string, pin: string) {
   const { data: m } = await supabase.from('household_members').select('*').eq('id', memberId).eq('owner_id', user.id).maybeSingle()
   if (!m) return { error: 'That person is not in your household.' }
   if (m.is_self) return { error: 'That is you.' }
+  if (!(await paidUser(supabase, user.id))) return { error: 'A sign-in for your child is part of The Circle.' }
 
   const familyCode = (m.family_code as string | null) ?? Math.random().toString(36).slice(2, 8).toUpperCase()
   const admin = createServiceClient()

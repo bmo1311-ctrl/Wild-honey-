@@ -4,7 +4,7 @@ import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
 import { getCourse, pillarOfDay, weekOfDay, type Pillar4 } from '@/lib/courses'
 import { PillarDots } from '@/components/course/pillar-dots'
 import { PillarFilter } from '@/components/course/pillar-filter'
-import { getCourseState, getDayPillars, mayOpenCourse } from '@/lib/data'
+import { getAccess, getCourseState, getDayPillars, mayOpenCourse } from '@/lib/data'
 import { StartCourseButton } from '@/components/course/start-course-button'
 import { cn } from '@/lib/utils'
 
@@ -15,7 +15,7 @@ export default async function CourseOverviewPage({ params, searchParams }: { par
   if (!course) notFound()
   if (!(await mayOpenCourse(slug))) redirect('/app')
 
-  const [{ enrollment, currentDay, completedDays }, overrides] = await Promise.all([getCourseState(slug), getDayPillars(slug)])
+  const [{ enrollment, currentDay, completedDays }, overrides, access] = await Promise.all([getCourseState(slug), getDayPillars(slug), getAccess()])
 
   if (!enrollment || currentDay === null) {
     return (
@@ -32,7 +32,13 @@ export default async function CourseOverviewPage({ params, searchParams }: { par
             {course.weeks} weeks. {course.length_days} days.
           </p>
           <p className="mt-1.5 text-[15px] leading-[1.5] text-pretty text-muted-foreground">Today becomes day one.</p>
-          <StartCourseButton slug={slug} />
+          {access.paid ? (
+            <StartCourseButton slug={slug} />
+          ) : (
+            <Link href="/app/membership?from=program" className="mt-4 flex h-[58px] w-full items-center justify-center rounded-2xl bg-primary text-[18px] font-bold text-primary-foreground">
+              Join The Circle to begin
+            </Link>
+          )}
         </div>
       </div>
     )

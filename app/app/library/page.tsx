@@ -1,9 +1,11 @@
 import Link from 'next/link'
+import { Lock } from 'lucide-react'
+import { meets } from '@/lib/access'
 import { COURSE } from '@/lib/courses'
 import { libraryModules } from '@/lib/modules'
 import { VaultBrowser } from '@/components/vault-browser'
 import { buildVaultIndex } from '@/lib/vault'
-import { getRecipes, getResources, getWorkouts } from '@/lib/data'
+import { getAccess, getRecipes, getResources, getWorkouts } from '@/lib/data'
 import { youTubeId } from '@/lib/youtube'
 
 /** Doors come from the module registry, so a new area appears here on its own. */
@@ -16,6 +18,7 @@ export default async function LibraryPage() {
     courseDays: COURSE.length_days,
   }
   const doors = libraryModules()
+  const access = await getAccess()
   const index = buildVaultIndex({ resources, recipes, workouts })
 
   return (
@@ -43,7 +46,13 @@ export default async function LibraryPage() {
                 <span className="block font-serif text-[19px] font-semibold">{d.title}</span>
                 <span className="mt-0.5 block text-[13.5px] text-muted-foreground text-pretty">{d.blurb}</span>
               </span>
-              {d.count && <span className="shrink-0 text-xs font-medium text-muted-foreground">{d.count(counts)}</span>}
+              {!meets(access.tier, d.access) ? (
+                <span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-muted-foreground">
+                  <Lock className="h-3 w-3" /> Circle
+                </span>
+              ) : (
+                d.count && <span className="shrink-0 text-xs font-medium text-muted-foreground">{d.count(counts)}</span>
+              )}
             </Link>
           )
         })}

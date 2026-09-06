@@ -90,10 +90,19 @@ export async function POST(req: Request) {
           { status: 400 },
         )
       }
+      const trialDays = Number(process.env.STRIPE_TRIAL_DAYS ?? 0)
       const session = await stripe.checkout.sessions.create({
         mode: 'subscription',
         customer_email: user.email ?? undefined,
+        client_reference_id: user.id,
+        allow_promotion_codes: true,
         line_items: [{ price: priceId, quantity: 1 }],
+        // Carried on the subscription too, so renewals and cancellations can
+        // find her even if the checkout row was never written.
+        subscription_data: {
+          metadata: { userId: user.id, tier },
+          ...(trialDays > 0 ? { trial_period_days: trialDays } : {}),
+        },
         success_url: `${origin}/app/profile?upgraded=1`,
         cancel_url: `${origin}/app/membership`,
         metadata: { kind: 'membership', tier, userId: user.id },

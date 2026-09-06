@@ -1,13 +1,16 @@
 import { VaultBrowser } from '@/components/vault-browser'
 import { buildVaultIndex } from '@/lib/vault'
 import { buildEngineShelves } from '@/lib/engine'
-import { GOAL_PILLAR, getContentEvents, getMyGoals, getResources } from '@/lib/data'
+import { getAccess, GOAL_PILLAR, getContentEvents, getMyGoals, getResources } from '@/lib/data'
 import { FeatureOff } from '@/components/feature-off'
+import { LockedArea } from '@/components/locked'
 import { FEATURES } from '@/lib/features'
 
 /** Teaching videos only. Food lives in Nutrition, training lives in Fitness. */
 export default async function WatchPage() {
   if (!FEATURES.vault) return <FeatureOff />
+  const access = await getAccess()
+  if (!access.paid) return <LockedArea title="Watch" subtitle="teaching videos on identity, mindset and faith." blurb="The whole library, on shelves that learn what you watch. Part of The Circle." from="watch" />
   const [resources, goals, events] = await Promise.all([getResources(), getMyGoals(), getContentEvents()])
   const goalPillars = [...new Set(goals.map((g) => GOAL_PILLAR[g.goal]).filter(Boolean))]
   const videos = buildVaultIndex({ resources, recipes: [], workouts: [] }).filter((i) => i.videoId)

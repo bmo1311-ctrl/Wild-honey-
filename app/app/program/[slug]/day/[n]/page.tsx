@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { DayView } from '@/components/course/day-view'
 import { getCourse, getDay, pillarOfDay } from '@/lib/courses'
-import { getCompletedDays, getDayPillars, getEnrollment, getOwnerScope, getTodayCheckin, getTodayNutrition, getWritings, mayOpenCourse } from '@/lib/data'
+import { requireTier, getCompletedDays, getDayPillars, getEnrollment, getOwnerScope, getTodayCheckin, getTodayNutrition, getWritings, mayOpenCourse } from '@/lib/data'
 import type { CourseWriting } from '@/lib/courses'
 
 export default async function CourseDayPage({
@@ -19,6 +19,7 @@ export default async function CourseDayPage({
   const day = getDay(course, dayNumber)
   if (!day) notFound()
   if (!(await mayOpenCourse(slug))) redirect('/app')
+  await requireTier('circle', 'program')
 
   const enrollment = await getEnrollment(slug)
   if (!enrollment) redirect(`/app/program/${slug}`)

@@ -1,5 +1,6 @@
 import { BookOpen, ChefHat, Dumbbell, GraduationCap, LibraryBig, type LucideIcon, Play, Scale, Sun, User, Users, Wallet } from 'lucide-react'
 import { FEATURES } from '@/lib/features'
+import { meets, type Requirement, type Tier } from '@/lib/access'
 import type { TodoRow } from '@/components/today-checklist'
 
 /**
@@ -21,6 +22,8 @@ export interface TodayContext {
   daysSinceWeighIn: number | null
   /** days since she last logged money, null if never */
   daysSinceMoney: number | null
+  /** her membership; areas above it contribute no rows */
+  tier: Tier
 }
 
 export interface ModuleCounts {
@@ -38,6 +41,8 @@ export interface AppModule {
   blurb: string
   /** Feature flag name. Omit for areas that are always on. */
   flag?: keyof typeof FEATURES
+  /** Membership needed to use this area. Omit for areas that are free. */
+  access?: Requirement
   /** Slot in the five-tab bar. Lower numbers sit further left. */
   navOrder?: number
   /** Shown as a door on the Library page. */
@@ -66,6 +71,7 @@ export const MODULES: AppModule[] = [
     icon: BookOpen,
     blurb: 'the course, week by week',
     navOrder: 2,
+    access: 'circle',
     todo: (ctx) =>
       ctx.courseDay
         ? [
@@ -95,6 +101,7 @@ export const MODULES: AppModule[] = [
     icon: Play,
     blurb: 'teaching on identity, mindset and faith',
     flag: 'vault',
+    access: 'circle',
     inLibrary: true,
     pillar: 'mindset',
     count: (c) => `${c.videos} videos`,
@@ -134,6 +141,7 @@ export const MODULES: AppModule[] = [
     href: '/app/fitness',
     icon: Dumbbell,
     blurb: 'strength, cardio and mobility',
+    access: 'circle',
     inLibrary: true,
     pillar: 'identity',
     count: (c) => `${c.workouts} workouts`,
@@ -158,6 +166,7 @@ export const MODULES: AppModule[] = [
     href: '/app/money',
     icon: Wallet,
     blurb: 'know your numbers, then move them',
+    access: 'circle',
     inLibrary: true,
     pillar: 'identity',
     count: () => 'private',
@@ -188,6 +197,7 @@ export const MODULES: AppModule[] = [
     href: '/app/learning',
     icon: GraduationCap,
     blurb: 'homeschool lists for everyone at home',
+    access: 'circle',
     inLibrary: true,
     pillar: 'faith',
     count: () => 'your household',
@@ -226,5 +236,5 @@ export function libraryModules(): AppModule[] {
 
 /** Every enabled area's contribution to today's list, in registry order. */
 export function todayRows(ctx: TodayContext): TodoRow[] {
-  return MODULES.filter(isEnabled).flatMap((m) => m.todo?.(ctx) ?? [])
+  return MODULES.filter((m) => isEnabled(m) && meets(ctx.tier, m.access)).flatMap((m) => m.todo?.(ctx) ?? [])
 }

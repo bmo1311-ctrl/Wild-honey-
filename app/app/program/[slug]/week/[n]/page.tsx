@@ -4,7 +4,7 @@ import { Check, ChevronRight } from 'lucide-react'
 import { Blocks } from '@/components/course/blocks'
 import { daysInWeek, getCourse, getWeek, pillarOfDay } from '@/lib/courses'
 import { PillarDots } from '@/components/course/pillar-dots'
-import { getCompletedDays, getDayPillars, mayOpenCourse } from '@/lib/data'
+import { requireTier, getCompletedDays, getDayPillars, mayOpenCourse } from '@/lib/data'
 import { cn } from '@/lib/utils'
 
 export default async function CourseWeekPage({ params }: { params: Promise<{ slug: string; n: string }> }) {
@@ -12,6 +12,7 @@ export default async function CourseWeekPage({ params }: { params: Promise<{ slu
   const course = getCourse(slug)
   if (!course) notFound()
   if (!(await mayOpenCourse(slug))) redirect('/app')
+  await requireTier('circle', 'program')
   const week = getWeek(course, Number(n))
   if (!week) notFound()
 

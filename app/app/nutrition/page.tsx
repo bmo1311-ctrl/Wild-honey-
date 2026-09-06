@@ -18,9 +18,10 @@ import {
   getRecommendedRecipes,
   getSessionProfile,
   getTodayNutrition,
-  hasPaidAccess,
+  getAccess,
 } from '@/lib/data'
 import { FeatureOff } from '@/components/feature-off'
+import { Locked } from '@/components/locked'
 import { FEATURES } from '@/lib/features'
 
 /** One home for food: recipes, meal plans, grocery and pantry. */
@@ -38,7 +39,7 @@ export default async function NutritionPage() {
     getPantryItems(),
     getSessionProfile(),
   ])
-  const unlocked = hasPaidAccess(profile?.membership_tier)
+  const unlocked = (await getAccess()).paid
   const own = ownerTargets(profile, cyclePhase)
   const panelTargets = { ...(driFor(ageFromBirthYear(own.birthYear), 'female') ?? {}), ...own.cycled.targets }
 
@@ -61,15 +62,19 @@ export default async function NutritionPage() {
       <NutritionTabs
         counts={{ recipes: recipes.length, plans: plans.length, grocery: grocery.length, pantry: pantry.length }}
         recipes={
-          <div className="flex flex-col gap-6">
-            <RecipeImport />
-            <RecommendedRecipesRow recipes={recommended} season={season} cyclePhase={cyclePhase} />
-            <RecipeSources recipes={recipes} userId={profile?.id ?? null} />
-          </div>
+          unlocked ? (
+            <div className="flex flex-col gap-6">
+              <RecipeImport />
+              <RecommendedRecipesRow recipes={recommended} season={season} cyclePhase={cyclePhase} />
+              <RecipeSources recipes={recipes} userId={profile?.id ?? null} />
+            </div>
+          ) : (
+            <Locked blurb="Sixty recipes, any recipe from a link, and picks for your season and cycle. Part of The Circle." from="nutrition" compact />
+          )
         }
         plans={<MealPlanList plans={plans} unlocked={unlocked} />}
-        grocery={<GroceryBuilder items={grocery} />}
-        pantry={<PantryList items={pantry} />}
+        grocery={unlocked ? <GroceryBuilder items={grocery} /> : <Locked blurb="A grocery list that builds itself from what you plan to cook. Part of The Circle." from="nutrition" compact />}
+        pantry={unlocked ? <PantryList items={pantry} /> : <Locked blurb="What is in the cupboard, so meals start from there. Part of The Circle." from="nutrition" compact />}
       />
     </div>
   )

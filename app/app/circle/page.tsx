@@ -3,10 +3,11 @@ import { CommunityPostCard } from '@/components/community-post-card'
 import { CommunityComposer } from '@/components/community-composer'
 import { PraiseReportCard } from '@/components/praise-report-card'
 import { HoneycombMark } from '@/components/logo'
-import { getUnifiedCircleFeed, getSessionProfile } from '@/lib/data'
+import { Locked } from '@/components/locked'
+import { getAccess, getUnifiedCircleFeed, getSessionProfile } from '@/lib/data'
 
 export default async function CirclePage() {
-  const [feed, profile] = await Promise.all([getUnifiedCircleFeed(), getSessionProfile()])
+  const [feed, profile, access] = await Promise.all([getUnifiedCircleFeed(), getSessionProfile(), getAccess()])
   const canPin = profile?.membership_tier === 'founder' || Boolean(profile?.is_admin)
 
   return (
@@ -19,7 +20,11 @@ export default async function CirclePage() {
       </div>
 
       <PraiseReportCard />
-      <CommunityComposer />
+      {access.paid ? (
+        <CommunityComposer />
+      ) : (
+        <Locked blurb="Read everything here, free. To post, comment and react, join The Circle." from="circle" compact />
+      )}
 
       {feed.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-card p-10 text-center">

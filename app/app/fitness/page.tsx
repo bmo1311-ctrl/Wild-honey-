@@ -1,10 +1,11 @@
 import { WorkoutFilterBar } from '@/components/workout-filter-bar'
-import { getSessionProfile, getWorkouts, hasPaidAccess } from '@/lib/data'
+import { Locked } from '@/components/locked'
+import { getAccess, getWorkouts } from '@/lib/data'
 
 /** Movement only. Meal plans and grocery lists moved to Nutrition. */
 export default async function FitnessPage() {
-  const [workouts, profile] = await Promise.all([getWorkouts(), getSessionProfile()])
-  const unlocked = hasPaidAccess(profile?.membership_tier)
+  const [workouts, access] = await Promise.all([getWorkouts(), getAccess()])
+  const unlocked = access.paid
 
   return (
     <div className="flex flex-col gap-5">
@@ -15,9 +16,7 @@ export default async function FitnessPage() {
       {unlocked ? (
         <WorkoutFilterBar workouts={workouts} />
       ) : (
-        <p className="rounded-2xl bg-card p-6 text-center text-sm text-muted-foreground ring-1 ring-border">
-          workouts are part of a paid membership.
-        </p>
+        <Locked blurb="Every workout — strength, cardio and mobility, filtered by type or body group. Part of The Circle." from="fitness" />
       )}
     </div>
   )

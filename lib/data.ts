@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation'
+import { accessFor, asTier, meets, type Access, type Requirement } from '@/lib/access'
 import { courseAllowList } from '@/lib/kid'
 import { createClient } from '@/lib/supabase/server'
 import type {
@@ -1584,4 +1586,27 @@ export async function getYearDayReflection(wildHoneyYear: number): Promise<Trans
 export async function mayOpenCourse(slug: string): Promise<boolean> {
   const allowed = courseAllowList(await getSessionProfile())
   return !allowed || allowed.includes(slug)
+}
+
+/**
+ * Her membership, with a child inheriting her guardian's — the same rule the
+ * database applies in is_paid(). Read once per request and passed down.
+ */
+export async function getAccess(): Promise<Access> {
+  const me = await getSessionProfile()
+  if (!me) return accessFor('free')
+  let tier = asTier(me.membership_tier)
+  if (me.is_child && me.guardian_id) {
+    const supabase = await createClient()
+    const { data: g } = await supabase.from('public_profiles').select('membership_tier').eq('id', me.guardian_id).maybeSingle()
+    tier = asTier((g as { membership_tier?: string | null } | null)?.membership_tier)
+  }
+  return accessFor(tier)
+}
+
+/** Send her to the membership page when an area is above her tier. */
+export async function requireTier(required: Requirement, from: string): Promise<Access> {
+  const access = await getAccess()
+  if (!meets(access.tier, required)) redirect(`/app/membership?from=${from}`)
+  return access
 }
