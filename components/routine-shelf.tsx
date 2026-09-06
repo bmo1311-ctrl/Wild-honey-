@@ -2,14 +2,15 @@
 
 import { useMemo, useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { Plus, Sun, Moon, X, AlertTriangle, Info, ScanLine } from 'lucide-react'
+import { Plus, Sun, Moon, X, AlertTriangle, Info, ScanLine, ClipboardPaste } from 'lucide-react'
 import { addBeautyProduct, removeBeautyProduct, setLifeStage } from '@/app/actions'
-import { ACTIVES } from '@/lib/actives'
+import { ACTIVES, detectActives, getActive } from '@/lib/actives'
 import { buildRoutines, findGaps, type ShelfItem } from '@/lib/routine'
 import type { LifeStage } from '@/lib/actives'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { BarcodeScanner } from '@/components/barcode-scanner'
 
 const CATEGORIES = [
@@ -47,6 +48,8 @@ export function RoutineShelf({
   const [name, setName] = useState('')
   const [category, setCategory] = useState('serum')
   const [picked, setPicked] = useState<string[]>([])
+  const [pasting, setPasting] = useState(false)
+  const [pasted, setPasted] = useState('')
   const [pending, startTransition] = useTransition()
 
   const { am, pm } = useMemo(() => buildRoutines(shelf, lifeStage), [shelf, lifeStage])
@@ -83,6 +86,26 @@ export function RoutineShelf({
     }
   }
 
+  /**
+   * Read an ingredient list she pasted from anywhere — Yuka, a retailer's
+   * page, the back of the box. The text is the same wherever it came from,
+   * and it fills the same fields a scan would.
+   */
+  function applyPaste() {
+    const found = detectActives(pasted)
+    setPicked((p) => [...new Set([...p, ...found])])
+    setIngredients(pasted)
+    setPasting(false)
+    setScanNote(
+      found.length
+        ? `read ${found.length === 1 ? 'one active' : `${found.length} actives`} off that: ${found
+            .map((f) => getActive(f)?.label ?? f)
+            .join(', ')
+            .toLowerCase()}.`
+        : 'nothing I recognise in that list — tick anything you know by hand.',
+    )
+  }
+
   function handleAdd() {
     if (!name.trim()) {
       toast.error('What is it called?')
@@ -106,6 +129,8 @@ export function RoutineShelf({
       setBarcode(null)
       setIngredients(null)
       setScanNote(null)
+      setPasted('')
+      setPasting(false)
       setAdding(false)
       toast.success('On your shelf.')
     })
@@ -219,6 +244,38 @@ export function RoutineShelf({
               ))}
             </select>
           </div>
+          {pasting ? (
+            <div className="flex flex-col gap-2">
+              <Label>paste the ingredient list</Label>
+              <Textarea
+                value={pasted}
+                onChange={(e) => setPasted(e.target.value)}
+                rows={4}
+                placeholder="aqua, glycerin, niacinamide, retinol…"
+              />
+              <p className="text-[0.7rem] text-muted-foreground text-pretty">
+                copy it from wherever you found it — yuka, the shop&rsquo;s page, or the back of the box.
+              </p>
+              <div className="flex gap-2">
+                <Button onClick={applyPaste} disabled={!pasted.trim()} className="h-9 flex-1">
+                  read it
+                </Button>
+                <Button variant="ghost" onClick={() => setPasting(false)} className="h-9">
+                  cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setPasting(true)}
+              className="flex items-center gap-1.5 self-start text-sm font-medium text-mindset-pillar"
+            >
+              <ClipboardPaste className="h-3.5 w-3.5" />
+              paste the ingredients instead
+            </button>
+          )}
+
           <div className="flex flex-col gap-1.5">
             <Label>what&rsquo;s in it? (tick any you know)</Label>
             <div className="flex flex-wrap gap-2">
