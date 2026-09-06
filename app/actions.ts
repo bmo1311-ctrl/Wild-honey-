@@ -6,7 +6,8 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { oneSignalConfigured, sendPushToUsers } from '@/lib/onesignal'
 import type { Comment, NotificationPrefs, Visibility } from '@/lib/types'
-import { COURSE_SLUG, getCourse, toISODate, weekOfDay } from '@/lib/courses'
+import { COURSE_SLUG, getCourse, weekOfDay } from '@/lib/courses'
+import { localTimeZone, localToday } from '@/lib/today'
 import { scaleNutrients, type NutrientMap } from '@/lib/nutrients'
 import { fetchRecipe, safeUrl } from '@/lib/recipe-import'
 import type { WritingKind } from '@/lib/courses'
@@ -64,10 +65,10 @@ async function bumpStreak(userId: string) {
     .single()
   if (!profile) return
 
-  const today = new Date().toISOString().slice(0, 10)
+  const today = (await localToday())
   if (profile.last_active_date === today) return
 
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
+  const yesterday = new Date(Date.parse(`${today}T00:00:00Z`) - 86400000).toISOString().slice(0, 10)
   const nextStreak = profile.last_active_date === yesterday ? profile.streak_count + 1 : 1
   await supabase
     .from('profiles')
@@ -383,7 +384,7 @@ export async function saveCheckin(input: {
   symptoms?: string[]
 }) {
   const { supabase, user } = await requireUser()
-  const today = new Date().toISOString().slice(0, 10)
+  const today = (await localToday())
   const { error } = await supabase.from('checkins').upsert(
     {
       user_id: user.id,
@@ -410,7 +411,7 @@ export async function saveCheckin(input: {
 
 export async function saveMorningReset(input: { intention: string; gratitude: string }) {
   const { supabase, user } = await requireUser()
-  const today = new Date().toISOString().slice(0, 10)
+  const today = (await localToday())
   const { error } = await supabase
     .from('morning_resets')
     .upsert({ user_id: user.id, date: today, intention: input.intention.trim(), gratitude: input.gratitude.trim(), completed_at: new Date().toISOString() }, { onConflict: 'user_id,date' })
@@ -422,7 +423,7 @@ export async function saveMorningReset(input: { intention: string; gratitude: st
 
 export async function saveEveningReflection(input: { q1: string; q2: string; q3: string }) {
   const { supabase, user } = await requireUser()
-  const today = new Date().toISOString().slice(0, 10)
+  const today = (await localToday())
   const { error } = await supabase
     .from('evening_reflections')
     .upsert({ user_id: user.id, date: today, q1: input.q1.trim(), q2: input.q2.trim(), q3: input.q3.trim() }, { onConflict: 'user_id,date' })
@@ -473,7 +474,7 @@ export async function archiveHabit(habitId: string) {
 
 export async function toggleHabitLog(habitId: string) {
   const { supabase, user } = await requireUser()
-  const today = new Date().toISOString().slice(0, 10)
+  const today = (await localToday())
   const { data: existing } = await supabase.from('habit_logs').select('id').eq('habit_id', habitId).eq('date', today).maybeSingle()
   if (existing) {
     const { error } = await supabase.from('habit_logs').delete().eq('id', existing.id)
@@ -780,7 +781,7 @@ export async function completeOnboarding(input: {
   faithPreference?: string
 }) {
   const { supabase, user } = await requireUser()
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const timezone = await localTimeZone()
 
   const { error: profileError } = await supabase
     .from('profiles')
@@ -1632,7 +1633,7 @@ export async function leaveChallenge(challengeId: string) {
 
 export async function checkInChallenge(challengeId: string) {
   const { supabase, user } = await requireUser()
-  const today = new Date().toISOString().slice(0, 10)
+  const today = (await localToday())
   const { data: existing } = await supabase.from('challenge_checkins').select('id').eq('challenge_id', challengeId).eq('user_id', user.id).eq('date', today).maybeSingle()
   if (existing) {
     const { error } = await supabase.from('challenge_checkins').delete().eq('id', existing.id)
@@ -1689,7 +1690,7 @@ export async function adminDeleteChallenge(challengeId: string) {
 
 export async function logMeal(recipeId: string, servings: number = 1) {
   const { supabase, user } = await requireUser()
-  const today = new Date().toISOString().slice(0, 10)
+  const today = (await localToday())
   const { error } = await supabase.from('meal_logs').insert({ user_id: user.id, recipe_id: recipeId, servings, date: today })
   if (error) return { error: error.message }
   revalidatePath('/app/recipes')
@@ -1792,7 +1793,7 @@ export async function startExperiment(input: { title: string; description?: stri
     title,
     description: input.description?.trim() || null,
     length_days: input.lengthDays,
-    start_date: new Date().toISOString().slice(0, 10),
+    start_date: (await localToday()),
   })
   if (error) return { error: error.message }
   revalidatePath('/app/calendar')
@@ -1801,7 +1802,7 @@ export async function startExperiment(input: { title: string; description?: stri
 
 export async function checkInExperimentDay(experimentId: string) {
   const { supabase, user } = await requireUser()
-  const today = new Date().toISOString().slice(0, 10)
+  const today = (await localToday())
   const { data: existing } = await supabase
     .from('experiment_checkins')
     .select('id')
@@ -1952,7 +1953,7 @@ export async function enrollInCourse(slug: string = COURSE_SLUG) {
   const { error } = await supabase
     .from('course_enrollments')
     .upsert(
-      { user_id: user.id, course_slug: slug, started_on: toISODate(), is_active: true, completed_at: null },
+      { user_id: user.id, course_slug: slug, started_on: (await localToday()), is_active: true, completed_at: null },
       { onConflict: 'user_id,course_slug' },
     )
   if (error) return { error: error.message }
@@ -2076,7 +2077,7 @@ export async function logFood(input: {
     fat_g: round1(input.fat),
     meal_slot: input.mealSlot ?? null,
     member_id: input.memberId ?? null,
-    date: input.date ?? toISODate(),
+    date: input.date ?? (await localToday()),
     servings: 1,
   })
   if (error) return { error: error.message }
@@ -2100,7 +2101,7 @@ export async function logRecipeMeal(recipeId: string, servings = 1) {
     protein_g: round1((recipe?.protein_g ?? 0) * servings),
     carbs_g: round1((recipe?.carbs_g ?? 0) * servings),
     fat_g: round1((recipe?.fat_g ?? 0) * servings),
-    date: toISODate(),
+    date: (await localToday()),
   })
   if (error) return { error: error.message }
   await bumpStreak(user.id)
@@ -2167,6 +2168,7 @@ export async function logFoods(
   if (readError) return { error: readError.message }
   const byId = new Map((foods ?? []).map((f) => [f.id as string, f]))
 
+  const today = await localToday()
   const rows = entries.flatMap((e) => {
     const f = byId.get(e.foodItemId)
     if (!f || !(f.serving_size > 0) || !(e.quantity > 0)) return []
@@ -2185,7 +2187,7 @@ export async function logFoods(
         fat_g: round1(f.fat_g * factor),
         meal_slot: mealSlot ?? null,
         member_id: memberId ?? null,
-        date: toISODate(),
+        date: today,
         servings: 1,
       },
     ]
@@ -2306,7 +2308,7 @@ export async function addLearningItem(input: { memberId: string | null; subject:
 
 export async function toggleLearningItem(itemId: string) {
   const { supabase, user } = await requireUser()
-  const today = toISODate()
+  const today = (await localToday())
   const { data: existing } = await supabase
     .from('learning_completions')
     .select('id')
@@ -2500,7 +2502,7 @@ export async function logMeasurement(input: {
   const row = {
     user_id: user.id,
     member_id: input.memberId ?? null,
-    date: input.date ?? toISODate(),
+    date: input.date ?? (await localToday()),
     weight_kg: kg,
     waist_cm: input.waist ?? null,
     hips_cm: input.hips ?? null,
@@ -2553,7 +2555,7 @@ export async function addMoneyEntry(input: { kind: string; amount: number; categ
     amount: input.amount,
     category: input.category?.trim() || null,
     note: input.note?.trim() || null,
-    date: input.date ?? toISODate(),
+    date: input.date ?? (await localToday()),
   })
   if (error) return { error: error.message }
   await bumpStreak(user.id)

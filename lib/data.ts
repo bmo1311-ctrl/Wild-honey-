@@ -39,6 +39,7 @@ import type {
 } from '@/lib/types'
 import { suggestProtocol } from '@/lib/protocols'
 import { COURSE_SLUG, currentDayFrom, getCourse } from '@/lib/courses'
+import { localToday } from '@/lib/today'
 import type { CourseEnrollment, CourseWriting } from '@/lib/courses'
 import type { FoodItem, HouseholdMember, LearningItem, PublicProfile } from '@/lib/types'
 import { sumNutrients, type NutrientMap } from '@/lib/nutrients'
@@ -101,7 +102,7 @@ export async function getTodayPrompt(): Promise<Prompt | null> {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const today = new Date().toISOString().slice(0, 10)
+  const today = (await localToday())
   const { data: pool } = await supabase.from('prompts').select('*').lte('date_scheduled', today).order('date_scheduled', { ascending: false })
   const candidates = (pool as Prompt[]) ?? []
   if (candidates.length === 0) return null
@@ -348,8 +349,8 @@ export async function getRetreats(): Promise<Retreat[]> {
   return retreats.map((r) => ({ ...r, signed_up: mine.has(r.id), my_group_membership: r.group_id ? myGroupIds.has(r.group_id) : false }))
 }
 
-function todayStr(): string {
-  return new Date().toISOString().slice(0, 10)
+async function todayStr(): Promise<string> {
+  return localToday()
 }
 
 export async function getTodayCheckin(): Promise<Checkin | null> {
@@ -358,7 +359,7 @@ export async function getTodayCheckin(): Promise<Checkin | null> {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) return null
-  const { data } = await supabase.from('checkins').select('*').eq('user_id', user.id).eq('date', todayStr()).maybeSingle()
+  const { data } = await supabase.from('checkins').select('*').eq('user_id', user.id).eq('date', (await todayStr())).maybeSingle()
   return (data as Checkin) ?? null
 }
 
@@ -384,7 +385,7 @@ export async function getTodayMorningReset(): Promise<MorningReset | null> {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) return null
-  const { data } = await supabase.from('morning_resets').select('*').eq('user_id', user.id).eq('date', todayStr()).maybeSingle()
+  const { data } = await supabase.from('morning_resets').select('*').eq('user_id', user.id).eq('date', (await todayStr())).maybeSingle()
   return (data as MorningReset) ?? null
 }
 
@@ -394,7 +395,7 @@ export async function getTodayEveningReflection(): Promise<EveningReflection | n
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) return null
-  const { data } = await supabase.from('evening_reflections').select('*').eq('user_id', user.id).eq('date', todayStr()).maybeSingle()
+  const { data } = await supabase.from('evening_reflections').select('*').eq('user_id', user.id).eq('date', (await todayStr())).maybeSingle()
   return (data as EveningReflection) ?? null
 }
 
@@ -1053,7 +1054,7 @@ export async function getLearningItems(memberId: string | null): Promise<Learnin
   const items = (ok(await q.order('subject', { ascending: true }).order('position', { ascending: true })) as LearningItem[]) ?? []
   if (items.length === 0) return []
 
-  const today = new Date().toISOString().slice(0, 10)
+  const today = (await localToday())
   const done = ok(
     await supabase
       .from('learning_completions')
@@ -1194,7 +1195,7 @@ export async function getDayProgress(slug: string = COURSE_SLUG): Promise<{ day_
 export async function getCurrentDay(slug: string = COURSE_SLUG): Promise<number | null> {
   const enrollment = await getEnrollment(slug)
   const course = getCourse(slug)
-  return enrollment && course ? currentDayFrom(course, enrollment.started_on) : null
+  return enrollment && course ? currentDayFrom(course, enrollment.started_on, await localToday()) : null
 }
 
 /** Every course she is enrolled in, most recently started first. */
@@ -1231,7 +1232,7 @@ export async function getCourseState(slug: string = COURSE_SLUG): Promise<{
   const enrollment = await getEnrollment(slug)
   if (!enrollment || !course) return { enrollment: null, currentDay: null, completedDays: [] }
   const completedDays = await getCompletedDays(slug)
-  return { enrollment, currentDay: currentDayFrom(course, enrollment.started_on), completedDays }
+  return { enrollment, currentDay: currentDayFrom(course, enrollment.started_on, await localToday()), completedDays }
 }
 
 /** The course she is actually on right now: the most recently started. */
@@ -1381,7 +1382,7 @@ export async function getTodayNutrition(memberId?: string | null): Promise<{
   } = await supabase.auth.getUser()
   if (!user) return { calories: 0, protein: 0, carbs: 0, fat: 0, nutrients: {}, calorieGoal: null, proteinGoal: null, loggedMeals: [] }
 
-  const today = new Date().toISOString().slice(0, 10)
+  const today = (await localToday())
   let logQuery = supabase.from('meal_logs').select('*, recipe:recipes(*)').eq('user_id', user.id).eq('date', today)
   // null member_id is the account holder, so her existing rows stay hers.
   logQuery = memberId ? logQuery.eq('member_id', memberId) : logQuery.is('member_id', null)

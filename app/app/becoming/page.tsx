@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Check, Flame, Lock } from 'lucide-react'
 import { getCourse, currentDayFrom, weekOfDay } from '@/lib/courses'
+import { localToday } from '@/lib/today'
 import { computeBecoming, computeMilestones, computeStreaks } from '@/lib/rewards'
 import { getActiveCourseState, getBaselineVitality, getDayProgress, getLatestVitalityCheckin, getWritings } from '@/lib/data'
 import { VITALITY_DIMENSIONS } from '@/lib/honey-profile'
@@ -37,7 +38,7 @@ export default async function BecomingPage() {
     .map((w) => ({ day_number: w.day_number, value: Number(w.body) }))
 
   const course = getCourse(active.slug)
-  const currentDay = active.enrollment && course ? currentDayFrom(course, active.enrollment.started_on) : 0
+  const currentDay = active.enrollment && course ? currentDayFrom(course, active.enrollment.started_on, await localToday()) : 0
   const weeksReached = currentDay && course ? weekOfDay(course, currentDay) : 0
 
   const streaks = computeStreaks(progress)

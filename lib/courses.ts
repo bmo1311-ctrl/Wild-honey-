@@ -99,9 +99,9 @@ export function clampDay(course: Course, day: number): number {
  * read as plain calendar days so a member who opens the app at 11pm and
  * again at 7am the next morning moves exactly one day, regardless of zone.
  */
-export function currentDayFrom(course: Course, startedOn: string, today = new Date()): number {
+export function currentDayFrom(course: Course, startedOn: string, todayISO?: string): number {
   const start = Date.parse(`${startedOn.slice(0, 10)}T00:00:00Z`)
-  const now = Date.parse(`${toISODate(today)}T00:00:00Z`)
+  const now = Date.parse(`${(todayISO ?? toISODate()).slice(0, 10)}T00:00:00Z`)
   if (Number.isNaN(start) || Number.isNaN(now)) return 1
   const elapsed = Math.floor((now - start) / 86_400_000)
   return clampDay(course, elapsed + 1)

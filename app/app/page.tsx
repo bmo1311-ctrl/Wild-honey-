@@ -5,7 +5,8 @@ import { BaselineCardLink } from '@/components/baseline-card'
 import { nudgesFor } from '@/lib/nudges'
 import { suggestHabits } from '@/lib/habit-suggestions'
 import { todayRows } from '@/lib/modules'
-import { getCourse, getDay, toISODate, weekOfDay } from '@/lib/courses'
+import { getCourse, getDay, weekOfDay } from '@/lib/courses'
+import { localHour, localToday } from '@/lib/today'
 import { CourseSwitcher } from '@/components/course/course-switcher'
 import { buildActivity, consistency, streaksFrom } from '@/lib/activity'
 import { QuickAddHabit } from '@/components/quick-add-habit'
@@ -42,10 +43,10 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
   ])
 
   const course = getCourse(slug)
+  const today = await localToday()
   const activity = buildActivity(activityDates)
-  const streaks = streaksFrom(activity)
-  const week = consistency(activity, 7)
-  const today = toISODate()
+  const streaks = streaksFrom(activity, today)
+  const week = consistency(activity, 7, today)
   const day = course && currentDay ? getDay(course, currentDay) : null
   const dayDone = currentDay ? completedDays.includes(currentDay) : false
   const pct = course ? Math.round((completedDays.length / course.length_days) * 100) : 0
@@ -58,7 +59,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
   const lastCheckin = recentCheckins[recentCheckins.length - 1]?.date ?? null
   const daysSinceCheckin = lastCheckin ? Math.floor((Date.parse(today) - Date.parse(lastCheckin)) / 86_400_000) : null
   const nudges = nudgesFor({
-    hour: new Date().getHours(),
+    hour: await localHour(),
     courseDay: day ? { number: day.day_number, slug } : null,
     courseDayDone: dayDone,
     mealsLogged: nutrition.loggedMeals.length,

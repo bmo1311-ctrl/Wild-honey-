@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Wordmark } from '@/components/logo'
 import { BottomNav } from '@/components/bottom-nav'
+import { TzCookie } from '@/components/tz-cookie'
 import { BloomAvatar } from '@/components/bloom-avatar'
 import { OneSignalInit } from '@/components/onesignal-init'
 import { getSessionProfile } from '@/lib/data'
@@ -42,6 +43,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </header>
       <main className="mx-auto max-w-2xl px-5 py-6">{children}</main>
       <BottomNav />
+      <TzCookie />
     </div>
   )
 }
