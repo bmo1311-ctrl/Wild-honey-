@@ -1,5 +1,7 @@
 import { ProtocolCard } from '@/components/protocol-card'
 import { ProtocolTracker } from '@/components/protocol-tracker'
+import { ProtocolNav } from '@/components/protocol-nav'
+import { ProtocolChooser } from '@/components/protocol-chooser'
 import { RoutineShelf } from '@/components/routine-shelf'
 import { TonightCard } from '@/components/tonight-card'
 import {
@@ -11,6 +13,7 @@ import {
   getTodayCheckin,
 } from '@/lib/data'
 import { PROTOCOLS, getProtocol, suggestProtocol } from '@/lib/protocols'
+import { AREAS, getArea, type ProtocolArea } from '@/lib/domains'
 import type { ShelfItem } from '@/lib/routine'
 import { planTonight } from '@/lib/tonight'
 import { localToday } from '@/lib/today'
@@ -18,36 +21,112 @@ import { FeatureOff } from '@/components/feature-off'
 import { FEATURES } from '@/lib/features'
 
 /**
- * Two different things live here, and keeping them apart matters.
+ * Protocols, one area at a time.
  *
- * Resets are time-boxed — five days, then done. Routines never end: they are
- * rebuilt every time she buys something, and they change with the season and
- * her cycle. Treating a skincare routine as a five-day protocol would have
- * fought the model forever.
+ * It used to open straight into skincare, which assumed she came for
+ * skincare — she might have come for her hair, or because the week went
+ * sideways and she wants a reset. Now the area is a choice held in the URL,
+ * and everything else is filtered away.
+ *
+ * The choice is only asked once. After that the page opens where her things
+ * already are, because asking someone the same question every visit is its
+ * own kind of friction.
  */
-export default async function ProtocolsPage() {
+export default async function ProtocolsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ area?: string }>
+}) {
   if (!FEATURES.protocols) return <FeatureOff />
 
-  const [enrollment, todayCheckin, products, profile, log, today] = await Promise.all([
+  const [{ area: requested }, enrollment, todayCheckin, allProducts, profile, log, today] = await Promise.all([
+    searchParams,
     getActiveEnrollment(),
     getTodayCheckin(),
-    getMemberProducts('skin'),
+    getMemberProducts(),
     getSessionProfile(),
     getRoutineLog(30),
     localToday(),
   ])
-  const completions = enrollment ? await getEnrollmentCompletions(enrollment.id) : []
-  const activeProtocol = enrollment ? getProtocol(enrollment.protocol_slug) : null
-  const suggestedSlug = suggestProtocol(todayCheckin)
 
-  const shelf: ShelfItem[] = products.map((p) => ({
-    id: p.id,
-    name: p.custom_name ?? p.product?.name ?? 'a product',
-    category: p.category ?? p.product?.category ?? null,
-    actives: p.actives?.length ? p.actives : (p.product?.actives ?? []),
-    timeOfDay: p.time_of_day,
-    frequencyPerWeek: p.frequency_per_week,
-  }))
+  const counts: Record<string, number> = {}
+  for (const p of allProducts) counts[p.domain] = (counts[p.domain] ?? 0) + 1
+  if (enrollment) counts.resets = 1
+
+  // Where to open when she has not said: wherever her things already are.
+  const busiest = AREAS.filter((a) => a.key !== 'resets')
+    .map((a) => ({ key: a.key, n: counts[a.key] ?? 0 }))
+    .sort((a, b) => b.n - a.n)[0]
+  const inferred: string | null =
+    busiest && busiest.n > 0 ? busiest.key : enrollment ? 'resets' : null
+
+  const area = getArea(requested ?? inferred ?? undefined)
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <h1 className="font-serif text-3xl font-semibold">Protocols</h1>
+        <p className="mt-1 text-sm text-muted-foreground text-pretty">
+          resets for a season that needs one, routines for the things you do anyway.
+        </p>
+      </div>
+
+      {/* Nothing set up anywhere yet — ask before assuming. */}
+      {!area ? (
+        <ProtocolChooser />
+      ) : (
+        <>
+          <ProtocolNav active={area.key} counts={counts} />
+
+          <div>
+            <h2 className="font-serif text-lg font-semibold">{area.label}</h2>
+            <p className="mt-0.5 text-sm text-muted-foreground text-pretty">{area.blurb}</p>
+          </div>
+
+          {area.key === 'resets' ? (
+            <ResetsArea enrollment={enrollment} todayCheckin={todayCheckin} />
+          ) : (
+            <BeautyArea
+              areaKey={area.key as ProtocolArea}
+              categories={area.categories}
+              allProducts={allProducts}
+              profile={profile}
+              log={log}
+              today={today}
+            />
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+/** One beauty area: tonight, the routine, and the shelf behind it. */
+function BeautyArea({
+  areaKey,
+  categories,
+  allProducts,
+  profile,
+  log,
+  today,
+}: {
+  areaKey: ProtocolArea
+  categories: string[]
+  allProducts: Awaited<ReturnType<typeof getMemberProducts>>
+  profile: Awaited<ReturnType<typeof getSessionProfile>>
+  log: Awaited<ReturnType<typeof getRoutineLog>>
+  today: string
+}) {
+  const shelf: ShelfItem[] = allProducts
+    .filter((p) => p.domain === areaKey)
+    .map((p) => ({
+      id: p.id,
+      name: p.custom_name ?? p.product?.name ?? 'a product',
+      category: p.category ?? p.product?.category ?? null,
+      actives: p.actives?.length ? p.actives : (p.product?.actives ?? []),
+      timeOfDay: p.time_of_day,
+      frequencyPerWeek: p.frequency_per_week,
+    }))
 
   const tonight = shelf.length > 0 ? planTonight({ shelf, log, today, allergies: profile?.allergies }) : null
   const doneTonight = log.some(
@@ -59,62 +138,52 @@ export default async function ProtocolsPage() {
   )
 
   return (
-    <div className="flex flex-col gap-10">
-      <div>
-        <h1 className="font-serif text-3xl font-semibold">Protocols</h1>
-        <p className="mt-1 text-sm text-muted-foreground text-pretty">
-          resets for a season that needs one, routines for the things you do anyway.
-        </p>
+    <div className="flex flex-col gap-5">
+      {/*
+        Where we stand on ingredients, said once. "Clean" is unregulated — any
+        brand can print it, and plenty charge for the word.
+      */}
+      <p className="rounded-2xl bg-muted p-4 text-sm leading-relaxed text-pretty">
+        <span className="font-medium">effective, transparent, affordable.</span>{' '}
+        &ldquo;clean&rdquo; has no legal meaning — any brand can print it, and many charge you for
+        the word. what matters is what is actually in the bottle, at a strength that does
+        something, at a price you can keep paying.
+      </p>
+
+      {tonight && <TonightCard plan={tonight} doneToday={doneTonight} />}
+
+      <RoutineShelf
+        shelf={shelf}
+        lifeStage={profile?.life_stage ?? null}
+        domain={areaKey}
+        categories={categories}
+      />
+    </div>
+  )
+}
+
+/** The time-boxed side: five days, then done. */
+async function ResetsArea({
+  enrollment,
+  todayCheckin,
+}: {
+  enrollment: Awaited<ReturnType<typeof getActiveEnrollment>>
+  todayCheckin: Awaited<ReturnType<typeof getTodayCheckin>>
+}) {
+  const completions = enrollment ? await getEnrollmentCompletions(enrollment.id) : []
+  const activeProtocol = enrollment ? getProtocol(enrollment.protocol_slug) : null
+  const suggestedSlug = suggestProtocol(todayCheckin)
+
+  return (
+    <div className="flex flex-col gap-4">
+      {enrollment && activeProtocol && (
+        <ProtocolTracker enrollment={enrollment} protocol={activeProtocol} completions={completions} />
+      )}
+      <div className="grid gap-4 sm:grid-cols-2">
+        {PROTOCOLS.filter((p) => p.slug !== enrollment?.protocol_slug).map((p) => (
+          <ProtocolCard key={p.slug} protocol={p} suggested={!enrollment && p.slug === suggestedSlug} />
+        ))}
       </div>
-
-      {/* Routines — ongoing, rebuilt from what she owns. */}
-      <section>
-        <h2 className="font-serif text-lg font-semibold">Skin</h2>
-        <p className="mt-0.5 text-sm text-muted-foreground text-pretty">
-          your products, in the order they actually go on.
-        </p>
-
-        {/*
-          Where we stand on this, said once and plainly.
-
-          "Clean" is unregulated — any brand can print it, and plenty charge a
-          premium for the word. Naming what actually matters gives a member
-          something she can use in a shop, instead of something to be afraid of.
-        */}
-        <p className="mb-4 mt-3 rounded-2xl bg-muted p-4 text-sm leading-relaxed text-pretty">
-          <span className="font-medium">effective, transparent, affordable.</span>{' '}
-          &ldquo;clean&rdquo; has no legal meaning — any brand can print it, and many charge you
-          for the word. what matters is what is actually in the bottle, at a strength that does
-          something, at a price you can keep paying. the same retinoid sits in a twelve dollar
-          bottle and a ninety dollar one.
-        </p>
-        {tonight && (
-          <div className="mb-5">
-            <TonightCard plan={tonight} doneToday={doneTonight} />
-          </div>
-        )}
-        <RoutineShelf shelf={shelf} lifeStage={profile?.life_stage ?? null} />
-      </section>
-
-      {/* Resets — time-boxed, and they end. */}
-      <section>
-        <h2 className="font-serif text-lg font-semibold">Resets</h2>
-        <p className="mb-4 mt-0.5 text-sm text-muted-foreground text-pretty">
-          a few days of small changes, for when something needs turning around.
-        </p>
-
-        {enrollment && activeProtocol && (
-          <div className="mb-4">
-            <ProtocolTracker enrollment={enrollment} protocol={activeProtocol} completions={completions} />
-          </div>
-        )}
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          {PROTOCOLS.filter((p) => p.slug !== enrollment?.protocol_slug).map((p) => (
-            <ProtocolCard key={p.slug} protocol={p} suggested={!enrollment && p.slug === suggestedSlug} />
-          ))}
-        </div>
-      </section>
     </div>
   )
 }

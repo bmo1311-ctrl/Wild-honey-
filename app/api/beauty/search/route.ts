@@ -29,6 +29,7 @@ export interface SearchHit {
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const term = (searchParams.get('q') ?? '').trim()
+  const domain = searchParams.get('domain') ?? 'skin'
   if (term.length < 2) return NextResponse.json({ hits: [] })
 
   const supabase = await createClient()
@@ -44,6 +45,7 @@ export async function GET(req: Request) {
     .from('beauty_products')
     .select('barcode, name, brand, actives, ingredients_raw')
     .ilike('name', `%${term}%`)
+    .eq('domain', domain)
     .limit(6)
 
   for (const p of mine ?? []) {

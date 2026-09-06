@@ -14,19 +14,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { BarcodeScanner } from '@/components/barcode-scanner'
 import type { SearchHit } from '@/app/api/beauty/search/route'
 
-const CATEGORIES = [
-  'cleanser',
-  'toner',
-  'essence',
-  'exfoliant',
-  'serum',
-  'treatment',
-  'eye',
-  'moisturizer',
-  'oil',
-  'spf',
-]
-
 const STAGES: { value: 'none' | 'pregnant' | 'trying' | 'breastfeeding'; label: string }[] = [
   { value: 'none', label: 'not right now' },
   { value: 'pregnant', label: 'pregnant' },
@@ -37,17 +24,23 @@ const STAGES: { value: 'none' | 'pregnant' | 'trying' | 'breastfeeding'; label: 
 export function RoutineShelf({
   shelf,
   lifeStage,
+  domain = 'skin',
+  categories,
 }: {
   shelf: ShelfItem[]
   lifeStage: LifeStage
+  domain?: string
+  /** Which product kinds belong in this area, in application order. */
+  categories: string[]
 }) {
+  const CATEGORIES = categories
   const [adding, setAdding] = useState(false)
   const [scanning, setScanning] = useState(false)
   const [scanNote, setScanNote] = useState<string | null>(null)
   const [barcode, setBarcode] = useState<string | null>(null)
   const [ingredients, setIngredients] = useState<string | null>(null)
   const [name, setName] = useState('')
-  const [category, setCategory] = useState('serum')
+  const [category, setCategory] = useState(categories[0] ?? 'serum')
   const [picked, setPicked] = useState<string[]>([])
   const [pasting, setPasting] = useState(false)
   const [pasted, setPasted] = useState('')
@@ -78,7 +71,7 @@ export function RoutineShelf({
     const timer = setTimeout(async () => {
       setSearching(true)
       try {
-        const res = await fetch(`/api/beauty/search?q=${encodeURIComponent(term)}`)
+        const res = await fetch(`/api/beauty/search?q=${encodeURIComponent(term)}&domain=${domain}`)
         const data = await res.json()
         if (!cancelled) setHits(data.hits ?? [])
       } catch {
@@ -91,7 +84,7 @@ export function RoutineShelf({
       cancelled = true
       clearTimeout(timer)
     }
-  }, [name, adding, barcode])
+  }, [name, adding, barcode, domain])
 
   /** Picking a result fills everything in at once. */
   function chooseHit(hit: SearchHit) {
@@ -173,7 +166,7 @@ export function RoutineShelf({
         name,
         category,
         actives: picked,
-        domain: 'skin',
+        domain,
         barcode: barcode ?? undefined,
         ingredientsRaw: ingredients ?? undefined,
       })
