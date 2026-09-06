@@ -3,6 +3,7 @@
 import { useTransition } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { fallbackLinkFor } from '@/lib/payment-links'
 
 export function BuyButton({
   productId,
@@ -32,8 +33,14 @@ export function BuyButton({
           window.location.href = data.url
           return
         }
+        // No API keys yet — fall back to the hand-made Square link.
         if (data.notConfigured) {
-          toast.info('Payments aren\u2019t connected yet \u2014 add your Square keys to enable checkout.')
+          const link = fallbackLinkFor(kind, billing)
+          if (link) {
+            window.location.href = link
+            return
+          }
+          toast.info('Payments aren\u2019t connected yet.')
           return
         }
         toast.error(data.error ?? 'Something went wrong starting checkout.')

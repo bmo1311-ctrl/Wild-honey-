@@ -35,11 +35,10 @@ export async function POST(req: Request) {
     if (kind === 'membership') {
       const cycle = billing === 'annual' ? 'annual' : 'monthly'
       const planVariationId = planVariationFor(cycle)
+      // Without a plan variation there is nothing to subscribe to, so hand
+      // the button back to the fixed Square link rather than failing.
       if (!planVariationId) {
-        return NextResponse.json(
-          { error: 'Membership pricing is not set up yet. Add SQUARE_PLAN_MONTHLY / SQUARE_PLAN_ANNUAL.' },
-          { status: 400 },
-        )
+        return NextResponse.json({ notConfigured: true }, { status: 200 })
       }
       const link = await createPaymentLink({
         name: cycle === 'annual' ? 'Wild Honey Circle — yearly' : 'Wild Honey Circle — monthly',
