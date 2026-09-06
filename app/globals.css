@@ -28,6 +28,16 @@
   --color-background: var(--background);
 
   --color-honey: var(--honey);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-icy-blue: var(--icy-blue);
+  --color-icy-blue-deep: var(--icy-blue-deep);
+  --color-icy-blue-tint: var(--icy-blue-tint);
+  --color-icy-blue-line: var(--icy-blue-line);
+  --color-honey-glow: var(--honey-glow);
+  --color-pink: var(--pink);
   --color-honey-foreground: var(--honey-foreground);
   --color-body-pillar: var(--pillar-body);
   --color-identity-pillar: var(--pillar-identity);
@@ -44,43 +54,56 @@
 
 :root {
   color-scheme: light;
-  /* Bright Winter palette — cool, clear, high contrast. No warm/muted tones. */
-  --background: oklch(0.99 0.003 240);
-  --foreground: oklch(0.16 0.015 255);
-  --card: oklch(0.995 0.002 240);
-  --card-foreground: oklch(0.16 0.015 255);
-  --popover: oklch(0.995 0.002 240);
-  --popover-foreground: oklch(0.16 0.015 255);
-  --primary: oklch(0.55 0.22 25);
-  --primary-foreground: oklch(0.99 0.003 240);
-  --secondary: oklch(0.95 0.015 235);
-  --secondary-foreground: oklch(0.22 0.03 250);
-  --muted: oklch(0.96 0.008 235);
-  --muted-foreground: oklch(0.45 0.02 250);
-  --accent: oklch(0.85 0.07 225);
-  --accent-foreground: oklch(0.18 0.04 250);
-  --destructive: oklch(0.55 0.22 25);
-  --border: oklch(0.9 0.012 235);
-  --input: oklch(0.9 0.012 235);
-  --ring: oklch(0.55 0.22 25);
+  /* Bright Winter — her tokens, verbatim */
+  --ink: oklch(0.18 0.02 265);
+  --ink-soft: oklch(0.48 0.018 262);
+  --bg: oklch(0.985 0.004 250);
+  --surface: oklch(1 0 0);
+  --line: oklch(0.9 0.008 250);
+  --icy-blue: oklch(0.68 0.17 235);
+  --icy-blue-deep: oklch(0.45 0.16 250);
+  --icy-blue-tint: oklch(0.955 0.04 235);
+  --icy-blue-line: oklch(0.82 0.09 235);
+  --honey-glow: oklch(0.9 0.12 76);
+  --pink: oklch(0.53 0.14 38);
 
-  --honey: oklch(0.72 0.1 225);
-  --honey-foreground: oklch(0.16 0.02 250);
+  /* the app's semantic variables, mapped onto them */
+  --background: var(--bg);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+  --primary: var(--icy-blue-deep);
+  --primary-foreground: oklch(0.99 0.003 250);
+  --secondary: var(--icy-blue-tint);
+  --secondary-foreground: var(--ink);
+  --muted: oklch(0.96 0.008 250);
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--icy-blue-tint);
+  --accent-foreground: var(--icy-blue-deep);
+  --destructive: oklch(0.55 0.2 25);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--icy-blue-deep);
 
-  --pillar-body: oklch(0.55 0.15 155);
-  --pillar-identity: oklch(0.55 0.22 25);
-  --pillar-mindset: oklch(0.5 0.18 255);
+  --honey: var(--icy-blue);
+  --honey-foreground: oklch(0.99 0.003 250);
+
+  --pillar-body: oklch(0.52 0.16 165);
+  --pillar-identity: var(--pink);
+  --pillar-mindset: var(--icy-blue-deep);
   --pillar-faith: oklch(0.5 0.2 335);
 
-  --chart-1: oklch(0.55 0.22 25);
-  --chart-2: oklch(0.55 0.15 155);
-  --chart-3: oklch(0.5 0.18 255);
+  --chart-1: var(--icy-blue-deep);
+  --chart-2: oklch(0.52 0.16 165);
+  --chart-3: var(--pink);
   --chart-4: oklch(0.5 0.2 335);
-  --chart-5: oklch(0.45 0.02 250);
+  --chart-5: var(--ink-soft);
   --radius: 0.6rem;
 
-  --founder: oklch(0.16 0.015 255);
-  --founder-foreground: oklch(0.99 0.003 240);
+  --founder: var(--ink);
+  --founder-foreground: oklch(0.99 0.003 250);
 }
 
 .dark {
