@@ -82,7 +82,7 @@ export const ACTIVES: Active[] = [
     label: 'Benzoyl peroxide',
     aliases: ['benzoyl peroxide'],
     timeOfDay: 'any',
-    conflictsWith: ['retinoid', 'vitamin-c'],
+    conflictsWith: ['retinoid', 'vitamin-c', 'hydroquinone'],
     pregnancyCaution: false,
     note: 'Keep it away from retinoids and vitamin C — it breaks both down.',
   },

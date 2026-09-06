@@ -115,8 +115,9 @@ export function buildRoutines(shelf: ShelfItem[], lifeStage: LifeStage): { am: R
         cadence: slot === 'pm' ? cadenceFor(i, conflicted) : undefined,
       }))
 
-    // Conflicts only really matter in the evening, where the actives live.
-    const cautions = [...(slot === 'pm' ? conflicts : []), ...findLifeStageCautions(actives, lifeStage)]
+    // Conflicts matter in both slots. Vitamin C and benzoyl peroxide clash in
+    // the morning, and saying nothing there was a real gap.
+    const cautions = [...conflicts, ...findLifeStageCautions(actives, lifeStage)]
 
     return { slot, steps, cautions }
   }

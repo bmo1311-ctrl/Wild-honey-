@@ -15,6 +15,15 @@ import { getActive } from '@/lib/actives'
 import { ritualFor, type Ritual } from '@/lib/rituals'
 import type { ShelfItem } from '@/lib/routine'
 
+/**
+ * Most strong nights allowed in any rolling seven.
+ *
+ * Without this, a shelf with four actives has something "due" every single
+ * night and the barrier never recovers — which is the exact over-treatment
+ * this feature exists to prevent. Three nights off a week is the floor.
+ */
+const MAX_STRONG_NIGHTS_PER_WEEK = 4
+
 /** Minimum nights between uses, by active. Longer for the harsher ones. */
 const MIN_GAP_NIGHTS: Record<string, number> = {
   retinoid: 2,
@@ -96,12 +105,24 @@ export function planTonight(input: {
     .filter((i) => !i.actives.some(isStrong) && i.category !== 'spf')
     .map((i) => ({ id: i.id, name: i.name }))
 
+  // How hard the last week has already been on her skin.
+  const strongIds = new Set(strong.map((s) => s.item.id))
+  const weekAgo = new Date(today)
+  weekAgo.setDate(weekAgo.getDate() - 6)
+  const weekAgoStr = weekAgo.toISOString().slice(0, 10)
+  const strongThisWeek = log.filter(
+    (e) => e.memberProductId && strongIds.has(e.memberProductId) && e.date >= weekAgoStr && e.date <= today,
+  ).length
+
   const waiting = notDue.map((s) => ({
     name: s.item.name,
     nightsAway: s.gap - (s.since ?? 0),
   }))
 
-  if (due.length > 0) {
+  // Earned rest beats an eligible active. A week is only so long.
+  const restEarned = strongThisWeek >= MAX_STRONG_NIGHTS_PER_WEEK
+
+  if (due.length > 0 && !restEarned) {
     // Most overdue first; a brand-new product goes ahead of a merely-due one.
     due.sort((a, b) => (b.since ?? 99) - (a.since ?? 99))
     const pick = due[0]
@@ -122,13 +143,17 @@ export function planTonight(input: {
 
   const soonest = waiting.slice().sort((a, b) => a.nightsAway - b.nightsAway)[0]
   const ritual = ritualFor(today, allergies)
+  const reason = restEarned
+    ? `${spell(strongThisWeek)} strong nights already this week. tonight your skin gets one back.`
+    : soonest
+      ? `nothing strong is due tonight — ${soonest.name.toLowerCase()} comes back in ${spell(soonest.nightsAway)}. tonight is for putting back what the week took.`
+      : 'a gentle night. this is where the repair actually happens.'
+
   return {
     kind: 'nourish',
     ritual: ritual ?? undefined,
     alongside,
-    reason: soonest
-      ? `nothing strong is due tonight — ${soonest.name.toLowerCase()} comes back in ${spell(soonest.nightsAway)}. tonight is for putting back what the week took.`
-      : 'a gentle night. this is where the repair actually happens.',
+    reason,
     waiting,
   }
 }
