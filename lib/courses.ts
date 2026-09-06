@@ -55,6 +55,17 @@ export interface Course {
    * (day-1)/7+1 formula puts them in a week five that does not exist.
    */
   week_from_day?: boolean
+  /**
+   * Which weekdays the course advances on (0 = Sunday … 6 = Saturday). Absent
+   * means every day. The Honest Room is written four days a week, so it moves
+   * Monday to Thursday and holds still Friday to Sunday.
+   */
+  cadence?: { weekdays: number[] }
+}
+
+/** Pacing lives here, beside the registry, so the content files stay content. */
+const CADENCE: Record<string, { weekdays: number[] }> = {
+  'the-honest-room': { weekdays: [1, 2, 3, 4] },
 }
 
 export const COURSES: Course[] = [
@@ -62,7 +73,7 @@ export const COURSES: Course[] = [
   dailyBread as unknown as Course,
   stillWaters as unknown as Course,
   theHonestRoom as unknown as Course,
-]
+].map((c) => (CADENCE[c.slug] ? { ...c, cadence: CADENCE[c.slug] } : c))
 
 export function getCourse(slug: string): Course | null {
   return COURSES.find((c) => c.slug === slug) ?? null
@@ -108,7 +119,22 @@ export function currentDayFrom(course: Course, startedOn: string, todayISO?: str
   const now = Date.parse(`${(todayISO ?? toISODate()).slice(0, 10)}T00:00:00Z`)
   if (Number.isNaN(start) || Number.isNaN(now)) return 1
   const elapsed = Math.floor((now - start) / 86_400_000)
-  return clampDay(course, elapsed + 1)
+  if (!course.cadence) return clampDay(course, elapsed + 1)
+  // The day she starts is always day one. After that, only the set weekdays
+  // count, so a four-day course takes its full ten weeks.
+  const on = new Set(course.cadence.weekdays)
+  let day = 1
+  for (let i = 1; i <= elapsed; i++) {
+    if (on.has(new Date(start + i * 86_400_000).getUTCDay())) day++
+  }
+  return clampDay(course, day)
+}
+
+/** True when the course does not move today — a rest day in a paced course. */
+export function isRestDay(course: Course, todayISO: string): boolean {
+  if (!course.cadence) return false
+  const t = Date.parse(`${todayISO.slice(0, 10)}T00:00:00Z`)
+  return !course.cadence.weekdays.includes(new Date(t).getUTCDay())
 }
 
 export function toISODate(d = new Date()): string {
