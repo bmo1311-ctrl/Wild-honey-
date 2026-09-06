@@ -28,8 +28,8 @@ const INSIDE = [
     body: 'Your money, tracked and taught — because peace is not only spiritual, and most of us were never shown this part.',
   },
   {
-    title: 'A circle, and a seat for your girl',
-    body: 'Women doing the same work, plus a sign-in of her own so she grows up with the habits instead of inheriting the scramble.',
+    title: 'A circle, not a feed',
+    body: 'Women doing the same work, in a room small enough to be known in. And if you have children, a sign-in of their own when you want it.',
   },
 ]
 
@@ -97,9 +97,8 @@ export default function LandingPage() {
           </h1>
           <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground text-pretty">
             Most apps take one piece of you. This one holds all of it — what you eat and how you
-            move, what you believe and what you carry, your money, your home, your daughter.
-            Four pillars, three programs, and a circle of women doing the same. Show up softly.
-            Grow wildly.
+            move, what you believe and what you carry, your money and your home. Four pillars,
+            three programs, and a circle of women doing the same. Show up softly. Grow wildly.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link href="/auth/sign-up" className={cn(buttonVariants(), 'h-12 px-7 text-base')}>
