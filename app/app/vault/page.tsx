@@ -11,7 +11,7 @@ import { FEATURES } from '@/lib/features'
 export default async function WatchPage() {
   if (!FEATURES.vault) return <FeatureOff />
   const access = await getAccess()
-  if (!access.paid) return <LockedArea title="Watch" subtitle="teaching videos on identity, mindset and faith." blurb="The whole library, on shelves that learn what you watch. Part of The Circle." from="watch" />
+  if (!access.paid) return <LockedArea title="Watch" subtitle="teaching videos on identity, mindset and faith." blurb="The whole library, on shelves by pillar and collection. Part of The Circle." from="watch" />
   const [resources, goals, events] = await Promise.all([getResources(), getMyGoals(), getContentEvents()])
   const goalPillars = [...new Set(goals.map((g) => GOAL_PILLAR[g.goal]).filter(Boolean))]
   const videos = buildVaultIndex({ resources, recipes: [], workouts: [] })

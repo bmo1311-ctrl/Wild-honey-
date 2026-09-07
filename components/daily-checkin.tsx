@@ -97,7 +97,7 @@ export function DailyCheckin({ existing, hasBaseline }: { existing: Checkin | nu
       {more ? (
         <div className="rounded-2xl border border-border bg-card p-4">
           <p className="font-serif text-[18px] font-semibold">A bit more</p>
-          <p className="mt-0.5 text-[13px] text-muted-foreground">{hasBaseline ? 'optional — this is what Your becoming compares over time.' : 'this becomes your before. optional, but worth a minute.'}</p>
+          <p className="mt-0.5 text-[13px] text-muted-foreground">{hasBaseline ? 'optional — cycle, movement, and what Your becoming compares over time.' : 'this becomes your before. optional, but worth a minute.'}</p>
           <div className="mt-3 flex flex-col gap-3">
             {MORE.map((m) => (
               <div key={m.key}>
@@ -110,12 +110,6 @@ export function DailyCheckin({ existing, hasBaseline }: { existing: Checkin | nu
               </div>
             ))}
           </div>
-        </div>
-      ) : (
-        <button type="button" onClick={() => setMore(true)} className="self-start text-sm font-medium text-muted-foreground underline underline-offset-[3px]">
-          + mood, confidence, motivation, clarity, strength
-        </button>
-      )}
 
       <div className="rounded-2xl border border-border bg-card p-4">
         <p className="font-serif text-[18px] font-semibold">Where are you in your cycle?</p>
@@ -163,6 +157,13 @@ export function DailyCheckin({ existing, hasBaseline }: { existing: Checkin | nu
           <span className="text-sm text-muted-foreground">minutes</span>
         </div>
       </div>
+        </div>
+      ) : (
+        <button type="button" onClick={() => setMore(true)} className="self-start text-sm font-medium text-muted-foreground underline underline-offset-[3px]">
+          + mood, confidence, motivation, clarity, strength
+        </button>
+      )}
+
 
       <button
         type="button"

@@ -8,12 +8,12 @@ import { PILLAR_META, PILLARS } from '@/lib/pillars'
 
 const INSIDE = [
   {
-    title: 'Three programs',
-    body: 'Strong and Surrendered, Daily Bread, and The Honest Room. Written days, not videos you half-watch. Your writing is the work, and it counts itself.',
+    title: 'Four programs',
+    body: 'Strong and Surrendered, Daily Bread, Still Waters and The Honest Room. Written days, not videos you half-watch. Your writing is the work, and it counts itself.',
   },
   {
-    title: 'A library that learns you',
-    body: 'Teaching on identity, mindset and faith, plus worship and scripture for sleep. The shelves reorder around what you actually watch.',
+    title: 'A library you can actually find things in',
+    body: 'Teaching on identity, mindset and faith, plus worship and scripture for sleep. Sorted so the newest is first, and searchable across everything at once.',
   },
   {
     title: 'Nourish',
@@ -49,7 +49,7 @@ const TIERS = [
     cadence: 'per month',
     tier: 'circle',
     features: [
-      'All three programs, start to finish',
+      'All four programs, start to finish',
       'The whole teaching library',
       'Nourish — recipes, meal plans, grocery, pantry',
       'Every workout, and the routines that keep you well',
@@ -98,7 +98,7 @@ export default function LandingPage() {
           <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground text-pretty">
             Most apps take one piece of you. This one holds all of it — what you eat and how you
             move, what you believe and what you carry, your money and your home. Four pillars,
-            three programs, and a circle of women doing the same. Show up softly. Grow wildly.
+            four programs, and a circle of women doing the same. Show up softly. Grow wildly.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link href="/auth/sign-up" className={cn(buttonVariants(), 'h-12 px-7 text-base')}>

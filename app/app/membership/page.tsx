@@ -23,8 +23,8 @@ const FREE = [
  * One price, one decision.
  */
 const INCLUDED = [
-  'All three programs — Strong and Surrendered, Daily Bread, The Honest Room',
-  'The whole teaching library, on shelves that learn what you watch',
+  'All four programs — Strong and Surrendered, Daily Bread, Still Waters, The Honest Room',
+  'The whole teaching library, searchable across everything at once',
   'Nourish: recipes, meal plans, grocery, pantry and cooking videos',
   'Every workout, and the routines that keep you well',
   'Freedom: your money, tracked and taught',

@@ -144,24 +144,18 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     daysSinceMoney: since(lastMoney),
   })
 
-  if (!enrollment || !currentDay || !course) {
-    return (
-      <div className="flex flex-col gap-6">
-        <header>
-          <h1 className="font-serif text-[29px] font-semibold leading-[1.1] text-balance">Start a program</h1>
-          <p className="mt-2 text-[16.5px] leading-[1.5] text-pretty text-muted-foreground">
-            pick where you&rsquo;re beginning — you can carry more than one.
-          </p>
-        </header>
-        <Link
-          href="/app/program"
-          className="flex h-[58px] items-center justify-center rounded-2xl bg-primary text-[18px] font-bold text-primary-foreground"
-        >
-          See the programs
-        </Link>
-      </div>
-    )
-  }
+  /*
+   * No early return for someone without a course.
+   *
+   * This page used to bail out entirely — a heading, a button, and nothing
+   * else — for anyone who had not started a programme. Which is every new
+   * member, and every paid member who switches a course off. The free tier
+   * is sold as the daily prompt, the journal, food and body logging, and all
+   * of it was invisible behind a button to a locked door.
+   *
+   * The programme is one row among several now, not the price of entry.
+   */
+  const hasCourse = Boolean(enrollment && currentDay && course)
 
   return (
     <div className="flex flex-col gap-6">
@@ -182,13 +176,26 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
         when she opened the app to ask "what do I do now". It all still exists,
         underneath, where it belongs.
       */}
-      {day && (
+      {hasCourse && day ? (
         <Link
           href={`/app/program/${slug}/day/${day.day_number}`}
           className="flex h-[58px] items-center justify-center gap-1.5 rounded-2xl bg-primary text-[18px] font-bold text-primary-foreground"
         >
           Open day {day.day_number}
           <ChevronRight className="h-5 w-5" />
+        </Link>
+      ) : (
+        <Link
+          href="/app/program"
+          className="flex items-center gap-3 rounded-2xl border border-dashed border-border bg-card px-4 py-4"
+        >
+          <span className="min-w-0 flex-1">
+            <span className="block text-[15px] font-semibold">Start a program</span>
+            <span className="mt-0.5 block text-[13px] text-muted-foreground text-pretty">
+              four of them. you can carry more than one, or none.
+            </span>
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
         </Link>
       )}
 
@@ -208,6 +215,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       <TodayChecklist rows={rows} />
       <QuickAddHabit suggestions={habitSuggestions} />
 
+      {hasCourse && (
       <section className="grid grid-cols-4 gap-2">
         {stats.map((s) => (
           <div key={s.label} className="rounded-2xl border border-border bg-card px-2 py-3 text-center">
@@ -220,15 +228,18 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
           </div>
         ))}
       </section>
+      )}
 
+      {hasCourse && course && (
       <section>
         <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
           <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
         </div>
         <p className="mt-1.5 text-xs text-muted-foreground">
-          {completedDays.length} of {course.length_days} days · week {weekOfDay(course, currentDay)} of {course.weeks}
+          {completedDays.length} of {course.length_days} days · week {weekOfDay(course, currentDay!)} of {course.weeks}
         </p>
       </section>
+      )}
 
       <Link href="/app/becoming" className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
         <span className="min-w-0 flex-1">

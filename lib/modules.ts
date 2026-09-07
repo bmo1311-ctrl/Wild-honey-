@@ -148,6 +148,16 @@ export const MODULES: AppModule[] = [
     count: (c) => `${c.workouts} workouts`,
   },
   {
+    key: 'energy',
+    title: 'Energy',
+    href: '/app/energy',
+    icon: Sun,
+    blurb: 'how the weeks have actually felt — trends, wins, and the habits you keep',
+    inLibrary: true,
+    pillar: 'body',
+    count: () => 'your trend',
+  },
+  {
     key: 'body',
     title: 'Body',
     href: '/app/body',
