@@ -1,3 +1,4 @@
+import { AboutYou } from '@/components/about-you'
 import { ProfileEditor } from '@/components/profile-editor'
 import { ProfilePageEditor } from '@/components/profile-page-editor'
 import { PrivacySettings } from '@/components/privacy-settings'
@@ -12,7 +13,7 @@ export default async function SettingsPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="font-serif text-3xl font-semibold">Settings</h1>
-        <p className="mt-1 text-sm text-muted-foreground text-pretty">your name and photo, what Wild Honey sends you, your data, your account.</p>
+        <p className="mt-1 text-sm text-muted-foreground text-pretty">your name and photo, what your body needs flagged, what Wild Honey sends you, your account.</p>
       </div>
       <section>
         <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">name, photo &amp; colour</p>
@@ -23,6 +24,13 @@ export default async function SettingsPage() {
           bio: profile.bio ?? '',
           show: { recipes: !!profile.profile_show?.recipes, progress: !!profile.profile_show?.progress, wins: !!profile.profile_show?.wins },
           colorSeason: profile.color_season ?? null,
+        }}
+      />
+      <AboutYou
+        initial={{
+          lifeStage: profile.life_stage ?? null,
+          allergies: profile.allergies ?? '',
+          foodsAvoided: profile.foods_avoided ?? '',
         }}
       />
       <BlockedMutedList blocked={blocked} muted={muted} />

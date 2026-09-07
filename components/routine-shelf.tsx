@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { Plus, Sun, Moon, X, AlertTriangle, Info, ScanLine, ClipboardPaste, Loader2, Search, Sparkles } from 'lucide-react'
-import { addBeautyProduct, removeBeautyProduct, setLifeStage } from '@/app/actions'
+import { addBeautyProduct, removeBeautyProduct } from '@/app/actions'
 import { ACTIVES, detectActives, getActive, guessCategory } from '@/lib/actives'
 import { buildRoutines, findGaps, type ShelfItem } from '@/lib/routine'
 import type { LifeStage } from '@/lib/actives'
@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { BarcodeScanner } from '@/components/barcode-scanner'
 import { BEAUTY_AREAS } from '@/lib/domains'
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import type { SearchHit } from '@/app/api/beauty/search/route'
 
@@ -204,12 +205,6 @@ export function RoutineShelf({
     })
   }
 
-  function handleStage(value: 'none' | 'pregnant' | 'trying' | 'breastfeeding') {
-    startTransition(async () => {
-      const res = await setLifeStage(value)
-      if (res?.error) toast.error(res.error)
-    })
-  }
 
   const cautions = [...am.cautions, ...pm.cautions]
 
@@ -262,29 +257,17 @@ export function RoutineShelf({
         </ul>
       )}
 
-      {/* Life stage — optional, private, and only ever used for cautions. */}
-      <div className="rounded-2xl bg-card p-4 ring-1 ring-border">
-        <Label className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
-anything to avoid?
-        </Label>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {STAGES.map((s) => (
-            <button
-              key={s.value}
-              type="button"
-              onClick={() => handleStage(s.value)}
-              className={`rounded-full px-3 py-1.5 text-sm ${
-                (lifeStage ?? 'none') === s.value ? 'bg-mindset-pillar text-white' : 'bg-muted text-muted-foreground'
-              }`}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
-        <p className="mt-2 text-[0.7rem] text-muted-foreground text-pretty">
-          private. only used to flag ingredients worth asking your doctor about.
-        </p>
-      </div>
+      {/*
+        This used to be a permanent "anything to avoid?" panel sitting under
+        her products on every visit. It is one answer, and it belongs in
+        settings — asked once, read everywhere. All that is left here is a
+        quiet line for someone who has never set it.
+      */}
+      {!lifeStage && (
+        <Link href="/app/settings" className="px-1 text-[12px] text-muted-foreground underline underline-offset-2">
+          pregnant, trying or feeding? set it once in settings and everything here will flag accordingly.
+        </Link>
+      )}
 
       {scanning && <BarcodeScanner onFound={handleScanned} onCancel={() => setScanning(false)} />}
 

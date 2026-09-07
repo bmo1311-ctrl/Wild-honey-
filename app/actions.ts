@@ -3257,3 +3257,31 @@ export async function removeStudioBlock(blockId: string) {
   revalidatePath('/app/studio')
   return { ok: true }
 }
+
+/**
+ * The things about her body that other screens read.
+ *
+ * One place, answered once. Protocols used to ask "anything to avoid?" on the
+ * page every visit, underneath her products — a permanent question in a room
+ * she came to do one quick thing in.
+ */
+export async function saveBodyPreferences(input: {
+  lifeStage: 'none' | 'pregnant' | 'trying' | 'breastfeeding'
+  allergies?: string
+  foodsAvoided?: string
+}) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      life_stage: input.lifeStage === 'none' ? null : input.lifeStage,
+      allergies: input.allergies?.trim() || null,
+      foods_avoided: input.foodsAvoided?.trim() || null,
+    })
+    .eq('id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/settings')
+  revalidatePath('/app/protocols')
+  revalidatePath('/app/nutrition')
+  return { ok: true }
+}
