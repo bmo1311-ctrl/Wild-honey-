@@ -4,15 +4,8 @@ import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { ChevronDown, X } from 'lucide-react'
 import { addStudioBlock, removeStudioBlock } from '@/app/actions'
-import { WEEKDAY, timeLabel, type Channel } from '@/lib/studio'
+import { SUGGESTED_CHANNELS, WEEKDAY, channelLabel, timeLabel, type Channel } from '@/lib/studio'
 import { cn } from '@/lib/utils'
-
-const CHANNELS: { key: Channel; label: string }[] = [
-  { key: 'tiktok', label: 'TikTok' },
-  { key: 'youtube', label: 'YouTube' },
-  { key: 'newsletter', label: 'Newsletter' },
-  { key: 'other', label: 'Other' },
-]
 
 /** Round hours from 5am to 10pm. Enough choice, no time picker. */
 const HOURS = Array.from({ length: 18 }, (_, i) => (i + 5) * 60)
@@ -84,18 +77,29 @@ export function StudioBlockSetup({
             className="h-11 w-full rounded-2xl bg-background px-3 text-base outline-none ring-1 ring-border focus-visible:ring-2 focus-visible:ring-primary/40"
           />
 
+          {/*
+            Typed, not chosen from a list of four. A fixed list is why adding
+            Instagram meant filing it under Other and then watching the whole
+            section call itself Other.
+          */}
+          <input
+            value={draft.channel}
+            onChange={(e) => setDraft({ ...draft, channel: e.target.value })}
+            placeholder="which channel? — Instagram, TikTok, anything"
+            className="h-11 w-full rounded-2xl bg-background px-3 text-base outline-none ring-1 ring-border focus-visible:ring-2 focus-visible:ring-primary/40"
+          />
           <div className="flex flex-wrap gap-1.5">
-            {CHANNELS.map((c) => (
+            {SUGGESTED_CHANNELS.map((c) => (
               <button
-                key={c.key}
+                key={c}
                 type="button"
-                onClick={() => setDraft({ ...draft, channel: c.key })}
+                onClick={() => setDraft({ ...draft, channel: c })}
                 className={cn(
                   'rounded-full px-3 py-1.5 text-[13px] font-medium ring-1 transition-colors',
-                  draft.channel === c.key ? 'bg-foreground text-background ring-foreground' : 'text-muted-foreground ring-border',
+                  draft.channel.trim().toLowerCase() === c ? 'bg-foreground text-background ring-foreground' : 'text-muted-foreground ring-border',
                 )}
               >
-                {c.label}
+                {channelLabel(c)}
               </button>
             ))}
           </div>

@@ -16,34 +16,77 @@
  * It never appears on the day.
  */
 
-export type Channel = 'tiktok' | 'youtube' | 'newsletter' | 'other'
+/**
+ * A channel is whatever she says it is.
+ *
+ * This was a fixed list of four, which is why adding Instagram meant filing
+ * it under "Other" and then watching the section call itself Other instead of
+ * Instagram. Her channels are hers — the ones below are only the ones whose
+ * pipelines are worth knowing in advance.
+ */
+export type Channel = string
 
 /**
- * The stages a piece moves through, per channel.
+ * The stages a piece moves through, for the channels we know.
  *
  * Ordered, and the order is the whole logic: the engine always advances the
  * piece that is furthest along, because a nearly-finished video is worth more
  * than a new idea and finishing is the thing she is short of.
  */
-export const PIPELINE: Record<Channel, string[]> = {
+export const PIPELINE: Record<string, string[]> = {
   tiktok: ['idea', 'filmed', 'posted'],
+  reels: ['idea', 'filmed', 'posted'],
+  instagram: ['idea', 'shot', 'captioned', 'posted'],
   youtube: ['idea', 'scripted', 'filmed', 'edited', 'posted'],
+  podcast: ['idea', 'recorded', 'edited', 'published'],
   newsletter: ['idea', 'drafted', 'sent'],
-  other: ['idea', 'doing', 'done'],
+  blog: ['idea', 'drafted', 'published'],
+  pinterest: ['idea', 'designed', 'pinned'],
+}
+
+/** Anything she names that we do not know a pipeline for. */
+export const DEFAULT_PIPELINE = ['idea', 'doing', 'done']
+
+/** Suggestions for the setup form. She can type anything instead. */
+export const SUGGESTED_CHANNELS = ['tiktok', 'instagram', 'youtube', 'newsletter', 'podcast', 'pinterest', 'blog']
+
+/** Her own capitalisation, restored — 'instagram' shows as Instagram. */
+export function channelLabel(channel: string): string {
+  const known: Record<string, string> = {
+    tiktok: 'TikTok',
+    youtube: 'YouTube',
+    instagram: 'Instagram',
+    reels: 'Reels',
+    pinterest: 'Pinterest',
+    podcast: 'Podcast',
+    newsletter: 'Newsletter',
+    blog: 'Blog',
+  }
+  const k = channel.trim().toLowerCase()
+  return known[k] ?? channel.trim().replace(/^./, (c) => c.toUpperCase())
 }
 
 /** What the work of moving from one stage to the next actually is. */
 const VERB: Record<string, string> = {
-  idea: 'film it',
+  idea: 'make it',
   scripted: 'film it',
+  shot: 'write the caption',
+  captioned: 'post it',
   filmed: 'edit it',
   edited: 'post it',
+  recorded: 'edit it',
   drafted: 'send it',
+  designed: 'pin it',
   doing: 'finish it',
 }
 
 const NEXT_VERB: Record<string, string> = {
   idea: 'write the script',
+}
+
+/** What moving on from this stage actually asks of her. */
+export function verbFor(stage: string): string {
+  return VERB[stage] ?? NEXT_VERB[stage] ?? 'move it on'
 }
 
 export interface StudioBlock {
@@ -56,13 +99,56 @@ export interface StudioBlock {
   minutes: number
 }
 
+/**
+ * How often a thing comes round.
+ *
+ * A YouTube video is made once and finished. Posting daily, a weekly
+ * newsletter, a quarterly review — those never finish, they return. Treating
+ * the second kind as the first meant they disappeared the moment they were
+ * done and had to be typed in again every time.
+ */
+export type Cadence = 'once' | 'daily' | 'weekly' | 'monthly' | 'yearly'
+
+export const CADENCES: { key: Cadence; label: string }[] = [
+  { key: 'once', label: 'one-off' },
+  { key: 'daily', label: 'daily' },
+  { key: 'weekly', label: 'weekly' },
+  { key: 'monthly', label: 'monthly' },
+  { key: 'yearly', label: 'yearly' },
+]
+
+const INTERVAL_DAYS: Record<Cadence, number> = {
+  once: 0,
+  daily: 1,
+  weekly: 7,
+  monthly: 30,
+  yearly: 365,
+}
+
 export interface StudioItem {
   id: string
   title: string
   channel: Channel
   stage: string
+  cadence?: Cadence
+  lastDoneOn?: string | null
   notes?: string | null
   updatedAt: string
+}
+
+/**
+ * Is this waiting on her right now?
+ *
+ * A one-off is due until it is finished. A recurring thing is due when its
+ * interval has passed since it was last completed — and always due if it
+ * never has been.
+ */
+export function isDue(item: StudioItem, today: string): boolean {
+  const cadence = item.cadence ?? 'once'
+  if (cadence === 'once') return !isFinished(item.channel, item.stage)
+  if (!item.lastDoneOn) return true
+  const days = Math.round((Date.parse(today) - Date.parse(item.lastDoneOn)) / 86_400_000)
+  return days >= INTERVAL_DAYS[cadence]
 }
 
 export interface BlockPlan {
@@ -77,8 +163,8 @@ export interface BlockPlan {
   why: string
 }
 
-function stagesFor(channel: Channel): string[] {
-  return PIPELINE[channel] ?? PIPELINE.other
+export function stagesFor(channel: Channel): string[] {
+  return PIPELINE[channel.trim().toLowerCase()] ?? DEFAULT_PIPELINE
 }
 
 /** The stage after this one, or null when it is already finished. */
@@ -101,11 +187,13 @@ export function isFinished(channel: Channel, stage: string): boolean {
  * fresh idea every time — the pile of unfinished things is what makes
  * showing up feel pointless, and clearing it is what makes it feel possible.
  */
-export function planBlock(block: StudioBlock, items: StudioItem[]): BlockPlan {
+export function planBlock(block: StudioBlock, items: StudioItem[], today?: string): BlockPlan {
   const stages = stagesFor(block.channel)
+  const day = today ?? new Date().toISOString().slice(0, 10)
 
   const live = items
-    .filter((i) => i.channel === block.channel && !isFinished(block.channel, i.stage))
+    .filter((i) => i.channel === block.channel && isDue(i, day))
+    .filter((i) => (i.cadence ?? 'once') !== 'once' || !isFinished(block.channel, i.stage))
     .sort((a, b) => {
       const byStage = stages.indexOf(b.stage) - stages.indexOf(a.stage)
       if (byStage !== 0) return byStage
@@ -125,7 +213,7 @@ export function planBlock(block: StudioBlock, items: StudioItem[]): BlockPlan {
   }
 
   const next = nextStage(block.channel, item.stage)
-  const action = VERB[item.stage] ?? NEXT_VERB[item.stage] ?? 'move it on'
+  const action = verbFor(item.stage)
   const nearlyThere = next !== null && stages.indexOf(next) === stages.length - 1
 
   return {

@@ -1722,7 +1722,7 @@ export async function getStudioBlocks(): Promise<
 }
 
 export async function getStudioItems(): Promise<
-  { id: string; title: string; channel: string; stage: string; notes: string | null; updatedAt: string }[]
+  { id: string; title: string; channel: string; stage: string; cadence: string; lastDoneOn: string | null; notes: string | null; updatedAt: string }[]
 > {
   const supabase = await createClient()
   const {
@@ -1736,12 +1736,16 @@ export async function getStudioItems(): Promise<
       .eq('user_id', user.id)
       .eq('archived', false)
       .order('updated_at', { ascending: false }),
-  ) as { id: string; title: string; channel: string; stage: string; notes: string | null; updated_at: string }[] | null
+  ) as
+    | { id: string; title: string; channel: string; stage: string; cadence: string; last_done_on: string | null; notes: string | null; updated_at: string }[]
+    | null
   return (data ?? []).map((i) => ({
     id: i.id,
     title: i.title,
     channel: i.channel,
     stage: i.stage,
+    cadence: i.cadence ?? 'once',
+    lastDoneOn: i.last_done_on,
     notes: i.notes,
     updatedAt: i.updated_at,
   }))

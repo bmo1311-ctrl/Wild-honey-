@@ -3163,7 +3163,7 @@ export async function advanceStudioItem(itemId: string, blockId?: string | null)
 
   const { data: row } = await supabase
     .from('studio_items')
-    .select('channel, stage')
+    .select('channel, stage, cadence, last_done_on')
     .eq('id', itemId)
     .eq('user_id', user.id)
     .maybeSingle()
@@ -3174,13 +3174,26 @@ export async function advanceStudioItem(itemId: string, blockId?: string | null)
   const next = nextStage(item.channel as never, item.stage)
   if (!next) return { error: 'That one is already finished.' }
 
-  const finished = next === 'posted' || next === 'sent' || next === 'done'
+  const { stagesFor } = await import('@/lib/studio')
+  const stages = stagesFor(item.channel)
+  const finished = next === stages[stages.length - 1]
+  const cadence = (item as unknown as { cadence?: string }).cadence ?? 'once'
+  const today = await localToday()
+
+  /*
+   * A recurring thing that reaches the end goes back to the start rather than
+   * retiring. She logged it, it counted, and it will come round again on its
+   * own interval — she should never have to type a weekly newsletter in
+   * fifty-two times.
+   */
+  const recurring = cadence !== 'once'
   const { error } = await supabase
     .from('studio_items')
     .update({
-      stage: next,
+      stage: finished && recurring ? stages[0] : next,
       updated_at: new Date().toISOString(),
-      posted_on: finished ? await localToday() : null,
+      posted_on: finished ? today : null,
+      last_done_on: finished ? today : null,
     })
     .eq('id', itemId)
     .eq('user_id', user.id)
@@ -3198,13 +3211,13 @@ export async function advanceStudioItem(itemId: string, blockId?: string | null)
   return { ok: true, stage: next }
 }
 
-export async function addStudioItem(input: { title: string; channel: string }) {
+export async function addStudioItem(input: { title: string; channel: string; cadence?: string }) {
   const { supabase, user } = await requireUser()
   const title = input.title.trim()
   if (!title) return { error: 'Give it a name — even a rough one.' }
   const { error } = await supabase
     .from('studio_items')
-    .insert({ user_id: user.id, title, channel: input.channel, stage: 'idea' })
+    .insert({ user_id: user.id, title, channel: input.channel, stage: 'idea', cadence: input.cadence ?? 'once' })
   if (error) return { error: error.message }
   revalidatePath('/app/studio')
   return { ok: true }

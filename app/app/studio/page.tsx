@@ -48,6 +48,7 @@ export default async function StudioPage() {
           blocks={blocks as StudioBlock[]}
           items={items as StudioItem[]}
           todayWeekday={todayWeekday}
+          today={today}
           keptBlockIds={keptBlockIds}
         />
       )}
