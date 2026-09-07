@@ -1,7 +1,7 @@
 # Closet tile images — a brief to paste elsewhere
 
-Copy the **style block** once, then one **tile prompt** per image. Nineteen
-images in total.
+Copy the **style block** once, then one **tile prompt** per image. Seventeen
+images in total (seventeen counting the 1:1).
 
 Save each as `public/closet/<filename>.jpg`, tell me when they're in, and
 I'll wire them into the tiles.
@@ -24,12 +24,9 @@ I'll wire them into the tiles.
 
 | filename | prompt |
 |---|---|
-| `becoming.jpg` | A pressed wildflower and a small hand mirror on cream linen |
-| `write.jpg` | An open notebook with a fountain pen resting in the gutter, one dried bloom beside it |
-| `evolution.jpg` | A row of three small terracotta pots, the seedling in each one taller than the last |
+| `becoming.jpg` | A row of three small terracotta pots, the seedling in each one taller than the last |
+| `write.jpg` | An open notebook with a fountain pen in the gutter, a stack of tied letters behind it |
 | `calendar.jpg` | A linen wall calendar with a few days softly circled in pencil |
-| `archive.jpg` | A stack of tied letters and a ribbon on a pale wooden shelf |
-| `challenges.jpg` | A single lit beeswax candle beside a folded slip of paper |
 
 ## Your body — blue shelf
 

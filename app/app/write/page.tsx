@@ -3,9 +3,19 @@ import { ChevronRight } from 'lucide-react'
 import { getAllWritings, getMyEntries, getMyEntryForPrompt, getTodayPrompt } from '@/lib/data'
 import { JournalComposer } from '@/components/journal-composer'
 import { cn } from '@/lib/utils'
+import { PageTabs } from '@/components/page-tabs'
+import ArchivePage from '@/app/app/archive/page'
 
-/** Everything she has written, newest first. Nothing here is destructive. */
-export default async function WritePage() {
+/**
+ * Everything she has written, newest first. Nothing here is destructive.
+ *
+ * Archive used to be its own tile on her page, showing a subset of what this
+ * page already held. It is a tab here instead — the writing and the record of
+ * the writing belong in the same room.
+ */
+export default async function WritePage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
+  const { tab } = await searchParams
+  const active = tab === 'archive' ? 'archive' : 'write'
   const [courseWritings, entries, prompt] = await Promise.all([getAllWritings(), getMyEntries(), getTodayPrompt()])
   const existing = prompt ? await getMyEntryForPrompt(prompt.id) : null
 
@@ -28,6 +38,18 @@ export default async function WritePage() {
         </p>
       </header>
 
+      <PageTabs
+        active={active}
+        tabs={[
+          { key: 'write', label: 'write', href: '/app/write' },
+          { key: 'archive', label: 'archive', href: '/app/write?tab=archive' },
+        ]}
+      />
+
+      {active === 'archive' ? (
+        <ArchivePage />
+      ) : (
+      <>
       <section className="rounded-2xl border border-border border-l-[3px] border-l-primary bg-card p-4">
         <p className="text-xs font-bold uppercase tracking-[0.1em] text-primary">{prompt ? "Today's prompt" : 'Write'}</p>
         {prompt && <p className="mt-2 font-serif text-[17px] leading-snug text-pretty">{prompt.text}</p>}
@@ -64,6 +86,8 @@ export default async function WritePage() {
             </Link>
           ))}
         </div>
+      )}
+      </>
       )}
     </div>
   )

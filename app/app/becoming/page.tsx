@@ -7,12 +7,38 @@ import { getActiveCourseState, getBaselineVitality, getDayProgress, getLatestVit
 import { VITALITY_DIMENSIONS } from '@/lib/honey-profile'
 import { PILLAR_META } from '@/lib/pillars'
 import { cn } from '@/lib/utils'
+import { PageTabs } from '@/components/page-tabs'
+import ProgressPage from '@/app/app/progress/page'
 
 /**
  * Evidence of change, drawn from what she has already done. Nothing here is a
  * score, nothing is compared to another member, and a gap is never scolded.
  */
-export default async function BecomingPage() {
+/** Becoming and Evolution are two views of the same change. */
+function BecomingTabs({ active }: { active: string }) {
+  return (
+    <PageTabs
+      active={active}
+      tabs={[
+        { key: 'becoming', label: 'becoming', href: '/app/becoming' },
+        { key: 'evolution', label: 'evolution', href: '/app/becoming?tab=evolution' },
+      ]}
+    />
+  )
+}
+
+export default async function BecomingPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
+  const { tab } = await searchParams
+  const activeTab = tab === 'evolution' ? 'evolution' : 'becoming'
+  if (activeTab === 'evolution') {
+    return (
+      <div className="flex flex-col gap-6">
+        <BecomingTabs active={activeTab} />
+        <ProgressPage />
+      </div>
+    )
+  }
+
   // Which course first, so progress and writing are read for that course, not the default.
   const active = await getActiveCourseState()
   const [progress, writings, baseline, latest] = await Promise.all([
@@ -58,6 +84,8 @@ export default async function BecomingPage() {
           what you&rsquo;ve actually done, in your own words and numbers.
         </p>
       </header>
+
+      <BecomingTabs active="becoming" />
 
       <section className="grid grid-cols-2 gap-2.5">
         <div className="rounded-2xl border border-border bg-card p-4">

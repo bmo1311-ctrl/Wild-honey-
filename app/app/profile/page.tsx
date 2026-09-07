@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import {
-  Archive,
   BookMarked,
   CalendarDays,
   ChefHat,
@@ -19,8 +18,6 @@ import {
   Sparkles,
   Target,
   Tent,
-  TrendingUp,
-  Trophy,
   Users,
 } from 'lucide-react'
 import { signOut } from '@/app/actions'
@@ -28,7 +25,7 @@ import { HoneyProfileCard } from '@/components/honey-profile-card'
 import { BloomAvatar } from '@/components/bloom-avatar'
 import { TierBadge } from '@/components/tier-badge'
 import { ClosetShelf } from '@/components/closet'
-import { getMyEntries, getMyGoals, getSessionProfile, getVitalityHistory } from '@/lib/data'
+import { getMyGoals, getSessionProfile, getVitalityHistory } from '@/lib/data'
 import { SQUARE_LINKS } from '@/lib/payment-links'
 import { relativeTime } from '@/lib/pillars'
 import { FEATURES } from '@/lib/features'
@@ -41,18 +38,20 @@ import { FEATURES } from '@/lib/features'
  * called "You" that is mostly a menu of things for sale is a hard page to
  * love, and impossible to scan.
  *
- * Same links, on four tinted shelves. Nothing was removed.
+ * Same links, on four tinted shelves.
+ *
+ * Evolution folded into Becoming and Archive into Write as tabs, and the
+ * reflections list that used to sit at the bottom went with them — it was a
+ * third copy of the same writing.
  */
 export default async function ProfilePage() {
-  const [profile, entries, goals, vitalityHistory] = await Promise.all([
+  const [profile, goals, vitalityHistory] = await Promise.all([
     getSessionProfile(),
-    getMyEntries(),
     getMyGoals(),
     getVitalityHistory(),
   ])
   if (!profile) return null
 
-  const shared = entries.filter((e) => e.visibility === 'circle').length
   const baseline = vitalityHistory.find((v) => v.label === 'baseline') ?? vitalityHistory[0] ?? null
   const latest = vitalityHistory[vitalityHistory.length - 1] ?? null
 
@@ -94,12 +93,15 @@ export default async function ProfilePage() {
         title="yours"
         tone="identity"
         items={[
-          { href: '/app/becoming', label: 'Becoming', icon: Sparkles, note: "what's changed" },
-          { href: '/app/write', label: 'Write', icon: PenLine },
-          FEATURES.progress && { href: '/app/progress', label: 'Evolution', icon: TrendingUp },
+          /*
+            Evolution lives inside Becoming and Archive inside Write, as tabs.
+            They were separate tiles showing overlapping views of the same
+            thing — three doors into one room is not more room, it is a
+            longer corridor.
+          */
+          { href: '/app/becoming', label: 'Becoming', icon: Sparkles, note: 'and your evolution' },
+          { href: '/app/write', label: 'Write', icon: PenLine, note: 'and your archive' },
           FEATURES.fixedCalendar && { href: '/app/calendar', label: 'Calendar', icon: CalendarDays },
-          FEATURES.archive && { href: '/app/archive', label: 'Archive', icon: Archive },
-          FEATURES.challenges && { href: '/app/challenges', label: 'Challenges', icon: Trophy },
         ]}
       />
 
@@ -137,37 +139,6 @@ export default async function ProfilePage() {
           FEATURES.shop && { href: '/app/shop', label: 'Shop', icon: ShoppingBag },
         ]}
       />
-
-      <div>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-serif text-[17px] font-semibold">your reflections</h2>
-          {entries.length > 0 && (
-            <span className="text-xs text-muted-foreground">
-              {entries.length} total · {shared} shared
-            </span>
-          )}
-        </div>
-        {entries.length === 0 ? (
-          <p className="rounded-3xl bg-card p-6 text-center text-sm text-muted-foreground ring-1 ring-border">
-            nothing written yet — head to today&rsquo;s prompt to begin.
-          </p>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {entries.slice(0, 3).map((e) => (
-              <div key={e.id} className="rounded-3xl bg-card p-4 ring-1 ring-border">
-                <p className="text-xs text-muted-foreground">{relativeTime(e.created_at)}</p>
-                {e.prompt && <p className="mt-1 text-xs italic text-muted-foreground text-pretty">&ldquo;{e.prompt.text}&rdquo;</p>}
-                <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-pretty">{e.text}</p>
-              </div>
-            ))}
-            {entries.length > 3 && (
-              <Link href="/app/write" className="rounded-3xl bg-card p-4 text-center text-sm font-medium ring-1 ring-border">
-                all {entries.length} reflections
-              </Link>
-            )}
-          </div>
-        )}
-      </div>
 
       <div className="flex flex-col gap-2">
         <Link
