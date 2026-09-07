@@ -15,8 +15,8 @@
 
 export const SQUARE_LINKS: Partial<Record<'monthly' | 'annual' | 'call', string>> = {
   monthly: 'https://square.link/u/TqtOFtVs',
-  // Add the yearly and call links here once they exist in Square.
-  annual: undefined,
+  annual: 'https://square.link/u/ROr2rrn4',
+  // Add the 1:1 call link here once it exists in Square.
   call: undefined,
 }
 
