@@ -3023,6 +3023,8 @@ export async function addBeautyProduct(input: {
   name: string
   brand?: string
   domain?: string
+  /** Any other areas she uses it in. Castor oil is hair, skin and nails. */
+  domains?: string[]
   category?: string
   actives?: string[]
   ingredientsRaw?: string
@@ -3071,11 +3073,16 @@ export async function addBeautyProduct(input: {
     }
   }
 
+  // Every area she ticked. `domain` stays the primary one so anything that
+  // reads a single area still works.
+  const domains = Array.from(new Set([domain, ...(input.domains ?? [])]))
+
   const { error } = await supabase.from('member_products').insert({
     user_id: user.id,
     product_id: productId,
     custom_name: productId ? null : name,
     domain,
+    domains,
     category: input.category ?? null,
     actives,
     time_of_day: input.timeOfDay ?? null,

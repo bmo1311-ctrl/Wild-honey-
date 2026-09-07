@@ -23,7 +23,10 @@ export const FEATURES = {
   shop: true,
   retreats: true,
   community: false,
-  challenges: true,
+  // Off: generic streak-style challenges never earned their place. If they
+  // come back it will be as aspirational goals tied to the transformation,
+  // not as a tab that exists because most apps have one.
+  challenges: false,
   protocols: true,
   groups: true,
   progress: true,

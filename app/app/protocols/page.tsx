@@ -54,7 +54,9 @@ export default async function ProtocolsPage({
   ])
 
   const counts: Record<string, number> = {}
-  for (const p of allProducts) counts[p.domain] = (counts[p.domain] ?? 0) + 1
+  for (const p of allProducts) {
+    for (const d of p.domains?.length ? p.domains : [p.domain]) counts[d] = (counts[d] ?? 0) + 1
+  }
   if (enrollment) counts.resets = 1
 
   // Where to open when she has not said: wherever her things already are.
@@ -117,8 +119,10 @@ function BeautyArea({
   log: Awaited<ReturnType<typeof getRoutineLog>>
   today: string
 }) {
+  // A product shows up in every area she uses it in. Castor oil belongs on
+  // the hair shelf and the nail shelf at once; older rows only have `domain`.
   const shelf: ShelfItem[] = allProducts
-    .filter((p) => p.domain === areaKey)
+    .filter((p) => (p.domains?.length ? p.domains.includes(areaKey as never) : p.domain === areaKey))
     .map((p) => ({
       id: p.id,
       name: p.custom_name ?? p.product?.name ?? 'a product',

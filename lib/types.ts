@@ -658,6 +658,12 @@ export interface MemberProduct {
   product_id: string | null
   custom_name: string | null
   domain: BeautyDomain
+  /**
+   * Every area this product is used in. A bottle of castor oil is hair and
+   * skin and nails, and making her pick one was the app not understanding
+   * her shelf. Empty falls back to `domain`.
+   */
+  domains?: BeautyDomain[]
   category: string | null
   actives: string[]
   time_of_day: 'am' | 'pm' | 'both' | null

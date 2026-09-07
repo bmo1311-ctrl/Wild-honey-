@@ -12,6 +12,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { BarcodeScanner } from '@/components/barcode-scanner'
+import { BEAUTY_AREAS } from '@/lib/domains'
+import { cn } from '@/lib/utils'
 import type { SearchHit } from '@/app/api/beauty/search/route'
 
 const STAGES: { value: 'none' | 'pregnant' | 'trying' | 'breastfeeding'; label: string }[] = [
@@ -47,6 +49,7 @@ export function RoutineShelf({
   const [ingredients, setIngredients] = useState<string | null>(null)
   const [name, setName] = useState('')
   const [category, setCategory] = useState(categories[0] ?? 'serum')
+  const [alsoUsedIn, setAlsoUsedIn] = useState<string[]>([])
   const [picked, setPicked] = useState<string[]>([])
   const [pasting, setPasting] = useState(false)
   const [pasted, setPasted] = useState('')
@@ -173,6 +176,7 @@ export function RoutineShelf({
         category,
         actives: picked,
         domain,
+        domains: alsoUsedIn,
         barcode: barcode ?? undefined,
         ingredientsRaw: ingredients ?? undefined,
       })
@@ -182,6 +186,7 @@ export function RoutineShelf({
       }
       setName('')
       setPicked([])
+      setAlsoUsedIn([])
       setBarcode(null)
       setIngredients(null)
       setScanNote(null)
@@ -349,6 +354,36 @@ anything to avoid?
                 </option>
               ))}
             </select>
+          </div>
+
+          {/*
+            One bottle, several jobs.
+            Castor oil is hair and skin and nails; so is rosehip, shea, aloe,
+            plain jojoba. Making her choose one area was the app not
+            understanding her shelf — and it meant she had to add the same
+            bottle three times to see it in three places.
+          */}
+          <div className="flex flex-col gap-1.5">
+            <Label>also used for</Label>
+            <div className="flex flex-wrap gap-1.5">
+              {BEAUTY_AREAS.filter((a) => a.key !== domain).map((a) => {
+                const on = alsoUsedIn.includes(a.key)
+                return (
+                  <button
+                    key={a.key}
+                    type="button"
+                    onClick={() => setAlsoUsedIn((prev) => (on ? prev.filter((k) => k !== a.key) : [...prev, a.key]))}
+                    className={cn(
+                      'rounded-full px-3 py-1.5 text-[13px] font-medium ring-1 transition-colors',
+                      on ? 'bg-foreground text-background ring-foreground' : 'bg-transparent text-muted-foreground ring-border',
+                    )}
+                  >
+                    {a.label}
+                  </button>
+                )
+              })}
+            </div>
+            <p className="text-[11px] text-muted-foreground">leave these alone if it is only for your {domain}.</p>
           </div>
           {pasting ? (
             <div className="flex flex-col gap-2">
