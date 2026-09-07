@@ -3,6 +3,7 @@ import {
   BookMarked,
   CalendarDays,
   ChefHat,
+  Clapperboard,
   ClipboardList,
   Dumbbell,
   Flame,
@@ -115,6 +116,12 @@ export default async function ProfilePage() {
           FEATURES.recipes && { href: '/app/recipes', label: 'Recipes', icon: ChefHat },
           FEATURES.pantry && { href: '/app/pantry', label: 'Pantry', icon: Refrigerator, note: '& grocery' },
         ]}
+      />
+
+      <ClosetShelf
+        title="your work"
+        tone="body"
+        items={[{ href: '/app/studio', label: 'Studio', icon: Clapperboard, note: 'blocks and what fills them' }]}
       />
 
       <ClosetShelf

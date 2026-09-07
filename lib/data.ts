@@ -1692,3 +1692,76 @@ export async function getRoutineLog(days = 30): Promise<{ memberProductId: strin
     date: r.date,
   }))
 }
+
+// ---- Studio: output blocks and the pipeline ----
+
+export async function getStudioBlocks(): Promise<
+  { id: string; label: string; channel: string; weekday: number; startMinute: number; minutes: number }[]
+> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const data = ok(
+    await supabase
+      .from('studio_blocks')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .order('weekday', { ascending: true }),
+  ) as { id: string; label: string; channel: string; weekday: number; start_minute: number; minutes: number }[] | null
+  return (data ?? []).map((b) => ({
+    id: b.id,
+    label: b.label,
+    channel: b.channel,
+    weekday: b.weekday,
+    startMinute: b.start_minute,
+    minutes: b.minutes,
+  }))
+}
+
+export async function getStudioItems(): Promise<
+  { id: string; title: string; channel: string; stage: string; notes: string | null; updatedAt: string }[]
+> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const data = ok(
+    await supabase
+      .from('studio_items')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('archived', false)
+      .order('updated_at', { ascending: false }),
+  ) as { id: string; title: string; channel: string; stage: string; notes: string | null; updated_at: string }[] | null
+  return (data ?? []).map((i) => ({
+    id: i.id,
+    title: i.title,
+    channel: i.channel,
+    stage: i.stage,
+    notes: i.notes,
+    updatedAt: i.updated_at,
+  }))
+}
+
+/** Blocks kept in the last seven days, so the week can be counted honestly. */
+export async function getStudioSessionsThisWeek(): Promise<{ blockId: string | null; date: string }[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const since = new Date()
+  since.setDate(since.getDate() - 6)
+  const data = ok(
+    await supabase
+      .from('studio_sessions')
+      .select('block_id, date')
+      .eq('user_id', user.id)
+      .gte('date', since.toISOString().slice(0, 10)),
+  ) as { block_id: string | null; date: string }[] | null
+  return (data ?? []).map((s) => ({ blockId: s.block_id, date: s.date }))
+}

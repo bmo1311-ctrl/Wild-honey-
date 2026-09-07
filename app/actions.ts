@@ -3148,3 +3148,97 @@ export async function logRoutineDone(input: { memberProductId?: string; ritualSl
   revalidatePath('/app/protocols')
   return { ok: true }
 }
+
+// ---- Studio ----
+
+/**
+ * Move a piece one stage on, and record that the block was kept.
+ *
+ * One tap. She does not pick the stage — the pipeline knows what comes next,
+ * and asking her to choose is the friction that stopped this happening in the
+ * first place.
+ */
+export async function advanceStudioItem(itemId: string, blockId?: string | null) {
+  const { supabase, user } = await requireUser()
+
+  const { data: row } = await supabase
+    .from('studio_items')
+    .select('channel, stage')
+    .eq('id', itemId)
+    .eq('user_id', user.id)
+    .maybeSingle()
+  if (!row) return { error: 'That is not on your board.' }
+
+  const { nextStage } = await import('@/lib/studio')
+  const item = row as { channel: string; stage: string }
+  const next = nextStage(item.channel as never, item.stage)
+  if (!next) return { error: 'That one is already finished.' }
+
+  const finished = next === 'posted' || next === 'sent' || next === 'done'
+  const { error } = await supabase
+    .from('studio_items')
+    .update({
+      stage: next,
+      updated_at: new Date().toISOString(),
+      posted_on: finished ? await localToday() : null,
+    })
+    .eq('id', itemId)
+    .eq('user_id', user.id)
+  if (error) return { error: error.message }
+
+  await supabase.from('studio_sessions').insert({
+    user_id: user.id,
+    block_id: blockId ?? null,
+    item_id: itemId,
+    date: await localToday(),
+    moved_to: next,
+  })
+
+  revalidatePath('/app/studio')
+  return { ok: true, stage: next }
+}
+
+export async function addStudioItem(input: { title: string; channel: string }) {
+  const { supabase, user } = await requireUser()
+  const title = input.title.trim()
+  if (!title) return { error: 'Give it a name — even a rough one.' }
+  const { error } = await supabase
+    .from('studio_items')
+    .insert({ user_id: user.id, title, channel: input.channel, stage: 'idea' })
+  if (error) return { error: error.message }
+  revalidatePath('/app/studio')
+  return { ok: true }
+}
+
+export async function archiveStudioItem(itemId: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('studio_items').update({ archived: true }).eq('id', itemId).eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/studio')
+  return { ok: true }
+}
+
+export async function addStudioBlock(input: { label: string; channel: string; weekday: number; startMinute: number; minutes: number }) {
+  const { supabase, user } = await requireUser()
+  const label = input.label.trim()
+  if (!label) return { error: 'What is this block for?' }
+  const { error } = await supabase.from('studio_blocks').insert({
+    user_id: user.id,
+    label,
+    channel: input.channel,
+    weekday: input.weekday,
+    start_minute: input.startMinute,
+    minutes: input.minutes,
+  })
+  if (error) return { error: error.message }
+  revalidatePath('/app/studio')
+  return { ok: true }
+}
+
+export async function removeStudioBlock(blockId: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('studio_blocks').update({ is_active: false }).eq('id', blockId).eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/studio')
+  return { ok: true }
+}

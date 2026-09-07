@@ -22,3 +22,5 @@ shapecheck.ts
 shape.tsconfig.json
 catcheck.ts
 cat.tsconfig.json
+studiocheck.ts
+studio.tsconfig.json
