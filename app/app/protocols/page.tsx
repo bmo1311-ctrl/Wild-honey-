@@ -4,6 +4,8 @@ import { ProtocolNav } from '@/components/protocol-nav'
 import { ProtocolChooser } from '@/components/protocol-chooser'
 import { RoutineShelf } from '@/components/routine-shelf'
 import { TonightCard } from '@/components/tonight-card'
+import { WashCard } from '@/components/wash-card'
+import { WashStrip } from '@/components/wash-strip'
 import { WeekStrip } from '@/components/week-strip'
 import {
   getActiveEnrollment,
@@ -17,6 +19,7 @@ import { PROTOCOLS, getProtocol, suggestProtocol } from '@/lib/protocols'
 import { AREAS, getArea, type ProtocolArea } from '@/lib/domains'
 import type { ShelfItem } from '@/lib/routine'
 import { planTonight, planWeek } from '@/lib/tonight'
+import { planWash, planWashDays } from '@/lib/wash-day'
 import { localToday } from '@/lib/today'
 import { FeatureOff } from '@/components/feature-off'
 import { FEATURES } from '@/lib/features'
@@ -119,8 +122,16 @@ function BeautyArea({
       frequencyPerWeek: p.frequency_per_week,
     }))
 
-  const tonight = shelf.length > 0 ? planTonight({ shelf, log, today, allergies: profile?.allergies }) : null
-  const week = shelf.length > 0 ? planWeek({ shelf, log, today, allergies: profile?.allergies }) : []
+  // Hair runs on washes, not nights — a different engine, not a tweak to the
+  // skin one. Everything else keeps the nightly rhythm.
+  const isHair = areaKey === 'hair'
+
+  const wash = isHair && shelf.length > 0 ? planWash({ shelf, log, today }) : null
+  const washDays = isHair && shelf.length > 0 ? planWashDays({ shelf, log, today }) : []
+  const washedToday = wash ? log.some((l) => l.date === today && wash.steps.some((s) => s.id === l.memberProductId)) : false
+
+  const tonight = !isHair && shelf.length > 0 ? planTonight({ shelf, log, today, allergies: profile?.allergies }) : null
+  const week = !isHair && shelf.length > 0 ? planWeek({ shelf, log, today, allergies: profile?.allergies }) : []
   const doneTonight = log.some(
     (l) =>
       l.date === today &&
@@ -131,6 +142,8 @@ function BeautyArea({
 
   return (
     <div className="flex flex-col gap-5">
+      {wash && <WashCard plan={wash} doneToday={washedToday} />}
+      {washDays.length > 0 && <WashStrip days={washDays} />}
       {tonight && <TonightCard plan={tonight} doneToday={doneTonight} />}
       {week.length > 0 && <WeekStrip nights={week} />}
 

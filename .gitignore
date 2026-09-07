@@ -14,3 +14,7 @@ node_modules
 .next/
 .DS_Store
 tsconfig.tsbuildinfo
+
+# local scratch (undeletable in this sandbox)
+simhair.ts
+sim.tsconfig.json
