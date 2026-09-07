@@ -1,16 +1,20 @@
 import Link from 'next/link'
 import { ChevronRight, Flame } from 'lucide-react'
-import { TodayChecklist } from '@/components/today-checklist'
 import { KidToday } from '@/components/kid-today'
 import { BaselineCardLink } from '@/components/baseline-card'
-import { nudgesFor } from '@/lib/nudges'
 import { suggestHabits } from '@/lib/habit-suggestions'
-import { todayRows } from '@/lib/modules'
 import { getCourse, getDay, weekOfDay } from '@/lib/courses'
 import { localHour, localToday } from '@/lib/today'
 import { buildActivity, consistency, streaksFrom } from '@/lib/activity'
 import { QuickAddHabit } from '@/components/quick-add-habit'
 import { NoticeLine } from '@/components/notice-line'
+import { MomentCard } from '@/components/moment-card'
+import { buildMoment, greetingFor } from '@/lib/moment'
+import { candidatesFor } from '@/lib/moment-candidates'
+import { planTonight } from '@/lib/tonight'
+import { planWash } from '@/lib/wash-day'
+import { daysUntil, planBlock, type StudioBlock, type StudioItem } from '@/lib/studio'
+import type { ShelfItem } from '@/lib/routine'
 import { pickNotice } from '@/lib/noticing'
 import { getAccess,
   getActiveCourseState,
@@ -30,6 +34,13 @@ import { getAccess,
   getSessionProfile,
   getTodayCheckin,
   getTodayNutrition,
+  getMemberProducts,
+  getRoutineLog,
+  getStudioBlocks,
+  getStudioItems,
+  getStudioSessionsThisWeek,
+  getTodayPrompt,
+  getMyEntryForPrompt,
 } from '@/lib/data'
 
 /**
@@ -98,16 +109,6 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
   const since = (d: string | null) => (d ? Math.floor((Date.parse(today) - Date.parse(d)) / 86_400_000) : null)
   const lastCheckin = recentCheckins[recentCheckins.length - 1]?.date ?? null
   const daysSinceCheckin = lastCheckin ? Math.floor((Date.parse(today) - Date.parse(lastCheckin)) / 86_400_000) : null
-  const nudges = nudgesFor({
-    hour: await localHour(),
-    courseDay: day ? { number: day.day_number, slug } : null,
-    courseDayDone: dayDone,
-    mealsLogged: nutrition.loggedMeals.length,
-    checkedIn: Boolean(checkin),
-    daysSinceCheckin,
-    weekHit: week.hit,
-    writingsCount: 0,
-  })
   const habitSuggestions = suggestHabits(goals.map((g) => g.goal), habits.map((h) => h.title))
 
   /*
@@ -132,17 +133,96 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     },
   ]
 
-  const access = await getAccess()
-  const rows = todayRows({
-    tier: access.tier,
-    courseDay: day ? { number: day.day_number, title: day.title, kind: day.kind, minutes: day.minutes, slug } : null,
-    courseDayDone: dayDone,
-    checkedInToday: Boolean(checkin),
-    mealsLoggedToday: nutrition.loggedMeals.length,
-    habits: habits.map((h) => ({ id: h.id, title: h.title, anchor: h.anchor, doneToday: loggedHabitIds.has(h.id) })),
-    daysSinceWeighIn: since(lastWeigh),
-    daysSinceMoney: since(lastMoney),
+  /*
+   * The moment.
+   *
+   * Today was a list in the order `lib/modules.ts` happened to declare its
+   * modules, and the only intelligence in it was putting unfinished things
+   * first. Which meant it showed her tonight's retinal at seven in the
+   * morning, her check-in at eleven at night, and — because Protocols and
+   * Studio were never registered as modules at all — it never showed the two
+   * engines in this app that actually decide something.
+   *
+   * So the three surfaces Today has never seen get fetched here: her shelf
+   * and routine log (Protocols), her blocks and pipeline (Studio), and
+   * today's prompt (Write). Each one is asked what it wants, and the moment
+   * engine picks whichever fits the hour she is in.
+   */
+  const hour = await localHour()
+  const [beautyProducts, routineLog, studioBlocks, studioItems, studioSessions, prompt] = await Promise.all([
+    getMemberProducts(),
+    getRoutineLog(30),
+    getStudioBlocks(),
+    getStudioItems(),
+    getStudioSessionsThisWeek(),
+    getTodayPrompt(),
+  ])
+  const promptEntry = prompt ? await getMyEntryForPrompt(prompt.id) : null
+
+  const shelfFor = (areaKey: string): ShelfItem[] =>
+    beautyProducts
+      .filter((p) => (p.domains?.length ? p.domains.includes(areaKey as never) : p.domain === areaKey))
+      .map((p) => ({
+        id: p.id,
+        name: p.custom_name ?? p.product?.name ?? 'a product',
+        category: p.category ?? p.product?.category ?? null,
+        actives: p.actives?.length ? p.actives : (p.product?.actives ?? []),
+        timeOfDay: p.time_of_day,
+        frequencyPerWeek: p.frequency_per_week,
+      }))
+
+  const skinShelf = shelfFor('skin')
+  const hairShelf = shelfFor('hair')
+  const tonight =
+    skinShelf.length > 0
+      ? planTonight({ shelf: skinShelf, log: routineLog, today, allergies: profile?.allergies })
+      : null
+  const tonightDone = tonight
+    ? routineLog.some(
+        (l) =>
+          l.date === today &&
+          (l.memberProductId === tonight.treatment?.id ||
+            tonight.alongside.some((a) => a.id === l.memberProductId)),
+      )
+    : false
+  const wash = hairShelf.length > 0 ? planWash({ shelf: hairShelf, log: routineLog, today }) : null
+  const washedToday = wash
+    ? routineLog.some((l) => l.date === today && wash.steps.some((s) => s.id === l.memberProductId))
+    : false
+
+  // Only the blocks that fall today. A Thursday block is not this moment.
+  const todayWeekday = new Date(`${today}T12:00:00`).getDay()
+  const keptBlockIds = new Set(studioSessions.map((s) => s.blockId).filter(Boolean) as string[])
+  const studioToday = (studioBlocks as StudioBlock[])
+    .filter((b) => daysUntil(b, todayWeekday, today) === 0)
+    .map((block) => ({
+      block,
+      plan: planBlock(block, studioItems as StudioItem[], today),
+      kept: keptBlockIds.has(block.id),
+    }))
+
+  const moment = buildMoment({
+    hour,
+    name: profile?.name?.split(' ')[0] ?? null,
+    candidates: candidatesFor({
+      today,
+      courseDay: day ? { number: day.day_number, title: day.title, minutes: day.minutes, slug } : null,
+      courseDayDone: dayDone,
+      checkedIn: Boolean(checkin),
+      mealsLogged: nutrition.loggedMeals.length,
+      habits: habits.map((h) => ({ id: h.id, title: h.title, anchor: h.anchor, doneToday: loggedHabitIds.has(h.id) })),
+      daysSinceWeighIn: since(lastWeigh),
+      hasPrompt: Boolean(prompt),
+      promptAnswered: Boolean(promptEntry),
+      tonight,
+      tonightDone,
+      wash,
+      washedToday,
+      studioToday,
+    }),
   })
+
+  const access = await getAccess()
 
   /*
    * No early return for someone without a course.
@@ -163,28 +243,26 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
         <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
           {new Date().toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}
         </p>
+        {/* It said "Morning" at eleven at night. It knows the hour now. */}
         <h1 className="mt-1 font-serif text-[29px] font-semibold leading-[1.1]">
-          {profile?.name ? `Morning, ${profile.name.split(' ')[0]}` : 'Today'}
+          {profile?.name ? greetingFor(hour, profile.name.split(' ')[0]) : greetingFor(hour, null)}
         </h1>
       </header>
 
       <NoticeLine notice={notice} />
 
       {/*
-        The day, first. Everything that used to sit above this — four counters,
-        a progress bar, a course switcher — was answering "how am I doing"
-        when she opened the app to ask "what do I do now". It all still exists,
-        underneath, where it belongs.
+        This moment, then everything behind it.
+
+        The flat checklist and the hourly nudge strip both came out — the
+        moment card is doing both jobs, and doing them with each engine's own
+        reasoning rather than a generic line. Everything that used to sit
+        above it — four counters, a progress bar, a course switcher — answers
+        "how am I doing" when she opened the app to ask "what now".
       */}
-      {hasCourse && day ? (
-        <Link
-          href={`/app/program/${slug}/day/${day.day_number}`}
-          className="flex h-[58px] items-center justify-center gap-1.5 rounded-2xl bg-primary text-[18px] font-bold text-primary-foreground"
-        >
-          Open day {day.day_number}
-          <ChevronRight className="h-5 w-5" />
-        </Link>
-      ) : (
+      <MomentCard moment={moment} hour={hour} />
+
+      {!hasCourse && (
         <Link
           href="/app/program"
           className="flex items-center gap-3 rounded-2xl border border-dashed border-border bg-card px-4 py-4"
@@ -199,20 +277,8 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
         </Link>
       )}
 
-      {nudges.length > 0 && (
-        <section className="flex flex-col gap-2">
-          {nudges.map((n) => (
-            <Link key={n.text} href={n.href} className="flex items-center gap-3 rounded-2xl bg-mindset-pillar/10 px-4 py-3 text-[14.5px] leading-[1.4] text-pretty">
-              <span className="h-2 w-2 shrink-0 rounded-full bg-mindset-pillar" aria-hidden="true" />
-              <span className="flex-1">{n.text}</span>
-            </Link>
-          ))}
-        </section>
-      )}
-
       {!baseline && <BaselineCardLink dayNumber={currentDay} />}
 
-      <TodayChecklist rows={rows} />
       <QuickAddHabit suggestions={habitSuggestions} />
 
       {hasCourse && (
