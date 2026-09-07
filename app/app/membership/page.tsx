@@ -1,6 +1,7 @@
 import Link from 'next/link'
-import { Check } from 'lucide-react'
+import { ArrowUpRight, Check } from 'lucide-react'
 import { BuyButton } from '@/components/buy-button'
+import { SQUARE_LINKS } from '@/lib/payment-links'
 import { getAccess, getSessionProfile } from '@/lib/data'
 import { squareConfigured } from '@/lib/square'
 import { MODULES } from '@/lib/modules'
@@ -96,6 +97,32 @@ export default async function MembershipPage({ searchParams }: { searchParams: P
             <BuyButton kind="membership" billing="annual" label="join yearly" />
           </div>
         )}
+      </div>
+
+      {/*
+        The 1:1 goes straight to Square Appointments rather than through
+        checkout. A payment link would sell the same Tuesday four times over;
+        the booking widget only offers the hours that are actually free, so
+        two calls a week enforce themselves and she pays for a specific time.
+      */}
+      <div className="flex flex-col gap-4 rounded-2xl bg-card p-6 ring-1 ring-border">
+        <div>
+          <h2 className="font-serif text-xl font-semibold">A 90-minute 1:1</h2>
+          <p className="mt-1 font-serif text-2xl font-semibold">$198</p>
+          <p className="mt-0.5 text-sm text-muted-foreground text-pretty">
+            two a week, and that is the whole of it. we go through your routine, your goals and
+            whatever is actually in the way.
+          </p>
+        </div>
+        <a
+          href={SQUARE_LINKS.call}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex h-11 items-center justify-center gap-1.5 rounded-full bg-foreground px-5 text-sm font-medium text-background"
+        >
+          see the open times
+          <ArrowUpRight className="h-3.5 w-3.5" />
+        </a>
       </div>
 
       {access.paid && access.tier !== 'founder' && (

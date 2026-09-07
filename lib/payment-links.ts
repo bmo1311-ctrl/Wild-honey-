@@ -16,7 +16,14 @@
 export const SQUARE_LINKS: Partial<Record<'monthly' | 'annual' | 'call', string>> = {
   monthly: 'https://square.link/u/TqtOFtVs',
   annual: 'https://square.link/u/ROr2rrn4',
-  call: 'https://square.link/u/GDCmzFcj',
+  /*
+   * The 1:1 is a booking link, not a payment link, and that difference is the
+   * whole point. A payment link would happily sell the same Tuesday four
+   * times over; Square Appointments only offers the slots that are actually
+   * free, so the two calls a week enforce themselves. She picks a time and
+   * pays for that time.
+   */
+  call: 'https://book.squareup.com/appointments/mqv8hblhkj0fga/location/DAQBV33E0A3NV/availability',
 }
 
 export function fallbackLinkFor(kind: string, billing?: string): string | undefined {
