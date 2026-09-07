@@ -2826,7 +2826,14 @@ export async function createChildAccess(memberId: string, pin: string) {
       guardian_id: user.id,
       onboarding_completed_at: new Date().toISOString(),
       birth_year: m.birth_year ?? null,
-      color_season: 'spring',
+      /*
+       * No season here.
+       *
+       * Every child account was being stamped with 'spring' — one person's
+       * palette handed to everybody, which is the whole thing this app is
+       * supposed to be the opposite of. A child gets the default theme until
+       * she picks her own.
+       */
     },
     { onConflict: 'id' },
   )
@@ -3288,6 +3295,13 @@ export async function saveBodyPreferences(input: {
 
 // ── Wardrobe ────────────────────────────────────────────────────────────────
 
+/**
+ * Her wardrobe colour season and her frame.
+ *
+ * Writes `style_season`. Deliberately not `color_season`, which is the app's
+ * UI theme and belongs to onboarding — see the migration for what happened
+ * when these two shared a column.
+ */
 export async function saveStyleProfile(input: {
   season?: string | null
   shape?: string | null
@@ -3296,7 +3310,7 @@ export async function saveStyleProfile(input: {
 }) {
   const { supabase, user } = await requireUser()
   const patch: Record<string, string | null> = {}
-  if ('season' in input) patch.color_season = input.season || null
+  if ('season' in input) patch.style_season = input.season || null
   if ('shape' in input) patch.body_shape = input.shape || null
   if ('vertical' in input) patch.vertical_proportion = input.vertical || null
   if ('scale' in input) patch.body_scale = input.scale || null

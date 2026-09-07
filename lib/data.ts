@@ -1857,7 +1857,13 @@ export async function getSavedOutfits(): Promise<
   }))
 }
 
-/** Her colour season and frame, when she has set them. */
+/**
+ * Her colour season and frame, when she has set them.
+ *
+ * `style_season`, not `color_season`. The latter is the app's UI theme and
+ * always was — the two shared a column for one commit and overwrote each
+ * other in both directions.
+ */
 export async function getStyleProfile(): Promise<{
   season: string | null
   shape: string | null
@@ -1872,13 +1878,13 @@ export async function getStyleProfile(): Promise<{
   const data = ok(
     await supabase
       .from('profiles')
-      .select('color_season, body_shape, vertical_proportion, body_scale')
+      .select('style_season, body_shape, vertical_proportion, body_scale')
       .eq('id', user.id)
       .maybeSingle(),
   ) as Record<string, string | null> | null
   if (!data) return null
   return {
-    season: data.color_season,
+    season: data.style_season,
     shape: data.body_shape,
     vertical: data.vertical_proportion,
     scale: data.body_scale,
