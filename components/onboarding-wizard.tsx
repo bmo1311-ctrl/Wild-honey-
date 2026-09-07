@@ -106,6 +106,23 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
     setStepIndex((i) => Math.min(i + 1, STEPS.length - 1))
   }
 
+  /**
+   * One question is enough to let her in.
+   *
+   * She has paid and arrived, and five screens of questions stood between her
+   * and the thing she came for. Everything after the first step is worth
+   * having and none of it is worth losing her over — so it stays, as an offer
+   * rather than a gate. Whatever she has filled in by the time she taps
+   * through is saved; the rest gets asked later, where it is actually used.
+   */
+  function finishNow() {
+    if (!name.trim()) {
+      toast.error('Tell us your name first.')
+      return
+    }
+    handleSubmit()
+  }
+
   function handleSubmit() {
     startTransition(async () => {
       const res = await completeOnboarding({
@@ -395,26 +412,56 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
         )}
       </div>
 
-      <div className="mt-8 flex items-center justify-between gap-3">
-        <Button
-          variant="ghost"
-          onClick={() => setStepIndex((i) => Math.max(i - 1, 0))}
-          disabled={stepIndex === 0 || pending}
-          className="h-11"
-        >
-          <ArrowLeft className="h-4 w-4" /> back
-        </Button>
-        <Button onClick={handleNext} disabled={pending} className="h-11 flex-1">
-          {isLast ? (
-            <>
-              <Check className="h-4 w-4" /> {pending ? 'saving…' : 'start'}
-            </>
-          ) : (
-            <>
-              next <ArrowRight className="h-4 w-4" />
-            </>
-          )}
-        </Button>
+      <div className="mt-8 flex flex-col gap-3">
+        {step === 'you' ? (
+          <>
+            <Button onClick={finishNow} disabled={pending} className="h-[52px] text-[17px] font-bold">
+              <Check className="h-4 w-4" /> {pending ? 'saving…' : 'take me in'}
+            </Button>
+            <button
+              type="button"
+              onClick={handleNext}
+              disabled={pending}
+              className="h-11 text-sm font-medium text-muted-foreground"
+            >
+              answer a few more first
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center justify-between gap-3">
+              <Button
+                variant="ghost"
+                onClick={() => setStepIndex((i) => Math.max(i - 1, 0))}
+                disabled={pending}
+                className="h-11"
+              >
+                <ArrowLeft className="h-4 w-4" /> back
+              </Button>
+              <Button onClick={handleNext} disabled={pending} className="h-11 flex-1">
+                {isLast ? (
+                  <>
+                    <Check className="h-4 w-4" /> {pending ? 'saving…' : 'start'}
+                  </>
+                ) : (
+                  <>
+                    next <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </Button>
+            </div>
+            {!isLast && (
+              <button
+                type="button"
+                onClick={finishNow}
+                disabled={pending}
+                className="h-9 text-sm font-medium text-muted-foreground"
+              >
+                that's enough — take me in
+              </button>
+            )}
+          </>
+        )}
       </div>
     </div>
   )

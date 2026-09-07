@@ -54,29 +54,38 @@ came for.
 context, at the moment they would actually change something — or inferred,
 the way the wash-day engine learns her rhythm instead of asking.
 
-### 3. The food logger has thirteen inputs
+### ~~3. The food logger has thirteen inputs~~ — I was wrong
 
-The heaviest screen in the app, and one she is meant to use several times
-a day.
+Checked properly afterwards: the one-tap repeat already exists. Her eight
+most-logged foods sit at the top of the logger, sorted by frequency, and
+one tap re-logs at the amount she last had. Saved meals sit under them.
 
-**Fix:** worth a session on its own. The fastest win is that logging the
-same thing again should be one tap, since most people eat the same
-fifteen things.
+The thirteen inputs are real but they all live in optional sub-flows —
+adding a food the library has never seen, or building a named meal. The
+daily path is already one tap. Nothing to do here.
 
-### 4. Thirty-nine member-facing pages
+### ~~4. Thirty-nine member-facing pages~~ — also overstated
 
-Archive, ask, becoming, body, calendar, challenges, checkin, circle,
-community, energy, fitness, groups, guidelines, household, kid-food,
-kid-me, kid-money, learning, library, members, membership, money,
-nutrition, pantry, profile, program, progress, protocols, recipes,
-retreats, settings, shop, vault, and more.
+There is a lobby. The Library page opens with a search across everything
+and then lists doors generated from the module registry, each with a
+count and a lock state. The bottom navigation carries five items, not
+thirty-nine.
 
-Any one of them is defensible. Together they are a building with
-thirty-nine doors and no lobby.
+The page count is high but it is organised. Nothing to do here either.
 
-**Fix:** not deletion — most of this is good work. But the Library needs
-to answer "what is in here" in one screen, and several of these should
-live inside another page rather than beside it.
+### 4. Nudges said what the checklist already said
+
+Four rules, three of which counted what she had *not* done — "nothing
+logged yet today", "three days since you said how you feel" — and all
+three repeated a row the checklist was already showing directly beneath
+them.
+
+Saying it twice does not make it kinder, and counting her absence back at
+her is the exact thing the noticing engine exists to refuse.
+
+**Fixed.** One line at most: an evening reminder that the day is still
+there for her, or an observation when a week has gone well. Both describe
+something she did or can still do.
 
 ---
 
