@@ -2,6 +2,7 @@ import { RecipeSources } from '@/components/recipe-sources'
 import { RecipeImport } from '@/components/recipe-import'
 import { RecommendedRecipesRow } from '@/components/recommended-recipes-row'
 import { TodayNutrition } from '@/components/today-nutrition'
+import { LifeStageFocus } from '@/components/life-stage-focus'
 import { ownerTargets } from '@/lib/targets'
 import { ageFromBirthYear, driFor } from '@/lib/dri'
 import { NutritionTabs } from '@/components/nutrition-tabs'
@@ -62,6 +63,13 @@ export default async function NutritionPage() {
         hasGoals={own.hasGoals}
         loggedMeals={nutrition.loggedMeals}
       />
+
+      {/*
+        She told us she is trying, or pregnant, or feeding — and until now
+        that changed nothing but a skincare warning. The folate and iron were
+        already being counted.
+      */}
+      <LifeStageFocus stage={profile?.life_stage ?? null} totals={nutrition.nutrients as Record<string, number>} />
 
       <NutritionTabs
         counts={{ recipes: recipes.length, plans: plans.length, grocery: grocery.length, pantry: pantry.length, cook: cookVideos.length }}
