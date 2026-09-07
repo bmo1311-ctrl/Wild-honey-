@@ -1,8 +1,8 @@
 'use client'
 
 import type React from 'react'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Wordmark } from '@/components/logo'
@@ -12,8 +12,17 @@ import { Label } from '@/components/ui/label'
 
 const AVATAR_COLORS = ['sapphire', 'icyblue', 'emerald', 'fuchsia', 'crimson', 'lavender']
 
-export default function SignUpPage() {
+/**
+ * Sign up — and, when she has just paid, the other side of the checkout.
+ *
+ * Square hands her back with ?paid=1. Without that, a woman who has just
+ * been charged $29 lands on a page headed "Join the circle" and reasonably
+ * wonders whether it went through. The money moment is the most anxious
+ * moment in the whole funnel; it costs one line to settle it.
+ */
+function SignUpForm() {
   const router = useRouter()
+  const paid = useSearchParams().get('paid') === '1'
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -51,9 +60,13 @@ export default function SignUpPage() {
           <Wordmark />
         </Link>
         <div className="mb-8 text-center">
-          <h1 className="font-serif text-3xl font-semibold text-balance">Join the circle</h1>
+          <h1 className="font-serif text-3xl font-semibold text-balance">
+            {paid ? "You're in" : 'Join the circle'}
+          </h1>
           <p className="mt-2 text-sm text-muted-foreground text-pretty">
-            Start with the body. The rest of the life is in here.
+            {paid
+              ? 'Payment received. Make your account and everything opens up.'
+              : 'Start with the body. The rest of the life is in here.'}
           </p>
         </div>
         <form onSubmit={handleSignUp} className="flex flex-col gap-4">
@@ -123,6 +136,15 @@ export default function SignUpPage() {
         </p>
       </div>
     </main>
+  )
+}
+
+/** useSearchParams needs a boundary; the form is the only thing that reads it. */
+export default function SignUpPage() {
+  return (
+    <Suspense>
+      <SignUpForm />
+    </Suspense>
   )
 }
 
