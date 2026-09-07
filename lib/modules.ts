@@ -13,7 +13,7 @@ import type { TodoRow } from '@/components/today-checklist'
  */
 
 export interface TodayContext {
-  courseDay: { number: number; title: string; kind: string; minutes: number } | null
+  courseDay: { number: number; title: string; kind: string; minutes: number; slug: string } | null
   courseDayDone: boolean
   checkedInToday: boolean
   mealsLoggedToday: number
@@ -79,6 +79,7 @@ export const MODULES: AppModule[] = [
               key: 'course',
               kind: 'course',
               id: String(ctx.courseDay.number),
+              slug: ctx.courseDay.slug,
               label: `Day ${ctx.courseDay.number} · ${ctx.courseDay.title}`,
               hint: `${ctx.courseDay.kind} · ${ctx.courseDay.minutes} min`,
               done: ctx.courseDayDone,

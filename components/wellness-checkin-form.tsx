@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { saveCheckin } from '@/app/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { ChevronDown } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import type { Checkin, CyclePhase } from '@/lib/types'
 import { SYMPTOM_KEYS } from '@/components/symptom-intelligence'
@@ -53,7 +54,6 @@ export function WellnessCheckinForm({ existing }: { existing: Checkin | null }) 
   const [stress, setStress] = useState(existing?.stress ?? 5)
   const [mood, setMood] = useState(existing?.mood ?? '')
   const [hydration, setHydration] = useState(existing?.hydration_oz?.toString() ?? '')
-  const [protein, setProtein] = useState(existing?.protein_g?.toString() ?? '')
   const [sunlight, setSunlight] = useState(existing?.sunlight_minutes?.toString() ?? '')
   const [movement, setMovement] = useState(existing?.movement_minutes?.toString() ?? '')
   const [cyclePhase, setCyclePhase] = useState<CyclePhase | null>(existing?.cycle_phase ?? null)
@@ -72,7 +72,6 @@ export function WellnessCheckinForm({ existing }: { existing: Checkin | null }) 
         stress,
         mood: mood || undefined,
         hydrationOz: hydration ? parseFloat(hydration) : undefined,
-        proteinG: protein ? parseFloat(protein) : undefined,
         sunlightMinutes: sunlight ? parseInt(sunlight, 10) : undefined,
         movementMinutes: movement ? parseInt(movement, 10) : undefined,
         cyclePhase: cyclePhase ?? undefined,
@@ -99,68 +98,82 @@ export function WellnessCheckinForm({ existing }: { existing: Checkin | null }) 
         />
       ))}
 
-      <div className="flex flex-col gap-1.5">
-        <Label className="text-xs text-muted-foreground">mood, in a word or two</Label>
-        <Input value={mood} onChange={(e) => setMood(e.target.value)} placeholder="e.g. steady, foggy, hopeful" className="h-11" />
-      </div>
+      {/*
+        Three scales and done.
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-xs text-muted-foreground">hydration (oz)</Label>
-          <Input type="number" value={hydration} onChange={(e) => setHydration(e.target.value)} className="h-11" />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-xs text-muted-foreground">protein (g)</Label>
-          <Input type="number" value={protein} onChange={(e) => setProtein(e.target.value)} className="h-11" />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-xs text-muted-foreground">sunlight (min)</Label>
-          <Input type="number" value={sunlight} onChange={(e) => setSunlight(e.target.value)} className="h-11" />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-xs text-muted-foreground">movement (min)</Label>
-          <Input type="number" value={movement} onChange={(e) => setMovement(e.target.value)} className="h-11" />
-        </div>
-      </div>
-
+        This used to ask nine things every day — mood, hydration, protein,
+        sunlight, movement, cycle phase and symptoms, four of them numbers she
+        would have to estimate. A woman does that on day one because she is
+        excited and skips the app by day nine because opening it means being
+        interviewed. The rest is still here for whoever wants it; it just is
+        not the price of checking in.
+      */}
+      <details className="group">
+        <summary className="flex cursor-pointer list-none items-center gap-1.5 text-sm text-muted-foreground [&::-webkit-details-marker]:hidden">
+          add more
+          <ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
+        </summary>
+        <div className="mt-5 flex flex-col gap-5">
       <div className="flex flex-col gap-1.5">
-        <Label className="text-xs text-muted-foreground">cycle phase</Label>
-        <div className="flex flex-wrap gap-1.5">
-          {CYCLE_PHASES.map((p) => (
-            <button
-              key={p.value}
-              type="button"
-              onClick={() => setCyclePhase(cyclePhase === p.value ? null : p.value)}
-              className={cn(
-                'rounded-full px-3 py-1.5 text-xs font-medium ring-1 ring-border transition-colors',
-                cyclePhase === p.value ? 'bg-foreground text-background ring-foreground' : 'bg-transparent text-muted-foreground',
-              )}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-      </div>
+            <Label className="text-xs text-muted-foreground">mood, in a word or two</Label>
+            <Input value={mood} onChange={(e) => setMood(e.target.value)} placeholder="e.g. steady, foggy, hopeful" className="h-11" />
+          </div>
 
-      <div className="flex flex-col gap-1.5">
-        <Label className="text-xs text-muted-foreground">any symptoms today?</Label>
-        <div className="flex flex-wrap gap-1.5">
-          {SYMPTOM_OPTIONS.map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => toggleSymptom(s)}
-              className={cn(
-                'rounded-full px-3 py-1.5 text-xs font-medium ring-1 ring-border transition-colors',
-                symptoms.includes(s) ? 'bg-foreground text-background ring-foreground' : 'bg-transparent text-muted-foreground',
-              )}
-            >
-              {s}
-            </button>
-          ))}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-xs text-muted-foreground">hydration (oz)</Label>
+              <Input type="number" value={hydration} onChange={(e) => setHydration(e.target.value)} className="h-11" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-xs text-muted-foreground">sunlight (min)</Label>
+              <Input type="number" value={sunlight} onChange={(e) => setSunlight(e.target.value)} className="h-11" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-xs text-muted-foreground">movement (min)</Label>
+              <Input type="number" value={movement} onChange={(e) => setMovement(e.target.value)} className="h-11" />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-xs text-muted-foreground">cycle phase</Label>
+            <div className="flex flex-wrap gap-1.5">
+              {CYCLE_PHASES.map((p) => (
+                <button
+                  key={p.value}
+                  type="button"
+                  onClick={() => setCyclePhase(cyclePhase === p.value ? null : p.value)}
+                  className={cn(
+                    'rounded-full px-3 py-1.5 text-xs font-medium ring-1 ring-border transition-colors',
+                    cyclePhase === p.value ? 'bg-foreground text-background ring-foreground' : 'bg-transparent text-muted-foreground',
+                  )}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-xs text-muted-foreground">any symptoms today?</Label>
+            <div className="flex flex-wrap gap-1.5">
+              {SYMPTOM_OPTIONS.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => toggleSymptom(s)}
+                  className={cn(
+                    'rounded-full px-3 py-1.5 text-xs font-medium ring-1 ring-border transition-colors',
+                    symptoms.includes(s) ? 'bg-foreground text-background ring-foreground' : 'bg-transparent text-muted-foreground',
+                  )}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+            <p className="mt-1 text-[0.7rem] text-muted-foreground">this is educational tracking, not medical advice — check with a doctor for anything persistent or concerning.</p>
+          </div>
         </div>
-        <p className="mt-1 text-[0.7rem] text-muted-foreground">this is educational tracking, not medical advice — check with a doctor for anything persistent or concerning.</p>
-      </div>
+      </details>
 
       <Button onClick={handleSave} disabled={pending} className="h-11">
         {pending ? 'saving…' : 'save check-in'}

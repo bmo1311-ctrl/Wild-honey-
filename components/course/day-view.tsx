@@ -25,6 +25,7 @@ export function DayView({
   showNav = true,
   pillars: pillarsProp,
   full = false,
+  daysDone = 0,
 }: {
   course: Course
   day: CourseDay
@@ -38,6 +39,8 @@ export function DayView({
   pillars?: Pillar4[]
   /** She asked for the whole day rather than the short path. */
   full?: boolean
+  /** Days already finished in this course, for the celebration line. */
+  daysDone?: number
 }) {
   const split = day.kind === 'milestone' ? splitMilestone(day.blocks) : null
   const twoPart = split !== null
@@ -95,7 +98,14 @@ export function DayView({
             The writing is done
           </Link>
         ) : (
-          <DoneButton dayNumber={day.day_number} slug={course.slug} initialDone={done} doneAt={doneAt} />
+          <DoneButton
+            dayNumber={day.day_number}
+            slug={course.slug}
+            initialDone={done}
+            doneAt={doneAt}
+            daysDone={daysDone}
+            courseLength={course.length_days}
+          />
         )}
 
         {showNav && (

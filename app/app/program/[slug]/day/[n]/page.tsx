@@ -51,6 +51,7 @@ export default async function CourseDayPage({
       doneAt={null}
       part={part === '2' ? 2 : 1}
       full={full === '1'}
+      daysDone={completed.length}
       pillars={pillarOfDay(day, overrides)}
     />
   )

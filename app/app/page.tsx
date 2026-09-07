@@ -8,7 +8,6 @@ import { suggestHabits } from '@/lib/habit-suggestions'
 import { todayRows } from '@/lib/modules'
 import { getCourse, getDay, weekOfDay } from '@/lib/courses'
 import { localHour, localToday } from '@/lib/today'
-import { CourseSwitcher } from '@/components/course/course-switcher'
 import { buildActivity, consistency, streaksFrom } from '@/lib/activity'
 import { QuickAddHabit } from '@/components/quick-add-habit'
 import { NoticeLine } from '@/components/notice-line'
@@ -52,7 +51,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     const programs = (me.child_permissions?.program ?? []).map((slug) => getCourse(slug)).filter((c): c is NonNullable<typeof c> => Boolean(c)).map((c) => ({ slug: c.slug, title: c.title }))
     return <KidToday name={me.name?.split(' ')[0] ?? 'there'} items={items} mealsToday={nutrition.loggedMeals.length} starsThisWeek={stars} programs={programs} earned={(kid?.balance.waiting ?? 0) + (kid?.balance.ready ?? 0)} />
   }
-  const [{ slug, enrollment, currentDay, completedDays, otherSlugs }, profile, activityDates, checkin, nutrition, habits, habitLogs] = await Promise.all([
+  const [{ slug, enrollment, currentDay, completedDays }, profile, activityDates, checkin, nutrition, habits, habitLogs] = await Promise.all([
     getActiveCourseState(preferred),
     getSessionProfile(),
     getActivityDates(),
@@ -111,10 +110,21 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
   })
   const habitSuggestions = suggestHabits(goals.map((g) => g.goal), habits.map((h) => h.title))
 
+  /*
+   * Counters that can only ever say something true and kind.
+   *
+   * A streak of zero under a flame, with "best 12" beside it, tells a woman
+   * who has been ill for a week that she has lost something. She has not —
+   * the days she did are still done. So a broken run shows the best run as
+   * the number instead, and the percentage is gone: nine per cent of
+   * fifty-six days is a discouraging way to describe five real mornings.
+   */
   const stats = [
     { label: 'Day', value: currentDay ? `${currentDay}` : '—', sub: course ? `of ${course.length_days}` : '' },
-    { label: 'Streak', value: `${streaks.current}`, sub: streaks.longest > streaks.current ? `best ${streaks.longest}` : `${week.hit} of 7 days`, flame: true },
-    { label: 'Done', value: `${completedDays.length}`, sub: `${pct}%` },
+    streaks.current > 0
+      ? { label: 'Run', value: `${streaks.current}`, sub: streaks.current === 1 ? 'day' : 'days', flame: true }
+      : { label: 'Best run', value: `${streaks.longest}`, sub: streaks.longest === 1 ? 'day' : 'days', flame: true },
+    { label: 'Done', value: `${completedDays.length}`, sub: completedDays.length === 1 ? 'day' : 'days' },
     {
       label: 'Protein',
       value: nutrition.protein ? `${Math.round(nutrition.protein)}` : '0',
@@ -125,7 +135,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
   const access = await getAccess()
   const rows = todayRows({
     tier: access.tier,
-    courseDay: day ? { number: day.day_number, title: day.title, kind: day.kind, minutes: day.minutes } : null,
+    courseDay: day ? { number: day.day_number, title: day.title, kind: day.kind, minutes: day.minutes, slug } : null,
     courseDayDone: dayDone,
     checkedInToday: Boolean(checkin),
     mealsLoggedToday: nutrition.loggedMeals.length,
@@ -210,8 +220,6 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
           </div>
         ))}
       </section>
-
-      {otherSlugs.length > 0 && <CourseSwitcher current={slug} others={otherSlugs} />}
 
       <section>
         <div className="h-2 w-full overflow-hidden rounded-full bg-muted">

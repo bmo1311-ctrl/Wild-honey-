@@ -1338,6 +1338,25 @@ export async function getCourseState(slug: string = COURSE_SLUG): Promise<{
   return { enrollment, currentDay: currentDayFrom(course, enrollment.started_on, await localToday()), completedDays }
 }
 
+/**
+ * Every course she has ever started, paused ones included.
+ *
+ * getEnrollments hides paused courses on purpose — they should not ask for a
+ * day. The Programs page is the one place that needs to see them, so she can
+ * find the thing she set down and pick it back up.
+ */
+export async function getAllEnrollments(): Promise<CourseEnrollment[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const data = ok(
+    await supabase.from('course_enrollments').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+  )
+  return (data as CourseEnrollment[]) ?? []
+}
+
 /** The course she is actually on right now: the most recently started. */
 export async function getActiveCourseState(preferredSlug?: string | null): Promise<{
   slug: string

@@ -203,6 +203,8 @@ export interface CourseEnrollment {
   is_active: boolean
   completed_at: string | null
   created_at: string
+  /** Set while she has the course switched off. */
+  paused_on?: string | null
 }
 
 export interface CourseDayProgress {

@@ -2007,11 +2007,59 @@ export async function enrollInCourse(slug: string = COURSE_SLUG) {
   return { ok: true }
 }
 
+/**
+ * Switch a course off without losing anything.
+ *
+ * Her progress stays exactly where it is; the course simply stops asking for
+ * a day every morning. Recording when she paused is what lets resuming put
+ * her back on the day she left rather than the day the calendar reached.
+ */
 export async function unenrollFromCourse(slug: string = COURSE_SLUG) {
   const { supabase, user } = await requireUser()
   const { error } = await supabase
     .from('course_enrollments')
-    .update({ is_active: false })
+    .update({ is_active: false, paused_on: await localToday() })
+    .eq('user_id', user.id)
+    .eq('course_slug', slug)
+  if (error) return { error: error.message }
+  revalidatePath('/app')
+  revalidatePath('/app/program')
+  return { ok: true }
+}
+
+/**
+ * Switch it back on, on the day she left it.
+ *
+ * The day number comes from how long ago the course started, so coming back
+ * after a fortnight would otherwise mean fourteen days she never agreed to
+ * miss. Shifting the start date forward by the length of the pause keeps her
+ * exactly where she was — the time away costs her nothing.
+ */
+export async function resumeCourse(slug: string) {
+  const { supabase, user } = await requireUser()
+  if (!(await paidUser(supabase, user.id))) return { error: 'Programs are part of The Circle. Join to begin.' }
+
+  const { data: existing } = await supabase
+    .from('course_enrollments')
+    .select('started_on, paused_on')
+    .eq('user_id', user.id)
+    .eq('course_slug', slug)
+    .maybeSingle()
+  if (!existing) return enrollInCourse(slug)
+
+  const today = await localToday()
+  const row = existing as { started_on: string; paused_on: string | null }
+  let startedOn = row.started_on
+  if (row.paused_on) {
+    const away = Math.max(0, Math.round((Date.parse(today) - Date.parse(row.paused_on)) / 86_400_000))
+    const shifted = new Date(row.started_on)
+    shifted.setDate(shifted.getDate() + away)
+    startedOn = shifted.toISOString().slice(0, 10)
+  }
+
+  const { error } = await supabase
+    .from('course_enrollments')
+    .update({ is_active: true, paused_on: null, started_on: startedOn })
     .eq('user_id', user.id)
     .eq('course_slug', slug)
   if (error) return { error: error.message }
