@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { Plus, Sun, Moon, X, AlertTriangle, Info, ScanLine, ClipboardPaste, Loader2, Search } from 'lucide-react'
+import { Plus, Sun, Moon, X, AlertTriangle, Info, ScanLine, ClipboardPaste, Loader2, Search, Sparkles } from 'lucide-react'
 import { addBeautyProduct, removeBeautyProduct, setLifeStage } from '@/app/actions'
 import { ACTIVES, detectActives, getActive, guessCategory } from '@/lib/actives'
 import { buildRoutines, findGaps, type ShelfItem } from '@/lib/routine'
@@ -26,12 +26,18 @@ export function RoutineShelf({
   lifeStage,
   domain = 'skin',
   categories,
+  expectedGaps = [],
+  dayParts = true,
 }: {
   shelf: ShelfItem[]
   lifeStage: LifeStage
   domain?: string
   /** Which product kinds belong in this area, in application order. */
   categories: string[]
+  /** What this area considers worth noticing as missing. */
+  expectedGaps?: { category: string; note: string }[]
+  /** Whether this area splits into morning and evening at all. */
+  dayParts?: boolean
 }) {
   const CATEGORIES = categories
   const [adding, setAdding] = useState(false)
@@ -51,7 +57,7 @@ export function RoutineShelf({
   const [pending, startTransition] = useTransition()
 
   const { am, pm } = useMemo(() => buildRoutines(shelf, lifeStage), [shelf, lifeStage])
-  const gaps = useMemo(() => findGaps(shelf), [shelf])
+  const gaps = useMemo(() => findGaps(shelf, expectedGaps), [shelf, expectedGaps])
 
   useEffect(() => {
     if (adding) formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -92,7 +98,7 @@ export function RoutineShelf({
     setPicked(hit.actives ?? [])
     setIngredients(hit.ingredients_raw)
     setBarcode(hit.barcode)
-    setCategory(guessCategory(`${hit.brand ?? ''} ${hit.name}`) ?? category)
+    setCategory(guessCategory(`${hit.brand ?? ''} ${hit.name}`, domain, categories) ?? category)
     setHits([])
     setScanNote(
       hit.actives?.length
@@ -206,11 +212,19 @@ export function RoutineShelf({
     <div className="flex flex-col gap-6">
       {shelf.length === 0 ? (
         <p className="text-sm text-muted-foreground">add what you use. the order sorts itself.</p>
-      ) : (
+      ) : dayParts ? (
         <div className="grid gap-4 sm:grid-cols-2">
           <RoutineColumn title="morning" icon={<Sun className="h-4 w-4" />} steps={am.steps} onRemove={handleRemove} />
           <RoutineColumn title="evening" icon={<Moon className="h-4 w-4" />} steps={pm.steps} onRemove={handleRemove} />
         </div>
+      ) : (
+        /*
+          Hair and nails do not have a morning and an evening. Hair runs on
+          wash days — the plan for that is the card above this one — and nails
+          run on their own slow cycle. Splitting either into two columns
+          invents a routine she was never meant to keep.
+        */
+        <RoutineColumn title="your shelf" icon={<Sparkles className="h-4 w-4" />} steps={[...am.steps, ...pm.steps.filter((p) => !am.steps.some((a) => a.id === p.id))]} onRemove={handleRemove} />
       )}
 
       {cautions.length > 0 && (
@@ -286,7 +300,7 @@ anything to avoid?
               value={name}
               onChange={(e) => {
                 setName(e.target.value)
-                const guess = guessCategory(e.target.value)
+                const guess = guessCategory(e.target.value, domain, categories)
                 if (guess) setCategory(guess)
               }}
               placeholder="start typing — cerave, the ordinary…"

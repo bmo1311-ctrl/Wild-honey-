@@ -249,9 +249,49 @@ const CATEGORY_HINTS: [RegExp, string][] = [
   [/\b(cream|lotion|moistur|balm|hydrat|emulsion)\b/i, 'moisturizer'],
 ]
 
-export function guessCategory(name: string): string | null {
-  for (const [pattern, category] of CATEGORY_HINTS) {
-    if (pattern.test(name)) return category
+/**
+ * Hair sorts by what a product does to the strand, not what it feels like.
+ * Checked before the generic list, because "Strengthening Treatment Oil" is a
+ * hair oil, and the skin rules would have called it a face oil.
+ */
+const HAIR_HINTS: [RegExp, string][] = [
+  // A bond builder is a bond builder whatever the bottle calls itself — K18
+  // sells a "Molecular Repair Hair Mask" that is not a moisture mask at all.
+  [/\b(olaplex|k18|bond|plex|protein|keratin|collagen)\b/i, 'hair-treatment'],
+  // Oil before scalp: the rosemary oils all say "scalp" on the front, and
+  // they belong on the days between washes rather than in a wash.
+  [/\b(oil|elixir)\b/i, 'hair-oil'],
+  [/\b(shampoo|clarifying|anti-residue)\b/i, 'shampoo'],
+  [/\b(mask|masque|deep condition)\b/i, 'hair-mask'],
+  [/\b(scalp|dandruff|exfoliat|hair density)\b/i, 'hair-treatment'],
+  [/\bconditioner\b/i, 'conditioner'],
+  [/\btreatment\b/i, 'hair-treatment'],
+]
+
+const NAIL_HINTS: [RegExp, string][] = [
+  [/\b(cuticle|oil|serum)\b/i, 'nail-oil'],
+  [/\b(base coat|strengthener|hardener|nail envy|defense)\b/i, 'nail-base'],
+  [/\b(treatment|formula|cure)\b/i, 'nail-treatment'],
+]
+
+/**
+ * Guess what kind of product this is from its name.
+ *
+ * The domain matters. This used to know only skin words and ran everywhere,
+ * so a hair oil came back as a face oil — a category the hair shelf does not
+ * have, which left the product sitting in the middle of a routine it did not
+ * belong to. Anything guessed outside the area's own categories is discarded
+ * rather than shown in the wrong place.
+ */
+export function guessCategory(name: string, domain = 'skin', allowed?: string[]): string | null {
+  const table = domain === 'hair' ? HAIR_HINTS : domain === 'nails' ? NAIL_HINTS : CATEGORY_HINTS
+  let guess: string | null = null
+  for (const [pattern, category] of table) {
+    if (pattern.test(name)) {
+      guess = category
+      break
+    }
   }
-  return null
+  if (guess && allowed && !allowed.includes(guess)) return null
+  return guess
 }

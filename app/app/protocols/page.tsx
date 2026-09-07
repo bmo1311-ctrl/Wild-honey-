@@ -83,6 +83,8 @@ export default async function ProtocolsPage({
             <BeautyArea
               areaKey={area.key as ProtocolArea}
               categories={area.categories}
+              expectedGaps={area.gaps}
+              dayParts={area.dayParts}
               allProducts={allProducts}
               profile={profile}
               log={log}
@@ -99,6 +101,8 @@ export default async function ProtocolsPage({
 function BeautyArea({
   areaKey,
   categories,
+  expectedGaps,
+  dayParts,
   allProducts,
   profile,
   log,
@@ -106,6 +110,8 @@ function BeautyArea({
 }: {
   areaKey: ProtocolArea
   categories: string[]
+  expectedGaps: { category: string; note: string }[]
+  dayParts: boolean
   allProducts: Awaited<ReturnType<typeof getMemberProducts>>
   profile: Awaited<ReturnType<typeof getSessionProfile>>
   log: Awaited<ReturnType<typeof getRoutineLog>>
@@ -152,6 +158,8 @@ function BeautyArea({
         lifeStage={profile?.life_stage ?? null}
         domain={areaKey}
         categories={categories}
+        expectedGaps={expectedGaps}
+        dayParts={dayParts}
       />
     </div>
   )

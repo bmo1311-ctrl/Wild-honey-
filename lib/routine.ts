@@ -125,12 +125,15 @@ export function buildRoutines(shelf: ShelfItem[], lifeStage: LifeStage): { am: R
   return { am: assemble('am'), pm: assemble('pm') }
 }
 
-/** What is missing from a routine that probably should not be. */
-export function findGaps(shelf: ShelfItem[]): string[] {
+/**
+ * What is missing from a routine that probably should not be.
+ *
+ * The expectations belong to the area, not to this function. They were
+ * hardcoded to skin — spf, cleanser, moisturiser — and ran on every area, so
+ * Hair told her she had no sunscreen and no moisturiser. Both true, and
+ * neither of them anything to do with hair.
+ */
+export function findGaps(shelf: ShelfItem[], expected: { category: string; note: string }[] = []): string[] {
   const categories = new Set(shelf.map((i) => i.category).filter(Boolean) as string[])
-  const gaps: string[] = []
-  if (!categories.has('spf')) gaps.push('No sunscreen yet — it is the one step that protects everything else you are doing.')
-  if (!categories.has('cleanser')) gaps.push('No cleanser on your shelf.')
-  if (!categories.has('moisturizer')) gaps.push('No moisturiser on your shelf.')
-  return gaps
+  return expected.filter((e) => !categories.has(e.category)).map((e) => e.note)
 }

@@ -20,3 +20,5 @@ simhair.ts
 sim.tsconfig.json
 shapecheck.ts
 shape.tsconfig.json
+catcheck.ts
+cat.tsconfig.json
