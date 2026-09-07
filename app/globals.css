@@ -272,3 +272,40 @@
   .petal { display: none; }
   .burst-line { animation-duration: 900ms; }
 }
+
+/*
+ * Closet tiles.
+ *
+ * A page of twenty-one identical grey rows is a filing cabinet. This is meant
+ * to be the opposite — things on shelves you can see, tinted so the eye sorts
+ * them before the words do. The highlight across the top is the glossy plastic
+ * of a 2000s wardrobe door, and it is the whole trick.
+ */
+.closet-tile {
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in oklch, white, transparent 62%),
+    transparent 42%
+  );
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.closet-tile:active {
+  transform: translateY(1px) scale(0.985);
+}
+
+@media (hover: hover) {
+  .closet-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -12px color-mix(in oklch, var(--ink), transparent 70%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .closet-tile,
+  .closet-tile:active,
+  .closet-tile:hover {
+    transform: none;
+    transition: none;
+  }
+}

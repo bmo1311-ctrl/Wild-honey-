@@ -1,15 +1,55 @@
 import Link from 'next/link'
-import { Target, GraduationCap, PenLine, Sparkles, Dumbbell, Flame, LogOut, ShoppingBag, Tent, Archive, ChevronRight, ClipboardList, Refrigerator, BookMarked, Users, HelpCircle, TrendingUp, ShieldCheck, Heart, ChefHat, Trophy, CalendarDays } from 'lucide-react'
+import {
+  Archive,
+  BookMarked,
+  CalendarDays,
+  ChefHat,
+  ClipboardList,
+  Dumbbell,
+  Flame,
+  GraduationCap,
+  Heart,
+  HelpCircle,
+  LogOut,
+  PenLine,
+  PhoneCall,
+  Refrigerator,
+  ShieldCheck,
+  ShoppingBag,
+  Sparkles,
+  Target,
+  Tent,
+  TrendingUp,
+  Trophy,
+  Users,
+} from 'lucide-react'
 import { signOut } from '@/app/actions'
 import { HoneyProfileCard } from '@/components/honey-profile-card'
 import { BloomAvatar } from '@/components/bloom-avatar'
 import { TierBadge } from '@/components/tier-badge'
+import { ClosetShelf } from '@/components/closet'
 import { getMyEntries, getMyGoals, getSessionProfile, getVitalityHistory } from '@/lib/data'
+import { SQUARE_LINKS } from '@/lib/payment-links'
 import { relativeTime } from '@/lib/pillars'
 import { FEATURES } from '@/lib/features'
 
+/**
+ * Her page, as a closet rather than a filing cabinet.
+ *
+ * It used to be twenty-one identical grey rows with a chevron on each, and
+ * half of them were not hers — workouts, recipes, retreats, the shop. A page
+ * called "You" that is mostly a menu of things for sale is a hard page to
+ * love, and impossible to scan.
+ *
+ * Same links, on four tinted shelves. Nothing was removed.
+ */
 export default async function ProfilePage() {
-  const [profile, entries, goals, vitalityHistory] = await Promise.all([getSessionProfile(), getMyEntries(), getMyGoals(), getVitalityHistory()])
+  const [profile, entries, goals, vitalityHistory] = await Promise.all([
+    getSessionProfile(),
+    getMyEntries(),
+    getMyGoals(),
+    getVitalityHistory(),
+  ])
   if (!profile) return null
 
   const shared = entries.filter((e) => e.visibility === 'circle').length
@@ -18,21 +58,23 @@ export default async function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col items-center gap-3 rounded-2xl bg-card p-6 text-center ring-1 ring-border">
+      <div className="honey-glow flex flex-col items-center gap-3 rounded-3xl bg-card p-6 text-center ring-1 ring-border">
         <BloomAvatar name={profile.name} color={profile.avatar_color} avatarUrl={profile.avatar_url} className="h-16 w-16 text-xl" />
         <div className="flex flex-col items-center gap-1.5">
           <h1 className="font-serif text-2xl font-semibold">{profile.name}</h1>
           <TierBadge tier={profile.membership_tier} />
           <p className="text-xs text-muted-foreground">joined {relativeTime(profile.created_at)}</p>
         </div>
-        <div className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
-          <Flame className="h-3.5 w-3.5 text-honey" />
-          {profile.streak_count} day streak
-        </div>
+        {profile.streak_count > 0 && (
+          <div className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
+            <Flame className="h-3.5 w-3.5 text-honey" />
+            {profile.streak_count} day{profile.streak_count === 1 ? '' : 's'} running
+          </div>
+        )}
       </div>
 
       {profile.membership_tier === 'free' && (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-5 text-center">
+        <div className="rounded-3xl border border-dashed border-border bg-card p-5 text-center">
           <p className="font-serif text-lg font-semibold">unlock The Circle</p>
           <p className="mt-1 text-sm text-muted-foreground text-pretty">
             both programs, Watch, recipes and meal plans, every workout, Freedom, and posting in the Circle.
@@ -46,208 +88,114 @@ export default async function ProfilePage() {
         </div>
       )}
 
-      {profile.membership_tier !== 'free' && (
-        <Link
-          href="/api/billing-portal"
-          className="rounded-2xl bg-card p-4 text-center text-sm font-medium ring-1 ring-border"
-        >
-          manage your membership
-        </Link>
-      )}
-
       <HoneyProfileCard profile={profile} goals={goals.map((g) => g.goal)} baseline={baseline} latest={latest} />
 
-      <div>
-        <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">my journey</p>
-        <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
-          <Link href="/app/nutrition/goals" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-            <Target className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Your targets &amp; cycle</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-          <Link href="/app/household" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-            <Users className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Your household</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-          <Link href="/app/learning" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-            <GraduationCap className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Learning lists</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-          <Link href="/app/write" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-            <PenLine className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Write</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-          <Link href="/app/becoming" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-            <Sparkles className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Your becoming</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-            {FEATURES.progress && (
-              <Link href="/app/progress" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                <span className="flex-1 text-sm font-medium">My Evolution</span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </Link>
-            )}
-            {FEATURES.fixedCalendar && (
-              <Link href="/app/calendar" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-                <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                <span className="flex-1 text-sm font-medium">Calendar</span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </Link>
-            )}
-            {FEATURES.challenges && (
-              <Link href="/app/challenges" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-                <Trophy className="h-4 w-4 text-muted-foreground" />
-                <span className="flex-1 text-sm font-medium">Challenges</span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </Link>
-            )}
-            {FEATURES.archive && (
-              <Link href="/app/archive" className="flex items-center gap-3 px-4 py-3.5">
-                <Archive className="h-4 w-4 text-muted-foreground" />
-                <span className="flex-1 text-sm font-medium">Archive</span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </Link>
-            )}
-          </div>
-        </div>
+      <ClosetShelf
+        title="yours"
+        tone="identity"
+        items={[
+          { href: '/app/becoming', label: 'Becoming', icon: Sparkles, note: "what's changed" },
+          { href: '/app/write', label: 'Write', icon: PenLine },
+          FEATURES.progress && { href: '/app/progress', label: 'Evolution', icon: TrendingUp },
+          FEATURES.fixedCalendar && { href: '/app/calendar', label: 'Calendar', icon: CalendarDays },
+          FEATURES.archive && { href: '/app/archive', label: 'Archive', icon: Archive },
+          FEATURES.challenges && { href: '/app/challenges', label: 'Challenges', icon: Trophy },
+        ]}
+      />
 
-      <div>
-        <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">nourish &amp; move</p>
-        <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
-          <Link href="/app/workouts" className="flex items-center gap-3 px-4 py-3.5">
-            <Dumbbell className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Workouts</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-          {FEATURES.recipes && (
-            <Link href="/app/recipes" className="flex items-center gap-3 px-4 py-3.5 border-t border-border">
-              <ChefHat className="h-4 w-4 text-muted-foreground" />
-              <span className="flex-1 text-sm font-medium">Recipes</span>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </Link>
-          )}
-          {FEATURES.pantry && (
-            <Link href="/app/pantry" className="flex items-center gap-3 px-4 py-3.5 border-t border-border">
-              <Refrigerator className="h-4 w-4 text-muted-foreground" />
-              <span className="flex-1 text-sm font-medium">Pantry &amp; Grocery</span>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </Link>
-          )}
-          {FEATURES.protocols && (
-            <Link href="/app/protocols" className="flex items-center gap-3 px-4 py-3.5 border-t border-border">
-              <ClipboardList className="h-4 w-4 text-muted-foreground" />
-              <span className="flex-1 text-sm font-medium">Protocols</span>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </Link>
-          )}
-        </div>
-      </div>
+      <ClosetShelf
+        title="your body"
+        tone="mindset"
+        items={[
+          FEATURES.protocols && { href: '/app/protocols', label: 'Protocols', icon: ClipboardList, note: 'skin, hair, nails' },
+          { href: '/app/nutrition/goals', label: 'Targets', icon: Target, note: '& your cycle' },
+          { href: '/app/workouts', label: 'Workouts', icon: Dumbbell },
+          FEATURES.recipes && { href: '/app/recipes', label: 'Recipes', icon: ChefHat },
+          FEATURES.pantry && { href: '/app/pantry', label: 'Pantry', icon: Refrigerator, note: '& grocery' },
+        ]}
+      />
 
-      <div>
-        <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">connect</p>
-        <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
-          {FEATURES.groups && (
-            <Link href="/app/groups" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-              <Users className="h-4 w-4 text-muted-foreground" />
-              <span className="flex-1 text-sm font-medium">Groups</span>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </Link>
-          )}
-          {FEATURES.vault && (
-            <Link href="/app/vault" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-              <BookMarked className="h-4 w-4 text-muted-foreground" />
-              <span className="flex-1 text-sm font-medium">Resource Vault</span>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </Link>
-          )}
-          {FEATURES.expertQA && (
-            <Link href="/app/ask" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-              <HelpCircle className="h-4 w-4 text-muted-foreground" />
-              <span className="flex-1 text-sm font-medium">Ask an Expert</span>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </Link>
-          )}
-          <Link href="/app/guidelines" className="flex items-center gap-3 px-4 py-3.5">
-            <Heart className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Community Guidelines</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-        </div>
-      </div>
+      <ClosetShelf
+        title="your people"
+        tone="honey"
+        items={[
+          { href: '/app/household', label: 'Household', icon: Users },
+          { href: '/app/learning', label: 'Learning', icon: GraduationCap, note: 'lists for home' },
+          FEATURES.groups && { href: '/app/groups', label: 'Groups', icon: Users },
+          FEATURES.expertQA && { href: '/app/ask', label: 'Ask an expert', icon: HelpCircle },
+          { href: '/app/guidelines', label: 'Guidelines', icon: Heart },
+        ]}
+      />
 
-      {(FEATURES.retreats || FEATURES.shop) && (
-        <div>
-          <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">retreats &amp; shop</p>
-          <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
-            {FEATURES.retreats && (
-              <Link href="/app/retreats" className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
-                <Tent className="h-4 w-4 text-muted-foreground" />
-                <span className="flex-1 text-sm font-medium">Retreats</span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </Link>
-            )}
-            {FEATURES.shop && (
-              <Link href="/app/shop" className="flex items-center gap-3 px-4 py-3.5">
-                <ShoppingBag className="h-4 w-4 text-muted-foreground" />
-                <span className="flex-1 text-sm font-medium">Shop</span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
-
-      <div>
-        <p className="mb-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">account</p>
-        <div className="flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-border">
-          <Link href="/app/settings" className="flex items-center gap-3 px-4 py-3.5">
-            <ShieldCheck className="h-4 w-4 text-muted-foreground" />
-            <span className="flex-1 text-sm font-medium">Privacy &amp; Notifications</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
-        </div>
-      </div>
+      <ClosetShelf
+        title="more from wild honey"
+        tone="faith"
+        items={[
+          { href: SQUARE_LINKS.call ?? '/app/membership', label: 'A 1:1 with Brooke', icon: PhoneCall, note: '90 min · $198', external: Boolean(SQUARE_LINKS.call) },
+          FEATURES.vault && { href: '/app/vault', label: 'Resource vault', icon: BookMarked },
+          FEATURES.retreats && { href: '/app/retreats', label: 'Retreats', icon: Tent },
+          FEATURES.shop && { href: '/app/shop', label: 'Shop', icon: ShoppingBag },
+        ]}
+      />
 
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-serif text-lg font-semibold">your reflections</h2>
-          <span className="text-xs text-muted-foreground">
-            {entries.length} total · {shared} shared
-          </span>
+          <h2 className="font-serif text-[17px] font-semibold">your reflections</h2>
+          {entries.length > 0 && (
+            <span className="text-xs text-muted-foreground">
+              {entries.length} total · {shared} shared
+            </span>
+          )}
         </div>
         {entries.length === 0 ? (
-          <p className="rounded-2xl bg-card p-6 text-center text-sm text-muted-foreground ring-1 ring-border">
-            nothing written yet — head to today's prompt to begin.
+          <p className="rounded-3xl bg-card p-6 text-center text-sm text-muted-foreground ring-1 ring-border">
+            nothing written yet — head to today&rsquo;s prompt to begin.
           </p>
         ) : (
           <div className="flex flex-col gap-3">
-            {entries.map((e) => (
-              <div key={e.id} className="rounded-2xl bg-card p-4 ring-1 ring-border">
+            {entries.slice(0, 3).map((e) => (
+              <div key={e.id} className="rounded-3xl bg-card p-4 ring-1 ring-border">
                 <p className="text-xs text-muted-foreground">{relativeTime(e.created_at)}</p>
-                {e.prompt && (
-                  <p className="mt-1 text-xs italic text-muted-foreground text-pretty">"{e.prompt.text}"</p>
-                )}
+                {e.prompt && <p className="mt-1 text-xs italic text-muted-foreground text-pretty">&ldquo;{e.prompt.text}&rdquo;</p>}
                 <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-pretty">{e.text}</p>
               </div>
             ))}
+            {entries.length > 3 && (
+              <Link href="/app/write" className="rounded-3xl bg-card p-4 text-center text-sm font-medium ring-1 ring-border">
+                all {entries.length} reflections
+              </Link>
+            )}
           </div>
         )}
       </div>
 
-      <form action={signOut}>
-        <button
-          type="submit"
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-secondary px-5 py-3 text-sm font-medium text-secondary-foreground"
+      <div className="flex flex-col gap-2">
+        <Link
+          href="/app/settings"
+          className="flex items-center gap-3 rounded-3xl bg-card px-4 py-3.5 text-sm font-medium ring-1 ring-border"
         >
-          <LogOut className="h-4 w-4" />
-          sign out
-        </button>
-      </form>
+          <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+          Privacy &amp; notifications
+        </Link>
+        {profile.membership_tier !== 'free' && (
+          <Link
+            href="/app/membership"
+            className="flex items-center gap-3 rounded-3xl bg-card px-4 py-3.5 text-sm font-medium ring-1 ring-border"
+          >
+            <Flame className="h-4 w-4 text-muted-foreground" />
+            Your membership
+          </Link>
+        )}
+        <form action={signOut}>
+          <button
+            type="submit"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-secondary px-5 py-3 text-sm font-medium text-secondary-foreground"
+          >
+            <LogOut className="h-4 w-4" />
+            sign out
+          </button>
+        </form>
+      </div>
     </div>
   )
 }

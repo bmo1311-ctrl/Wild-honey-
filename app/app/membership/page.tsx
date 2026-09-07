@@ -126,9 +126,13 @@ export default async function MembershipPage({ searchParams }: { searchParams: P
       </div>
 
       {access.paid && access.tier !== 'founder' && (
-        <Link href="/api/billing-portal" className="rounded-2xl bg-card p-4 text-center text-sm font-medium ring-1 ring-border">
-          manage your membership
-        </Link>
+        <div className="rounded-2xl bg-card p-4 text-sm ring-1 ring-border">
+          <p className="font-medium">Managing your membership</p>
+          <p className="mt-1 text-muted-foreground text-pretty">
+            Square handles the billing, so changing or cancelling happens from the receipt Square emailed
+            you — or email Brooke and she&rsquo;ll do it from her end.
+          </p>
+        </div>
       )}
 
       {!configured && profile?.is_admin && (
