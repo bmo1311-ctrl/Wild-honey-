@@ -8,20 +8,22 @@ import {
   type Chroma, type Hue, type SeasonKey, type Value,
 } from '@/lib/color-season'
 import { SHAPES, SCALES, VERTICAL, type Scale, type Shape, type VerticalProportion } from '@/lib/silhouette'
+import { ColorAnalysis } from '@/components/color-analysis'
 import { cn } from '@/lib/utils'
 
 /**
  * Her colouring and her frame, asked once.
  *
- * Two ways in, because women arrive at this from opposite directions. Some
+ * Three ways in, because women arrive at this from three directions. Some
  * have already been draped and know their season — those women should not be
- * made to answer three questions to reach an answer they already paid for.
- * The rest have never heard the word chroma, and for them three questions
- * about their own hair and skin is a far easier ask than picking from twelve
- * names that all sound made up.
+ * made to answer anything to reach a result they already paid for. Some have
+ * never heard the word chroma, and for them three questions about their own
+ * hair and skin is far easier than picking from twelve names that all sound
+ * made up. And some would rather the app looked at a photograph, which it
+ * can now do for the two axes a photograph can honestly carry.
  *
- * Whatever it lands on, she can overrule. She was in the room and this is
- * arithmetic.
+ * Whatever it lands on, she can overrule. She is the one in the mirror and
+ * all of this is arithmetic.
  */
 export function StyleSetup({
   initial,
@@ -37,7 +39,9 @@ export function StyleSetup({
   const [hue, setHue] = useState<Hue | null>(null)
   const [value, setValue] = useState<Value | null>(null)
   const [chroma, setChroma] = useState<Chroma | null>(null)
-  const [mode, setMode] = useState<'work-it-out' | 'i-know'>(initial.season ? 'i-know' : 'work-it-out')
+  const [mode, setMode] = useState<'photo' | 'work-it-out' | 'i-know'>(
+    initial.season ? 'i-know' : 'photo',
+  )
 
   const derived = hue && value && chroma ? seasonFrom(hue, value, chroma) : null
   const active = getSeason(season)
@@ -52,18 +56,43 @@ export function StyleSetup({
   return (
     <div className="flex flex-col gap-6">
       <section>
-        <div className="mb-2 flex items-center justify-between px-1">
-          <h2 className="font-serif text-[17px] font-semibold">your colouring</h2>
-          <button
-            type="button"
-            onClick={() => setMode((m) => (m === 'i-know' ? 'work-it-out' : 'i-know'))}
-            className="text-[12.5px] text-muted-foreground underline underline-offset-2"
-          >
-            {mode === 'i-know' ? 'work it out with me' : 'I already know mine'}
-          </button>
+        <h2 className="mb-2 px-1 font-serif text-[17px] font-semibold">your colouring</h2>
+
+        {/*
+          Three doors, because women arrive at this from three directions:
+          already draped and certain, willing to answer three questions, or
+          wanting the app to look at a photograph and tell them. All three
+          land in the same place, and she can overrule any of them.
+        */}
+        <div className="mb-3 flex gap-1.5">
+          {([
+            ['photo', 'from a photo'],
+            ['work-it-out', 'answer three questions'],
+            ['i-know', 'I know mine'],
+          ] as const).map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setMode(key)}
+              className={cn(
+                'flex-1 rounded-full px-2 py-1.5 text-[12.5px] font-medium ring-1 transition-colors',
+                mode === key ? 'bg-foreground text-background ring-foreground' : 'text-muted-foreground ring-border',
+              )}
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
-        {mode === 'i-know' ? (
+        {mode === 'photo' ? (
+          <ColorAnalysis
+            onAccept={(s) => {
+              setSeason(s as SeasonKey)
+              save({ season: s })
+              setMode('i-know')
+            }}
+          />
+        ) : mode === 'i-know' ? (
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {SEASON_LIST.map((s) => (
               <button

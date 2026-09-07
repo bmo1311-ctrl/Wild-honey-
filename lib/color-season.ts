@@ -327,16 +327,47 @@ export const SEASON_LIST = Object.values(SEASONS)
  * has already been draped can check it against what she was told — and if it
  * disagrees, she overrules it. She was in the room and this is arithmetic.
  */
-export function seasonFrom(hue: Hue, value: Value, chroma: Chroma): SeasonKey {
+export function seasonFrom(
+  hue: Hue,
+  value: Value,
+  chroma: Chroma,
+  /**
+   * Which axis is furthest from the middle, when the caller knows.
+   *
+   * Without this, deep and bright together always resolved to a deep season,
+   * so a woman with deep colouring and real clarity could never land on a
+   * bright one however clear she was. That is a genuine fault in the
+   * arithmetic and it fell hardest on women with deep skin, who got sorted
+   * into two of the twelve seasons no matter what else was true about them.
+   *
+   * The photo analysis measures how extreme each axis actually is and says
+   * which one wins. The three-question version has no way to know, so it
+   * keeps the old order — value first, then chroma — which is the
+   * conventional reading and is right more often than not.
+   */
+  dominant?: 'value' | 'chroma',
+): SeasonKey {
   const warm = hue === 'warm'
+  const brightSeason = (): SeasonKey => (warm ? 'bright-spring' : 'bright-winter')
+  const softSeason = (): SeasonKey => (warm ? 'soft-autumn' : 'soft-summer')
+  const lightSeason = (): SeasonKey => (warm ? 'light-spring' : 'light-summer')
+  const deepSeason = (): SeasonKey => (warm ? 'deep-autumn' : 'deep-winter')
+
+  const valueIsExtreme = value !== 'medium'
+  const chromaIsExtreme = chroma !== 'medium'
+
+  // Both axes are extreme and we have been told which one runs the show.
+  if (valueIsExtreme && chromaIsExtreme && dominant) {
+    if (dominant === 'chroma') return chroma === 'bright' ? brightSeason() : softSeason()
+    return value === 'light' ? lightSeason() : deepSeason()
+  }
 
   // Chroma leads: the extremes of clear and muted.
-  if (chroma === 'bright' && value !== 'deep') return warm ? 'bright-spring' : 'bright-winter'
-  if (chroma === 'soft' && value !== 'deep') return warm ? 'soft-autumn' : 'soft-summer'
+  if (chromaIsExtreme && !valueIsExtreme) return chroma === 'bright' ? brightSeason() : softSeason()
 
   // Value leads: the extremes of light and deep.
-  if (value === 'light') return warm ? 'light-spring' : 'light-summer'
-  if (value === 'deep') return warm ? 'deep-autumn' : 'deep-winter'
+  if (value === 'light') return lightSeason()
+  if (value === 'deep') return deepSeason()
 
   // Nothing extreme — hue leads, and chroma places it within the family.
   if (warm) return chroma === 'bright' ? 'true-spring' : 'true-autumn'
