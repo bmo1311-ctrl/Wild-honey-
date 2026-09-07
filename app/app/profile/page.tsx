@@ -15,6 +15,7 @@ import {
   PhoneCall,
   Refrigerator,
   ShieldCheck,
+  Shirt,
   ShoppingBag,
   Sparkles,
   Target,
@@ -102,6 +103,7 @@ export default async function ProfilePage() {
           */
           { href: '/app/becoming', label: 'Becoming', icon: Sparkles, note: 'and your evolution' },
           { href: '/app/write', label: 'Write', icon: PenLine, note: 'and your archive' },
+          { href: '/app/wardrobe', label: 'Wardrobe', icon: Shirt, note: 'your colours and closet' },
           FEATURES.fixedCalendar && { href: '/app/calendar', label: 'Calendar', icon: CalendarDays },
         ]}
       />

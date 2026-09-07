@@ -15,6 +15,9 @@ import { planTonight } from '@/lib/tonight'
 import { planWash } from '@/lib/wash-day'
 import { daysUntil, planBlock, type StudioBlock, type StudioItem } from '@/lib/studio'
 import type { ShelfItem } from '@/lib/routine'
+import { getSeason } from '@/lib/color-season'
+import { outfitForToday } from '@/lib/outfit'
+import type { Body, Scale, Shape, VerticalProportion } from '@/lib/silhouette'
 import { pickNotice } from '@/lib/noticing'
 import { getAccess,
   getActiveCourseState,
@@ -41,6 +44,8 @@ import { getAccess,
   getStudioSessionsThisWeek,
   getTodayPrompt,
   getMyEntryForPrompt,
+  getWardrobe,
+  getStyleProfile,
 } from '@/lib/data'
 
 /**
@@ -149,14 +154,17 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
    * engine picks whichever fits the hour she is in.
    */
   const hour = await localHour()
-  const [beautyProducts, routineLog, studioBlocks, studioItems, studioSessions, prompt] = await Promise.all([
-    getMemberProducts(),
-    getRoutineLog(30),
-    getStudioBlocks(),
-    getStudioItems(),
-    getStudioSessionsThisWeek(),
-    getTodayPrompt(),
-  ])
+  const [beautyProducts, routineLog, studioBlocks, studioItems, studioSessions, prompt, garments, style] =
+    await Promise.all([
+      getMemberProducts(),
+      getRoutineLog(30),
+      getStudioBlocks(),
+      getStudioItems(),
+      getStudioSessionsThisWeek(),
+      getTodayPrompt(),
+      getWardrobe(),
+      getStyleProfile(),
+    ])
   const promptEntry = prompt ? await getMyEntryForPrompt(prompt.id) : null
 
   const shelfFor = (areaKey: string): ShelfItem[] =>
@@ -201,6 +209,30 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       kept: keptBlockIds.has(block.id),
     }))
 
+  /*
+   * What to wear, but only when the wardrobe can actually answer.
+   *
+   * Four pieces and a colour season and a frame, or it says nothing at all.
+   * A suggestion built from two shirts and no idea what suits her is worse
+   * than silence, and silence is a thing this app is allowed to do.
+   */
+  const season = getSeason(style?.season)
+  const styleBody: Body | null =
+    style?.shape && style?.vertical && style?.scale
+      ? { shape: style.shape as Shape, vertical: style.vertical as VerticalProportion, scale: style.scale as Scale }
+      : null
+  const look =
+    season && styleBody && garments.length >= 4
+      ? outfitForToday({ garments, occasion: 'everyday', season, body: styleBody, today })
+      : null
+  const outfit = look
+    ? {
+        label: look.pieces.map((p) => p.name).join(' + '),
+        detail: look.colourStory,
+        done: look.pieces.every((p) => p.lastWornOn === today),
+      }
+    : null
+
   const moment = buildMoment({
     hour,
     name: profile?.name?.split(' ')[0] ?? null,
@@ -219,6 +251,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       wash,
       washedToday,
       studioToday,
+      outfit,
     }),
   })
 

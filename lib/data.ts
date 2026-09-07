@@ -1773,3 +1773,114 @@ export async function getStudioSessionsThisWeek(): Promise<{ blockId: string | n
   ) as { block_id: string | null; date: string }[] | null
   return (data ?? []).map((s) => ({ blockId: s.block_id, date: s.date }))
 }
+
+// ── Wardrobe ────────────────────────────────────────────────────────────────
+
+/**
+ * Her closet, with the wear log already folded in.
+ *
+ * The count and the last-worn date come from `wardrobe_wears` rather than
+ * from a counter on the item, so an accidental tap can be undone without
+ * leaving the numbers wrong forever.
+ */
+export async function getWardrobe(): Promise<import('@/lib/wardrobe').Garment[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const [items, wears] = await Promise.all([
+    supabase
+      .from('wardrobe_items')
+      .select('*')
+      .eq('member_id', user.id)
+      .eq('archived', false)
+      .order('created_at', { ascending: false }),
+    supabase.from('wardrobe_wears').select('item_id, date').eq('member_id', user.id),
+  ])
+
+  const rows = (ok(items) ?? []) as Record<string, unknown>[]
+  const wearRows = (ok(wears) ?? []) as { item_id: string; date: string }[]
+
+  const count = new Map<string, number>()
+  const last = new Map<string, string>()
+  for (const w of wearRows) {
+    count.set(w.item_id, (count.get(w.item_id) ?? 0) + 1)
+    const seen = last.get(w.item_id)
+    if (!seen || w.date > seen) last.set(w.item_id, w.date)
+  }
+
+  return rows.map((r) => ({
+    id: r.id as string,
+    name: r.name as string,
+    layer: r.layer as never,
+    hex: (r.hex as string) ?? null,
+    hex2: (r.hex2 as string) ?? null,
+    effects: ((r.effects as string[]) ?? []) as never,
+    occasions: ((r.occasions as string[]) ?? []) as never,
+    warmth: (r.warmth as never) ?? undefined,
+    imageUrl: (r.image_url as string) ?? null,
+    price: (r.price as number) ?? null,
+    loved: Boolean(r.loved),
+    notes: (r.notes as string) ?? null,
+    wornCount: count.get(r.id as string) ?? 0,
+    lastWornOn: last.get(r.id as string) ?? null,
+  }))
+}
+
+/** The looks she has saved, newest first, pinned ones first of all. */
+export async function getSavedOutfits(): Promise<
+  { id: string; name: string | null; itemIds: string[]; occasion: string | null; notes: string | null; pinned: boolean; plannedFor: string | null }[]
+> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const data = ok(
+    await supabase
+      .from('wardrobe_outfits')
+      .select('*')
+      .eq('member_id', user.id)
+      .order('pinned', { ascending: false })
+      .order('created_at', { ascending: false }),
+  ) as Record<string, unknown>[] | null
+  return (data ?? []).map((o) => ({
+    id: o.id as string,
+    name: (o.name as string) ?? null,
+    itemIds: ((o.item_ids as string[]) ?? []),
+    occasion: (o.occasion as string) ?? null,
+    notes: (o.notes as string) ?? null,
+    pinned: Boolean(o.pinned),
+    plannedFor: (o.planned_for as string) ?? null,
+  }))
+}
+
+/** Her colour season and frame, when she has set them. */
+export async function getStyleProfile(): Promise<{
+  season: string | null
+  shape: string | null
+  vertical: string | null
+  scale: string | null
+} | null> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return null
+  const data = ok(
+    await supabase
+      .from('profiles')
+      .select('color_season, body_shape, vertical_proportion, body_scale')
+      .eq('id', user.id)
+      .maybeSingle(),
+  ) as Record<string, string | null> | null
+  if (!data) return null
+  return {
+    season: data.color_season,
+    shape: data.body_shape,
+    vertical: data.vertical_proportion,
+    scale: data.body_scale,
+  }
+}

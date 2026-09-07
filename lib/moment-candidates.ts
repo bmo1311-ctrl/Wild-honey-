@@ -39,6 +39,8 @@ export function candidatesFor(input: {
   washedToday: boolean
   /** Studio blocks that fall on today, already planned. */
   studioToday: { block: StudioBlock; plan: BlockPlan; kept: boolean }[]
+  /** What to wear, from the wardrobe engine. Morning only, by its nature. */
+  outfit: { label: string; detail: string; done: boolean } | null
 }): Candidate[] {
   const out: Candidate[] = []
 
@@ -69,6 +71,24 @@ export function candidatesFor(input: {
       window: 'any',
       done: input.promptAnswered,
       tone: 'mindset',
+    })
+  }
+
+  /*
+   * What to wear is a morning question and only a morning question. It is in
+   * the dawn window rather than 'any' because an outfit suggestion at four in
+   * the afternoon is answering something she settled hours ago.
+   */
+  if (input.outfit) {
+    out.push({
+      key: 'outfit',
+      label: input.outfit.label,
+      detail: input.outfit.detail,
+      href: '/app/wardrobe',
+      action: 'See it',
+      window: 'dawn',
+      done: input.outfit.done,
+      tone: 'identity',
     })
   }
 

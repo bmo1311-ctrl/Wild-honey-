@@ -3285,3 +3285,150 @@ export async function saveBodyPreferences(input: {
   revalidatePath('/app/nutrition')
   return { ok: true }
 }
+
+// ── Wardrobe ────────────────────────────────────────────────────────────────
+
+export async function saveStyleProfile(input: {
+  season?: string | null
+  shape?: string | null
+  vertical?: string | null
+  scale?: string | null
+}) {
+  const { supabase, user } = await requireUser()
+  const patch: Record<string, string | null> = {}
+  if ('season' in input) patch.color_season = input.season || null
+  if ('shape' in input) patch.body_shape = input.shape || null
+  if ('vertical' in input) patch.vertical_proportion = input.vertical || null
+  if ('scale' in input) patch.body_scale = input.scale || null
+  const { error } = await supabase.from('profiles').update(patch).eq('id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/wardrobe')
+  revalidatePath('/app/wardrobe/you')
+  return { ok: true }
+}
+
+export async function addGarment(input: {
+  name: string
+  layer: string
+  hex?: string | null
+  effects?: string[]
+  occasions?: string[]
+  warmth?: string | null
+  imageUrl?: string | null
+  price?: number | null
+  notes?: string | null
+}) {
+  const { supabase, user } = await requireUser()
+  const name = input.name.trim()
+  if (!name) return { error: 'It needs a name.' }
+  const { error } = await supabase.from('wardrobe_items').insert({
+    member_id: user.id,
+    name,
+    layer: input.layer,
+    hex: input.hex || null,
+    effects: input.effects ?? [],
+    occasions: input.occasions ?? [],
+    warmth: input.warmth || null,
+    image_url: input.imageUrl || null,
+    price: input.price ?? null,
+    notes: input.notes?.trim() || null,
+  })
+  if (error) return { error: error.message }
+  revalidatePath('/app/wardrobe')
+  return { ok: true }
+}
+
+export async function updateGarment(id: string, patch: Record<string, unknown>) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('wardrobe_items').update(patch).eq('id', id).eq('member_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/wardrobe')
+  return { ok: true }
+}
+
+export async function archiveGarment(id: string) {
+  return updateGarment(id, { archived: true })
+}
+
+/**
+ * Mark a look as worn.
+ *
+ * One row per piece per day, and taping the same look twice on one day is a
+ * no-op rather than a double count — she should never have to be careful
+ * with a button.
+ */
+export async function logWear(itemIds: string[], date: string, outfitId?: string | null) {
+  const { supabase, user } = await requireUser()
+  if (itemIds.length === 0) return { ok: true }
+
+  const existing = (
+    await supabase
+      .from('wardrobe_wears')
+      .select('item_id')
+      .eq('member_id', user.id)
+      .eq('date', date)
+      .in('item_id', itemIds)
+  ).data as { item_id: string }[] | null
+  const already = new Set((existing ?? []).map((r) => r.item_id))
+  const fresh = itemIds.filter((id) => !already.has(id))
+  if (fresh.length === 0) return { ok: true }
+
+  const { error } = await supabase.from('wardrobe_wears').insert(
+    fresh.map((item_id) => ({ member_id: user.id, item_id, date, outfit_id: outfitId ?? null })),
+  )
+  if (error) return { error: error.message }
+  revalidatePath('/app/wardrobe')
+  revalidatePath('/app')
+  return { ok: true }
+}
+
+export async function undoWear(itemIds: string[], date: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase
+    .from('wardrobe_wears')
+    .delete()
+    .eq('member_id', user.id)
+    .eq('date', date)
+    .in('item_id', itemIds)
+  if (error) return { error: error.message }
+  revalidatePath('/app/wardrobe')
+  return { ok: true }
+}
+
+export async function saveOutfit(input: {
+  name?: string | null
+  itemIds: string[]
+  occasion?: string | null
+  notes?: string | null
+  plannedFor?: string | null
+}) {
+  const { supabase, user } = await requireUser()
+  if (input.itemIds.length === 0) return { error: 'Pick at least one piece.' }
+  const { error } = await supabase.from('wardrobe_outfits').insert({
+    member_id: user.id,
+    name: input.name?.trim() || null,
+    item_ids: input.itemIds,
+    occasion: input.occasion || null,
+    notes: input.notes?.trim() || null,
+    planned_for: input.plannedFor || null,
+  })
+  if (error) return { error: error.message }
+  revalidatePath('/app/wardrobe')
+  return { ok: true }
+}
+
+export async function deleteOutfit(id: string) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('wardrobe_outfits').delete().eq('id', id).eq('member_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/wardrobe')
+  return { ok: true }
+}
+
+export async function pinOutfit(id: string, pinned: boolean) {
+  const { supabase, user } = await requireUser()
+  const { error } = await supabase.from('wardrobe_outfits').update({ pinned }).eq('id', id).eq('member_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/wardrobe')
+  return { ok: true }
+}
