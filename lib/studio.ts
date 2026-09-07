@@ -89,6 +89,18 @@ export function verbFor(stage: string): string {
   return VERB[stage] ?? NEXT_VERB[stage] ?? 'move it on'
 }
 
+/** How often a block comes round. Weeks, so the weekday model still holds. */
+export const REPEATS: { weeks: number; label: string }[] = [
+  { weeks: 1, label: 'every week' },
+  { weeks: 2, label: 'every other week' },
+  { weeks: 4, label: 'monthly' },
+  { weeks: 13, label: 'quarterly' },
+]
+
+export function repeatLabel(weeks: number): string {
+  return REPEATS.find((r) => r.weeks === weeks)?.label ?? `every ${weeks} weeks`
+}
+
 export interface StudioBlock {
   id: string
   label: string
@@ -97,6 +109,32 @@ export interface StudioBlock {
   weekday: number
   startMinute: number
   minutes: number
+  /** 1 weekly, 2 fortnightly, 4 monthly, 13 quarterly. */
+  everyNWeeks?: number
+  /** The date the repeat counts from. */
+  anchorOn?: string | null
+}
+
+/**
+ * How many days until this block next comes round.
+ *
+ * A weekly block is simply the next time that weekday arrives. Anything
+ * longer has to land on the right week as well as the right day, counted
+ * from the date it was set up — otherwise a fortnightly block would show up
+ * every seven days and quietly become a weekly one.
+ */
+export function daysUntil(block: StudioBlock, todayWeekday: number, today: string): number {
+  const base = (block.weekday - todayWeekday + 7) % 7
+  const every = block.everyNWeeks ?? 1
+  if (every <= 1) return base
+
+  const anchor = block.anchorOn
+  if (!anchor) return base
+
+  const candidate = Date.parse(today) + base * 86_400_000
+  const weeksSince = Math.floor((candidate - Date.parse(anchor)) / (7 * 86_400_000))
+  const offBy = ((weeksSince % every) + every) % every
+  return base + (offBy === 0 ? 0 : (every - offBy) * 7)
 }
 
 /**
@@ -245,10 +283,16 @@ export interface WeekBlock {
  * Starting from today rather than Sunday, because the useful question is
  * "what is next", not "what did Monday look like".
  */
-export function weekAhead(blocks: StudioBlock[], todayWeekday: number, doneBlockIds: Set<string>): WeekBlock[] {
+export function weekAhead(
+  blocks: StudioBlock[],
+  todayWeekday: number,
+  doneBlockIds: Set<string>,
+  today?: string,
+): WeekBlock[] {
+  const day = today ?? new Date().toISOString().slice(0, 10)
   return blocks
     .map((block) => {
-      const offset = (block.weekday - todayWeekday + 7) % 7
+      const offset = daysUntil(block, todayWeekday, day)
       return {
         block,
         at: offset * 1440 + block.startMinute,

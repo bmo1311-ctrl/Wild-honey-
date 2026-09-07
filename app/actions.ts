@@ -3231,7 +3231,7 @@ export async function archiveStudioItem(itemId: string) {
   return { ok: true }
 }
 
-export async function addStudioBlock(input: { label: string; channel: string; weekday: number; startMinute: number; minutes: number }) {
+export async function addStudioBlock(input: { label: string; channel: string; weekday: number; startMinute: number; minutes: number; everyNWeeks?: number }) {
   const { supabase, user } = await requireUser()
   const label = input.label.trim()
   if (!label) return { error: 'What is this block for?' }
@@ -3242,6 +3242,8 @@ export async function addStudioBlock(input: { label: string; channel: string; we
     weekday: input.weekday,
     start_minute: input.startMinute,
     minutes: input.minutes,
+    every_n_weeks: input.everyNWeeks ?? 1,
+    anchor_on: await localToday(),
   })
   if (error) return { error: error.message }
   revalidatePath('/app/studio')

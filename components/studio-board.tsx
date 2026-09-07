@@ -8,10 +8,12 @@ import { Celebrate } from '@/components/celebrate'
 import {
   CADENCES,
   channelLabel,
+  daysUntil,
   isDue,
   planBlock,
   stagesFor,
   timeLabel,
+  repeatLabel,
   verbFor,
   WEEKDAY,
   weekNotice,
@@ -60,11 +62,10 @@ export function StudioBoard({
    */
   const channels = [...new Set([...blocks.map((b) => b.channel), ...items.map((i) => i.channel)])].sort()
 
-  // Today first, then the rest of the week in the order it arrives.
-  const ordered = [...blocks].sort(
-    (a, b) =>
-      ((a.weekday - todayWeekday + 7) % 7) * 1440 + a.startMinute - (((b.weekday - todayWeekday + 7) % 7) * 1440 + b.startMinute),
-  )
+  // Soonest first. A fortnightly block has to land on the right fortnight,
+  // not just the right weekday, or it quietly becomes a weekly one.
+  const until = (b: StudioBlock) => daysUntil(b, todayWeekday, today) * 1440 + b.startMinute
+  const ordered = [...blocks].sort((a, b) => until(a) - until(b))
   const next = ordered[0]
   const plan = next ? planBlock(next, items, today) : null
 
@@ -101,7 +102,7 @@ export function StudioBoard({
       {plan && next && (
         <section className="rounded-3xl bg-card p-5 ring-1 ring-border">
           <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-            {((next.weekday - todayWeekday + 7) % 7) === 0 ? 'today' : WEEKDAY[next.weekday]} · {timeLabel(next.startMinute)} · {next.minutes} min
+            {daysUntil(next, todayWeekday, today) === 0 ? 'today' : WEEKDAY[next.weekday]} · {timeLabel(next.startMinute)} · {next.minutes} min
           </p>
 
           <p className="mt-1 font-serif text-xl font-semibold text-pretty">{next.label}</p>
@@ -157,6 +158,7 @@ export function StudioBoard({
                   <span className="block text-sm font-medium">{b.label}</span>
                   <span className="block text-[12px] text-muted-foreground">
                     {WEEKDAY[b.weekday]} · {timeLabel(b.startMinute)} · {b.minutes} min
+                    {(b.everyNWeeks ?? 1) > 1 && ` · ${repeatLabel(b.everyNWeeks ?? 1)}`}
                   </span>
                 </span>
               </li>

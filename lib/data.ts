@@ -1696,7 +1696,7 @@ export async function getRoutineLog(days = 30): Promise<{ memberProductId: strin
 // ---- Studio: output blocks and the pipeline ----
 
 export async function getStudioBlocks(): Promise<
-  { id: string; label: string; channel: string; weekday: number; startMinute: number; minutes: number }[]
+  { id: string; label: string; channel: string; weekday: number; startMinute: number; minutes: number; everyNWeeks: number; anchorOn: string | null }[]
 > {
   const supabase = await createClient()
   const {
@@ -1710,7 +1710,9 @@ export async function getStudioBlocks(): Promise<
       .eq('user_id', user.id)
       .eq('is_active', true)
       .order('weekday', { ascending: true }),
-  ) as { id: string; label: string; channel: string; weekday: number; start_minute: number; minutes: number }[] | null
+  ) as
+    | { id: string; label: string; channel: string; weekday: number; start_minute: number; minutes: number; every_n_weeks: number; anchor_on: string | null }[]
+    | null
   return (data ?? []).map((b) => ({
     id: b.id,
     label: b.label,
@@ -1718,6 +1720,8 @@ export async function getStudioBlocks(): Promise<
     weekday: b.weekday,
     startMinute: b.start_minute,
     minutes: b.minutes,
+    everyNWeeks: b.every_n_weeks ?? 1,
+    anchorOn: b.anchor_on,
   }))
 }
 

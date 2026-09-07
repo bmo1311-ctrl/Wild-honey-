@@ -2,7 +2,7 @@ import { StudioBoard } from '@/components/studio-board'
 import { StudioBlockSetup } from '@/components/studio-block-setup'
 import { getStudioBlocks, getStudioItems, getStudioSessionsThisWeek } from '@/lib/data'
 import { localToday } from '@/lib/today'
-import type { Channel, StudioBlock, StudioItem } from '@/lib/studio'
+import type { StudioBlock, StudioItem } from '@/lib/studio'
 
 /**
  * Studio — the work that pays.
@@ -53,7 +53,7 @@ export default async function StudioPage() {
         />
       )}
 
-      <StudioBlockSetup blocks={blocks as { id: string; label: string; channel: Channel; weekday: number; startMinute: number; minutes: number }[]} />
+      <StudioBlockSetup blocks={blocks} />
     </div>
   )
 }
