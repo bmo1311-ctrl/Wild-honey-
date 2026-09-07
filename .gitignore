@@ -18,3 +18,5 @@ tsconfig.tsbuildinfo
 # local scratch (undeletable in this sandbox)
 simhair.ts
 sim.tsconfig.json
+shapecheck.ts
+shape.tsconfig.json

@@ -9,10 +9,10 @@ export default async function CourseDayPage({
   searchParams,
 }: {
   params: Promise<{ slug: string; n: string }>
-  searchParams: Promise<{ part?: string }>
+  searchParams: Promise<{ part?: string; full?: string }>
 }) {
   const { slug, n } = await params
-  const { part } = await searchParams
+  const { part, full } = await searchParams
   const course = getCourse(slug)
   if (!course) notFound()
   const dayNumber = Number(n)
@@ -50,6 +50,7 @@ export default async function CourseDayPage({
       done={completed.includes(dayNumber)}
       doneAt={null}
       part={part === '2' ? 2 : 1}
+      full={full === '1'}
       pillars={pillarOfDay(day, overrides)}
     />
   )

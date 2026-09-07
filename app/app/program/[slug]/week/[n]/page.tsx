@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import { Check, ChevronRight } from 'lucide-react'
+import { Check, ChevronDown, ChevronRight } from 'lucide-react'
 import { Blocks } from '@/components/course/blocks'
+import { wordsOf } from '@/lib/day-shape'
 import { daysInWeek, getCourse, getWeek, pillarOfDay } from '@/lib/courses'
 import { PillarDots } from '@/components/course/pillar-dots'
 import { requireTier, getCompletedDays, getDayPillars, mayOpenCourse } from '@/lib/data'
@@ -19,6 +20,7 @@ export default async function CourseWeekPage({ params }: { params: Promise<{ slu
   const [completed, overrides] = await Promise.all([getCompletedDays(slug), getDayPillars(slug)])
   // days come from their own week_number, so a nine-day week four is right
   const days = daysInWeek(course, week.week_number)
+  const weekWords = week.blocks.reduce((n, b) => n + wordsOf(b), 0)
 
   return (
     <div className="flex flex-col gap-6">
@@ -27,8 +29,6 @@ export default async function CourseWeekPage({ params }: { params: Promise<{ slu
         <h1 className="mt-2 font-serif text-[25px] font-semibold leading-[1.15] text-balance">{week.opening_line}</h1>
         <p className="mt-3 text-[16.5px] leading-[1.5] text-pretty text-muted-foreground">{week.stakes}</p>
       </header>
-
-      <Blocks blocks={week.blocks} ctx={{ dayNumber: null, slug }} />
 
       <div>
         <h2 className="mb-2 text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">the seven days</h2>
@@ -59,6 +59,23 @@ export default async function CourseWeekPage({ params }: { params: Promise<{ slu
           })}
         </div>
       </div>
+
+      {/*
+        The week's own teaching runs to several hundred words. It used to sit
+        above the days, so the way in was buried under it. It is worth reading
+        — just not before she can see what she actually has to do.
+      */}
+      {week.blocks.length > 0 && (
+        <details className="group">
+          <summary className="flex cursor-pointer list-none items-center gap-1.5 text-sm text-muted-foreground [&::-webkit-details-marker]:hidden">
+            about this week · {weekWords} words
+            <ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
+          </summary>
+          <div className="mt-4">
+            <Blocks blocks={week.blocks} ctx={{ dayNumber: null, slug }} />
+          </div>
+        </details>
+      )}
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import type { TrackedToday } from '@/components/course/log-block'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Blocks } from '@/components/course/blocks'
+import { DayBody } from '@/components/course/day-body'
 import { DoneButton } from '@/components/course/done-button'
 import { pillarsOf, splitMilestone, type Pillar4 } from '@/lib/courses'
 import { PillarDots } from '@/components/course/pillar-dots'
@@ -24,6 +24,7 @@ export function DayView({
   part,
   showNav = true,
   pillars: pillarsProp,
+  full = false,
 }: {
   course: Course
   day: CourseDay
@@ -35,6 +36,8 @@ export function DayView({
   part?: 1 | 2
   showNav?: boolean
   pillars?: Pillar4[]
+  /** She asked for the whole day rather than the short path. */
+  full?: boolean
 }) {
   const split = day.kind === 'milestone' ? splitMilestone(day.blocks) : null
   const twoPart = split !== null
@@ -75,7 +78,13 @@ export function DayView({
         )}
       </header>
 
-      <Blocks blocks={blocks} ctx={{ dayNumber: day.day_number, slug: course.slug, saved, checkin, tracked, offset }} />
+      <DayBody
+        blocks={blocks}
+        minutes={day.minutes}
+        full={full}
+        fullHref={`/app/program/${course.slug}/day/${day.day_number}?${new URLSearchParams({ ...(part ? { part: String(part) } : {}), full: '1' })}`}
+        ctx={{ dayNumber: day.day_number, slug: course.slug, saved, checkin, tracked, offset }}
+      />
 
       <div className="flex flex-col gap-3 pt-2">
         {twoPart && activePart === 1 ? (

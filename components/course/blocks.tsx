@@ -22,6 +22,12 @@ export interface BlocksContext {
    * in the day's full blocks array.
    */
   offset?: number
+  /**
+   * The original position of each block passed in, when the caller is showing
+   * a subset. Saved writing is keyed by position, so a filtered list must
+   * carry its real indices or every answer lands against the wrong prompt.
+   */
+  indices?: number[]
 }
 
 /** Renders a day's or week's blocks. Every block type in the course is handled. */
@@ -29,7 +35,7 @@ export function Blocks({ blocks, ctx }: { blocks: Block[]; ctx: BlocksContext })
   return (
     <div className="flex flex-col gap-[15px]">
       {blocks.map((b, i) => (
-        <BlockView key={i} block={b} index={(ctx.offset ?? 0) + i} ctx={ctx} />
+        <BlockView key={ctx.indices ? ctx.indices[i] : i} block={b} index={ctx.indices ? ctx.indices[i] : (ctx.offset ?? 0) + i} ctx={ctx} />
       ))}
     </div>
   )

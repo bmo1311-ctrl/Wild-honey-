@@ -166,6 +166,38 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
 
       <NoticeLine notice={notice} />
 
+      {/*
+        The day, first. Everything that used to sit above this — four counters,
+        a progress bar, a course switcher — was answering "how am I doing"
+        when she opened the app to ask "what do I do now". It all still exists,
+        underneath, where it belongs.
+      */}
+      {day && (
+        <Link
+          href={`/app/program/${slug}/day/${day.day_number}`}
+          className="flex h-[58px] items-center justify-center gap-1.5 rounded-2xl bg-primary text-[18px] font-bold text-primary-foreground"
+        >
+          Open day {day.day_number}
+          <ChevronRight className="h-5 w-5" />
+        </Link>
+      )}
+
+      {nudges.length > 0 && (
+        <section className="flex flex-col gap-2">
+          {nudges.map((n) => (
+            <Link key={n.text} href={n.href} className="flex items-center gap-3 rounded-2xl bg-mindset-pillar/10 px-4 py-3 text-[14.5px] leading-[1.4] text-pretty">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-mindset-pillar" aria-hidden="true" />
+              <span className="flex-1">{n.text}</span>
+            </Link>
+          ))}
+        </section>
+      )}
+
+      {!baseline && <BaselineCardLink dayNumber={currentDay} />}
+
+      <TodayChecklist rows={rows} />
+      <QuickAddHabit suggestions={habitSuggestions} />
+
       <section className="grid grid-cols-4 gap-2">
         {stats.map((s) => (
           <div key={s.label} className="rounded-2xl border border-border bg-card px-2 py-3 text-center">
@@ -189,32 +221,6 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
           {completedDays.length} of {course.length_days} days · week {weekOfDay(course, currentDay)} of {course.weeks}
         </p>
       </section>
-
-      {nudges.length > 0 && (
-        <section className="flex flex-col gap-2">
-          {nudges.map((n) => (
-            <Link key={n.text} href={n.href} className="flex items-center gap-3 rounded-2xl bg-mindset-pillar/10 px-4 py-3 text-[14.5px] leading-[1.4] text-pretty">
-              <span className="h-2 w-2 shrink-0 rounded-full bg-mindset-pillar" aria-hidden="true" />
-              <span className="flex-1">{n.text}</span>
-            </Link>
-          ))}
-        </section>
-      )}
-
-      {!baseline && <BaselineCardLink dayNumber={currentDay} />}
-
-      <TodayChecklist rows={rows} />
-      <QuickAddHabit suggestions={habitSuggestions} />
-
-      {day && (
-        <Link
-          href={`/app/program/${slug}/day/${day.day_number}`}
-          className="flex h-[58px] items-center justify-center gap-1.5 rounded-2xl bg-primary text-[18px] font-bold text-primary-foreground"
-        >
-          Open day {day.day_number}
-          <ChevronRight className="h-5 w-5" />
-        </Link>
-      )}
 
       <Link href="/app/becoming" className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
         <span className="min-w-0 flex-1">
