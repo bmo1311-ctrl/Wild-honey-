@@ -1,0 +1,182 @@
+# Phase 0 — what is actually here
+
+Read before building the intelligence layer. Everything below was verified
+against the live Supabase schema and the repo, not inferred from the brief.
+
+September 13, 2026. Commit `91ebf58`.
+
+---
+
+## 1. The finding that changes the plan
+
+**Three of the tables the directive asks for already exist, empty and
+unreferenced.**
+
+| table | rows | referenced in code? | what it is |
+|---|---|---|---|
+| `transformation_state` | 0 | **no** | `current_season`, `capacity_score`, `vitality_score`, `awareness_score`, `alignment_score`, `becoming_goal`, `state_json` |
+| `transformation_diagnoses` | 0 | **no** | `diagnosis_type`, `evidence` jsonb, `confidence`, `impact`, `first_detected_at`, `resolved_at` |
+| `transformation_leverage` | 0 | **no** | `move_type`, `title`, `rationale`, `action_label`, `action_href`, `priority`, `confidence`, `source_diagnosis_id` |
+| `transformation_reflections` | 0 | **yes** — 7 places | milestone reflections, `q_*` questions |
+| `companion_messages` | 0 | **no** | `role`, `content` — an AI chat that was never built |
+
+Those column lists are the Honey Trap engine, the Leverage engine and the
+transformation dashboard, near enough as designed. Somebody — an earlier
+session, or the v0 chat — laid the foundation and never built on it.
+
+**So Phases 1, 2 and 4 do not start from an empty database.** They start by
+adopting this schema. Creating `woman_state` beside `transformation_state`
+would violate the directive's own rule 2 on the first day, and it is exactly
+the mistake made twice already in this repo (`color_season` vs the wardrobe
+season; `timezone` vs `time_zone`).
+
+Gaps to add rather than replace: there is no experiment-outcome link, no
+recommendation-feedback table, and `state_json` is unstructured so its shape
+has to be defined in TypeScript and enforced there.
+
+---
+
+## 2. How much evidence exists to reason from
+
+| signal | rows |
+|---|---|
+| profiles | 3 |
+| checkins | 6 |
+| vitality_checkins | 4 |
+| habit_logs | 3 |
+| meal_logs | 45 |
+| journal_entries | 3 |
+| commitments | 1 |
+| personal_experiments | **0** |
+| evening_reflections | **0** |
+| routine_log | **0** |
+
+This is the most important constraint on the build and it is worth stating
+plainly: **there is almost nothing to detect patterns in yet.**
+
+A Honey Trap engine run against six check-ins would produce confident
+nonsense. So confidence and evidence thresholds are not polish to add later
+— they decide whether the first thing a woman sees is trustworthy. The
+engine must be able to say *"not enough yet"* and mean it, and the magic
+moment of §37 is realistically weeks in, not on day one.
+
+The one exception is `meal_logs` at 45 rows, which is the only signal with
+enough history to say anything.
+
+---
+
+## 3. The existing engines, and what they already do
+
+The directive's core loop is partly built. Nothing here needs rewriting.
+
+| loop stage | what exists | file |
+|---|---|---|
+| NOTICE | picks one true sentence from real behaviour, or stays silent | `lib/noticing.ts` |
+| ACT | ranks what belongs to this hour; appointments beat rough times | `lib/moment.ts`, `lib/moment-candidates.ts` |
+| EXPERIENCE — skin | decides tonight's one strong product from the shelf and the log | `lib/tonight.ts` |
+| EXPERIENCE — hair | runs on washes not nights; alternates protein and moisture | `lib/wash-day.ts` |
+| EXPERIENCE — work | picks the piece closest to finished for the next block | `lib/studio.ts` |
+| EXPERIENCE — dress | scores an outfit on colour, contrast and line, and explains it | `lib/outfit.ts`, `lib/color-season.ts`, `lib/silhouette.ts` |
+| BECOME | milestones, streaks, becoming summary | `lib/rewards.ts` |
+| RELEASE | commitments reviewed every 14 days; experiments with reflection | `/app/promises` |
+
+Every one of these already produces a *reason*, not just a result. That is
+the §22 "why this?" requirement, and it is the reason connecting them is
+tractable: they can each explain themselves to a layer above.
+
+**What no engine does yet:** look across them. Tonight's skincare does not
+know her capacity is low. Studio does not know she has not slept. The outfit
+engine does not know she has a presentation. That is the whole job.
+
+---
+
+## 4. Orphans — built but unreachable
+
+Fix or remove before adding anything.
+
+**Content with no door:**
+- `lib/acids.ts` — six acids, layering, downtime, contraindications. Rendered nowhere.
+- `lib/apothecary.ts` — 25 herbs with concerns and cautions. Rendered nowhere.
+
+Both were written to be read by a member. Neither can be.
+
+**Dead code:**
+- `lib/nudges.ts` — orphaned when the nudge strip came off Today this week.
+- `lib/spark-lines.ts`, `lib/stripe.ts` — unreferenced.
+- `components/year-day-ritual.tsx` — never rendered (see §5).
+- `companion_messages` — a table for a feature that does not exist.
+
+**Routes reachable only by typing the URL:**
+- `/app/progress` — renders "My Evolution", linked from nowhere. The directive wants Evolution as one of four top-level surfaces (§24); it is currently invisible.
+- `/app/archive` — exists as a tab on Write, but the route itself is unlinked.
+- `/app/program/[slug]/week/[n]` — no link anywhere points at a week.
+- `/kid` — the child sign-in. Printed as text in Household, never a link.
+- `/app/challenges` — unlinked and flag-off.
+
+**Flags that gate nothing:** `mealPlans`, `groceries`, `community`.
+
+---
+
+## 5. The calendar frame still to fix
+
+The 13-month calendar is deleted and stays deleted. One concept survived it:
+
+**Year Day.** A day belonging to no month — meaningless without the
+13-month structure. It persists in:
+
+- `transformation_reflections.wild_honey_year` (column)
+- `saveYearDayReflection`, `getYearDayReflectionForYear` (`app/actions.ts`)
+- `getYearDayReflection` (`lib/data.ts`)
+- `components/year-day-ritual.tsx` — **never rendered**
+- `/app/progress` — displays a "Year Day {n}" chip on any such reflection
+
+Nothing has ever written one (0 rows), so nothing is lost by retiring it.
+The *milestone reflection* idea underneath is good and should survive under
+a name that does not depend on a calendar nobody uses.
+
+---
+
+## 6. Navigation as it stands
+
+Five tabs: **Today · Program · Library · Circle · You**.
+
+The directive wants **ME · TODAY · BECOMING · EVOLUTION** with everything
+else demoted to tools (§24). The distance between those two is the real UI
+work, and it is mostly reorganisation rather than new screens:
+
+- Becoming exists at `/app/becoming`, reachable only from a closet tile.
+- Evolution exists at `/app/progress`, reachable from nothing.
+- "ME" — the current-state view — does not exist in any form.
+- Program, Library and Circle currently occupy three of five tabs.
+
+`/app/profile` carries 20 tiles across five shelves. That is the catch-all
+the directive warns about, and it is where the demoted tools belong.
+
+---
+
+## 7. Access, and a decision nobody has made
+
+Tiers: `free` < `circle` < `inner-circle` < `founder`. Nothing branches on
+`inner` anywhere.
+
+**Fully locked:** Ask, Learning, Money, Watch.
+**Partially locked:** Circle composer, Fitness, Nutrition (4 panels), Program.
+
+**Free, and probably not on purpose:** Protocols, Studio, Wardrobe,
+Promises, Becoming, Body, Write, Progress. That is most of the distinctive
+work in the app, and it includes everything the intelligence layer would sit
+on. Flagged in the walk-through a week ago and still undecided.
+
+---
+
+## 8. Order I would actually build in
+
+The directive's phases are right. Two amendments from what the audit found:
+
+1. **Phase 1 adopts `transformation_state` rather than designing a schema.** The table exists; the work is defining `state_json`'s shape in TypeScript, writing the read/derive layer, and RLS tests.
+
+2. **Phase 2 cannot honestly ship on current data.** Build the Honey Trap engine with its evidence thresholds, then let it stay quiet until there is something to see. Silence is the correct first behaviour, and it is consistent with how `noticing.ts` already works.
+
+Before either: clear the orphans in §4 and the Year Day frame in §5, because
+building an intelligence layer on top of dead code means carrying it
+forever.
