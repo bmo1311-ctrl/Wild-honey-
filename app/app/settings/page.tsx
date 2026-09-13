@@ -1,4 +1,5 @@
 import { AboutYou } from '@/components/about-you'
+import { TimeZoneSetting } from '@/components/time-zone-setting'
 import { ProfileEditor } from '@/components/profile-editor'
 import { ProfilePageEditor } from '@/components/profile-page-editor'
 import { PrivacySettings } from '@/components/privacy-settings'
@@ -26,6 +27,7 @@ export default async function SettingsPage() {
           colorSeason: profile.color_season ?? null,
         }}
       />
+      <TimeZoneSetting initial={profile.timezone ?? null} />
       <AboutYou
         initial={{
           lifeStage: profile.life_stage ?? null,

@@ -3446,3 +3446,41 @@ export async function pinOutfit(id: string, pinned: boolean) {
   revalidatePath('/app/wardrobe')
   return { ok: true }
 }
+
+/**
+ * The timezone she chose.
+ *
+ * Validated twice — shape, then whether the platform can actually format a
+ * date with it — because this value ends up inside Intl calls on every page
+ * and a bad one throws rather than degrading.
+ *
+ * Null means go back to detecting it from her browser.
+ */
+export async function saveTimeZone(zone: string | null) {
+  const { supabase, user } = await requireUser()
+
+  let value: string | null = null
+  if (zone) {
+    const trimmed = zone.trim()
+    if (!/^[A-Za-z_]+\/[A-Za-z_/+\-0-9]+$|^UTC$/.test(trimmed)) {
+      return { error: 'That does not look like a timezone.' }
+    }
+    try {
+      new Intl.DateTimeFormat('en-US', { timeZone: trimmed })
+    } catch {
+      return { error: 'That timezone is not one this app can read.' }
+    }
+    value = trimmed
+  }
+
+  const { error } = await supabase.from('profiles').update({ timezone: value }).eq('id', user.id)
+  if (error) return { error: error.message }
+
+  /*
+   * Every page that says what day or hour it is has to be built again.
+   * Today is the obvious one, but the course rolls over on a date and the
+   * food log, protocols and studio all ask what day it is too.
+   */
+  revalidatePath('/app', 'layout')
+  return { ok: true }
+}
