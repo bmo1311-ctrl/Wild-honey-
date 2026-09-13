@@ -100,6 +100,12 @@ Fix or remove before adding anything.
 
 Both were written to be read by a member. Neither can be.
 
+~~`lib/rituals.ts`~~ — **fixed 13 Sept.** Six kitchen treatments that were
+reachable only through `planTonight`, which needs a shelf of products first,
+so the woman with nothing on her shelf was the one who could never see them.
+Now offered directly on Protocols with one-tap logging — which is also the
+first thing that has ever written to `routine_log`.
+
 **Dead code:**
 - `lib/nudges.ts` — orphaned when the nudge strip came off Today this week.
 - `lib/spark-lines.ts`, `lib/stripe.ts` — unreferenced.

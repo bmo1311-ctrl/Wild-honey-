@@ -7,6 +7,8 @@ import { TonightCard } from '@/components/tonight-card'
 import { WashCard } from '@/components/wash-card'
 import { WashStrip } from '@/components/wash-strip'
 import { WeekStrip } from '@/components/week-strip'
+import { TreatmentSuggestions } from '@/components/treatment-suggestions'
+import { treatmentSuggestions } from '@/lib/suggestions'
 import {
   getActiveEnrollment,
   getEnrollmentCompletions,
@@ -150,12 +152,39 @@ function BeautyArea({
         : l.ritualSlug === tonight?.ritual?.slug),
   )
 
+  /*
+   * Treatments she can do with nothing but a kitchen.
+   *
+   * Skin only — an oat soak is not a hair plan, and hair already has the wash
+   * engine above. Offered hardest when the shelf is empty, because that is the
+   * woman who has somewhere to start and no way to reach it: the six rituals
+   * in lib/rituals.ts were only ever reachable through planTonight, which
+   * needs products entered first.
+   *
+   * Anything she has done in the last week is dropped so the same mask is not
+   * suggested two nights running.
+   */
+  const recentRituals = [...new Set(log.filter((l) => l.ritualSlug).map((l) => l.ritualSlug as string))].slice(0, 3)
+  const treatments =
+    areaKey === 'skin'
+      ? treatmentSuggestions({
+          allergies: profile?.allergies,
+          recentRitualSlugs: recentRituals,
+          today,
+          shelfIsEmpty: shelf.length === 0,
+        })
+      : []
+
   return (
     <div className="flex flex-col gap-5">
       {wash && <WashCard plan={wash} doneToday={washedToday} />}
       {washDays.length > 0 && <WashStrip days={washDays} />}
       {tonight && <TonightCard plan={tonight} doneToday={doneTonight} />}
       {week.length > 0 && <WeekStrip nights={week} />}
+
+      {treatments.length > 0 && (
+        <TreatmentSuggestions suggestions={treatments} shelfIsEmpty={shelf.length === 0} />
+      )}
 
       <RoutineShelf
         shelf={shelf}

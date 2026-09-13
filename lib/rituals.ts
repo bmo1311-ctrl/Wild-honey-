@@ -15,7 +15,16 @@ export interface Ritual {
   /** Two or three lines, her voice, no fuss. */
   how: string
   minutes: number
-  /** Skip when she has said she avoids one of these. Matched against profile allergies. */
+  /**
+   * Everything in it that a person could react to, matched against her stated
+   * allergies.
+   *
+   * Three of these were an empty array while their instructions named real
+   * ingredients — squalane and jojoba, green tea, rice. An empty list here
+   * does not mean "gentle", it means "nothing will ever be filtered", so a
+   * woman allergic to jojoba would have been handed the oil one. Anything a
+   * ritual touches her skin with belongs in this array.
+   */
   contains: string[]
 }
 
@@ -39,14 +48,14 @@ export const RITUALS: Ritual[] = [
     title: 'seal it in',
     how: 'damp skin, a few drops of squalane or jojoba, then your moisturiser over the top. nothing clever — it just stops the water leaving overnight.',
     minutes: 3,
-    contains: [],
+    contains: ['squalane', 'jojoba'],
   },
   {
     slug: 'green-tea-compress',
     title: 'green tea compress',
     how: 'brew a bag, let it go properly cold, soak a cloth and lay it over your face for ten minutes. good for heat, redness, and the day being too much.',
     minutes: 10,
-    contains: [],
+    contains: ['green tea', 'tea', 'caffeine'],
   },
   {
     slug: 'aloe-night',
@@ -60,7 +69,7 @@ export const RITUALS: Ritual[] = [
     title: 'rice water rinse',
     how: 'the cloudy water from rinsing rice, kept in the fridge. splash it on after cleansing and let it dry. quiet, brightening, free.',
     minutes: 5,
-    contains: [],
+    contains: ['rice'],
   },
 ]
 

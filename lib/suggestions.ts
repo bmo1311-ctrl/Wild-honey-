@@ -1,3 +1,5 @@
+import { RITUALS, type Ritual } from './rituals'
+
 /**
  * Something to react to, instead of a blank line.
  *
@@ -415,4 +417,66 @@ export function experimentSuggestions(ctx: SuggestionContext, limit = 5): Experi
  */
 export function groundedCount(suggestions: Suggestion[]): number {
   return suggestions.filter((s) => s.because !== null).length
+}
+
+// ── Treatments ──────────────────────────────────────────────────────────────
+
+
+export interface TreatmentSuggestion extends Suggestion {
+  slug: string
+  /** How to do it, in her voice. Already written in lib/rituals.ts. */
+  how: string
+  minutes: number
+}
+
+/**
+ * Treatments she could actually do tonight.
+ *
+ * Six of these have existed in lib/rituals.ts since the beginning — a honey
+ * mask, an oat and yoghurt soak, a green tea compress — written in her voice,
+ * needing nothing but a kitchen. Every one of them was unreachable. They
+ * surfaced only as the fallback inside planTonight on a rest night, which
+ * requires a shelf of products to have been entered first.
+ *
+ * So the woman with nothing on her shelf — the one who most needs somewhere
+ * to start — was the one woman who could never see them. Her empty Protocols
+ * page said "add what you use" and gave her a search box, which is the blank
+ * page problem again wearing a different hat.
+ *
+ * These need no products, cost nothing, and produce a real log entry the
+ * moment she taps one. routine_log has never had a single row in it.
+ */
+export function treatmentSuggestions(input: {
+  /** Free text from her settings. A ritual containing any of it is dropped. */
+  allergies?: string | null
+  /** Slugs she has done lately, so the same one is not offered twice running. */
+  recentRitualSlugs?: string[]
+  /** Drives the stable per-day ordering. */
+  today?: string
+  /** True when she has no products at all in this area. */
+  shelfIsEmpty?: boolean
+  limit?: number
+}): TreatmentSuggestion[] {
+  const { allergies, recentRitualSlugs = [], today, shelfIsEmpty = false, limit = 3 } = input
+
+  const avoid = (allergies ?? '').toLowerCase()
+  const safe: Ritual[] = RITUALS.filter(
+    (r) => !recentRitualSlugs.includes(r.slug) && !r.contains.some((c) => avoid && avoid.includes(c)),
+  )
+  if (safe.length === 0) return []
+
+  // Same stable per-day rotation the tonight engine already uses, so the two
+  // never disagree about what tonight's gentle option is.
+  const seed = today ? Number(today.replace(/-/g, '')) % safe.length : 0
+  const ordered = Array.from({ length: safe.length }, (_, i) => safe[(seed + i) % safe.length])
+
+  return ordered.slice(0, limit).map((r) => ({
+    slug: r.slug,
+    text: r.title,
+    how: r.how,
+    minutes: r.minutes,
+    because: shelfIsEmpty
+      ? 'nothing to buy — this one is done with what is already in your kitchen'
+      : null,
+  }))
 }
