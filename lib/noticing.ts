@@ -122,7 +122,7 @@ export function buildNotices(input: NoticeInput): Notice[] {
   if (stale) {
     out.push({
       text: `you said "${stale.text.toLowerCase()}". still true?`,
-      href: '/app/calendar',
+      href: '/app/promises',
       kind: 'commitment',
     })
   }

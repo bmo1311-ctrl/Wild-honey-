@@ -1766,7 +1766,7 @@ export async function addCommitment(text: string) {
   if (!trimmed) return { error: 'Write your commitment first.' }
   const { error } = await supabase.from('commitments').insert({ user_id: user.id, text: trimmed })
   if (error) return { error: error.message }
-  revalidatePath('/app/calendar')
+  revalidatePath('/app/promises')
   return { ok: true }
 }
 
@@ -1808,7 +1808,7 @@ export async function reviewCommitment(id: string, action: 'continue' | 'modify'
     if (error) return { error: error.message }
   }
 
-  revalidatePath('/app/calendar')
+  revalidatePath('/app/promises')
   return { ok: true }
 }
 
@@ -1816,7 +1816,7 @@ export async function deleteCommitment(id: string) {
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from('commitments').delete().eq('id', id).eq('user_id', user.id)
   if (error) return { error: error.message }
-  revalidatePath('/app/calendar')
+  revalidatePath('/app/promises')
   return { ok: true }
 }
 
@@ -1836,7 +1836,7 @@ export async function startExperiment(input: { title: string; description?: stri
     start_date: (await localToday()),
   })
   if (error) return { error: error.message }
-  revalidatePath('/app/calendar')
+  revalidatePath('/app/promises')
   return { ok: true }
 }
 
@@ -1853,7 +1853,7 @@ export async function checkInExperimentDay(experimentId: string) {
   if (existing) return { ok: true, alreadyLogged: true }
   const { error } = await supabase.from('experiment_checkins').insert({ experiment_id: experimentId, user_id: user.id, date: today })
   if (error) return { error: error.message }
-  revalidatePath('/app/calendar')
+  revalidatePath('/app/promises')
   return { ok: true }
 }
 
@@ -1871,7 +1871,7 @@ export async function reflectOnExperiment(experimentId: string, helped: 'yes' | 
     .eq('id', experimentId)
     .eq('user_id', user.id)
   if (error) return { error: error.message }
-  revalidatePath('/app/calendar')
+  revalidatePath('/app/promises')
   return { ok: true }
 }
 
@@ -1879,7 +1879,7 @@ export async function abandonExperiment(experimentId: string) {
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from('personal_experiments').update({ status: 'abandoned' }).eq('id', experimentId).eq('user_id', user.id)
   if (error) return { error: error.message }
-  revalidatePath('/app/calendar')
+  revalidatePath('/app/promises')
   return { ok: true }
 }
 
@@ -1887,7 +1887,7 @@ export async function deleteExperiment(experimentId: string) {
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from('personal_experiments').delete().eq('id', experimentId).eq('user_id', user.id)
   if (error) return { error: error.message }
-  revalidatePath('/app/calendar')
+  revalidatePath('/app/promises')
   return { ok: true }
 }
 
@@ -1923,7 +1923,7 @@ export async function saveYearDayReflection(input: {
     q_intention: input.qIntention?.trim() || null,
   })
   if (error) return { error: error.message }
-  revalidatePath('/app/calendar')
+  revalidatePath('/app/promises')
   revalidatePath('/app/progress')
   return { ok: true }
 }
@@ -1944,7 +1944,7 @@ export async function updateSeason(season: string) {
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from('profiles').update({ season }).eq('id', user.id)
   if (error) return { error: error.message }
-  revalidatePath('/app/calendar')
+  revalidatePath('/app/promises')
   revalidatePath('/app')
   return { ok: true }
 }

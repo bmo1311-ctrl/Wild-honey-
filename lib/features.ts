@@ -18,7 +18,6 @@ export const FEATURES = {
   energy: true,
   vault: true,
   archive: true,
-  fixedCalendar: true,
   expertQA: true,
   shop: true,
   retreats: true,

@@ -1,26 +1,14 @@
-import { CalendarView } from '@/components/calendar-view'
-import { CommitmentsPanel } from '@/components/commitments-panel'
-import { ExperimentsPanel } from '@/components/experiments-panel'
-import { getMyCommitments, getMyExperiments } from '@/lib/data'
-import { FeatureOff } from '@/components/feature-off'
-import { FEATURES } from '@/lib/features'
+import { redirect } from 'next/navigation'
 
-export default async function CalendarPage() {
-  if (!FEATURES.fixedCalendar) return <FeatureOff />
-
-  const [commitments, experiments] = await Promise.all([getMyCommitments(), getMyExperiments()])
-
-  return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="font-serif text-3xl font-semibold">Calendar</h1>
-        <p className="mt-1 text-sm text-muted-foreground text-pretty">
-          switch between the standard calendar and Wild Honey's 13-month rhythm — every month exactly 28 days, with Sol as a threshold between June and July.
-        </p>
-      </div>
-      <CommitmentsPanel commitments={commitments} />
-      <ExperimentsPanel experiments={experiments} />
-      <CalendarView />
-    </div>
-  )
+/**
+ * The thirteen-month calendar is gone — two calendars in one app was one
+ * calendar too many, and Studio is the one she plans her work in.
+ *
+ * This stays as a redirect rather than a deletion because the commitments
+ * and experiments that lived here are still very much alive, just under
+ * their own name now. Anything still pointing here — a bookmark, a
+ * notification, a link in an older build — lands where it meant to.
+ */
+export default function CalendarPage() {
+  redirect('/app/promises')
 }

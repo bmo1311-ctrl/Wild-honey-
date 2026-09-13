@@ -31,8 +31,8 @@ export function MyBecomingSummary({ commitments, experiments }: { commitments: C
             ))}
           </ul>
         )}
-        <Link href="/app/calendar" className="mt-1 flex items-center gap-1 text-xs font-medium text-honey">
-          manage on Calendar <ArrowRight className="h-3 w-3" />
+        <Link href="/app/promises" className="mt-1 flex items-center gap-1 text-xs font-medium text-honey">
+          manage your promises <ArrowRight className="h-3 w-3" />
         </Link>
       </div>
 
@@ -58,8 +58,8 @@ export function MyBecomingSummary({ commitments, experiments }: { commitments: C
             ))}
           </ul>
         )}
-        <Link href="/app/calendar" className="mt-1 flex items-center gap-1 text-xs font-medium text-honey">
-          manage on Calendar <ArrowRight className="h-3 w-3" />
+        <Link href="/app/promises" className="mt-1 flex items-center gap-1 text-xs font-medium text-honey">
+          manage your promises <ArrowRight className="h-3 w-3" />
         </Link>
       </div>
     </div>
