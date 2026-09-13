@@ -1,22 +1,22 @@
 import { notFound, redirect } from 'next/navigation'
 import { DayView } from '@/components/course/day-view'
-import { getCourse, getDay, pillarOfDay } from '@/lib/courses'
+import {pillarOfDay} from '@/lib/courses'
+import { loadCourse, loadDay } from '@/lib/courses-db'
 import { requireTier, getCompletedDays, getDayPillars, getEnrollment, getOwnerScope, getTodayCheckin, getTodayNutrition, getWritings, mayOpenCourse } from '@/lib/data'
 import type { CourseWriting } from '@/lib/courses'
 
 export default async function CourseDayPage({
   params,
-  searchParams,
-}: {
+  searchParams }: {
   params: Promise<{ slug: string; n: string }>
   searchParams: Promise<{ part?: string; full?: string }>
 }) {
   const { slug, n } = await params
   const { part, full } = await searchParams
-  const course = getCourse(slug)
+  const course = await loadCourse(slug)
   if (!course) notFound()
   const dayNumber = Number(n)
-  const day = getDay(course, dayNumber)
+  const day = await loadDay(slug, dayNumber)
   if (!day) notFound()
   if (!(await mayOpenCourse(slug))) redirect('/app')
   await requireTier('circle', 'program')
@@ -36,8 +36,7 @@ export default async function CourseDayPage({
     proteinG: nutrition.protein,
     waterMl: nutrition.nutrients.water_ml ?? 0,
     caffeineMg: nutrition.nutrients.caffeine_mg ?? 0,
-    mealsLogged: nutrition.loggedMeals.length,
-  }
+    mealsLogged: nutrition.loggedMeals.length }
   const saved = new Map<number, CourseWriting>(writings.map((w) => [w.prompt_index, w]))
 
   return (

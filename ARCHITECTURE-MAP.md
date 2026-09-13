@@ -236,7 +236,14 @@ nothing; two had suggestions.** Both of those were on Promises.
 6. Milestone reflection — four blank textareas, none with a placeholder.
 7. Allergies and foods-avoided in settings — comma-separated free text.
 
-**Unmounted, and worth deciding about rather than leaving:** `year-day-ritual`
-(nine placeholder-less textareas), `reset-panel` (four), `evening-reflection-card`
-(three), `morning-reset-card`. None is reachable from any route. The heaviest
-blank-box load in the repo is code nobody can get to.
+~~**Unmounted**~~ — **all four mounted 13 Sept.**
+
+- `morning-reset-card` → Today, 5am–noon.
+- `evening-reflection-card` → Today, after 7pm.
+- `reset-panel` → Today, unconditionally. It asks `getCheckinGap()` itself and stays silent unless she has genuinely been away, which is the right behaviour for a card about coming back.
+- `year-day-ritual` → Evolution, renamed. Nine questions once a year, named after Year Day from the deleted calendar; a ritual named after a calendar nobody uses is a ritual nobody opens.
+
+**And the reason she could not find her settings:** the only link to
+`/app/settings` said *"Privacy & notifications"*. The page holds her name and
+photo, her timezone, what her body needs flagged, her profile page and who she
+has blocked. It says **Settings** now, with a line naming what is in it.

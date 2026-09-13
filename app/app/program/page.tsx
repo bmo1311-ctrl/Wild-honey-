@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { ChevronRight } from 'lucide-react'
-import { COURSES, currentDayFrom } from '@/lib/courses'
+import { currentDayFrom } from '@/lib/courses'
+import { loadCourses } from '@/lib/courses-db'
 import { getAllEnrollments, getCompletedDays, getSessionProfile } from '@/lib/data'
 import { localToday } from '@/lib/today'
 import { courseAllowList } from '@/lib/kid'
@@ -22,7 +23,8 @@ export default async function ProgramIndexPage({ searchParams }: { searchParams:
 
   // A child sees only the programs her parent turned on.
   const allowed = courseAllowList(me)
-  const courses = allowed ? COURSES.filter((c) => allowed.includes(c.slug)) : COURSES
+  const ALL = await loadCourses()
+  const courses = allowed ? ALL.filter((c) => allowed.includes(c.slug)) : ALL
   const enrollments = allowed ? allEnrollments.filter((e) => allowed.includes(e.course_slug)) : allEnrollments
   const live = enrollments.filter((e) => e.is_active)
 

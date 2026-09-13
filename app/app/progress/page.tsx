@@ -1,6 +1,7 @@
 import { VitalityComparison } from '@/components/vitality-comparison'
 import { CheckpointForm } from '@/components/checkpoint-form'
 import { ReflectionForm } from '@/components/reflection-form'
+import { YearDayRitual } from '@/components/year-day-ritual'
 import { MySeasonCard } from '@/components/my-season-card'
 import { MyBecomingSummary } from '@/components/my-becoming-summary'
 import { getMyCommitments, getMyExperiments, getRecentWins, getReflections, getSessionProfile, getVitalityHistory } from '@/lib/data'
@@ -76,7 +77,7 @@ export default async function ProgressPage() {
             {yearDayReflections.map((r) => (
               <div key={r.id} className="rounded-2xl bg-honey/10 p-4 ring-1 ring-honey/30">
                 <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-honey/20 px-2.5 py-1 text-[0.7rem] font-medium text-honey">Year Day {r.wild_honey_year}</span>
+                  <span className="rounded-full bg-honey/20 px-2.5 py-1 text-[0.7rem] font-medium text-honey">{r.wild_honey_year}</span>
                   <span className="text-xs text-muted-foreground">{relativeTime(r.created_at)}</span>
                 </div>
                 <div className="mt-3 flex flex-col gap-2.5">
@@ -103,6 +104,17 @@ export default async function ProgressPage() {
         <h2 className="mb-3 font-serif text-lg font-semibold">what I'm learning</h2>
         <div className="flex flex-col gap-3">
           <ReflectionForm />
+
+          {/*
+            The nine-question annual reflection. It existed and was mounted
+            nowhere — the heaviest piece of writing in the app, unreachable.
+            Named after Year Day from the deleted calendar; it is simply the
+            year's reflection now.
+          */}
+          <YearDayRitual
+            wildHoneyYear={new Date().getFullYear()}
+            existing={yearDayReflections[0] ?? null}
+          />
           {otherReflections.map((r) => (
             <div key={r.id} className="rounded-2xl bg-card p-4 ring-1 ring-border">
               <div className="flex items-center justify-between">

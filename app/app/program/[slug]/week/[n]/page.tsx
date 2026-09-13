@@ -3,14 +3,15 @@ import { notFound, redirect } from 'next/navigation'
 import { Check, ChevronDown, ChevronRight } from 'lucide-react'
 import { Blocks } from '@/components/course/blocks'
 import { wordsOf } from '@/lib/day-shape'
-import { daysInWeek, getCourse, getWeek, pillarOfDay } from '@/lib/courses'
+import { daysInWeek, getWeek, pillarOfDay } from '@/lib/courses'
+import { loadCourse } from '@/lib/courses-db'
 import { PillarDots } from '@/components/course/pillar-dots'
 import { requireTier, getCompletedDays, getDayPillars, mayOpenCourse } from '@/lib/data'
 import { cn } from '@/lib/utils'
 
 export default async function CourseWeekPage({ params }: { params: Promise<{ slug: string; n: string }> }) {
   const { slug, n } = await params
-  const course = getCourse(slug)
+  const course = await loadCourse(slug)
   if (!course) notFound()
   if (!(await mayOpenCourse(slug))) redirect('/app')
   await requireTier('circle', 'program')

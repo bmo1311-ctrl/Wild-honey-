@@ -7,7 +7,7 @@ import { Check, Pencil, Trash2, UserPlus, X } from 'lucide-react'
 import { addHouseholdMember, addKidReward, archiveKidReward, createChildAccess, getChildPermissions, payAllKidEarnings, removeHouseholdMember, setChildPermissions, setKidEarningStatus, updateHouseholdMember } from '@/app/actions'
 import type { KidEarning, KidReward } from '@/lib/data'
 import { rewardIdeas } from '@/lib/kid-reward-ideas'
-import { COURSES } from '@/lib/courses'
+
 import type { HouseholdMember } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -18,7 +18,16 @@ function ageFrom(birthYear: number | null): string {
 }
 
 /** Add, rename and remove the people you're tracking. */
-export function HouseholdManager({ members, rewards = {} }: { members: HouseholdMember[]; rewards?: Record<string, { rewards: KidReward[]; earnings: KidEarning[]; balance: { waiting: number; ready: number; paid: number } }> }) {
+export function HouseholdManager({
+  members,
+  rewards = {},
+  courses = [],
+}: {
+  members: HouseholdMember[]
+  rewards?: Record<string, { rewards: KidReward[]; earnings: KidEarning[]; balance: { waiting: number; ready: number; paid: number } }>
+  /** Passed from the server: this is a client component and courses live in the database now. */
+  courses?: { slug: string; title: string }[]
+}) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
   const [adding, setAdding] = useState(false)
@@ -252,7 +261,7 @@ export function HouseholdManager({ members, rewards = {} }: { members: Household
           <button type="button" onClick={() => setPerms({ ...perms, circle: !perms.circle })} className={cn('mt-3 flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left ring-1', perms.circle ? 'bg-mindset-pillar text-white ring-transparent' : 'ring-border')}>
             <span className="text-sm font-medium">The Circle and discussions</span><span className={cn('text-xs', perms.circle ? 'text-white/80' : 'text-muted-foreground')}>{perms.circle ? 'on' : 'off'}</span>
           </button>
-          {COURSES.map((c) => { const on = perms.program.includes(c.slug); return (
+          {courses.map((c) => { const on = perms.program.includes(c.slug); return (
             <button key={c.slug} type="button" onClick={() => setPerms({ ...perms, program: on ? perms.program.filter((s) => s !== c.slug) : [...perms.program, c.slug] })} className={cn('mt-2 flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left ring-1', on ? 'bg-mindset-pillar text-white ring-transparent' : 'ring-border')}>
               <span className="text-sm font-medium">{c.title}</span><span className={cn('text-xs', on ? 'text-white/80' : 'text-muted-foreground')}>{on ? 'on' : 'off'}</span>
             </button>

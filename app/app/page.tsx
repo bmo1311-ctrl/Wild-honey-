@@ -3,12 +3,16 @@ import { ChevronRight, Flame } from 'lucide-react'
 import { KidToday } from '@/components/kid-today'
 import { BaselineCardLink } from '@/components/baseline-card'
 import { suggestHabits } from '@/lib/habit-suggestions'
-import { getCourse, getDay, weekOfDay } from '@/lib/courses'
+import { weekOfDay } from '@/lib/courses'
+import { loadCourse, loadCourses, loadDay } from '@/lib/courses-db'
 import { localHour, localToday } from '@/lib/today'
 import { buildActivity, consistency, streaksFrom } from '@/lib/activity'
 import { QuickAddHabit } from '@/components/quick-add-habit'
 import { NoticeLine } from '@/components/notice-line'
 import { MomentCard } from '@/components/moment-card'
+import { MorningResetCard } from '@/components/morning-reset-card'
+import { EveningReflectionCard } from '@/components/evening-reflection-card'
+import { ResetPanel } from '@/components/reset-panel'
 import { buildMoment, greetingFor } from '@/lib/moment'
 import { candidatesFor } from '@/lib/moment-candidates'
 import { planTonight } from '@/lib/tonight'
@@ -46,6 +50,8 @@ import { getAccess,
   getMyEntryForPrompt,
   getWardrobe,
   getStyleProfile,
+  getTodayMorningReset,
+  getTodayEveningReflection,
 } from '@/lib/data'
 
 /**
@@ -64,7 +70,11 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       scope?.childMemberId ? getKidRewards(scope.childMemberId) : Promise.resolve(null),
     ])
     const stars = items.filter((i) => i.doneToday).length + (nutrition.loggedMeals.length > 0 ? 1 : 0)
-    const programs = (me.child_permissions?.program ?? []).map((slug) => getCourse(slug)).filter((c): c is NonNullable<typeof c> => Boolean(c)).map((c) => ({ slug: c.slug, title: c.title }))
+    const all = await loadCourses()
+    const programs = (me.child_permissions?.program ?? [])
+      .map((slug) => all.find((c) => c.slug === slug))
+      .filter((c): c is NonNullable<typeof c> => Boolean(c))
+      .map((c) => ({ slug: c.slug, title: c.title }))
     return <KidToday name={me.name?.split(' ')[0] ?? 'there'} items={items} mealsToday={nutrition.loggedMeals.length} starsThisWeek={stars} programs={programs} earned={(kid?.balance.waiting ?? 0) + (kid?.balance.ready ?? 0)} />
   }
   const [{ slug, enrollment, currentDay, completedDays }, profile, activityDates, checkin, nutrition, habits, habitLogs] = await Promise.all([
@@ -77,12 +87,12 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     getRecentHabitLogs(7),
   ])
 
-  const course = getCourse(slug)
+  const course = await loadCourse(slug)
   const today = await localToday()
   const activity = buildActivity(activityDates)
   const streaks = streaksFrom(activity, today)
   const week = consistency(activity, 7, today)
-  const day = course && currentDay ? getDay(course, currentDay) : null
+  const day = course && currentDay ? await loadDay(slug, currentDay) : null
   const dayDone = currentDay ? completedDays.includes(currentDay) : false
   const pct = course ? Math.round((completedDays.length / course.length_days) * 100) : 0
   const loggedHabitIds = new Set(habitLogs.filter((l) => l.date === today).map((l) => l.habit_id))
@@ -154,7 +164,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
    * engine picks whichever fits the hour she is in.
    */
   const hour = await localHour()
-  const [beautyProducts, routineLog, studioBlocks, studioItems, studioSessions, prompt, garments, style] =
+  const [beautyProducts, routineLog, studioBlocks, studioItems, studioSessions, prompt, garments, style, morning, evening] =
     await Promise.all([
       getMemberProducts(),
       getRoutineLog(30),
@@ -164,6 +174,8 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       getTodayPrompt(),
       getWardrobe(),
       getStyleProfile(),
+      getTodayMorningReset(),
+      getTodayEveningReflection(),
     ])
   const promptEntry = prompt ? await getMyEntryForPrompt(prompt.id) : null
 
@@ -294,6 +306,20 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
         "how am I doing" when she opened the app to ask "what now".
       */}
       <MomentCard moment={moment} hour={hour} />
+
+      {/*
+        Three cards that existed and were reachable from nowhere.
+        Each one belongs to a time rather than a page, which is what Today is
+        for — the moment engine already decides the hour, so these follow it.
+
+        ResetPanel decides for itself: it asks how long she has been away and
+        stays hidden unless there is a real gap. That is the right behaviour
+        for a card about coming back, so it is mounted unconditionally and
+        trusted to keep quiet.
+      */}
+      <ResetPanel />
+      {hour >= 5 && hour < 12 && <MorningResetCard existing={morning} />}
+      {hour >= 19 && <EveningReflectionCard existing={evening} />}
 
       {!hasCourse && (
         <Link

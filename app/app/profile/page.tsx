@@ -14,7 +14,7 @@ import {
   PenLine,
   PhoneCall,
   Refrigerator,
-  ShieldCheck,
+  Settings as SettingsIcon,
   Shirt,
   ShoppingBag,
   Sparkles,
@@ -150,12 +150,24 @@ export default async function ProfilePage() {
       />
 
       <div className="flex flex-col gap-2">
+        {/*
+          This said "Privacy & notifications", which is why she could not
+          find her settings — she was looking for the word Settings and it
+          was nowhere in the app. The page holds her name and photo, her
+          timezone, what her body needs flagged, her profile page and who she
+          has blocked; privacy is one part of it, not the name of it.
+        */}
         <Link
           href="/app/settings"
-          className="flex items-center gap-3 rounded-3xl bg-card px-4 py-3.5 text-sm font-medium ring-1 ring-border"
+          className="flex items-center gap-3 rounded-3xl bg-card px-4 py-3.5 ring-1 ring-border"
         >
-          <ShieldCheck className="h-4 w-4 text-muted-foreground" />
-          Privacy &amp; notifications
+          <SettingsIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-medium">Settings</span>
+            <span className="mt-0.5 block text-[12px] text-muted-foreground">
+              your name, timezone, what gets flagged, privacy &amp; notifications
+            </span>
+          </span>
         </Link>
         {profile.membership_tier !== 'free' && (
           <Link

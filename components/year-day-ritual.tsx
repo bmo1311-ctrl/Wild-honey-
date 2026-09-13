@@ -23,6 +23,19 @@ const QUESTIONS = [
   { key: 'qIntention', label: 'what is my intention for the next cycle?' },
 ] as const
 
+/**
+ * The long annual reflection.
+ *
+ * Nine questions, once a year — the deepest thing in the app and, until now,
+ * reachable from nowhere at all. It was written for Year Day, the day
+ * belonging to no month in the thirteen-month calendar that has since been
+ * deleted, so the name had to go: a ritual named after a calendar nobody
+ * uses is a ritual nobody opens.
+ *
+ * It lives on Evolution rather than in Settings, because Settings is where
+ * configuration goes and this is the opposite of configuration. Evolution is
+ * already where her other reflections are kept.
+ */
 export function YearDayRitual({ wildHoneyYear, existing }: { wildHoneyYear: number; existing: TransformationReflection | null }) {
   const [stage, setStage] = useState<'intro' | 'questions' | 'establish' | 'done'>(existing ? 'done' : 'intro')
   const [answers, setAnswers] = useState<Record<string, string>>({})
@@ -61,7 +74,7 @@ export function YearDayRitual({ wildHoneyYear, existing }: { wildHoneyYear: numb
     return (
       <div className="flex flex-col items-center gap-3 rounded-2xl bg-honey/10 p-8 text-center ring-1 ring-honey/30">
         <Sun className="h-8 w-8 text-honey" />
-        <p className="font-serif text-xl font-semibold text-honey">Year Day {wildHoneyYear}, complete</p>
+        <p className="font-serif text-xl font-semibold text-honey">Your {wildHoneyYear} reflection, complete</p>
         <p className="max-w-sm text-sm text-muted-foreground text-pretty">
           {existing ? 'you already reflected today — come back to it on your Progress page anytime.' : 'reflect · integrate · celebrate · begin again.'}
         </p>

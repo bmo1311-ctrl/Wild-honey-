@@ -51,6 +51,7 @@ import type { FoodItem, HouseholdMember, LearningItem, PublicProfile } from '@/l
 import { sumNutrients, type NutrientMap } from '@/lib/nutrients'
 import type { ContentEvent } from '@/lib/engine'
 import type { MoneyAccount, MoneyEntry, MoneyGoal } from '@/lib/money'
+import { loadCourse, loadCourses } from '@/lib/courses-db'
 
 /**
  * Unwraps a Supabase response, throwing on error instead of quietly
@@ -927,8 +928,12 @@ export async function getAllWritings(): Promise<(CourseWriting & { course_title:
   const enrollments = await getEnrollments()
   const slugs = enrollments.length ? enrollments.map((e) => e.course_slug) : [COURSE_SLUG]
   const lists = await Promise.all(slugs.map((slug) => getWritings(undefined, slug)))
+  // Titles come from the database now, so an edited course title shows up
+  // in her archive too rather than only on the course page.
+  const all = await loadCourses()
+  const titles = Object.fromEntries(all.map((c) => [c.slug, c.title]))
   return lists
-    .flatMap((list, i) => list.map((w) => ({ ...w, course_title: getCourse(slugs[i])?.title ?? slugs[i] })))
+    .flatMap((list, i) => list.map((w) => ({ ...w, course_title: titles[slugs[i]] ?? slugs[i] })))
     .sort((a, b) => b.updated_at.localeCompare(a.updated_at))
 }
 
@@ -1297,7 +1302,7 @@ export async function getDayProgress(slug: string = COURSE_SLUG): Promise<{ day_
 /** Which day she is on today, or null when not enrolled. */
 export async function getCurrentDay(slug: string = COURSE_SLUG): Promise<number | null> {
   const enrollment = await getEnrollment(slug)
-  const course = getCourse(slug)
+  const course = await loadCourse(slug)
   return enrollment && course ? currentDayFrom(course, enrollment.started_on, await localToday()) : null
 }
 
@@ -1331,7 +1336,7 @@ export async function getCourseState(slug: string = COURSE_SLUG): Promise<{
   currentDay: number | null
   completedDays: number[]
 }> {
-  const course = getCourse(slug)
+  const course = await loadCourse(slug)
   const enrollment = await getEnrollment(slug)
   if (!enrollment || !course) return { enrollment: null, currentDay: null, completedDays: [] }
   const completedDays = await getCompletedDays(slug)

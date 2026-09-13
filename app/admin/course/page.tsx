@@ -1,9 +1,11 @@
-import { COURSES, pillarsOf } from '@/lib/courses'
+import { pillarsOf } from '@/lib/courses'
+import { loadCourses } from '@/lib/courses-db'
 import { getDayPillars } from '@/lib/data'
 import { DayPillarEditor } from '@/components/admin/day-pillar-editor'
 
 /** Set the pillar for every day of every course. Blank means "read it off the blocks". */
 export default async function AdminCoursePage() {
+  const COURSES = await loadCourses(true)
   const overrides = Object.fromEntries(await Promise.all(COURSES.map(async (c) => [c.slug, await getDayPillars(c.slug)] as const)))
   return (
     <div className="flex flex-col gap-6">

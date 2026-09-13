@@ -6,6 +6,7 @@ import { WriteBlock } from '@/components/course/write-block'
 import { RateBlock } from '@/components/course/rate-block'
 import { CheckBlock } from '@/components/course/check-block'
 import { LogBlock, type TrackedToday } from '@/components/course/log-block'
+import { youTubeId } from '@/lib/youtube'
 
 export interface BlocksContext {
   /** null on week pages, where there is no day to save against. */
@@ -206,6 +207,68 @@ function BlockView({ block, index, ctx }: { block: Block; index: number; ctx: Bl
           <LogBlock existing={ctx.checkin ?? null} tracked={ctx.tracked ?? null} />
         </div>
       )
+
+    /*
+     * Media.
+     *
+     * Plain <img> and <video> rather than next/image: the URLs come out of a
+     * Supabase bucket she uploads to, at whatever dimensions her phone
+     * produced, and next/image wants to know sizes it cannot know here.
+     *
+     * A YouTube link is embedded rather than played inline, because her Watch
+     * library is already on YouTube and re-hosting it would be a second copy
+     * of every video to keep in sync.
+     */
+    case 'image':
+      return (
+        <figure className="flex flex-col gap-1.5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={block.url}
+            alt={block.alt}
+            loading="lazy"
+            className="w-full rounded-2xl ring-1 ring-border"
+          />
+          {block.caption && (
+            <figcaption className="px-1 text-[12.5px] leading-[1.45] text-pretty text-muted-foreground">
+              {block.caption}
+            </figcaption>
+          )}
+        </figure>
+      )
+
+    case 'video': {
+      const yt = youTubeId(block.url)
+      return (
+        <figure className="flex flex-col gap-1.5">
+          <div className="overflow-hidden rounded-2xl ring-1 ring-border">
+            {yt ? (
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${yt}`}
+                title={block.title ?? 'video'}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="aspect-video w-full"
+              />
+            ) : (
+              <video
+                src={block.url}
+                poster={block.poster}
+                controls
+                playsInline
+                preload="metadata"
+                className="w-full"
+              />
+            )}
+          </div>
+          {block.caption && (
+            <figcaption className="px-1 text-[12.5px] leading-[1.45] text-pretty text-muted-foreground">
+              {block.caption}
+            </figcaption>
+          )}
+        </figure>
+      )
+    }
 
     default: {
       // Compile-time proof that every block type in the course is rendered.

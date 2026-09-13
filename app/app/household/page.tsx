@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { HouseholdManager } from '@/components/household-manager'
+import { loadCourses } from '@/lib/courses-db'
 import { getHouseholdMembers, getKidRewards } from '@/lib/data'
 
 export default async function HouseholdPage() {
-  const members = await getHouseholdMembers()
+  const [members, courses] = await Promise.all([getHouseholdMembers(), loadCourses()])
   const kids = members.filter((m) => !m.is_self)
   const rewards = Object.fromEntries(await Promise.all(kids.map(async (k) => [k.id, await getKidRewards(k.id)] as const)))
 
@@ -19,7 +20,7 @@ export default async function HouseholdPage() {
           everyone you&rsquo;re tracking. add a child and you can keep their learning list and their food alongside your own.
         </p>
       </div>
-      <HouseholdManager members={members} rewards={rewards} />
+      <HouseholdManager members={members} rewards={rewards} courses={courses.map((c) => ({ slug: c.slug, title: c.title }))} />
     </div>
   )
 }

@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
-import { getCourse, pillarOfDay, weekOfDay, type Pillar4 } from '@/lib/courses'
+import { pillarOfDay, weekOfDay, type Pillar4 } from '@/lib/courses'
+import { loadCourse } from '@/lib/courses-db'
 import { PillarDots } from '@/components/course/pillar-dots'
 import { PillarFilter } from '@/components/course/pillar-filter'
 import { getAccess, getCourseState, getDayPillars, mayOpenCourse } from '@/lib/data'
@@ -11,7 +12,7 @@ import { cn } from '@/lib/utils'
 export default async function CourseOverviewPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ pillar?: string }> }) {
   const { slug } = await params
   const { pillar } = await searchParams
-  const course = getCourse(slug)
+  const course = await loadCourse(slug)
   if (!course) notFound()
   if (!(await mayOpenCourse(slug))) redirect('/app')
 

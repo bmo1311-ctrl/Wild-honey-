@@ -1,14 +1,15 @@
 import Link from 'next/link'
-import { getCourse } from '@/lib/courses'
+import { loadCourses } from '@/lib/courses-db'
 import { cn } from '@/lib/utils'
 
 /** Shown only when she holds more than one course. One tap changes what Today is about. */
-export function CourseSwitcher({ current, others }: { current: string; others: string[] }) {
+export async function CourseSwitcher({ current, others }: { current: string; others: string[] }) {
   const all = [current, ...others]
+  const courses = await loadCourses()
   return (
     <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
       {all.map((slug) => {
-        const c = getCourse(slug)
+        const c = courses.find((x) => x.slug === slug)
         if (!c) return null
         const active = slug === current
         return (

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Check, Flame, Lock } from 'lucide-react'
-import { getCourse, currentDayFrom, weekOfDay } from '@/lib/courses'
+import { currentDayFrom, weekOfDay } from '@/lib/courses'
+import { loadCourse } from '@/lib/courses-db'
 import { localToday } from '@/lib/today'
 import { computeBecoming, computeMilestones, computeStreaks } from '@/lib/rewards'
 import { getActiveCourseState, getBaselineVitality, getDayProgress, getLatestVitalityCheckin, getWritings } from '@/lib/data'
@@ -63,7 +64,7 @@ export default async function BecomingPage({ searchParams }: { searchParams: Pro
     .filter((w) => w.kind === 'rate' && Number(w.body))
     .map((w) => ({ day_number: w.day_number, value: Number(w.body) }))
 
-  const course = getCourse(active.slug)
+  const course = await loadCourse(active.slug)
   const currentDay = active.enrollment && course ? currentDayFrom(course, active.enrollment.started_on, await localToday()) : 0
   const weeksReached = currentDay && course ? weekOfDay(course, currentDay) : 0
 

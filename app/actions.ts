@@ -15,6 +15,7 @@ import { scaleNutrients, type NutrientMap } from '@/lib/nutrients'
 import { fetchRecipe, safeUrl } from '@/lib/recipe-import'
 import type { WritingKind } from '@/lib/courses'
 import { CONCERNS } from '@/lib/skin-concerns'
+import { loadCourse } from '@/lib/courses-db'
 
 /** The user, plus the account her rows are stored under (her parent's, if she is a child). */
 async function requireOwner() {
@@ -2087,7 +2088,7 @@ export async function completeCourseDay(dayNumber: number, slug: string = COURSE
     )
   if (error) return { error: error.message }
   await bumpStreak(user.id)
-  revalidateCourse(dayNumber, slug)
+  await revalidateCourse(dayNumber, slug)
   return { ok: true }
 }
 
@@ -2100,7 +2101,7 @@ export async function uncompleteCourseDay(dayNumber: number, slug: string = COUR
     .eq('course_slug', slug)
     .eq('day_number', dayNumber)
   if (error) return { error: error.message }
-  revalidateCourse(dayNumber, slug)
+  await revalidateCourse(dayNumber, slug)
   return { ok: true }
 }
 
@@ -2154,12 +2155,12 @@ export async function saveCourseWriting(input: {
   }
 
   revalidatePath('/app/write')
-  revalidateCourse(input.dayNumber, slug)
+  await revalidateCourse(input.dayNumber, slug)
   return { ok: true, savedAt: new Date().toISOString() }
 }
 
-function revalidateCourse(dayNumber: number, slug: string) {
-  const course = getCourse(slug)
+async function revalidateCourse(dayNumber: number, slug: string) {
+  const course = await loadCourse(slug)
   revalidatePath('/app')
   revalidatePath('/app/program')
   revalidatePath(`/app/program/${slug}`)

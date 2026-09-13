@@ -18,6 +18,18 @@ export type Block =
   | { t: 'scripture'; ref: string; text: string; why?: string }
   | { t: 'log' }
   | { t: 'note'; tone?: 'warn' | 'scope' | 'note'; title?: string; v: string }
+  /*
+   * Media. Neither existed until courses moved into the database — there
+   * were thirteen block types and not one of them could carry a picture,
+   * which is why a course full of movement and posture had to describe
+   * everything in words.
+   *
+   * `alt` is required on an image rather than optional, because a decorative
+   * image in a teaching course is rare and a missing alt is invisible to the
+   * person writing it and total to the person who needs it.
+   */
+  | { t: 'image'; url: string; alt: string; caption?: string }
+  | { t: 'video'; url: string; title?: string; caption?: string; poster?: string }
 
 export type DayKind = 'teaching' | 'practice' | 'session' | 'rest' | 'milestone'
 
