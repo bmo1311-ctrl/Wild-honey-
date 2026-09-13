@@ -480,3 +480,114 @@ export function treatmentSuggestions(input: {
       : null,
   }))
 }
+
+// ── Her own words, given back ───────────────────────────────────────────────
+
+/**
+ * What she has typed here before, most-used first.
+ *
+ * The cheapest friction fix in the app and the most honest one: no content
+ * written by me, no inference, just her own past entries offered as taps.
+ * Money categories are the clearest case — she retypes "groceries" every
+ * week into a blank box while the database already holds it forty times.
+ *
+ * Case-insensitive on the way in, but her own capitalisation is what comes
+ * back out, because "Groceries" and "groceries" being two chips is exactly
+ * the kind of mess that makes a feature feel broken.
+ */
+export function recentlyUsed(values: (string | null | undefined)[], limit = 8): string[] {
+  const counts = new Map<string, { display: string; n: number }>()
+  for (const raw of values) {
+    const v = raw?.trim()
+    if (!v) continue
+    const key = v.toLowerCase()
+    const seen = counts.get(key)
+    if (seen) seen.n++
+    else counts.set(key, { display: v, n: 1 })
+  }
+  return [...counts.values()]
+    .sort((a, b) => b.n - a.n)
+    .slice(0, limit)
+    .map((x) => x.display)
+}
+
+/**
+ * Ways into a journal entry, when the page is blank.
+ *
+ * These are openings rather than questions — a half-finished sentence is far
+ * easier to continue than a question is to answer, and it leaves her writing
+ * her own thought rather than answering mine.
+ *
+ * Deliberately not therapy. No "how does that make you feel", nothing
+ * fishing for a confession.
+ */
+export function journalStarters(input: { seasons?: string[]; today?: string }): Suggestion[] {
+  const out: Suggestion[] = []
+  const general = [
+    'Today was mostly…',
+    'The thing I keep circling back to is…',
+    'What I actually want right now is…',
+    'Something I noticed today…',
+    'I am tired of…',
+    'One thing that went right…',
+  ]
+
+  const bySeason: Record<string, string> = {
+    motherhood: 'The part of today that was only mine…',
+    entrepreneurship: 'What the work took out of me today…',
+    rebuilding: 'One thing that is steadier than it was…',
+    deepening_faith: 'What I want to say that I have not said…',
+    healing: 'What my body was asking for today…',
+    transition: 'What I am between…',
+    growing: 'What I am not saying out loud yet…',
+    career_expansion: 'What I said yes to that I meant…',
+    finding_balance: 'What I let go of today, or did not…',
+    becoming_healthiest: 'How I actually felt in my body today…',
+  }
+
+  for (const s of seasonsForToday(input.seasons ?? [], input.today, 2)) {
+    const line = bySeason[s]
+    if (line) out.push({ text: line, because: `you said you are in ${seasonLabel(s)}` })
+  }
+
+  // Rotate the general openings too, so it is not the same page every night.
+  const day = input.today ? Number(input.today.replace(/-/g, '')) : 0
+  const start = general.length ? ((day % general.length) + general.length) % general.length : 0
+  for (let i = 0; i < 3; i++) {
+    out.push({ text: general[(start + i) % general.length], because: null })
+  }
+  return out
+}
+
+/**
+ * Kinds of win worth writing down.
+ *
+ * "write it down…" was the emptiest prompt in the app, and wins are the one
+ * thing women reliably under-record — the bar drifts up until only enormous
+ * things count and then nothing gets logged at all. These are deliberately
+ * small.
+ */
+export function winStarters(input: { seasons?: string[]; today?: string }): Suggestion[] {
+  const out: Suggestion[] = []
+  const bySeason: Record<string, string> = {
+    motherhood: 'I kept my patience when I nearly did not',
+    entrepreneurship: 'I finished something instead of starting another thing',
+    rebuilding: 'I did the small boring maintenance thing',
+    deepening_faith: 'I showed up to it even though I did not feel it',
+    healing: 'I rested without earning it first',
+    finding_balance: 'I said no to something',
+    growing: 'I did the thing I was avoiding',
+    career_expansion: 'I asked for what I actually wanted',
+    transition: 'I sat with not knowing',
+    becoming_healthiest: 'I moved my body when I did not feel like it',
+  }
+  for (const s of seasonsForToday(input.seasons ?? [], input.today, 2)) {
+    const line = bySeason[s]
+    if (line) out.push({ text: line, because: `you said you are in ${seasonLabel(s)}` })
+  }
+  out.push({ text: 'I asked for help', because: null })
+  out.push({ text: 'I did one hard thing before noon', because: null })
+  out.push({ text: 'I let something be good enough', because: null })
+  out.push({ text: 'Someone told me something kind and I believed it', because: null })
+  return out.slice(0, 5)
+}

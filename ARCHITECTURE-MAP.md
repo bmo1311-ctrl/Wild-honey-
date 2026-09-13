@@ -208,3 +208,35 @@ The directive's phases are right. Two amendments from what the audit found:
 Before either: clear the orphans in §4 and the Year Day frame in §5, because
 building an intelligence layer on top of dead code means carrying it
 forever.
+
+---
+
+## 9. Friction audit — the blank boxes
+
+Swept every free-text input outside admin. **37 asked her to generate from
+nothing; two had suggestions.** Both of those were on Promises.
+
+**Fixed 13 Sept** — the ones she hits daily or weekly:
+
+| surface | was | now |
+|---|---|---|
+| Journal / Write | `"Let it be honest."` and a cursor | openings from her seasons, shown only on an empty page |
+| Wins | `"write it down…"` — the emptiest prompt in the app | small wins, deliberately small |
+| Mood (check-in) | free text between three sliders and a row of symptom chips | 16 mood chips, own word still possible |
+| Money category | retyped every entry | **her own past categories**, most-used first |
+| Commitments, experiments, treatments | blank | done earlier today |
+
+**Still blank, in rough order of how often she meets one:**
+
+1. **Course write-block** — daily while in a programme, and it has *no placeholder at all*. Probably the single worst remaining one.
+2. Community and group composers, replies, and encouragement on another woman's entry — the last has the highest social stakes in the app.
+3. Studio idea (`"what is it?"`), learning item title, wardrobe garment name — the name is load-bearing there since `inferEffects` reads it.
+4. Grocery and pantry items — no autocomplete against the 407-food library, which is an obvious connection going unused.
+5. Habit stack — two blank boxes back to back, while `QuickAddHabit` right next door gets suggestions.
+6. Milestone reflection — four blank textareas, none with a placeholder.
+7. Allergies and foods-avoided in settings — comma-separated free text.
+
+**Unmounted, and worth deciding about rather than leaving:** `year-day-ritual`
+(nine placeholder-less textareas), `reset-panel` (four), `evening-reflection-card`
+(three), `morning-reset-card`. None is reachable from any route. The heaviest
+blank-box load in the repo is code nobody can get to.

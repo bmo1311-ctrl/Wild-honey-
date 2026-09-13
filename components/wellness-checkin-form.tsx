@@ -24,6 +24,23 @@ const CYCLE_PHASES: { value: CyclePhase; label: string }[] = [
   { value: 'not_tracked', label: "don't track" },
 ]
 
+/**
+ * Words for how she is.
+ *
+ * Mood was the one free-text field sitting between three sliders and a row
+ * of symptom chips — the only thing on the page she had to compose. These
+ * are a spread rather than a scale: several are good, several are hard, and
+ * none of them is "fine", because "fine" is what people type to get out of
+ * the box.
+ *
+ * Tapping toggles. She can hold two, or clear them and type her own.
+ */
+const MOOD_WORDS = [
+  'steady', 'light', 'hopeful', 'content', 'clear', 'grateful',
+  'tired', 'foggy', 'stretched', 'flat', 'wired', 'tender',
+  'restless', 'heavy', 'raw', 'quiet',
+]
+
 const SYMPTOM_OPTIONS = SYMPTOM_KEYS
 
 export function ScaleRow({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
@@ -116,7 +133,34 @@ export function WellnessCheckinForm({ existing }: { existing: Checkin | null }) 
         <div className="mt-5 flex flex-col gap-5">
       <div className="flex flex-col gap-1.5">
             <Label className="text-xs text-muted-foreground">mood, in a word or two</Label>
-            <Input value={mood} onChange={(e) => setMood(e.target.value)} placeholder="e.g. steady, foggy, hopeful" className="h-11" />
+            {/*
+              Chips, like the symptoms directly below. This was the only
+              field on the page she had to compose rather than choose.
+            */}
+            <div className="flex flex-wrap gap-1.5">
+              {MOOD_WORDS.map((w) => {
+                const parts = mood.split(',').map((m) => m.trim()).filter(Boolean)
+                const on = parts.some((p) => p.toLowerCase() === w)
+                return (
+                  <button
+                    key={w}
+                    type="button"
+                    onClick={() =>
+                      setMood(
+                        (on ? parts.filter((p) => p.toLowerCase() !== w) : [...parts, w]).join(', '),
+                      )
+                    }
+                    className={cn(
+                      'rounded-full px-2.5 py-1 text-[12.5px] font-medium ring-1 transition-colors',
+                      on ? 'bg-foreground text-background ring-foreground' : 'text-muted-foreground ring-border',
+                    )}
+                  >
+                    {w}
+                  </button>
+                )
+              })}
+            </div>
+            <Input value={mood} onChange={(e) => setMood(e.target.value)} placeholder="or your own word" className="h-11" />
           </div>
 
           <div className="grid grid-cols-3 gap-3">

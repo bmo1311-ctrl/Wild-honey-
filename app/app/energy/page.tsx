@@ -4,6 +4,9 @@ import { WellnessCheckinForm } from '@/components/wellness-checkin-form'
 import { WellnessTrends } from '@/components/wellness-trends'
 import { SymptomIntelligence } from '@/components/symptom-intelligence'
 import { WinsJournal } from '@/components/wins-journal'
+import { winStarters } from '@/lib/suggestions'
+import { localToday } from '@/lib/today'
+import { getSessionProfile } from '@/lib/data'
 import { HabitStack } from '@/components/habit-stack'
 import { getHabits, getRecentCheckins, getRecentHabitLogs, getRecentWins, getTodayCheckin } from '@/lib/data'
 import { FeatureOff } from '@/components/feature-off'
@@ -12,12 +15,14 @@ import { FEATURES } from '@/lib/features'
 export default async function EnergyPage() {
   if (!FEATURES.energy) return <FeatureOff />
 
-  const [today, recent, wins, habits, habitLogs] = await Promise.all([
+  const [today, recent, wins, habits, habitLogs, profile, todayDate] = await Promise.all([
     getTodayCheckin(),
     getRecentCheckins(30),
     getRecentWins(30),
     getHabits(),
     getRecentHabitLogs(30),
+    getSessionProfile(),
+    localToday(),
   ])
 
   return (
@@ -51,7 +56,7 @@ export default async function EnergyPage() {
 
       <div>
         <h2 className="mb-3 font-serif text-lg font-semibold">wins journal</h2>
-        <WinsJournal wins={wins} />
+        <WinsJournal wins={wins} starters={winStarters({ seasons: profile?.seasons ?? [], today: todayDate })} />
       </div>
     </div>
   )

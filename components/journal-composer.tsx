@@ -8,13 +8,18 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import type { JournalEntry, Visibility } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { SuggestionPicker } from '@/components/suggestion-picker'
+import type { Suggestion } from '@/lib/suggestions'
 
 export function JournalComposer({
   promptId,
   existing,
+  starters = [],
 }: {
   promptId: string | null
   existing: JournalEntry | null
+  /** Openings, not questions. See lib/suggestions.ts. */
+  starters?: Suggestion[]
 }) {
   const [text, setText] = useState(existing?.text ?? '')
   const [visibility, setVisibility] = useState<Visibility>(existing?.visibility ?? 'private')
@@ -52,6 +57,25 @@ export function JournalComposer({
         rows={7}
         className="resize-none border-0 bg-transparent p-0 text-base leading-relaxed shadow-none focus-visible:ring-0"
       />
+
+      {/*
+        Only on an empty page, and only openings — never questions. A
+        half-finished sentence is far easier to continue than a question is
+        to answer, and it leaves her writing her own thought rather than
+        answering mine. It disappears the moment she starts typing.
+      */}
+      {text.trim().length === 0 && starters.length > 0 && (
+        <div className="mt-4 border-t border-border pt-4">
+          <SuggestionPicker
+            suggestions={starters}
+            label="or start here"
+            onPick={(s) => {
+              setText(`${s.text} `)
+              setSaved(false)
+            }}
+          />
+        </div>
+      )}
       <div className="mt-4 flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <VisibilityToggle

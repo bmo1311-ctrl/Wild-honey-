@@ -3,6 +3,7 @@ import { MoneyAccounts } from '@/components/money-accounts'
 import { MoneyQuickAdd } from '@/components/money-quick-add'
 import { LockedArea } from '@/components/locked'
 import { getAccess, getMoney } from '@/lib/data'
+import { recentlyUsed } from '@/lib/suggestions'
 import { debtFreeDate, fmtMoney, freedomPath, monthSummary, netWorth, runwayMonths } from '@/lib/money'
 import { cn } from '@/lib/utils'
 
@@ -55,7 +56,8 @@ export default async function MoneyPage() {
         </div>
       )}
 
-      <MoneyQuickAdd />
+      {/* Her own categories, given back to her instead of a blank box. */}
+      <MoneyQuickAdd recentCategories={recentlyUsed(entries.map((e) => e.category))} />
 
       <section>
         <h2 className="mb-2 text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">The path</h2>

@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
-import { getAllWritings, getMyEntries, getMyEntryForPrompt, getTodayPrompt } from '@/lib/data'
+import { getAllWritings, getMyEntries, getMyEntryForPrompt, getTodayPrompt, getSessionProfile } from '@/lib/data'
+import { journalStarters } from '@/lib/suggestions'
+import { localToday } from '@/lib/today'
 import { JournalComposer } from '@/components/journal-composer'
 import { cn } from '@/lib/utils'
 import { PageTabs } from '@/components/page-tabs'
@@ -16,7 +18,13 @@ import ArchivePage from '@/app/app/archive/page'
 export default async function WritePage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
   const { tab } = await searchParams
   const active = tab === 'archive' ? 'archive' : 'write'
-  const [courseWritings, entries, prompt] = await Promise.all([getAllWritings(), getMyEntries(), getTodayPrompt()])
+  const [courseWritings, entries, prompt, profile, today] = await Promise.all([
+    getAllWritings(),
+    getMyEntries(),
+    getTodayPrompt(),
+    getSessionProfile(),
+    localToday(),
+  ])
   const existing = prompt ? await getMyEntryForPrompt(prompt.id) : null
 
   // One notebook: course answers and free writing, newest first.
@@ -54,7 +62,11 @@ export default async function WritePage({ searchParams }: { searchParams: Promis
         <p className="text-xs font-bold uppercase tracking-[0.1em] text-primary">{prompt ? "Today's prompt" : 'Write'}</p>
         {prompt && <p className="mt-2 font-serif text-[17px] leading-snug text-pretty">{prompt.text}</p>}
         <div className="mt-3">
-          <JournalComposer promptId={prompt?.id ?? null} existing={existing} />
+          <JournalComposer
+            promptId={prompt?.id ?? null}
+            existing={existing}
+            starters={journalStarters({ seasons: profile?.seasons ?? [], today })}
+          />
         </div>
       </section>
 

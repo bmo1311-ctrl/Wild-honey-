@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input'
 import type { Win, WinKind } from '@/lib/types'
 import { relativeTime } from '@/lib/pillars'
 import { cn } from '@/lib/utils'
+import { SuggestionPicker } from '@/components/suggestion-picker'
+import type { Suggestion } from '@/lib/suggestions'
 
 const KINDS: { value: WinKind; label: string; icon: typeof Award }[] = [
   { value: 'win', label: "today's win", icon: Award },
@@ -17,7 +19,14 @@ const KINDS: { value: WinKind; label: string; icon: typeof Award }[] = [
   { value: 'courage', label: 'moment of courage', icon: Flame },
 ]
 
-export function WinsJournal({ wins }: { wins: Win[] }) {
+export function WinsJournal({
+  wins,
+  starters = [],
+}: {
+  wins: Win[]
+  /** Small wins worth writing down. See lib/suggestions.ts. */
+  starters?: Suggestion[]
+}) {
   const [kind, setKind] = useState<WinKind>('win')
   const [text, setText] = useState('')
   const [pending, startTransition] = useTransition()
@@ -59,6 +68,12 @@ export function WinsJournal({ wins }: { wins: Win[] }) {
         </div>
         <div className="mt-3 flex items-center gap-2">
           <Input value={text} onChange={(e) => setText(e.target.value)} placeholder="write it down..." className="h-11" />
+          {/*
+            'write it down…' was the emptiest prompt in the app. Wins are the
+            one thing women reliably under-record — the bar drifts up until
+            only enormous things count — so these are deliberately small.
+          */}
+          <SuggestionPicker suggestions={starters} onPick={(s) => setText(s.text)} label="or one of these" />
           <Button onClick={handleAdd} disabled={pending} className="h-11 shrink-0">
             add
           </Button>

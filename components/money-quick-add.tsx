@@ -14,7 +14,12 @@ const KINDS = [
 ] as const
 
 /** One line: what happened and how much. */
-export function MoneyQuickAdd() {
+export function MoneyQuickAdd({
+  recentCategories = [],
+}: {
+  /** Her own past categories, most-used first. Nothing invented here. */
+  recentCategories?: string[]
+}) {
   const router = useRouter()
   const [kind, setKind] = useState<(typeof KINDS)[number]['key']>('expense')
   const [amount, setAmount] = useState('')
@@ -42,6 +47,31 @@ export function MoneyQuickAdd() {
           <button key={k.key} type="button" onClick={() => setKind(k.key)} className={cn('h-10 flex-1 rounded-xl text-[13px] font-medium', kind === k.key ? 'bg-mindset-pillar text-white' : 'bg-muted text-muted-foreground')}>{k.label}</button>
         ))}
       </div>
+
+      {/*
+        Her own categories, not a list I wrote. She has been retyping
+        "groceries" into a blank box every week while the database already
+        held it forty times.
+      */}
+      {recentCategories.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {recentCategories.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setCategory(c)}
+              className={cn(
+                'rounded-full px-2.5 py-1 text-[12px] font-medium ring-1 transition-colors',
+                category.toLowerCase() === c.toLowerCase()
+                  ? 'bg-foreground text-background ring-foreground'
+                  : 'text-muted-foreground ring-border',
+              )}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="flex gap-2">
         <input value={amount} onChange={(e) => setAmount(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submit()} inputMode="decimal" placeholder="$" className="h-12 w-28 rounded-xl bg-background px-3 text-base outline-none ring-1 ring-border focus-visible:ring-2 focus-visible:ring-primary/40" />
         <input value={category} onChange={(e) => setCategory(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submit()} placeholder={kind === 'income' ? 'from' : 'what for'} className="h-12 flex-1 rounded-xl bg-background px-3 text-base outline-none ring-1 ring-border focus-visible:ring-2 focus-visible:ring-primary/40" />
