@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { Commitment } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { SuggestionPicker } from '@/components/suggestion-picker'
+import type { Suggestion } from '@/lib/suggestions'
 
 const REVIEW_THRESHOLD_DAYS = 14
 
@@ -95,7 +97,14 @@ function CommitmentCard({ commitment }: { commitment: Commitment }) {
   )
 }
 
-export function CommitmentsPanel({ commitments }: { commitments: Commitment[] }) {
+export function CommitmentsPanel({
+  commitments,
+  suggestions = [],
+}: {
+  commitments: Commitment[]
+  /** Something to react to, rather than a blank line. See lib/suggestions.ts. */
+  suggestions?: Suggestion[]
+}) {
   const [adding, setAdding] = useState(false)
   const [text, setText] = useState('')
   const [pending, startTransition] = useTransition()
@@ -135,6 +144,11 @@ export function CommitmentsPanel({ commitments }: { commitments: Commitment[] })
       {adding && (
         <div className="flex flex-col gap-2 rounded-xl bg-secondary/50 p-3">
           <Input value={text} onChange={(e) => setText(e.target.value)} placeholder="I will..." className="h-10" />
+          {/*
+            Tapping a suggestion fills the box above and nothing more — she
+            still presses the button, and she can rewrite every word first.
+          */}
+          <SuggestionPicker suggestions={suggestions} onPick={(s) => setText(s.text)} />
           <Button onClick={handleAdd} disabled={pending} className="h-9 self-start text-xs">
             set commitment
           </Button>

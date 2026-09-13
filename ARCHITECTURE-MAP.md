@@ -162,10 +162,13 @@ Tiers: `free` < `circle` < `inner-circle` < `founder`. Nothing branches on
 **Fully locked:** Ask, Learning, Money, Watch.
 **Partially locked:** Circle composer, Fitness, Nutrition (4 panels), Program.
 
-**Free, and probably not on purpose:** Protocols, Studio, Wardrobe,
-Promises, Becoming, Body, Write, Progress. That is most of the distinctive
-work in the app, and it includes everything the intelligence layer would sit
-on. Flagged in the walk-through a week ago and still undecided.
+**Decided (13 Sept):** Write stays free. Protocols stays free. Promises
+stays free. All three are already ungated, so nothing changes in code — it
+is recorded here so it is not re-litigated.
+
+**Still open:** Studio, Wardrobe, Becoming, Body, Progress. These are free
+today by accident rather than by decision, and they are where the
+intelligence layer will sit.
 
 ---
 

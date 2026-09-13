@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import type { PersonalExperiment } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { SuggestionPicker } from '@/components/suggestion-picker'
+import type { ExperimentSuggestion } from '@/lib/suggestions'
 
 const LENGTH_PRESETS = [7, 10, 14, 21]
 
@@ -152,7 +154,14 @@ function ExperimentCard({ experiment }: { experiment: PersonalExperiment }) {
   )
 }
 
-export function ExperimentsPanel({ experiments }: { experiments: PersonalExperiment[] }) {
+export function ExperimentsPanel({
+  experiments,
+  suggestions = [],
+}: {
+  experiments: PersonalExperiment[]
+  /** Whole ready-to-run experiments, not just titles. See lib/suggestions.ts. */
+  suggestions?: ExperimentSuggestion[]
+}) {
   const [adding, setAdding] = useState(false)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -197,6 +206,21 @@ export function ExperimentsPanel({ experiments }: { experiments: PersonalExperim
         <div className="flex flex-col gap-2 rounded-xl bg-secondary/50 p-3">
           <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Morning Light Experiment" className="h-10" />
           <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} placeholder="what are you testing? (optional)" />
+          {/*
+            A suggestion fills all three fields at once — title, what she is
+            testing, and how long. Asking a tired woman to invent a hypothesis,
+            a duration and a measure from nothing is why this table was empty.
+          */}
+          <SuggestionPicker
+            suggestions={suggestions}
+            label="or try one of these"
+            onPick={(s) => {
+              const e = s as ExperimentSuggestion
+              setTitle(e.text)
+              setDescription(e.description)
+              setLengthDays(e.lengthDays)
+            }}
+          />
           <div className="flex flex-wrap gap-1.5">
             {LENGTH_PRESETS.map((n) => (
               <button
