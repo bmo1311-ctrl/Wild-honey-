@@ -94,11 +94,12 @@ engine does not know she has a presentation. That is the whole job.
 
 Fix or remove before adding anything.
 
-**Content with no door:**
-- `lib/acids.ts` — six acids, layering, downtime, contraindications. Rendered nowhere.
-- `lib/apothecary.ts` — 25 herbs with concerns and cautions. Rendered nowhere.
-
-Both were written to be read by a member. Neither can be.
+~~`lib/acids.ts`, `lib/apothecary.ts`~~ — **fixed 13 Sept.** Both now reached
+through `lib/skin-concerns.ts`, which connects a chosen concern to the actives
+and acids that address it topically and the nutrients, foods and herbs that
+support it internally. Nothing was restated: the herbs come from `APOTHECARY`
+by key so their pregnancy and medication cautions travel with them, and the
+nutrients are only ones the food log can genuinely count.
 
 ~~`lib/rituals.ts`~~ — **fixed 13 Sept.** Six kitchen treatments that were
 reachable only through `planTonight`, which needs a shelf of products first,

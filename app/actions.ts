@@ -14,6 +14,7 @@ import { localTimeZone, localToday } from '@/lib/today'
 import { scaleNutrients, type NutrientMap } from '@/lib/nutrients'
 import { fetchRecipe, safeUrl } from '@/lib/recipe-import'
 import type { WritingKind } from '@/lib/courses'
+import { CONCERNS } from '@/lib/skin-concerns'
 
 /** The user, plus the account her rows are stored under (her parent's, if she is a child). */
 async function requireOwner() {
@@ -3490,5 +3491,22 @@ export async function saveTimeZone(zone: string | null) {
    * food log, protocols and studio all ask what day it is too.
    */
   revalidatePath('/app', 'layout')
+  return { ok: true }
+}
+
+/**
+ * The skin concerns she chose.
+ *
+ * Validated against the library rather than trusted, because these keys drive
+ * which actives and acids get recommended and an unknown one would silently
+ * render nothing.
+ */
+export async function saveSkinConcerns(keys: string[]) {
+  const { supabase, user } = await requireUser()
+  const valid = new Set(CONCERNS.map((c) => c.key))
+  const clean = [...new Set(keys)].filter((k) => valid.has(k as never))
+  const { error } = await supabase.from('profiles').update({ skin_concerns: clean }).eq('id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/app/protocols')
   return { ok: true }
 }

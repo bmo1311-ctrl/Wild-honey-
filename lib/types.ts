@@ -48,6 +48,8 @@ export interface Profile {
   timezone: string | null
   /** Plural and simultaneous — she can be rebuilding, in motherhood and deepening faith at once. */
   seasons: Season[]
+  /** Self-selected skin concerns. Keys from lib/skin-concerns.ts. */
+  skin_concerns: string[]
   faith_preference: FaithPreference | null
   /** Optional and private. Only ever used to raise ingredient cautions. */
   life_stage: 'pregnant' | 'trying' | 'breastfeeding' | 'none' | null

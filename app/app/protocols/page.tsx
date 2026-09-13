@@ -8,6 +8,7 @@ import { WashCard } from '@/components/wash-card'
 import { WashStrip } from '@/components/wash-strip'
 import { WeekStrip } from '@/components/week-strip'
 import { TreatmentSuggestions } from '@/components/treatment-suggestions'
+import { SkinConcernsPanel } from '@/components/skin-concerns-panel'
 import { treatmentSuggestions } from '@/lib/suggestions'
 import {
   getActiveEnrollment,
@@ -181,6 +182,18 @@ function BeautyArea({
       {washDays.length > 0 && <WashStrip days={washDays} />}
       {tonight && <TonightCard plan={tonight} doneToday={doneTonight} />}
       {week.length > 0 && <WeekStrip nights={week} />}
+
+      {/*
+        What she is working on comes before the shelf, because it decides
+        what belongs on the shelf. Skin only — hair and nails have their own
+        engines and their own vocabulary.
+      */}
+      {areaKey === 'skin' && (
+        <SkinConcernsPanel
+          initial={profile?.skin_concerns ?? []}
+          lifeStage={profile?.life_stage ?? null}
+        />
+      )}
 
       {treatments.length > 0 && (
         <TreatmentSuggestions suggestions={treatments} shelfIsEmpty={shelf.length === 0} />
