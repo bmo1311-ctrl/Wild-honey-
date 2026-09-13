@@ -97,6 +97,24 @@ export default async function LogFoodPage({ searchParams }: { searchParams: Prom
         </div>
       )}
 
+      {/*
+        The logger comes first.
+        
+        It used to sit below a macro ring chart and a full micronutrient
+        table, so logging lunch meant scrolling past two pieces of analysis
+        to reach the box. Both are feedback on what she has already eaten —
+        they belong after the act, not in front of it. This page has one job
+        and it is now the first thing on it.
+      */}
+      <FoodLogScreen
+        foods={foods}
+        logged={logged}
+        usual={usual}
+        members={members.map((m) => ({ id: m.id, name: m.name, is_self: m.is_self }))}
+        memberId={memberId}
+        savedMeals={savedMeals}
+      />
+
       <NutrientRings
         totals={{
           calories: nutrition.calories,
@@ -109,15 +127,6 @@ export default async function LogFoodPage({ searchParams }: { searchParams: Prom
       />
 
       <NutrientPanel totals={nutrition.nutrients} targets={panelTargets} note={note} />
-
-      <FoodLogScreen
-        foods={foods}
-        logged={logged}
-        usual={usual}
-        members={members.map((m) => ({ id: m.id, name: m.name, is_self: m.is_self }))}
-        memberId={memberId}
-        savedMeals={savedMeals}
-      />
 
       <Link href="/app/nutrition" className="text-center text-sm font-medium text-mindset-pillar underline underline-offset-[3px]">
         Browse recipes instead

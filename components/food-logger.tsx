@@ -196,6 +196,7 @@ export function FoodLogger({
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Who she is logging for, before what — only shown with a household. */}
       {members.length > 1 && onSwitchMember && (
         <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
           {members.map((m) => {
@@ -220,97 +221,18 @@ export function FoodLogger({
         </div>
       )}
 
-      {usual.length > 0 && (
-        <section>
-          <div className="mb-2 flex items-baseline justify-between">
-            <h2 className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">Your usual</h2>
-            <button type="button" onClick={() => { setBuilding((b) => !b); setMulti({}) }} className={cn('rounded-full px-3 py-1 text-xs font-semibold', building ? 'bg-mindset-pillar text-white' : 'bg-muted text-muted-foreground')}>
-              {building ? 'Cancel' : 'Build a meal'}
-            </button>
-          </div>
-          <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
-            {usual.map((u) => {
-              const picked = Boolean(multi[u.food.id])
-              return (
-                <button
-                  key={u.food.id}
-                  type="button"
-                  disabled={pending}
-                  onClick={() => (building ? toggleMulti(u) : quickLog(u))}
-                  className={cn(
-                    'shrink-0 select-none rounded-2xl border px-3.5 py-2.5 text-left transition-colors disabled:opacity-50 [-webkit-touch-callout:none]',
-                    picked ? 'border-transparent bg-mindset-pillar text-white' : 'border-border bg-card',
-                  )}
-                >
-                  <span className="block text-[14px] font-semibold">{u.food.name}</span>
-                  <span className={cn('block text-[12px]', picked ? 'text-white/80' : 'text-muted-foreground')}>
-                    {u.lastQuantity}{u.unit} · {Math.round((u.food.calories * u.lastQuantity) / u.food.serving_size)} cal
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-          {building && (
-            <div className="mt-2 flex flex-col gap-2 rounded-2xl border border-border bg-card p-3">
-              <p className="text-[13px] text-muted-foreground">{selectedCount === 0 ? 'tap the foods that go in it' : `${selectedCount} in the bowl`}</p>
-              <input value={mealName} onChange={(e) => setMealName(e.target.value)} placeholder="name it — Breakfast bowl" className="h-11 w-full rounded-xl bg-background px-3 text-base outline-none ring-1 ring-border focus-visible:ring-2 focus-visible:ring-primary/40" />
-              <div className="flex gap-2">
-                <button type="button" onClick={() => logSelected(true)} disabled={pending || selectedCount === 0} className="h-11 flex-1 rounded-xl bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50">Save & log</button>
-                <button type="button" onClick={() => logSelected(false)} disabled={pending || selectedCount === 0} className="h-11 flex-1 rounded-xl bg-muted text-sm font-semibold disabled:opacity-50">Just log once</button>
-              </div>
-            </div>
-          )}
-        </section>
-      )}
+      {/*
+        What did you eat, first.
 
-      {savedMeals.length > 0 && !building && (
-        <section>
-          <h2 className="mb-2 text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">Your meals</h2>
-          <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
-            {savedMeals.map((m) => (
-              <div key={m.id} className="flex shrink-0 items-stretch overflow-hidden rounded-2xl border border-border bg-card">
-                <button type="button" disabled={pending} onClick={() => startTransition(async () => { const r = await logFoods(m.items.map((i) => ({ foodItemId: i.food_item_id, quantity: i.quantity })), undefined, memberId, m.name); if ('error' in r && r.error) toast.error(r.error); else toast.success(`${m.name} logged`) })} className="px-3.5 py-2.5 text-left disabled:opacity-50">
-                  <span className="block text-[14px] font-semibold">{m.name}</span>
-                  <span className="block text-[12px] text-muted-foreground">{m.foods.length} foods · {m.calories} cal · {m.protein}g protein</span>
-                </button>
-                <button type="button" onClick={() => startTransition(async () => { await deleteSavedMeal(m.id) })} aria-label={`Remove ${m.name}`} className="border-l border-border px-2 text-muted-foreground"><X className="h-3.5 w-3.5" /></button>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+        This was the fourth thing on the screen — under the member
+        switcher, her usual foods, her saved meals and everything already
+        logged today. Three taps to reach the page and then a scroll past
+        all of that to reach the box, three times a day.
 
-      {logged.length > 0 && (
-        <ul className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card">
-          {groupLogged(logged).map((g, i) => g.rows.length > 1 || g.mealName ? (
-            <li key={g.key} className={cn('px-4 py-3', i > 0 && 'border-t border-border')}>
-              <div className="flex items-center gap-3">
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[15px] font-semibold">{g.mealName ?? 'Meal'}</span>
-                  <span className="block text-[12.5px] text-muted-foreground">{Math.round(g.calories)} cal · {Math.round(g.protein)}g protein · {g.rows.length} foods</span>
-                </span>
-                <button type="button" onClick={() => startTransition(async () => { await deleteMealGroup(g.key) })} aria-label={`Remove ${g.mealName ?? 'meal'}`} className="p-1.5 text-muted-foreground"><Trash2 className="h-4 w-4" /></button>
-              </div>
-              <p className="mt-1 truncate text-[12px] text-muted-foreground">{g.rows.map((r) => r.name).join(' · ')}</p>
-            </li>
-          ) : (
-            g.rows.map((l) => (
-            <li key={l.id} className={cn('flex items-center gap-3 px-4 py-3', i > 0 && 'border-t border-border')}>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-[15px] font-medium">{l.name}</span>
-                <span className="block text-[12.5px] text-muted-foreground">
-                  {l.quantity ?? ''}{l.unit ?? ''} · {Math.round(l.calories ?? 0)} cal · {Math.round(l.protein ?? 0)}g protein
-                </span>
-              </span>
-              <button type="button" onClick={() => remove(l.id)} aria-label={`Remove ${l.name}`} className="p-1.5 text-muted-foreground">
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </li>
-            ))
-          ))}
-        </ul>
-      )}
-
+        Your usual stays directly underneath, because a tap still beats
+        typing when the food is one she eats constantly. Both are above the
+        fold now; the difference is which one she lands on.
+      */}
       {!custom ? (
         <div className="rounded-2xl border border-border bg-card p-4">
           <div className="relative">
@@ -323,6 +245,14 @@ export function FoodLogger({
               }}
               placeholder="What did you eat?"
               aria-label="Search foods"
+              /*
+                The keyboard should already be up. This page exists to log a
+                meal and the box is now the first thing on it, so there is
+                nothing for the focus to jump past — and it saves a tap three
+                times a day, which is where this kind of friction actually
+                lives.
+              */
+              autoFocus
               className={cn(field, 'pl-9')}
             />
             {picked && (
@@ -471,6 +401,94 @@ export function FoodLogger({
             <p className="text-center text-xs text-muted-foreground">saved to your foods, so it&rsquo;s one tap next time</p>
           </div>
         </div>
+      )}
+      {usual.length > 0 && (
+        <section>
+          <div className="mb-2 flex items-baseline justify-between">
+            <h2 className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">Your usual</h2>
+            <button type="button" onClick={() => { setBuilding((b) => !b); setMulti({}) }} className={cn('rounded-full px-3 py-1 text-xs font-semibold', building ? 'bg-mindset-pillar text-white' : 'bg-muted text-muted-foreground')}>
+              {building ? 'Cancel' : 'Build a meal'}
+            </button>
+          </div>
+          <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
+            {usual.map((u) => {
+              const picked = Boolean(multi[u.food.id])
+              return (
+                <button
+                  key={u.food.id}
+                  type="button"
+                  disabled={pending}
+                  onClick={() => (building ? toggleMulti(u) : quickLog(u))}
+                  className={cn(
+                    'shrink-0 select-none rounded-2xl border px-3.5 py-2.5 text-left transition-colors disabled:opacity-50 [-webkit-touch-callout:none]',
+                    picked ? 'border-transparent bg-mindset-pillar text-white' : 'border-border bg-card',
+                  )}
+                >
+                  <span className="block text-[14px] font-semibold">{u.food.name}</span>
+                  <span className={cn('block text-[12px]', picked ? 'text-white/80' : 'text-muted-foreground')}>
+                    {u.lastQuantity}{u.unit} · {Math.round((u.food.calories * u.lastQuantity) / u.food.serving_size)} cal
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+          {building && (
+            <div className="mt-2 flex flex-col gap-2 rounded-2xl border border-border bg-card p-3">
+              <p className="text-[13px] text-muted-foreground">{selectedCount === 0 ? 'tap the foods that go in it' : `${selectedCount} in the bowl`}</p>
+              <input value={mealName} onChange={(e) => setMealName(e.target.value)} placeholder="name it — Breakfast bowl" className="h-11 w-full rounded-xl bg-background px-3 text-base outline-none ring-1 ring-border focus-visible:ring-2 focus-visible:ring-primary/40" />
+              <div className="flex gap-2">
+                <button type="button" onClick={() => logSelected(true)} disabled={pending || selectedCount === 0} className="h-11 flex-1 rounded-xl bg-primary text-sm font-bold text-primary-foreground disabled:opacity-50">Save & log</button>
+                <button type="button" onClick={() => logSelected(false)} disabled={pending || selectedCount === 0} className="h-11 flex-1 rounded-xl bg-muted text-sm font-semibold disabled:opacity-50">Just log once</button>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+      {savedMeals.length > 0 && !building && (
+        <section>
+          <h2 className="mb-2 text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">Your meals</h2>
+          <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
+            {savedMeals.map((m) => (
+              <div key={m.id} className="flex shrink-0 items-stretch overflow-hidden rounded-2xl border border-border bg-card">
+                <button type="button" disabled={pending} onClick={() => startTransition(async () => { const r = await logFoods(m.items.map((i) => ({ foodItemId: i.food_item_id, quantity: i.quantity })), undefined, memberId, m.name); if ('error' in r && r.error) toast.error(r.error); else toast.success(`${m.name} logged`) })} className="px-3.5 py-2.5 text-left disabled:opacity-50">
+                  <span className="block text-[14px] font-semibold">{m.name}</span>
+                  <span className="block text-[12px] text-muted-foreground">{m.foods.length} foods · {m.calories} cal · {m.protein}g protein</span>
+                </button>
+                <button type="button" onClick={() => startTransition(async () => { await deleteSavedMeal(m.id) })} aria-label={`Remove ${m.name}`} className="border-l border-border px-2 text-muted-foreground"><X className="h-3.5 w-3.5" /></button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+      {logged.length > 0 && (
+        <ul className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card">
+          {groupLogged(logged).map((g, i) => g.rows.length > 1 || g.mealName ? (
+            <li key={g.key} className={cn('px-4 py-3', i > 0 && 'border-t border-border')}>
+              <div className="flex items-center gap-3">
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[15px] font-semibold">{g.mealName ?? 'Meal'}</span>
+                  <span className="block text-[12.5px] text-muted-foreground">{Math.round(g.calories)} cal · {Math.round(g.protein)}g protein · {g.rows.length} foods</span>
+                </span>
+                <button type="button" onClick={() => startTransition(async () => { await deleteMealGroup(g.key) })} aria-label={`Remove ${g.mealName ?? 'meal'}`} className="p-1.5 text-muted-foreground"><Trash2 className="h-4 w-4" /></button>
+              </div>
+              <p className="mt-1 truncate text-[12px] text-muted-foreground">{g.rows.map((r) => r.name).join(' · ')}</p>
+            </li>
+          ) : (
+            g.rows.map((l) => (
+            <li key={l.id} className={cn('flex items-center gap-3 px-4 py-3', i > 0 && 'border-t border-border')}>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[15px] font-medium">{l.name}</span>
+                <span className="block text-[12.5px] text-muted-foreground">
+                  {l.quantity ?? ''}{l.unit ?? ''} · {Math.round(l.calories ?? 0)} cal · {Math.round(l.protein ?? 0)}g protein
+                </span>
+              </span>
+              <button type="button" onClick={() => remove(l.id)} aria-label={`Remove ${l.name}`} className="p-1.5 text-muted-foreground">
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </li>
+            ))
+          ))}
+        </ul>
       )}
     </div>
   )

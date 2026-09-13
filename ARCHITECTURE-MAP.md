@@ -284,3 +284,27 @@ than through a form. Validated on every keystroke, so the worst case is a
 message about a bracket, not a broken day. A safe form for each is roughly a
 week of work to improve something done rarely; worth doing if she finds
 herself in there often.
+
+
+---
+
+## 11. Logging a meal — the daily path
+
+Reported as the worst friction in the app, three times a day. Three separate
+causes, all fixed 13 Sept:
+
+1. **Today linked to the wrong page.** The breakfast, lunch and dinner rows on
+   Today pointed at `/app/nutrition` — the hub, with recipes, pantry and
+   grocery — rather than `/app/nutrition/log`. My bug from the moment engine.
+   That was a whole extra tap, every meal.
+2. **The logger was below the analysis.** The log page rendered a macro ring
+   chart and a full micronutrient table *above* the logger, so logging lunch
+   meant scrolling past two pieces of feedback to reach the box. Both are
+   commentary on what she has already eaten; they sit below it now.
+3. **The search box was fourth inside the logger** — under the member
+   switcher, her usual foods, her saved meals and everything logged today.
+
+Now: who she is logging for, then **What did you eat?**, then Your usual, then
+saved meals, then today's list. The box autofocuses.
+
+**Today → tap the meal → type.** One tap, no scroll.

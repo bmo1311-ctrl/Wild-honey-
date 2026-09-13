@@ -111,10 +111,14 @@ export function candidatesFor(input: {
    * holding the plate — and each one closes as soon as she logs.
    */
   const meals = input.mealsLogged
+  // /app/nutrition is the hub — recipes, pantry, grocery. The logger is one
+  // level in, and pointing at the hub put a whole extra tap between her and
+  // the search box every single meal.
+  const LOG = '/app/nutrition/log'
   out.push({
     key: 'breakfast',
     label: 'Breakfast',
-    href: '/app/nutrition',
+    href: LOG,
     action: 'Log it',
     window: 'dawn',
     done: meals >= 1,
@@ -123,7 +127,7 @@ export function candidatesFor(input: {
   out.push({
     key: 'lunch',
     label: 'Lunch',
-    href: '/app/nutrition',
+    href: LOG,
     action: 'Log it',
     window: 'afternoon',
     done: meals >= 2,
@@ -132,7 +136,7 @@ export function candidatesFor(input: {
   out.push({
     key: 'dinner',
     label: 'Dinner',
-    href: '/app/nutrition',
+    href: LOG,
     action: 'Log it',
     window: 'evening',
     done: meals >= 3,
