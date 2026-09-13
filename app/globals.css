@@ -58,7 +58,26 @@
   color-scheme: light;
   /* Bright Winter — her tokens, verbatim */
   --ink: oklch(0.18 0.02 265);
-  --ink-soft: oklch(0.48 0.018 262);
+  --ink-soft: oklch(0.42 0.018 262);      /* every small grey label. 8.5:1 on white */
+
+  /*
+   * A solid action surface, and the text that is guaranteed to sit on it.
+   *
+   * These are a pair and they must move together. The moment card builds its
+   * button by mixing a pillar tone toward --solid-anchor, then writes on it
+   * with --on-solid. In light mode the anchor is dark, so the button is dark
+   * and the text is white. In dark mode both flip: the anchor goes light, so
+   * the button is a light block on a dark card and the text goes dark.
+   *
+   * The bug this fixes: the button used to mix toward --ink and then write
+   * --primary-foreground on it, which is also --ink. Dark text on a dark
+   * button — 2.3:1 on the green tone, unreadable. And because --ink flips in
+   * dark mode, mixing toward it made the button dark in light mode and light
+   * in dark mode while the text never changed at all.
+   */
+  --solid-anchor: oklch(0.18 0.02 265);
+  --solid-mix: 55%;
+  --on-solid: oklch(0.99 0.003 250);
   --bg: oklch(0.975 0.03 100);            /* Bright Winter lemon — clear, bright, softened; the outer ground */
   --surface: oklch(1 0 0);                /* neutral white — every card and panel sits on this */
   --line: oklch(0.9 0.012 95);
@@ -92,7 +111,12 @@
   --ring: var(--baby-pink-deep);
 
   --honey: var(--icy-blue);
-  --honey-foreground: oklch(0.99 0.003 250);
+  /*
+   * Dark, not white. --honey is the icy blue at L 0.68, which is light — a
+   * near-white label on it measured 2.7:1 and was unreadable on every
+   * bg-honey chip in the app. Ink on it is 6.9:1.
+   */
+  --honey-foreground: var(--ink);
 
   --pillar-body: oklch(0.52 0.16 165);
   --pillar-identity: var(--pink);
@@ -114,7 +138,12 @@
   color-scheme: dark;
   /* Bright Winter after dark — same cool tokens, inverted */
   --ink: oklch(0.95 0.008 250);
-  --ink-soft: oklch(0.7 0.015 255);
+  --ink-soft: oklch(0.76 0.015 255);      /* 9:1 on the dark ground */
+
+  /* Flipped, as a pair. Light block, dark text - see the note in :root. */
+  --solid-anchor: oklch(0.95 0.008 250);
+  --solid-mix: 42%;
+  --on-solid: oklch(0.17 0.015 262);
   --bg: oklch(0.17 0.015 262);
   --surface: oklch(0.21 0.015 262);
   --line: oklch(0.3 0.012 258);
@@ -151,7 +180,20 @@
 
   --pillar-body: oklch(0.65 0.16 165);
   --pillar-identity: var(--pink);
-  --pillar-mindset: var(--icy-blue-deep);
+  /*
+   * Not var(--icy-blue-deep) after dark.
+   *
+   * bg-mindset-pillar with white text is how this app draws every selected
+   * state — the active tab in the bottom nav, the chips in the food logger,
+   * the check-in, the cycle settings. In dark mode icy-blue-deep lifts to
+   * L 0.72 so that white text fell to 2.5:1, across 48 call sites.
+   *
+   * It cannot simply be darkened at the source: --accent-foreground also
+   * points at --icy-blue-deep in this theme and needs to stay light there.
+   * So the pillar gets its own value, dark enough to carry white text at
+   * 5.4:1 while still standing 3.3:1 clear of the card behind it.
+   */
+  --pillar-mindset: oklch(0.52 0.16 245);
   --pillar-faith: oklch(0.65 0.2 335);
 
   --chart-1: var(--icy-blue-deep);
@@ -308,4 +350,21 @@
     transform: none;
     transition: none;
   }
+}
+
+/*
+ * A solid, high-contrast action.
+ *
+ * Set --tone to any pillar colour and this works out the rest. The point of
+ * binding the background and the foreground in one class is that they cannot
+ * drift apart again: anything that sets one gets the other for free, in both
+ * themes, without anyone having to remember.
+ *
+ * Measured across all five tones: 5.8:1 to 13.2:1 for the text, and never
+ * below 5.7:1 against the card behind it, so it reads as a button shape and
+ * not just a word.
+ */
+.btn-solid {
+  background-color: color-mix(in oklch, var(--tone, var(--primary)), var(--solid-anchor) var(--solid-mix));
+  color: var(--on-solid);
 }

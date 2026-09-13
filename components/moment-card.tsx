@@ -53,9 +53,22 @@ export function MomentCard({ moment, hour }: { moment: Moment; hour: number }) {
             </span>
           )}
         </span>
+        {/*
+          The one button on the page, and it was unreadable.
+
+          It mixed the tone toward --ink and then wrote --primary-foreground
+          on top, which is also --ink. Dark text on a dark button: 2.3:1 on
+          the green tone, well under the 4.5:1 a small label needs. Four of
+          the five tones failed the same way — only honey passed, and only
+          because it is light enough that dark text happened to work.
+
+          .btn-solid takes the tone and derives both halves, so they cannot
+          come apart again. See the note in globals.css for why the anchor
+          has to flip with the theme rather than the text being pinned white.
+        */}
         <span
-          className="flex h-[52px] items-center justify-center gap-1.5 rounded-2xl text-[16px] font-bold text-primary-foreground"
-          style={{ backgroundColor: `color-mix(in oklch, ${colour}, var(--ink) 34%)` }}
+          className="btn-solid flex h-[52px] items-center justify-center gap-1.5 rounded-2xl text-[16px] font-bold"
+          style={{ '--tone': colour } as React.CSSProperties}
         >
           {now.action ?? 'Open it'}
           <ChevronRight className="h-4.5 w-4.5" />
