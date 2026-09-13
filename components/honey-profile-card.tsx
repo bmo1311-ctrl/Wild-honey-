@@ -46,7 +46,7 @@ export function HoneyProfileCard({
   latest: VitalityCheckin | null
 }) {
   const [expanded, setExpanded] = useState(false)
-  const [season, setSeason] = useState(profile.season)
+  const [seasons, setSeasons] = useState<string[]>(profile.seasons ?? [])
   const [goals, setGoals] = useState<string[]>(initialGoals)
   const [communicationStyle, setCommunicationStyle] = useState(profile.communication_style)
   const [faithPreference, setFaithPreference] = useState(profile.faith_preference)
@@ -56,10 +56,10 @@ export function HoneyProfileCard({
     Object.fromEntries(VITALITY_DIMENSIONS.map((d) => [d.key, (latest as any)?.[d.key] ?? 5])),
   )
 
-  function saveProfileField(patch: Partial<{ season: string | null; communicationStyle: string | null; faithPreference: string | null }>) {
+  function saveProfileField(patch: Partial<{ seasons: string[]; communicationStyle: string | null; faithPreference: string | null }>) {
     startTransition(async () => {
       const res = await updateHoneyProfile({
-        season: patch.season !== undefined ? patch.season ?? undefined : season ?? undefined,
+        seasons: patch.seasons !== undefined ? patch.seasons : seasons,
         communicationStyle: patch.communicationStyle !== undefined ? patch.communicationStyle ?? undefined : communicationStyle ?? undefined,
         faithPreference: patch.faithPreference !== undefined ? patch.faithPreference ?? undefined : faithPreference ?? undefined,
       })
@@ -154,16 +154,27 @@ export function HoneyProfileCard({
       {expanded && (
         <div className="flex flex-col gap-5 border-t border-border pt-4">
           <div className="flex flex-col gap-2">
-            <p className="text-xs font-medium text-muted-foreground">season</p>
+            {/*
+              Multi-select, because a woman is normally in several of these at
+              once. This was single-select and tapping a second one cleared the
+              first, so an entrepreneur rebuilding, in motherhood, deepening
+              her faith had to pick which of the four the app was allowed to
+              know about.
+            */}
+            <p className="text-xs font-medium text-muted-foreground">
+              your seasons <span className="font-normal">— choose as many as are true</span>
+            </p>
             <div className="flex flex-wrap gap-1.5">
               {SEASONS.map((s) => (
                 <Chip
                   key={s}
-                  active={season === s}
+                  active={seasons.includes(s)}
                   onClick={() => {
-                    const next = season === s ? null : s
-                    setSeason(next)
-                    saveProfileField({ season: next })
+                    const next = seasons.includes(s)
+                      ? seasons.filter((x) => x !== s)
+                      : [...seasons, s]
+                    setSeasons(next)
+                    saveProfileField({ seasons: next })
                   }}
                 >
                   {SEASON_META[s].label}

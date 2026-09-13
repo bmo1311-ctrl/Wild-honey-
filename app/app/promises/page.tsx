@@ -7,8 +7,10 @@ import {
   getMyGoals,
   getRecentCheckins,
   getActiveCourseState,
+  getSessionProfile,
 } from '@/lib/data'
 import { commitmentSuggestions, experimentSuggestions } from '@/lib/suggestions'
+import { localToday } from '@/lib/today'
 
 /**
  * The promises she made to herself, and the things she is trying out.
@@ -24,14 +26,16 @@ import { commitmentSuggestions, experimentSuggestions } from '@/lib/suggestions'
  * lib/suggestions.ts for why that line matters.
  */
 export default async function PromisesPage() {
-  const [commitments, experiments, checkins, habits, goals, course] = await Promise.all([
+  const [commitments, experiments, checkins, habits, goals, course, profile] = await Promise.all([
     getMyCommitments(),
     getMyExperiments(),
     getRecentCheckins(14),
     getHabits(),
     getMyGoals(),
     getActiveCourseState(),
+    getSessionProfile(),
   ])
+  const today = await localToday()
 
   const ctx = {
     goals: goals.map((g) => String(g.goal)),
@@ -44,6 +48,9 @@ export default async function PromisesPage() {
     habits: habits.map((h) => h.title),
     existingCommitments: commitments.map((c) => c.text),
     hasCourse: Boolean(course.enrollment && course.currentDay),
+    // The richest thing the app knows about her, and it was going unread.
+    seasons: profile?.seasons ?? [],
+    today,
   }
 
   return (

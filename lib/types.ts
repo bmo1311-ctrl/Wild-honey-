@@ -46,7 +46,8 @@ export interface Profile {
   birthday: string | null
   age_range: string | null
   timezone: string | null
-  season: Season | null
+  /** Plural and simultaneous — she can be rebuilding, in motherhood and deepening faith at once. */
+  seasons: Season[]
   faith_preference: FaithPreference | null
   /** Optional and private. Only ever used to raise ingredient cautions. */
   life_stage: 'pregnant' | 'trying' | 'breastfeeding' | 'none' | null

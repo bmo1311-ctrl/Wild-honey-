@@ -172,6 +172,24 @@ intelligence layer will sit.
 
 ---
 
+## 7b. "Season" means four different things
+
+Worth writing down, because the word has now caused two bugs in this repo.
+
+| column | meaning | shape |
+|---|---|---|
+| `profiles.seasons` | her life seasons — rebuilding, motherhood, entrepreneurship… | **text[], plural** |
+| `profiles.color_season` | the app's UI theme | winter/spring/summer/autumn |
+| `profiles.style_season` | her wardrobe palette | one of twelve |
+| `recipes.season` | when a recipe suits | spring/summer/fall/winter/any |
+
+`profiles.season` was singular and is gone; `seasons` replaced it and the one
+real value was carried across. The directive's `transformation_state.current_season`
+is a fifth and should be reconciled with `profiles.seasons` rather than
+becoming another parallel truth.
+
+---
+
 ## 8. Order I would actually build in
 
 The directive's phases are right. Two amendments from what the audit found:

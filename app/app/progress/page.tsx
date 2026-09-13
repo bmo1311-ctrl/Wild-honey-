@@ -41,7 +41,7 @@ export default async function ProgressPage() {
         <p className="mt-1 text-sm text-muted-foreground text-pretty">not just what changed — who you're becoming.</p>
       </div>
 
-      <MySeasonCard season={profile?.season ?? null} />
+      <MySeasonCard seasons={profile?.seasons ?? []} />
 
       <MyBecomingSummary commitments={commitments} experiments={experiments} />
 

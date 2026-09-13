@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { Sun, ArrowRight } from 'lucide-react'
-import { saveYearDayReflection, startExperiment, addCommitment, updateSeason } from '@/app/actions'
+import { saveYearDayReflection, startExperiment, addCommitment, updateSeasons } from '@/app/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -48,7 +48,7 @@ export function YearDayRitual({ wildHoneyYear, existing }: { wildHoneyYear: numb
   function handleEstablish() {
     startTransition(async () => {
       const tasks: Promise<any>[] = []
-      if (season) tasks.push(updateSeason(season))
+      if (season) tasks.push(updateSeasons([season]))
       if (commitmentText.trim()) tasks.push(addCommitment(commitmentText))
       if (experimentTitle.trim()) tasks.push(startExperiment({ title: experimentTitle, lengthDays: 7 }))
       await Promise.all(tasks)

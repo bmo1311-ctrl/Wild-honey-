@@ -127,7 +127,7 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
     startTransition(async () => {
       const res = await completeOnboarding({
         name,
-        season: season ?? undefined,
+        seasons: season ? [season] : undefined,
         goals,
         vitality: {},
         wakeTime,

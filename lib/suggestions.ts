@@ -46,6 +46,23 @@ export interface SuggestionContext {
   hasCourse: boolean
   /** Where she is, when she has said. Changes what is appropriate to suggest. */
   lifeStage?: string | null
+  /**
+   * The life seasons she is in — plural, and usually several at once.
+   *
+   * This is the richest thing the app knows about her and it was going
+   * unread. A woman who has said she is an entrepreneur, rebuilding, in
+   * motherhood and deepening her faith has told us four true things about
+   * where her capacity is going; suggestions that ignore all four are
+   * generic by choice rather than by necessity.
+   *
+   * Keys from lib/honey-profile.ts.
+   */
+  seasons?: string[]
+  /**
+   * Today's date, used only to rotate which seasons get a turn.
+   * Optional — without it the order is simply the order she chose them.
+   */
+  today?: string
 }
 
 export interface Suggestion {
@@ -113,6 +130,133 @@ function readState(ctx: SuggestionContext): { lowEnergy: boolean; poorSleep: boo
 }
 
 /**
+ * What each season makes worth offering.
+ *
+ * One commitment and one experiment per season, written for the actual
+ * shape of that life rather than for wellness in general. A woman in
+ * motherhood does not need the same suggestion as a woman in career
+ * expansion, and the app already knew which she was.
+ *
+ * The `because` names the season in her own words, so the reason is
+ * checkable — she told us this, and can untell us in one tap.
+ */
+const BY_SEASON: Record<
+  string,
+  { commitment: string; experiment: { text: string; description: string; lengthDays: number; notice: string } }
+> = {
+  rebuilding: {
+    commitment: 'I will rebuild one thing at a time',
+    experiment: {
+      text: 'One thing rebuilt',
+      description: 'Choosing a single thing to put back together this week, and letting the rest wait.',
+      lengthDays: 7,
+      notice: 'Whether finishing one thing feels better than touching five.',
+    },
+  },
+  growing: {
+    commitment: 'I will do the thing that scares me slightly, once a week',
+    experiment: {
+      text: 'The slightly-too-big thing',
+      description: 'One thing a week that is just past what feels comfortable.',
+      lengthDays: 14,
+      notice: 'What it actually costs, versus what you expected it to cost.',
+    },
+  },
+  healing: {
+    commitment: 'I will let this take the time it takes',
+    experiment: {
+      text: 'No pushing',
+      description: 'A week with nothing forced. Rest when tired, stop when done.',
+      lengthDays: 7,
+      notice: 'Whether anything recovers faster when it is not being hurried.',
+    },
+  },
+  motherhood: {
+    commitment: 'I will take twenty minutes that belong to nobody else',
+    experiment: {
+      text: 'Twenty minutes of my own',
+      description: 'Twenty minutes a day that are not for anyone else, at whatever hour they can be found.',
+      lengthDays: 7,
+      notice: 'Whether the rest of the day is easier to give when some of it was yours.',
+    },
+  },
+  entrepreneurship: {
+    commitment: 'I will stop working at a time I choose in advance',
+    experiment: {
+      text: 'A closing time',
+      description: 'Naming the hour the working day ends the night before, and keeping it.',
+      lengthDays: 7,
+      notice: 'Whether the work actually suffers, or only feels like it will.',
+    },
+  },
+  career_expansion: {
+    commitment: 'I will say no to one thing that is not mine to carry',
+    experiment: {
+      text: 'One no a week',
+      description: 'Declining one request that belongs to someone else.',
+      lengthDays: 14,
+      notice: 'What happens. Usually nothing.',
+    },
+  },
+  transition: {
+    commitment: 'I will not decide anything big while I am this tired',
+    experiment: {
+      text: 'Nothing decided at night',
+      description: 'No big decisions after eight in the evening for two weeks.',
+      lengthDays: 14,
+      notice: 'Whether the same question looks different in the morning.',
+    },
+  },
+  deepening_faith: {
+    commitment: 'I will keep the first ten minutes of the day for prayer',
+    experiment: {
+      text: 'The first ten minutes',
+      description: 'Ten minutes of prayer or stillness before anything else begins.',
+      lengthDays: 7,
+      notice: 'What the day feels like when it does not start with a screen.',
+    },
+  },
+  finding_balance: {
+    commitment: 'I will stop trying to do all of it in the same week',
+    experiment: {
+      text: 'One thing at a time',
+      description: 'Choosing what this week is for, and letting the other things be next week.',
+      lengthDays: 7,
+      notice: 'Whether less at once turns out to be more done.',
+    },
+  },
+  becoming_healthiest: {
+    commitment: 'I will eat something with protein at breakfast',
+    experiment: {
+      text: 'Protein first',
+      description: 'Protein at the first meal, every day.',
+      lengthDays: 7,
+      notice: 'Mid-morning energy, and what you reach for at eleven.',
+    },
+  },
+}
+
+function seasonLabel(key: string): string {
+  return key.replace(/_/g, ' ')
+}
+
+/**
+ * Which seasons get to speak today.
+ *
+ * Three at most, or the list becomes the thing she was trying to escape.
+ * But a woman carrying four seasons would otherwise never see the fourth —
+ * hers was deepening faith, permanently cut by the cap — so the window
+ * rotates by the day. Over a week every season she named gets a turn, and
+ * the order is deterministic, so it does not reshuffle on every render.
+ */
+function seasonsForToday(seasons: string[], today?: string, take = 3): string[] {
+  if (seasons.length <= take) return seasons
+  const day = today ? Math.floor(Date.parse(`${today}T00:00:00Z`) / 86_400_000) : 0
+  const start = Number.isFinite(day) ? ((day % seasons.length) + seasons.length) % seasons.length : 0
+  return Array.from({ length: take }, (_, i) => seasons[(start + i) % seasons.length])
+}
+
+/**
  * Commitments she might make.
  *
  * A commitment here is a sentence she agrees to revisit in a fortnight, so
@@ -138,6 +282,13 @@ export function commitmentSuggestions(ctx: SuggestionContext, limit = 6): Sugges
   if (state.highStress) {
     add('I will get outside for ten minutes before noon', 'your stress has been rating high this week')
   }
+  // Her seasons. Several at once is normal, so several can contribute — but
+  // capped, because six suggestions from six seasons is a list again.
+  for (const season of seasonsForToday(ctx.seasons ?? [], ctx.today)) {
+    const entry = BY_SEASON[season]
+    if (entry) add(entry.commitment, `you said you are in ${seasonLabel(season)}`)
+  }
+
   for (const goal of ctx.goals.slice(0, 2)) {
     add(`I will protect one hour a week for ${goal.toLowerCase()}`, `you said this matters to you`)
   }
@@ -208,6 +359,11 @@ export function experimentSuggestions(ctx: SuggestionContext, limit = 5): Experi
       notice: 'What the rest of the day feels like when it does not begin by answering someone.',
       because: 'worth testing while your energy is low, because it costs nothing to try',
     })
+  }
+
+  for (const season of seasonsForToday(ctx.seasons ?? [], ctx.today)) {
+    const entry = BY_SEASON[season]
+    if (entry) add({ ...entry.experiment, because: `you said you are in ${seasonLabel(season)}` })
   }
 
   // Always available, and genuinely good regardless of what the data says.

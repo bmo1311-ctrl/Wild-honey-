@@ -807,7 +807,7 @@ export async function adminDeleteResource(resourceId: string) {
 export async function completeOnboarding(input: {
   name: string
   ageRange?: string
-  season?: string
+  seasons?: string[]
   goals: string[]
   vitality: Record<string, number>
   wakeTime?: string
@@ -828,7 +828,7 @@ export async function completeOnboarding(input: {
     .update({
       name: input.name.trim() || undefined,
       age_range: input.ageRange || null,
-      season: input.season || null,
+      seasons: input.seasons ?? [],
       wake_time: input.wakeTime?.trim() || null,
       bedtime: input.bedtime?.trim() || null,
       movement_preference: input.movementPreference || null,
@@ -898,7 +898,7 @@ export async function updateGoals(goals: string[]) {
 }
 
 export async function updateHoneyProfile(input: {
-  season?: string
+  seasons?: string[]
   faithPreference?: string
   communicationStyle?: string
   ageRange?: string
@@ -914,7 +914,7 @@ export async function updateHoneyProfile(input: {
   const { error } = await supabase
     .from('profiles')
     .update({
-      season: input.season || null,
+      seasons: input.seasons ?? [],
       faith_preference: input.faithPreference || null,
       communication_style: input.communicationStyle || null,
       age_range: input.ageRange || null,
@@ -1940,9 +1940,17 @@ export async function getYearDayReflectionForYear(wildHoneyYear: number) {
   return data ?? null
 }
 
-export async function updateSeason(season: string) {
+/**
+ * The seasons she is in — plural, because she is usually in several.
+ *
+ * Replaces updateSeason, which took one string and overwrote whatever was
+ * there. An entrepreneur rebuilding, in motherhood, deepening her faith had
+ * to pick one of the four and let the app forget the rest.
+ */
+export async function updateSeasons(seasons: string[]) {
   const { supabase, user } = await requireUser()
-  const { error } = await supabase.from('profiles').update({ season }).eq('id', user.id)
+  const clean = [...new Set(seasons.map((s) => s.trim()).filter(Boolean))]
+  const { error } = await supabase.from('profiles').update({ seasons: clean }).eq('id', user.id)
   if (error) return { error: error.message }
   revalidatePath('/app/promises')
   revalidatePath('/app')
