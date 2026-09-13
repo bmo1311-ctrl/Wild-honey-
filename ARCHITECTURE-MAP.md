@@ -247,3 +247,32 @@ nothing; two had suggestions.** Both of those were on Promises.
 `/app/settings` said *"Privacy & notifications"*. The page holds her name and
 photo, her timezone, what her body needs flagged, her profile page and who she
 has blocked. It says **Settings** now, with a line naming what is in it.
+
+
+---
+
+## 10. Courses are editable now
+
+They were four JSON files in the repo — 312KB, 154 days, 750 blocks, every
+word hers — and the admin page could change exactly one thing about them:
+which pillar a day belonged to.
+
+**Now:** `courses` and `course_days` in Supabase, seeded lazily from the JSON
+on first read and **only into an empty table**, so a deploy can never
+overwrite an edit. Every read falls back to the bundled JSON if the database
+has nothing to say.
+
+`/admin/course` → course → day. Title, kind, minutes, and every block: add,
+reorder, delete, edit. Publish toggle hides a course from members without
+deleting it, so a rewrite can happen in place.
+
+**Image and video blocks exist**, which they never did — thirteen block types
+and not one could carry a picture. Upload to the `course-media` bucket, or
+paste a YouTube link and it embeds.
+
+**One honest limitation.** Five block types hold nested arrays — `steps`,
+`grid`, `versus`, `check`, `figure` — and those are edited as JSON rather
+than through a form. Validated on every keystroke, so the worst case is a
+message about a bracket, not a broken day. A safe form for each is roughly a
+week of work to improve something done rarely; worth doing if she finds
+herself in there often.

@@ -36,10 +36,13 @@ export async function ensureCoursesSeeded(): Promise<void> {
     const { count } = await admin.from('courses').select('slug', { count: 'exact', head: true })
     if ((count ?? 0) > 0) return
 
-    for (const c of SEED) {
+    for (const [i, c] of SEED.entries()) {
       await admin.from('courses').upsert(
         {
           slug: c.slug,
+          // Without this every course defaults to 0 and Programs lists them
+          // in whatever order Postgres feels like. SEED order is her order.
+          sort_order: i,
           title: c.title,
           subtitle: c.subtitle ?? null,
           length_days: c.length_days,
@@ -85,14 +88,17 @@ type DayRow = {
  * a cold start, a seed that has not run, or an outage. A member should never
  * see an empty programme because a table was empty.
  */
-export async function loadCourses(includeUnpublished = false): Promise<Course[]> {
+/** A course as stored, with the one field the JSON shape never had. */
+export type StoredCourse = Course & { published: boolean }
+
+export async function loadCourses(includeUnpublished = false): Promise<StoredCourse[]> {
   await ensureCoursesSeeded()
   try {
     const supabase = await createClient()
     let q = supabase.from('courses').select('*').order('sort_order', { ascending: true })
     if (!includeUnpublished) q = q.eq('published', true)
     const { data: courses } = await q
-    if (!courses || courses.length === 0) return SEED
+    if (!courses || courses.length === 0) return SEED.map((c) => ({ ...c, published: true }))
 
     const { data: days } = await supabase
       .from('course_days')
@@ -107,6 +113,7 @@ export async function loadCourses(includeUnpublished = false): Promise<Course[]>
     }
 
     return courses.map((c) => ({
+      published: (c.published as boolean) ?? true,
       slug: c.slug as string,
       title: c.title as string,
       subtitle: (c.subtitle as string) ?? '',
@@ -121,13 +128,13 @@ export async function loadCourses(includeUnpublished = false): Promise<Course[]>
         minutes: d.minutes,
         blocks: d.blocks,
       })) as CourseDay[],
-    })) as Course[]
+    })) as StoredCourse[]
   } catch {
-    return SEED
+    return SEED.map((c) => ({ ...c, published: true }))
   }
 }
 
-export async function loadCourse(slug: string, includeUnpublished = false): Promise<Course | null> {
+export async function loadCourse(slug: string, includeUnpublished = false): Promise<StoredCourse | null> {
   const all = await loadCourses(includeUnpublished)
   return all.find((c) => c.slug === slug) ?? null
 }

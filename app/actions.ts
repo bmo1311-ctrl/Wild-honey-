@@ -3511,3 +3511,82 @@ export async function saveSkinConcerns(keys: string[]) {
   revalidatePath('/app/protocols')
   return { ok: true }
 }
+
+// ============================================================
+// COURSE EDITING
+// ============================================================
+
+/**
+ * Her own course content, editable at last.
+ *
+ * These write to the `courses` and `course_days` tables that replaced the
+ * JSON files. Admin-only at the database level too — the RLS policy checks
+ * `is_admin_user`, so these actions are a convenience, not the security.
+ */
+export async function saveCourseMeta(
+  slug: string,
+  patch: { title?: string; subtitle?: string | null; published?: boolean },
+) {
+  const { supabase } = await requireAdmin()
+  const update: Record<string, unknown> = { updated_at: new Date().toISOString() }
+  if (patch.title !== undefined) {
+    const t = patch.title.trim()
+    if (!t) return { error: 'A course needs a title.' }
+    update.title = t
+  }
+  if (patch.subtitle !== undefined) update.subtitle = patch.subtitle?.trim() || null
+  if (patch.published !== undefined) update.published = patch.published
+
+  const { error } = await supabase.from('courses').update(update).eq('slug', slug)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/course')
+  revalidatePath('/app/program')
+  revalidatePath(`/app/program/${slug}`)
+  revalidatePath('/app')
+  return { ok: true }
+}
+
+/**
+ * One day, saved whole.
+ *
+ * The blocks array arrives complete rather than as a diff. A course day is
+ * small — a few dozen blocks at most — and sending the whole thing means the
+ * order, the deletions and the edits cannot disagree with each other, which
+ * is the usual way a block editor corrupts something.
+ */
+export async function saveCourseDay(
+  slug: string,
+  dayNumber: number,
+  patch: { title?: string; kind?: string | null; minutes?: number | null; blocks?: unknown[] },
+) {
+  const { supabase } = await requireAdmin()
+  const update: Record<string, unknown> = { updated_at: new Date().toISOString() }
+  if (patch.title !== undefined) {
+    const t = patch.title.trim()
+    if (!t) return { error: 'A day needs a title.' }
+    update.title = t
+  }
+  if (patch.kind !== undefined) update.kind = patch.kind || null
+  if (patch.minutes !== undefined) update.minutes = patch.minutes ?? null
+  if (patch.blocks !== undefined) {
+    if (!Array.isArray(patch.blocks)) return { error: 'Blocks must be a list.' }
+    // Every block needs a type, or the renderer's exhaustiveness check has
+    // nothing to match and the day renders blank.
+    const bad = patch.blocks.findIndex((b) => !b || typeof (b as { t?: unknown }).t !== 'string')
+    if (bad !== -1) return { error: `Block ${bad + 1} has no type.` }
+    update.blocks = patch.blocks
+  }
+
+  const { error } = await supabase
+    .from('course_days')
+    .update(update)
+    .eq('slug', slug)
+    .eq('day_number', dayNumber)
+  if (error) return { error: error.message }
+
+  revalidatePath(`/admin/course/${slug}/${dayNumber}`)
+  revalidatePath(`/app/program/${slug}/day/${dayNumber}`)
+  revalidatePath(`/app/program/${slug}`)
+  revalidatePath('/app')
+  return { ok: true }
+}

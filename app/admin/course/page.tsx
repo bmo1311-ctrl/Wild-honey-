@@ -1,24 +1,54 @@
-import { pillarsOf } from '@/lib/courses'
+import Link from 'next/link'
+import { ChevronRight } from 'lucide-react'
 import { loadCourses } from '@/lib/courses-db'
-import { getDayPillars } from '@/lib/data'
-import { DayPillarEditor } from '@/components/admin/day-pillar-editor'
+import { CoursePublishToggle } from '@/components/admin/course-publish-toggle'
 
-/** Set the pillar for every day of every course. Blank means "read it off the blocks". */
-export default async function AdminCoursePage() {
-  const COURSES = await loadCourses(true)
-  const overrides = Object.fromEntries(await Promise.all(COURSES.map(async (c) => [c.slug, await getDayPillars(c.slug)] as const)))
+/**
+ * Her courses, listed.
+ *
+ * This page used to do exactly one thing: set which pillar each day belonged
+ * to. Everything else about a course — every word of 154 days — lived in JSON
+ * files she could not reach.
+ */
+export default async function AdminCoursesPage() {
+  const courses = await loadCourses(true)
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <div>
-        <h1 className="font-serif text-3xl font-semibold">Course days</h1>
-        <p className="mt-1 text-sm text-muted-foreground">which pillar each day works in. blank falls back to what the day&rsquo;s blocks say; a body-first course reads as Body when nothing else is there.</p>
+        <h1 className="font-serif text-3xl font-semibold">Courses</h1>
+        <p className="mt-1 text-sm text-pretty text-muted-foreground">
+          every word of every day, yours to change. Saving publishes it — members see the
+          new version on their next load.
+        </p>
       </div>
-      {COURSES.map((c) => (
-        <section key={c.slug}>
-          <h2 className="mb-2 font-serif text-xl font-semibold">{c.title}</h2>
-          <DayPillarEditor slug={c.slug} days={c.days.map((d) => ({ n: d.day_number, title: d.title, week: d.week_number, derived: pillarsOf(d.blocks), set: overrides[c.slug]?.[d.day_number] ?? null }))} />
-        </section>
-      ))}
+
+      <div className="flex flex-col gap-2">
+        {courses.map((c) => (
+          <div key={c.slug} className="rounded-3xl bg-card p-4 ring-1 ring-border">
+            <div className="flex items-start gap-3">
+              <Link href={`/admin/course/${c.slug}`} className="min-w-0 flex-1">
+                <p className="font-serif text-lg font-semibold">{c.title}</p>
+                <p className="mt-0.5 text-[13px] leading-[1.45] text-pretty text-muted-foreground">
+                  {c.subtitle}
+                </p>
+                <p className="mt-1.5 text-[12px] text-muted-foreground">
+                  {c.length_days} days · {c.weeks} weeks
+                </p>
+              </Link>
+              <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" />
+            </div>
+            {/*
+              Unpublishing hides a course from members without deleting a
+              thing, so she can rewrite one in place rather than editing
+              something people are reading mid-sentence.
+            */}
+            <div className="mt-3 border-t border-border pt-3">
+              <CoursePublishToggle slug={c.slug} published={c.published} />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
