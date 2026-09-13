@@ -5,6 +5,8 @@ import { toast } from 'sonner'
 import { saveReflection } from '@/app/actions'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { SuggestionPicker } from '@/components/suggestion-picker'
+import { promptOpeners } from '@/lib/suggestions'
 import type { Milestone } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -71,6 +73,12 @@ export function ReflectionForm() {
           </button>
         ))}
       </div>
+      {/*
+        Four blank boxes in a row was the shape of this form, and a woman
+        sitting down at ninety days to say what has changed does not need a
+        cursor blinking at her four times. Openers only, and only while a box
+        is still empty.
+      */}
       {QUESTIONS.map((q) => (
         <div key={q.key} className="flex flex-col gap-1.5">
           <label className="text-xs font-medium text-muted-foreground">{q.label}</label>
@@ -79,6 +87,13 @@ export function ReflectionForm() {
             onChange={(e) => setAnswers((prev) => ({ ...prev, [q.key]: e.target.value }))}
             rows={2}
           />
+          {!(answers[q.key] ?? '').trim() && (
+            <SuggestionPicker
+              suggestions={promptOpeners(q.label)}
+              label="start here"
+              onPick={(s) => setAnswers((prev) => ({ ...prev, [q.key]: `${s.text} ` }))}
+            />
+          )}
         </div>
       ))}
       <div className="flex gap-2">

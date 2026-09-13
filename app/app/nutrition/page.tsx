@@ -14,6 +14,7 @@ import {
   getCurrentCyclePhase,
   getCurrentSeason,
   getGroceryBuilderItems,
+  getFoodItems,
   getMealPlans,
   getPantryItems,
   getRecipes,
@@ -31,7 +32,7 @@ import { FEATURES } from '@/lib/features'
 export default async function NutritionPage() {
   if (!FEATURES.recipes) return <FeatureOff />
 
-  const [recipes, recommended, season, cyclePhase, nutrition, plans, grocery, pantry, profile, allResources] = await Promise.all([
+  const [recipes, recommended, season, cyclePhase, nutrition, plans, grocery, foods, pantry, profile, allResources] = await Promise.all([
     getRecipes(),
     getRecommendedRecipes(),
     Promise.resolve(getCurrentSeason()),
@@ -39,10 +40,14 @@ export default async function NutritionPage() {
     getTodayNutrition(),
     getMealPlans(),
     getGroceryBuilderItems(),
+    getFoodItems(),
     getPantryItems(),
     getSessionProfile(),
     getResources(),
   ])
+  // 407 names, filtered client-side. Passing whole food rows would ship the
+  // full nutrient table for every one of them to the browser for no reason.
+  const foodNames = foods.map((f) => f.name)
   const cookVideos = allResources.filter((r) => r.collection === 'nourish')
   const unlocked = (await getAccess()).paid
   const own = ownerTargets(profile, cyclePhase)
@@ -85,8 +90,8 @@ export default async function NutritionPage() {
           )
         }
         plans={<MealPlanList plans={plans} unlocked={unlocked} />}
-        grocery={unlocked ? <GroceryBuilder items={grocery} /> : <Locked blurb="A grocery list that builds itself from what you plan to cook. Part of The Circle." from="nutrition" compact />}
-        pantry={unlocked ? <PantryList items={pantry} /> : <Locked blurb="What is in the cupboard, so meals start from there. Part of The Circle." from="nutrition" compact />}
+        grocery={unlocked ? <GroceryBuilder items={grocery} foodNames={foodNames} /> : <Locked blurb="A grocery list that builds itself from what you plan to cook. Part of The Circle." from="nutrition" compact />}
+        pantry={unlocked ? <PantryList items={pantry} foodNames={foodNames} /> : <Locked blurb="What is in the cupboard, so meals start from there. Part of The Circle." from="nutrition" compact />}
         cook={
           unlocked ? (
             <ResourceShelf resources={cookVideos} empty="no cooking videos yet." />

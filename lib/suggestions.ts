@@ -591,3 +591,42 @@ export function winStarters(input: { seasons?: string[]; today?: string }): Sugg
   out.push({ text: 'Someone told me something kind and I believed it', because: null })
   return out.slice(0, 5)
 }
+
+/**
+ * A running start on a question someone has already asked her.
+ *
+ * Different problem from the journal. There the page is blank and she has to
+ * find a subject; here the prompt is sitting right above the box, so the
+ * subject is settled and the obstacle is purely the first word. A course day
+ * can hold several of these in a row, and the fourth blank box in one sitting
+ * is where people close the app.
+ *
+ * So these are sentence openers, not ideas — deliberately empty of content.
+ * They commit her to nothing except starting, which is the only thing that is
+ * actually hard.
+ *
+ * An earlier version of this tried to derive a stem from the prompt itself —
+ * turning "What are you avoiding?" into "What I am avoiding is…". Tested
+ * against real course prompts it produced broken English far more often than
+ * not: "What saying yes to that I mean no to is…". A suggestion in mangled
+ * grammar costs more trust than a blank box does, so the clever half is gone
+ * and only the openers that always read properly remain.
+ */
+export function promptOpeners(_prompt: string, today?: string): Suggestion[] {
+  const out: Suggestion[] = []
+
+  const universal = [
+    'Honestly, …',
+    'The first thing that comes up is…',
+    'What is actually true is…',
+    'I keep coming back to…',
+    'The part I would rather not write is…',
+  ]
+  // Rotated by the day so a course day with four write blocks in it does not
+  // show the same three openers four times.
+  const day = today ? Number(today.replace(/-/g, '')) : 0
+  const start = ((day % universal.length) + universal.length) % universal.length
+  for (let i = 0; i < 3; i++) out.push({ text: universal[(start + i) % universal.length], because: null })
+
+  return out
+}

@@ -13,7 +13,16 @@ function todayStr(): string {
   return new Date().toISOString().slice(0, 10)
 }
 
-export function HabitStack({ habits, logs }: { habits: Habit[]; logs: HabitLog[] }) {
+export function HabitStack({
+  habits,
+  logs,
+  suggestions = [],
+}: {
+  habits: Habit[]
+  logs: HabitLog[]
+  /** From suggestHabits — the same source QuickAddHabit has always had. */
+  suggestions?: string[]
+}) {
   const [adding, setAdding] = useState(false)
   const [title, setTitle] = useState('')
   const [anchor, setAnchor] = useState('')
@@ -80,7 +89,44 @@ export function HabitStack({ habits, logs }: { habits: Habit[]; logs: HabitLog[]
       {adding && (
         <div className="flex flex-col gap-2 rounded-xl bg-secondary/50 p-3">
           <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="habit, e.g. drink a glass of water" className="h-10" />
+          {/*
+            Two blank boxes back to back, while QuickAddHabit on Today has had
+            suggestions from the same function all along. Same source, used here.
+          */}
+          {suggestions.length > 0 && !title.trim() && (
+            <div className="flex flex-wrap gap-1.5">
+              {suggestions.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setTitle(s)}
+                  className="rounded-full bg-card px-2.5 py-1 text-[12.5px] font-medium ring-1 ring-border"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
           <Input value={anchor} onChange={(e) => setAnchor(e.target.value)} placeholder="stack it onto... e.g. after I make coffee" className="h-10" />
+          {/*
+            An anchor is the whole point of stacking — it has to be something
+            she already does without thinking, so these are the ordinary
+            fixtures of a day rather than anything aspirational.
+          */}
+          {!anchor.trim() && (
+            <div className="flex flex-wrap gap-1.5">
+              {['after I make coffee', 'after I brush my teeth', 'before I open my laptop', 'when I put the kettle on', 'after the school run', 'before bed'].map((a) => (
+                <button
+                  key={a}
+                  type="button"
+                  onClick={() => setAnchor(a)}
+                  className="rounded-full bg-card px-2.5 py-1 text-[12.5px] font-medium ring-1 ring-border"
+                >
+                  {a}
+                </button>
+              ))}
+            </div>
+          )}
           <Button onClick={handleAdd} disabled={pending} className="h-10 self-start">
             save habit
           </Button>

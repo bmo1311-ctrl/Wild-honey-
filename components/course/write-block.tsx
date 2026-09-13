@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { saveCourseWriting } from '@/app/actions'
+import { SuggestionPicker } from '@/components/suggestion-picker'
+import { promptOpeners } from '@/lib/suggestions'
 
 /**
  * Saves as she types, debounced. Never destructive — this replaces a paper
@@ -23,6 +25,9 @@ export function WriteBlock({
   initialBody: string
 }) {
   const [body, setBody] = useState(initialBody)
+  // Openers, computed once. Not rotated per render or they would reshuffle
+  // while she is looking at them.
+  const [openers] = useState(() => promptOpeners(prompt, new Date().toISOString().slice(0, 10)))
   const [savedAt, setSavedAt] = useState<string | null>(initialBody ? 'saved' : null)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const dirty = useRef(false)
@@ -52,6 +57,24 @@ export function WriteBlock({
         }}
         className="mt-3 w-full rounded-xl bg-background p-3 text-[16.5px] leading-[1.5] outline-none ring-1 ring-border focus-visible:ring-2 focus-visible:ring-primary/40"
       />
+      {/*
+        The fourth blank box in one sitting is where people close the app.
+        Openers only — no content, nothing to agree with — and only while the
+        box is empty.
+      */}
+      {body.trim().length === 0 && (
+        <div className="mt-3">
+          <SuggestionPicker
+            suggestions={openers}
+            label="stuck? start here"
+            onPick={(s) => {
+              dirty.current = true
+              setBody(`${s.text} `)
+            }}
+          />
+        </div>
+      )}
+
       <p className="mt-2 text-xs text-muted-foreground">
         {dayNumber === null ? 'Saving is available on the day itself.' : savedAt ? `Saved as you type · ${savedAt}` : 'Saved as you type'}
       </p>

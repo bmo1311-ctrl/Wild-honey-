@@ -7,6 +7,8 @@ import { saveYearDayReflection, startExperiment, addCommitment, updateSeasons } 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { SuggestionPicker } from '@/components/suggestion-picker'
+import { promptOpeners } from '@/lib/suggestions'
 import { SEASON_META, SEASONS } from '@/lib/honey-profile'
 import type { TransformationReflection } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -104,6 +106,11 @@ export function YearDayRitual({ wildHoneyYear, existing }: { wildHoneyYear: numb
     return (
       <div className="flex flex-col gap-4 rounded-2xl bg-card p-5 ring-1 ring-border">
         <p className="font-serif text-lg font-semibold">your year in Wild Honey</p>
+        {/*
+          Nine questions is the heaviest ask in the app. It is once a year and
+          worth the weight, but nine blank boxes in a column is how a person
+          answers two and closes the tab.
+        */}
         {QUESTIONS.map((q) => (
           <div key={q.key} className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-muted-foreground">{q.label}</label>
@@ -112,6 +119,13 @@ export function YearDayRitual({ wildHoneyYear, existing }: { wildHoneyYear: numb
               onChange={(e) => setAnswers((prev) => ({ ...prev, [q.key]: e.target.value }))}
               rows={2}
             />
+            {!(answers[q.key] ?? '').trim() && (
+              <SuggestionPicker
+                suggestions={promptOpeners(q.label)}
+                label="start here"
+                onPick={(s) => setAnswers((prev) => ({ ...prev, [q.key]: `${s.text} ` }))}
+              />
+            )}
           </div>
         ))}
         <Button onClick={handleSaveReflection} disabled={pending} className="h-11">

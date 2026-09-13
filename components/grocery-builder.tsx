@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { GroceryBuilderItem } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { FoodNameInput } from '@/components/food-name-input'
 
 function EditableItem({ item }: { item: GroceryBuilderItem }) {
   const [editing, setEditing] = useState(false)
@@ -85,7 +86,14 @@ function EditableItem({ item }: { item: GroceryBuilderItem }) {
   )
 }
 
-export function GroceryBuilder({ items }: { items: GroceryBuilderItem[] }) {
+export function GroceryBuilder({
+  items,
+  foodNames = [],
+}: {
+  items: GroceryBuilderItem[]
+  /** The food library, so a grocery item is a tap rather than typing. */
+  foodNames?: string[]
+}) {
   const [name, setName] = useState('')
   const [quantity, setQuantity] = useState('')
   const [pending, startTransition] = useTransition()
@@ -129,14 +137,13 @@ export function GroceryBuilder({ items }: { items: GroceryBuilderItem[] }) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Input
+        <FoodNameInput
           value={name}
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleAdd()
-          }}
+          onChange={setName}
+          onEnter={handleAdd}
+          foodNames={foodNames}
           placeholder="add an item..."
-          className="h-10 flex-1"
+          className="h-10 w-full rounded-md border border-input bg-background px-3 py-1 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         />
         <Input value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder="qty" className="h-10 w-20" />
         <Button onClick={handleAdd} disabled={pending} size="icon" className="h-10 w-10 shrink-0">

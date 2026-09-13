@@ -226,15 +226,23 @@ nothing; two had suggestions.** Both of those were on Promises.
 | Money category | retyped every entry | **her own past categories**, most-used first |
 | Commitments, experiments, treatments | blank | done earlier today |
 
-**Still blank, in rough order of how often she meets one:**
+**Also fixed 13 Sept**, finishing the list:
 
-1. **Course write-block** — daily while in a programme, and it has *no placeholder at all*. Probably the single worst remaining one.
-2. Community and group composers, replies, and encouragement on another woman's entry — the last has the highest social stakes in the app.
-3. Studio idea (`"what is it?"`), learning item title, wardrobe garment name — the name is load-bearing there since `inferEffects` reads it.
-4. Grocery and pantry items — no autocomplete against the 407-food library, which is an obvious connection going unused.
-5. Habit stack — two blank boxes back to back, while `QuickAddHabit` right next door gets suggestions.
-6. Milestone reflection — four blank textareas, none with a placeholder.
-7. Allergies and foods-avoided in settings — comma-separated free text.
+| surface | was | now |
+|---|---|---|
+| Course write-block | daily in a programme, **no placeholder at all** | sentence openers, only while the box is empty |
+| Milestone reflection | four blank textareas in a column | openers per question |
+| The annual reflection | nine blank textareas | openers per question |
+| Grocery list | blank box beside a 407-food library | autocomplete against the library |
+| Pantry | same | same |
+| Habit stack | two blank boxes, while QuickAddHabit next door had suggestions | the same `suggestHabits` source, plus anchor suggestions |
+
+**Still blank, and deliberately so:** the community composer, group posts,
+replies, and encouragement on another woman's entry. Suggesting words for
+those would put my sentences in her mouth to another person, which is a
+different thing from helping her start her own private writing. Also
+Studio idea titles, learning item titles, the wardrobe garment name and the
+allergies field — occasional, and each one is genuinely hers to name.
 
 ~~**Unmounted**~~ — **all four mounted 13 Sept.**
 

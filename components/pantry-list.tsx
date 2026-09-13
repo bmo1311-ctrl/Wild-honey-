@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { PantryCategory, PantryItem } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { FoodNameInput } from '@/components/food-name-input'
 
 const CATEGORIES: { value: PantryCategory; label: string }[] = [
   { value: 'produce', label: 'produce' },
@@ -91,7 +92,14 @@ function EditablePantryItem({ item }: { item: PantryItem }) {
   )
 }
 
-export function PantryList({ items }: { items: PantryItem[] }) {
+export function PantryList({
+  items,
+  foodNames = [],
+}: {
+  items: PantryItem[]
+  /** The food library, so what is in the cupboard is a tap rather than typing. */
+  foodNames?: string[]
+}) {
   const [adding, setAdding] = useState(false)
   const [name, setName] = useState('')
   const [quantity, setQuantity] = useState('')
@@ -130,7 +138,13 @@ export function PantryList({ items }: { items: PantryItem[] }) {
 
       {adding && (
         <div className="flex flex-col gap-2 rounded-xl bg-secondary/50 p-3">
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="item, e.g. chicken thighs" className="h-10" />
+          <FoodNameInput
+            value={name}
+            onChange={setName}
+            foodNames={foodNames}
+            placeholder="item, e.g. chicken thighs"
+            className="h-10 w-full rounded-md border border-input bg-background px-3 py-1 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+          />
           <Input value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder="how much you have, e.g. 2 lbs" className="h-10" />
           <div className="flex flex-wrap gap-1.5">
             {CATEGORIES.map((c) => (
