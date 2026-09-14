@@ -125,3 +125,42 @@ export const GATED_ACTIONS: Record<string, { required: Requirement; area: string
   archiveLearningItem: { required: 'circle', area: 'Learning boards' },
   toggleLearningItem: { required: 'circle', area: 'Learning boards' },
 }
+
+/**
+ * May this account work on this course?
+ *
+ * `enrollInCourse` asks two questions carefully — is this program turned on
+ * for her, and is she paid — and then `completeCourseDay`,
+ * `uncompleteCourseDay` and `saveCourseWriting` asked neither. Enrolling is
+ * the door; doing the days is the action. A free account could complete every
+ * day of a paid program, and a child could work through a course her mother
+ * had deliberately switched off, in both cases without ever enrolling, since
+ * none of the three requires an enrollment to exist.
+ *
+ * `saveCourseWriting` also calls `bumpStreak`, so the streak on Today counted
+ * work done inside something she was not in.
+ *
+ * The program allow-list check is the same one `enrollInCourse` was doing
+ * inline; it lives here now so there is one copy of it rather than two that
+ * can drift.
+ */
+export async function courseWriteAllowed(slug: string): Promise<{ error: string } | null> {
+  const { getSessionProfile } = await import('@/lib/data')
+  const { courseAllowList } = await import('@/lib/kid')
+
+  const me = await getSessionProfile()
+  const allowed = courseAllowList(me)
+  if (allowed && !allowed.includes(slug)) {
+    return { error: 'That program is not turned on for you yet.' }
+  }
+  return tierWriteAllowed('circle', 'Programs')
+}
+
+/**
+ * The course actions that must call `courseWriteAllowed`.
+ *
+ * Separate from `GATED_ACTIONS` because these need the two-part check — tier
+ * *and* which programs a child's parent has switched on — rather than tier
+ * alone. `check:access` reads both maps.
+ */
+export const COURSE_ACTIONS = ['enrollInCourse', 'completeCourseDay', 'uncompleteCourseDay', 'saveCourseWriting']

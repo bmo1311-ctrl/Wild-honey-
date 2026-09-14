@@ -173,6 +173,34 @@ const bodies = new Map()
   }
 }
 
+/*
+ * The course actions need a two-part check rather than tier alone — is she
+ * paid, *and* is this program one her parent switched on — so they carry
+ * `courseWriteAllowed` instead and are listed separately.
+ */
+const courseActions = (() => {
+  const m = /export const COURSE_ACTIONS = \[([^\]]*)\]/.exec(gateSrc)
+  return m ? [...m[1].matchAll(/'(\w+)'/g)].map((x) => x[1]) : []
+})()
+
+if (courseActions.length === 0) {
+  problems.push('COURSE_ACTIONS in lib/gate.ts parsed as empty — this check is not checking anything.')
+}
+
+for (const name of courseActions) {
+  const body = bodies.get(name)
+  if (!body) {
+    problems.push(`COURSE_ACTIONS names \`${name}\`, which no longer exists in app/actions.ts.`)
+    continue
+  }
+  if (!body.includes('courseWriteAllowed(')) {
+    problems.push(
+      `\`${name}\` is listed in COURSE_ACTIONS but does not call courseWriteAllowed(). ` +
+        `Enrolling is the door; doing the days is the action, and they need the same two checks.`,
+    )
+  }
+}
+
 for (const name of gatedActions) {
   const body = bodies.get(name)
   if (!body) {
@@ -198,3 +226,4 @@ if (problems.length > 0) {
 
 console.log(`✓ ${Object.keys(COVERED_BY).length} paid areas, each named on the membership list and on the marketing page.`)
 console.log(`✓ ${gatedActions.length} write actions in those areas each check the tier themselves.`)
+console.log(`✓ ${courseActions.length} course actions each check tier and the program allow-list.`)

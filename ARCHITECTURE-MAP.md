@@ -1599,3 +1599,49 @@ guard. Both failure modes were tested by breaking them on purpose:
 ```
 
 Five checks now: `tsc`, columns, kid routes, access, and gated actions.
+
+---
+
+## 31. Enrolling is the door; doing the days is the action (14 Sept)
+
+The same species a fourth time, and this one was hiding behind a guard that
+looked thorough.
+
+`enrollInCourse` asks two questions carefully: is this program one her parent
+turned on, and is she paid. Then `completeCourseDay`, `uncompleteCourseDay`
+and `saveCourseWriting` asked **neither** — and none of the three requires an
+enrollment to exist first. So a free account could complete every day of a
+paid program without ever enrolling, and a child could work through a course
+her mother had deliberately switched off.
+
+`saveCourseWriting` also calls `bumpStreak`, so the streak on Today was
+counting work done inside something she was not in.
+
+The tell was that the careful check sat on the *entry* function. A guard on
+the way in reads as covering what follows, and it covers nothing at all —
+which is exactly what §30 said about pages and is no different for functions.
+
+`courseWriteAllowed(slug)` now holds both questions in one place, and
+`enrollInCourse` uses it too rather than keeping its own copy of the
+allow-list logic — two copies of a rule is how they drift.
+
+`COURSE_ACTIONS` in `lib/gate.ts` is the enforced list, checked by
+`check:access` alongside `GATED_ACTIONS`. Verified by deleting the guard from
+`completeCourseDay` on purpose:
+
+```
+✗ `completeCourseDay` is listed in COURSE_ACTIONS but does not call courseWriteAllowed().
+```
+
+### Running count of this one bug
+
+| # | Where | What was guarded | What was not |
+|---|---|---|---|
+| §24 | Circle | the page (`circleOrRedirect`) | the nine social actions |
+| §28 | kid routes | top-level pages | anything nested a level deeper |
+| §30 | paid areas | `LockedArea` on the page | 28 write actions, and RLS |
+| §31 | courses | `enrollInCourse` | completing, uncompleting, writing |
+
+Four times now, in four different subsystems, always the same shape: **the
+check is on the way in, and the way in is not the only way.** Worth assuming
+it is true of anything else built the same way until checked.

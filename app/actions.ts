@@ -1,7 +1,6 @@
 'use server'
 
 import { asTier, meets } from '@/lib/access'
-import { courseAllowList } from '@/lib/kid'
 import { revalidatePath } from 'next/cache'
 import { detectActives } from '@/lib/actives'
 import { redirect } from 'next/navigation'
@@ -9,7 +8,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { getHiddenAuthorIds } from '@/lib/data'
 import { CONTENT_TABLE } from '@/lib/moderation'
-import { tierWriteAllowed, type GatedResult } from '@/lib/gate'
+import { courseWriteAllowed, tierWriteAllowed, type GatedResult } from '@/lib/gate'
 import { circleWriteAllowed } from '@/lib/kid-guard'
 import { oneSignalConfigured, sendPushToUsers } from '@/lib/onesignal'
 import type { Comment, NotificationPrefs, Visibility } from '@/lib/types'
@@ -2126,11 +2125,11 @@ export async function getCheckinGap() {
 
 export async function enrollInCourse(slug: string = COURSE_SLUG) {
   const { supabase, user } = await requireUser()
-  // A child can only start what her parent turned on, whatever the page showed.
-  const { data: me } = await supabase.from('profiles').select('is_child, child_permissions').eq('id', user.id).maybeSingle()
-  const allowed = courseAllowList(me as unknown as { is_child?: boolean | null; child_permissions?: { program?: string[] } | null } | null)
-  if (allowed && !allowed.includes(slug)) return { error: 'That program is not turned on for you yet.' }
-  if (!(await paidUser(supabase, user.id))) return { error: 'Programs are part of The Circle. Join to begin.' }
+  // A child can only start what her parent turned on, whatever the page
+  // showed — and the same two questions now guard doing the days, not just
+  // starting them.
+  const blocked = await courseWriteAllowed(slug)
+  if (blocked) return blocked
   const { error } = await supabase
     .from('course_enrollments')
     .upsert(
@@ -2205,6 +2204,8 @@ export async function resumeCourse(slug: string) {
 }
 
 export async function completeCourseDay(dayNumber: number, slug: string = COURSE_SLUG) {
+  const blocked = await courseWriteAllowed(slug)
+  if (blocked) return blocked
   const { supabase, user } = await requireUser()
   const { error } = await supabase
     .from('course_day_progress')
@@ -2219,6 +2220,8 @@ export async function completeCourseDay(dayNumber: number, slug: string = COURSE
 }
 
 export async function uncompleteCourseDay(dayNumber: number, slug: string = COURSE_SLUG) {
+  const blocked = await courseWriteAllowed(slug)
+  if (blocked) return blocked
   const { supabase, user } = await requireUser()
   const { error } = await supabase
     .from('course_day_progress')
@@ -2243,6 +2246,8 @@ export async function saveCourseWriting(input: {
   kind?: WritingKind
   slug?: string
 }) {
+  const blocked = await courseWriteAllowed(input.slug ?? COURSE_SLUG)
+  if (blocked) return blocked
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from('course_writings').upsert(
     {
