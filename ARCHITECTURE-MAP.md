@@ -921,3 +921,66 @@ does, Phase 2 becomes buildable in a few weeks on real evidence. If it does
 not, the problem is not friction and the next move is a different one —
 probably that a daily check-in is not something she wants to do, in which case
 capacity should be derived from what she already does rather than asked for.
+
+---
+
+## 20. Why Today timed out, and the actual fix (14 Sept)
+
+### What happened
+
+`/app` started returning Bad Gateway. No other route did — `/app/circle`,
+`/app/library`, `/app/profile`, `/app/program` all stayed at 200 throughout.
+The build was green and `npm run verify` was clean, because neither can see
+how long a page takes.
+
+Two things I did made it worse, and one of them was careless:
+
+**Adding `getPersonalState()` to Today.** Eighteen queries, serialised behind
+its own `localToday()` call, for a headline that fires rarely by design. The
+full reading belongs on You, which is what it is for. Removed from Today.
+
+**Putting `request.headers.set('x-pathname', …)` in `proxy.ts`.** `proxy` runs
+in front of every request and owns the Supabase session refresh, and I edited
+it with no way to run it locally. Reverted — and worth noting the revert did
+*not* fix `/app`, which is how the real cause got found.
+
+### The real cause: a waterfall, not a query count
+
+Today fetched in five sequential stages:
+
+```
+getSessionProfile()          →  await
+Promise.all([ 7 queries ])   →  await
+loadCourse() / localToday()  →  await
+Promise.all([ 7 queries ])   →  await
+localHour() / Promise.all([ 10 ])  →  await
+getAccess()                  →  await
+```
+
+Almost none of those groups needed the result of the one before it. The page's
+wall-clock time was the **sum of five round trips** rather than the slowest of
+one, and every surface added this week lengthened the chain. That is why it
+failed intermittently rather than outright, and why it was always `/app`.
+
+Now: one `Promise.all` of 27 independent fetches, then `loadCourse` →
+`loadDay`, which are the only two that genuinely depend on something earlier.
+**Three sequential stages instead of eight.**
+
+### `cache()` on the two hottest reads
+
+`getSessionProfile` was a plain async function and is the most-called thing in
+the app. Today reached it **three times** — directly, in its fetch batch, and
+inside `getAccess` — and each call was `auth.getUser()` *plus* a profiles
+select. Six network calls for one row that cannot change mid-render.
+`getOwnerScope` was the same shape, called from five helpers in `lib/data.ts`.
+
+Both are `cache()`d now: React's per-request memoisation, no cross-request
+sharing, nothing retained between users. Both are read-only.
+
+### The rule this leaves
+
+**`tsc` and `check:columns` say nothing about how long a page takes.** Today is
+the page that will always be closest to the ceiling, because it is the one
+every engine wants a line on. Anything added to it should go in the existing
+`Promise.all`, never as a new `await` — and anything costing more than a query
+or two should ask whether Today is where it belongs at all.

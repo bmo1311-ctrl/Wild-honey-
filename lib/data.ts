@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { redirect } from 'next/navigation'
 import { accessFor, asTier, meets, type Access, type Requirement } from '@/lib/access'
 import { courseAllowList } from '@/lib/kid'
@@ -72,7 +73,20 @@ export function hasPaidAccess(tier: string | undefined | null): boolean {
   return !!tier && PAID_TIERS.has(tier)
 }
 
-export async function getSessionProfile(): Promise<Profile | null> {
+/**
+ * Her profile, fetched once per request however many times it is asked for.
+ *
+ * This was a plain async function, and it is the single most-called thing in
+ * the app — Today alone reaches it three times (once directly, once in its
+ * fetch batch, once inside `getAccess`), and each call was an auth round trip
+ * *plus* a profiles select. Six network calls for one row that cannot change
+ * mid-render.
+ *
+ * `cache()` is React's per-request memoisation: same request, same result, no
+ * cross-request sharing and nothing retained between users. Read-only with no
+ * side effects, so there is nothing here that wants to run twice.
+ */
+export const getSessionProfile = cache(async (): Promise<Profile | null> => {
   const supabase = await createClient()
   const {
     data: { user },
@@ -80,7 +94,7 @@ export async function getSessionProfile(): Promise<Profile | null> {
   if (!user) return null
   const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
   return (data as Profile) ?? null
-}
+})
 
 export const GOAL_PILLAR: Record<string, 'Body' | 'Identity' | 'Mindset' | 'Faith'> = {
   more_energy: 'Body',
@@ -1181,7 +1195,15 @@ export async function getKidRewards(memberId: string): Promise<{ rewards: KidRew
  * member row. This resolves both, so every member-scoped helper works the
  * same for parent and child.
  */
-export async function getOwnerScope(): Promise<{ userId: string; ownerId: string; childMemberId: string | null } | null> {
+/**
+ * Who is logged in and whose data they are looking at. Memoised per request.
+ *
+ * Called from five different helpers in this file, each of which may be in
+ * the same render — and every call was an auth round trip plus one or two
+ * selects. Same reasoning as `getSessionProfile` above: read-only, cannot
+ * change mid-render, nothing that wants to run twice.
+ */
+export const getOwnerScope = cache(async (): Promise<{ userId: string; ownerId: string; childMemberId: string | null } | null> => {
   const supabase = await createClient()
   const {
     data: { user },
@@ -1191,7 +1213,7 @@ export async function getOwnerScope(): Promise<{ userId: string; ownerId: string
   if (!p?.is_child || !p.guardian_id) return { userId: user.id, ownerId: user.id, childMemberId: null }
   const { data: m } = await supabase.from('household_members').select('id').eq('child_user_id', user.id).maybeSingle()
   return { userId: user.id, ownerId: p.guardian_id, childMemberId: m?.id ?? null }
-}
+})
 
 // ---- Food logging ----
 

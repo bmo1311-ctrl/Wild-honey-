@@ -78,7 +78,50 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       .map((c) => ({ slug: c.slug, title: c.title }))
     return <KidToday name={me.name?.split(' ')[0] ?? 'there'} items={items} mealsToday={nutrition.loggedMeals.length} starsThisWeek={stars} programs={programs} earned={(kid?.balance.waiting ?? 0) + (kid?.balance.ready ?? 0)} />
   }
-  const [{ slug, enrollment, currentDay, completedDays }, profile, activityDates, checkin, nutrition, habits, habitLogs] = await Promise.all([
+  /*
+   * Everything this page needs that does not depend on anything else, in one
+   * round trip.
+   *
+   * This used to be five separate awaits in a row — seven queries, then the
+   * course, then the date, then the day, then seven more, then the hour, then
+   * ten more. Each group sat waiting for the one before it even though almost
+   * none of them needed its result, so the page's wall-clock time was the sum
+   * of five round trips rather than the slowest of one.
+   *
+   * That waterfall is why `/app` was the only route that ever timed out, and
+   * why it got closer to the edge with every surface added this week. Only
+   * the course and its day genuinely depend on something earlier; they follow
+   * below. Everything else belongs here.
+   */
+  const [
+    { slug, enrollment, currentDay, completedDays },
+    profile,
+    activityDates,
+    checkin,
+    nutrition,
+    habits,
+    habitLogs,
+    today,
+    hour,
+    baseline,
+    goals,
+    recentCheckins,
+    measurements,
+    money,
+    commitments,
+    wins,
+    beautyProducts,
+    routineLog,
+    studioBlocks,
+    studioItems,
+    studioSessions,
+    prompt,
+    garments,
+    style,
+    morning,
+    evening,
+    access,
+  ] = await Promise.all([
     getActiveCourseState(preferred),
     getSessionProfile(),
     getActivityDates(),
@@ -86,19 +129,8 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     getTodayNutrition(),
     getHabits(),
     getRecentHabitLogs(7),
-  ])
-
-  const course = await loadCourse(slug)
-  const today = await localToday()
-  const activity = buildActivity(activityDates)
-  const streaks = streaksFrom(activity, today)
-  const week = consistency(activity, 7, today)
-  const day = course && currentDay ? await loadDay(slug, currentDay) : null
-  const dayDone = currentDay ? completedDays.includes(currentDay) : false
-  const pct = course ? Math.round((completedDays.length / course.length_days) * 100) : 0
-  const loggedHabitIds = new Set(habitLogs.filter((l) => l.date === today).map((l) => l.habit_id))
-
-  const [baseline, goals, recentCheckins, measurements, money, commitments, wins] = await Promise.all([
+    localToday(),
+    localHour(),
     getBaselineVitality(),
     getMyGoals(),
     getRecentCheckins(30),
@@ -106,7 +138,31 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     getMoney(),
     getMyCommitments(),
     getRecentWins(10),
+    getMemberProducts(),
+    getRoutineLog(30),
+    getStudioBlocks(),
+    getStudioItems(),
+    getStudioSessionsThisWeek(),
+    getTodayPrompt(),
+    getWardrobe(),
+    getStyleProfile(),
+    getTodayMorningReset(),
+    getTodayEveningReflection(),
+    // Reads her own profile, which is already cached — no reason for it to
+    // have been its own await two hundred lines further down.
+    getAccess(),
   ])
+
+  // The only two that genuinely have to wait: the day needs the course, and
+  // the course needs the slug the enrollment above resolved.
+  const course = await loadCourse(slug)
+  const activity = buildActivity(activityDates)
+  const streaks = streaksFrom(activity, today)
+  const week = consistency(activity, 7, today)
+  const day = course && currentDay ? await loadDay(slug, currentDay) : null
+  const dayDone = currentDay ? completedDays.includes(currentDay) : false
+  const pct = course ? Math.round((completedDays.length / course.length_days) * 100) : 0
+  const loggedHabitIds = new Set(habitLogs.filter((l) => l.date === today).map((l) => l.habit_id))
 
   // One true sentence, or nothing. Built from what she has actually done.
   const notice = pickNotice({
@@ -164,20 +220,6 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
    * today's prompt (Write). Each one is asked what it wants, and the moment
    * engine picks whichever fits the hour she is in.
    */
-  const hour = await localHour()
-  const [beautyProducts, routineLog, studioBlocks, studioItems, studioSessions, prompt, garments, style, morning, evening] =
-    await Promise.all([
-      getMemberProducts(),
-      getRoutineLog(30),
-      getStudioBlocks(),
-      getStudioItems(),
-      getStudioSessionsThisWeek(),
-      getTodayPrompt(),
-      getWardrobe(),
-      getStyleProfile(),
-      getTodayMorningReset(),
-      getTodayEveningReflection(),
-    ])
   const promptEntry = prompt ? await getMyEntryForPrompt(prompt.id) : null
 
   const shelfFor = (areaKey: string): ShelfItem[] =>
@@ -266,8 +308,6 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       outfit,
     }),
   })
-
-  const access = await getAccess()
 
   /*
    * No early return for someone without a course.
