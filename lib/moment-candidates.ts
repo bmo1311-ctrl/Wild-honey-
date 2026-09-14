@@ -23,7 +23,6 @@ export function candidatesFor(input: {
   /** The course day, when she is carrying one. */
   courseDay: { number: number; title: string; minutes: number; slug: string } | null
   courseDayDone: boolean
-  checkedIn: boolean
   mealsLogged: number
   /** Her habits with their anchor — anchors decide the hour. */
   habits: { id: string; title: string; anchor: string | null; doneToday: boolean }[]
@@ -92,16 +91,14 @@ export function candidatesFor(input: {
     })
   }
 
-  out.push({
-    key: 'checkin',
-    label: 'How you are today',
-    detail: 'three scales',
-    href: '/app/checkin',
-    action: 'Check in',
-    window: 'dawn',
-    done: input.checkedIn,
-    tone: 'mindset',
-  })
+  /*
+   * The check-in is no longer a candidate.
+   *
+   * It is answered in place on Today now, in a card directly below the moment
+   * card, so offering it here as well would be the same three scales twice on
+   * one screen — once as a thing to tap through to, once as a thing to just
+   * do. The moment engine is for what lives somewhere else.
+   */
 
   /*
    * Food is three separate moments, not one task.

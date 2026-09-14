@@ -12,6 +12,7 @@ import { NoticeLine } from '@/components/notice-line'
 import { StateHeadline } from '@/components/state-reading'
 import { getPersonalState } from '@/lib/personal-state-db'
 import { MomentCard } from '@/components/moment-card'
+import { CheckinInline } from '@/components/checkin-inline'
 import { MorningResetCard } from '@/components/morning-reset-card'
 import { EveningReflectionCard } from '@/components/evening-reflection-card'
 import { ResetPanel } from '@/components/reset-panel'
@@ -255,7 +256,6 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       today,
       courseDay: day ? { number: day.day_number, title: day.title, minutes: day.minutes, slug } : null,
       courseDayDone: dayDone,
-      checkedIn: Boolean(checkin),
       mealsLogged: nutrition.loggedMeals.length,
       habits: habits.map((h) => ({ id: h.id, title: h.title, anchor: h.anchor, doneToday: loggedHabitIds.has(h.id) })),
       daysSinceWeighIn: since(lastWeigh),
@@ -323,6 +323,19 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
         "how am I doing" when she opened the app to ask "what now".
       */}
       <MomentCard moment={moment} hour={hour} />
+
+      {/*
+        The check-in, in place, directly under the moment card.
+
+        62 meals logged against 5 check-ins. Meal logging is the one thing
+        that was made reachable without leaving this page, and it is the one
+        thing that got used. The check-in was still a card that sent her to
+        another page — the exact shape meal logging had before it was fixed.
+        Everything the app is trying to become is built on these three
+        numbers, so the taps happening matters more than any engine behind
+        them.
+      */}
+      <CheckinInline existing={checkin ? { energy: checkin.energy, sleep_quality: checkin.sleep_quality, stress: checkin.stress } : null} />
 
       {/*
         Three cards that existed and were reachable from nowhere.

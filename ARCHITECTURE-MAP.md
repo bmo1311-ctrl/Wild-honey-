@@ -864,3 +864,60 @@ count; Studio `verbFor` is channel-blind; advancing a recurring Studio item
 nulls `last_done_on`; `foods_avoided` is collected twice and read nowhere;
 `updateNutritionGoals` is the only writer of the manual overrides and has no
 caller, so Today's protein tile never shows a target.
+
+---
+
+## 19. The check-in moves onto Today (14 Sept)
+
+### Why this and not Phase 2
+
+Her account, a day after the friction work shipped:
+
+| | count |
+|---|---|
+| **meal logs** | **62** |
+| check-ins | 5 (3 in the last fortnight) |
+| evening reflections | 0 |
+| routine logs | 0 |
+
+Meal logging is the one thing that was made answerable without leaving Today,
+and it is the one thing that got used. That is not a coincidence and it is the
+most useful single number in the database.
+
+It also settles what to build next. Phases 2, 4 and 5 — Honey Traps, Leverage,
+the Today remodel — all read check-ins. `MIN_CHECKINS_TO_INFER` is 4 and
+`recentCheckins` only counts the last 14 days, so on three recent check-ins
+every engine downstream correctly stays silent. **No amount of engine work
+substitutes for the three taps happening.** Building Phase 2 on this data
+produces either a silent feature or a lying one.
+
+### What changed
+
+`components/checkin-inline.tsx`, mounted directly under the moment card.
+Three scales, answered in place, saved on the third tap.
+
+- **No save button.** A save button is a fourth tap and a decision, and there
+  is nothing here to decide. The third answer is the save.
+- **No navigation.** The old path was: tap the card, wait for
+  `/app/checkin`, three taps, press Save, get pushed back. Five taps and two
+  page loads. It is three taps and no page loads.
+- **Full-height targets**, not dots. This is tapped on a phone at seven in the
+  morning; a six-pixel target is how a daily habit quietly stops being daily.
+- **Done state stays visible** as one line, still tappable. Hiding it would
+  make the page jump and leave her unsure whether it saved.
+- `/app/checkin` is still there behind "more" — mood, cycle phase, movement,
+  and the vitality snapshot all still live there. This is the floor, not a
+  replacement.
+
+The `checkin` candidate came **out** of `lib/moment-candidates.ts`. Offering it
+there as well would put the same three scales on one screen twice — once as a
+thing to tap through to, once as a thing to just do. The moment engine is for
+what lives somewhere else.
+
+### What to watch
+
+The only measure that matters is whether check-ins per week goes up. If it
+does, Phase 2 becomes buildable in a few weeks on real evidence. If it does
+not, the problem is not friction and the next move is a different one —
+probably that a daily check-in is not something she wants to do, in which case
+capacity should be derived from what she already does rather than asked for.
