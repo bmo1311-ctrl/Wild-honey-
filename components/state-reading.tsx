@@ -109,7 +109,17 @@ export function StateReading({ state }: { state: PersonalState }) {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Measure label="vitality" value={state.vitality.value} note="check in and this appears" />
         <Measure label="noticing" value={state.awareness.value} note="writing and reflecting build this" />
-        <Measure label="alignment" value={state.alignment.value} note="needs a goal in your words" />
+        {/*
+          This said "needs a goal in your words", which was simply untrue —
+          `computeAlignment` reads commitments, experiments and active days,
+          and never touches her goals at all. Following that instruction moved
+          nothing. The note names what actually feeds it.
+        */}
+        <Measure
+          label="alignment"
+          value={state.alignment.value}
+          note="make a commitment or run an experiment"
+        />
       </div>
 
       {disclaimer && <p className="text-xs text-muted-foreground">{disclaimer}</p>}

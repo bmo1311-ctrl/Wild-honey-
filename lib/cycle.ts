@@ -22,10 +22,22 @@ export const CYCLE_PHASES: { key: CyclePhaseKey; label: string; blurb: string }[
   { key: 'luteal', label: 'Luteal', blurb: 'metabolism runs warmer, appetite usually up' },
 ]
 
-/** Percentage shift on calories and carbs, by phase. */
+/**
+ * Percentage shift on calories and carbs, by phase.
+ *
+ * Every one of these must be a value in `CYCLE_CHOICES` below. Menstrual and
+ * follicular were 2 and −2, which are not offered, and the settings form snaps
+ * whatever it loads onto the nearest choice — so on first open it previewed
+ * 3% and −3% while every other surface was still applying 2% and −2%, never
+ * marked either as "typical" because the numbers no longer matched, and
+ * persisted an override she never chose the moment she pressed Save.
+ *
+ * A percentage point either way is well inside the noise of a default. The two
+ * lists agreeing is not.
+ */
 export const DEFAULT_ADJUSTMENTS: Record<CyclePhaseKey, number> = {
-  menstrual: 2,
-  follicular: -2,
+  menstrual: 3,
+  follicular: -3,
   ovulation: 0,
   luteal: 7,
 }
@@ -95,7 +107,19 @@ export function cycleShape(shape: CycleShape | null | undefined) {
   const clamp = (v: number | null | undefined, lo: number, hi: number, fallback: number) =>
     typeof v === 'number' && Number.isFinite(v) ? Math.min(Math.max(Math.round(v), lo), hi) : fallback
   const cycleLength = clamp(shape?.cycleLength, 15, 60, CYCLE_DEFAULTS.cycleLength)
-  const lutealLength = clamp(shape?.lutealLength, 7, 20, CYCLE_DEFAULTS.lutealLength)
+  /*
+   * Bounded against her cycle, not just against itself.
+   *
+   * Clamping the two independently let a 18-day cycle carry a 20-day luteal
+   * phase, which put ovulation on day −2: every day but the first came back
+   * luteal, and the settings page cheerfully printed "ovulation around day
+   * -2". A luteal phase has to end before the cycle does, and leave at least
+   * a few days of follicular in front of it.
+   */
+  const lutealLength = Math.min(
+    clamp(shape?.lutealLength, 7, 20, CYCLE_DEFAULTS.lutealLength),
+    Math.max(7, cycleLength - 7),
+  )
   return {
     cycleLength,
     // A period cannot be longer than the cycle it sits in, and cannot run past

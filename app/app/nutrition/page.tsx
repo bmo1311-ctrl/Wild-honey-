@@ -50,7 +50,7 @@ export default async function NutritionPage() {
   const foodNames = foods.map((f) => f.name)
   const cookVideos = allResources.filter((r) => r.collection === 'nourish')
   const unlocked = (await getAccess()).paid
-  const own = ownerTargets(profile, cycle.phase, cycle.phase)
+  const own = ownerTargets(profile, cycle.phase)
   const panelTargets = { ...(driFor(ageFromBirthYear(own.birthYear), 'female') ?? {}), ...own.cycled.targets }
 
   return (

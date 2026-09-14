@@ -1,4 +1,4 @@
-import { applyCycle, resolvePhase, type CyclePhaseKey } from '@/lib/cycle'
+import { applyCycle, type CyclePhaseKey } from '@/lib/cycle'
 import { calculateTargets, effectiveTargets, type ActivityLevel, type BodyGoal } from '@/lib/goals'
 import type { Profile } from '@/lib/types'
 
@@ -18,12 +18,7 @@ type BodyProfile = Profile & {
  * where she is in her cycle. One place, so the Nutrition hub, the log screen
  * and Today all show the same numbers.
  */
-export function ownerTargets(
-  profile: Profile | null,
-  loggedPhase: string | null,
-  /** Already worked out by `getCyclePhase`. Pass it whenever you have it. */
-  resolved?: CyclePhaseKey | null,
-) {
+export function ownerTargets(profile: Profile | null, phase: CyclePhaseKey | null) {
   const p = profile as BodyProfile | null
   const calculated = calculateTargets({
     weightKg: p?.weight_kg ?? null,
@@ -37,27 +32,23 @@ export function ownerTargets(
     ...(p?.daily_protein_goal_g ? { protein_g: p.daily_protein_goal_g } : {}),
   })
   /*
-   * Deciding the phase used to happen here, and the rule was "logged wins".
-   * That is how the day her period started came out as luteal: she had
-   * tapped luteal on a check-in that morning, then set the period start, and
-   * this line preferred the earlier guess — then quietly added luteal's 7% to
-   * her calories on day one of bleeding.
+   * The phase arrives already decided. It is not worked out here.
    *
-   * The decision now belongs to `resolvePhase`, in one place, weighing both
-   * things she said by how recently she said them. This function just applies
-   * the adjustment to whatever it is handed.
+   * Deciding it here was the bug: the rule was "a logged phase wins", so the
+   * day her period started, a luteal chip tapped that morning outranked her
+   * setting the period start, and this quietly added luteal's 7% to her
+   * calories on day one of bleeding.
+   *
+   * The first repair left a fallback for callers that passed no phase, and
+   * that fallback was quietly wrong in two ways of its own — it could not see
+   * her period or luteal lengths, so it fell back to the 5-and-14 averages
+   * `cycleShape` exists to replace, and it passed no check-in date, which made
+   * the dates beat the logged phase unconditionally. It was dead code that
+   * would have bitten the first caller to lean on it.
+   *
+   * So there is no fallback now. `getCyclePhase` is the one place that
+   * decides; this function only applies the adjustment.
    */
-  const phase =
-    resolved !== undefined
-      ? resolved
-      : resolvePhase({
-          loggedPhase: loggedPhase ?? null,
-          // No check-in date to compare against, so this is the conservative
-          // reading: only callers that pass a resolved phase get the full rule.
-          loggedOn: null,
-          lastPeriodStart: p?.last_period_start ?? null,
-          cycleLength: p?.cycle_length_days ?? null,
-        }).phase
   const cycled = applyCycle(targets, phase, (p?.cycle_adjustments ?? {}) as Record<string, number>)
   return { cycled, phase, hasGoals: Boolean(p?.weight_kg), birthYear: p?.birth_year ?? null }
 }

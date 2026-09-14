@@ -28,7 +28,7 @@ export default async function LogFoodPage({ searchParams }: { searchParams: Prom
     getSavedMeals(memberId),
   ])
 
-  const { cycled, phase, hasGoals, birthYear } = ownerTargets(profile, cycle.phase, cycle.phase)
+  const { cycled, phase, hasGoals, birthYear } = ownerTargets(profile, cycle.phase)
 
   // Whoever is selected gets their own reference intakes. For her, the
   // calculated macro targets override the generic adult figures.

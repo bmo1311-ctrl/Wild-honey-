@@ -1,6 +1,6 @@
 import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
-import { isoToday } from '@/lib/activity'
+import { localToday } from '@/lib/today'
 import { computeState, headline, type PersonalState, type StateInput } from '@/lib/personal-state'
 
 /**
@@ -21,16 +21,30 @@ import { computeState, headline, type PersonalState, type StateInput } from '@/l
 /** How far back anything is worth pulling. Beyond this it is history, not state. */
 const WINDOW_DAYS = 60
 
-function since(days: number): string {
-  return isoToday(new Date(Date.now() - days * 86_400_000))
+/**
+ * Dates here must be *her* dates.
+ *
+ * This used `isoToday()`, which is the server's day — UTC on Vercel. Every row
+ * it compares against is dated with `localToday()`: `checkins.date`,
+ * `meal_logs.date`, `habit_logs.date` are all written in her timezone. For
+ * anyone ahead of UTC the two disagree for part of every day, and then
+ * `recentCheckins` throws today's check-in away for having a negative gap.
+ *
+ * Worst case, and it was live: `saveCheckin` calls `recordPersonalState()`
+ * immediately after writing the row, so the reading saved right after a
+ * check-in was computed as though that check-in did not exist — which at four
+ * check-ins is exactly the boundary where the card stops saying anything.
+ */
+function daysBefore(today: string, days: number): string {
+  return new Date(Date.parse(`${today}T00:00:00Z`) - days * 86_400_000).toISOString().slice(0, 10)
 }
 
 /**
  * Gather everything the state layer needs, in one pass.
  *
- * Twelve small queries rather than one clever join, because they are all
+ * Fifteen small queries rather than one clever join, because they are all
  * indexed on user_id and they run in parallel — and because a join across
- * twelve tables would be unreadable the first time something in it went
+ * fifteen tables would be unreadable the first time something in it went
  * wrong. Every one of them is allowed to fail without taking the page down:
  * a missing table or a permission change should cost confidence, not the
  * whole surface.
@@ -42,8 +56,8 @@ export const readStateInput = cache(async (): Promise<StateInput | null> => {
   } = await supabase.auth.getUser()
   if (!user) return null
 
-  const from = since(WINDOW_DAYS)
-  const today = isoToday()
+  const today = await localToday()
+  const from = daysBefore(today, WINDOW_DAYS)
 
   const [
     profile,
@@ -59,6 +73,8 @@ export const readStateInput = cache(async (): Promise<StateInput | null> => {
     goals,
     meals,
     courseDays,
+    reflections,
+    resets,
   ] = await Promise.all([
     supabase.from('profiles').select('seasons').eq('id', user.id).maybeSingle(),
     supabase
@@ -77,6 +93,14 @@ export const readStateInput = cache(async (): Promise<StateInput | null> => {
     supabase.from('user_goals').select('goal'),
     supabase.from('meal_logs').select('date').gte('date', from),
     supabase.from('course_day_progress').select('completed_at').gte('completed_at', from),
+    /*
+     * The two the engine was quietly ignoring. `saveEveningReflection` called
+     * `recordPersonalState` with a comment saying reflecting is most of what
+     * noticing is made of — and then nothing here read the table, so an
+     * evening reflection moved the reading by zero. Same for morning resets.
+     */
+    supabase.from('evening_reflections').select('date').gte('date', from),
+    supabase.from('morning_resets').select('date').gte('date', from),
   ])
 
   /*
@@ -89,7 +113,17 @@ export const readStateInput = cache(async (): Promise<StateInput | null> => {
   const days = (rows: { [k: string]: unknown }[] | null, key: string): string[] =>
     (rows ?? []).map((r) => day(r[key] as string)).filter((d): d is string => !!d)
 
-  const writingDates = [...days(journal.data, 'created_at'), ...days(courseWriting.data, 'updated_at')]
+  /*
+   * Noticing is writing *and* reflecting. Both evening reflections and morning
+   * resets are her putting words to her own state, which is the thing this
+   * measure is supposed to be about.
+   */
+  const writingDates = [
+    ...days(journal.data, 'created_at'),
+    ...days(courseWriting.data, 'updated_at'),
+    ...days(reflections.data, 'date'),
+    ...days(resets.data, 'date'),
+  ]
 
   /*
    * An active day is any day she did *something*. Deliberately generous —
@@ -189,7 +223,7 @@ export async function dismissHeadline(text: string): Promise<void> {
     await supabase.from('transformation_state').upsert(
       {
         user_id: user.id,
-        state_json: { ...existing, headline: { text, dismissedOn: isoToday() } },
+        state_json: { ...existing, headline: { text, dismissedOn: await localToday() } },
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'user_id' },

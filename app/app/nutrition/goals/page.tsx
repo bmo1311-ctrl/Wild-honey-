@@ -49,7 +49,22 @@ export default async function GoalsPage() {
         }}
       />
 
+      {/*
+        Keyed on the saved values, so the form remounts when they change.
+        Without this its useState initialisers hold the values from first
+        render for ever — and the phase switch *inside* this card writes
+        `last_period_start` behind them. Tapping "my period started today"
+        left the date field below showing the old date, and the next save on
+        this page wrote that stale date back over today's day one.
+      */}
       <CycleSettingsForm
+        key={[
+          profile?.last_period_start ?? '',
+          profile?.cycle_length_days ?? '',
+          profile?.period_length_days ?? '',
+          profile?.luteal_length_days ?? '',
+          String(profile?.cycle_is_regular ?? ''),
+        ].join('|')}
         baseCalories={
           calculateTargets({
             weightKg: profile?.weight_kg ?? null,

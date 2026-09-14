@@ -606,3 +606,74 @@ all.
 - All 237 existing blocks checked against what the forms expect: no step
   missing a head, no non-string checklist item, no ragged grid, no malformed
   versus, no figure missing pose or label. Every one will render.
+
+---
+
+## 16. Audit of the unexercised work (14 Sept)
+
+Everything in §12–§15 shipped without a real user touching it. An independent
+read-only audit of those files found seven issues. All fixed. Ordered as found.
+
+**1. The settings form silently reverted day one.** `CyclePhaseSwitch` is
+rendered *inside* `CycleSettingsForm`. Tapping "my period started today" wrote
+`last_period_start` and revalidated — but `start` is a `useState` initialised
+once from props, so the date field below still showed the old date. Touch
+anything else on that page, press Save, and it wrote the stale date back over
+today. The exact scenario the feature was built for. Fixed by keying the
+component on the saved values so it remounts when they change.
+
+**2. The state engine used the server's day, not hers.** `readStateInput`
+called `isoToday()` (UTC on Vercel) while every row it compares against is
+dated with `localToday()`. For anyone ahead of UTC they disagree for part of
+every day, and `recentCheckins` then dropped today's check-in for having a
+negative gap. Worst instance: `saveCheckin` calls `recordPersonalState()`
+immediately after writing, so the reading persisted right after a check-in was
+computed as if that check-in did not exist — at four check-ins, exactly the
+`MIN_FOR_PATTERN` boundary where the card goes quiet.
+
+**3. Reflecting moved "noticing" by zero.** `saveEveningReflection` called
+`recordPersonalState()` under a comment saying reflecting is most of what
+noticing is made of. `readStateInput` never queried `evening_reflections`.
+Nor `morning_resets`. Both are in `writingDates` now.
+
+**4. Alignment told her to do something with no effect.** The card read
+"needs a goal in your words"; `computeAlignment` reads commitments,
+experiments and active days and never touches `goals`. Copy now names what
+actually feeds it.
+
+**5. The default adjustments were not offered as choices.** `menstrual: 2`
+and `follicular: -2`, against `CYCLE_CHOICES` of −7/−3/0/3/7. The form snaps
+to the nearest, so on first open it previewed 3%/−3% while every other surface
+applied 2%/−2%, never marked either "typical", and persisted an override she
+never chose on the next Save. Defaults are 3/−3 now; a point is inside the
+noise, the two lists agreeing is not.
+
+**6. Ovulation could land on day −2.** `cycleShape` clamped cycle length and
+luteal length independently, so an 18-day cycle could carry a 20-day luteal
+phase: every day but the first came back luteal and the settings page printed
+"ovulation around day -2". Luteal is now bounded against the cycle it sits in.
+
+**7. `ownerTargets` kept a fallback that was wrong twice over.** It could not
+see her period or luteal lengths, so it fell back to the 5-and-14 averages
+`cycleShape` exists to replace; and it passed no check-in date, which made the
+dates beat the logged phase unconditionally — the opposite of the
+"conservative reading" its own comment claimed. Dead code that would have bitten
+the first caller to lean on it. Removed; the phase now arrives already decided.
+
+**Verified clean:** no hooks-rules violations (every hook precedes every early
+return in both `StateReading` and `StateHeadline`), no server/client boundary
+errors, no re-render storms, and the `{ ...prev }` upsert in
+`setCyclePhaseToday` is safe — `checkins` has `unique (user_id, date)` and no
+generated columns.
+
+21 new unit tests cover 5 and 6.
+
+### The lesson worth keeping
+
+Six of the seven are the same species: **state or copy that drifts out of step
+with the thing it describes.** A form holding values the page has since
+changed. An engine dating rows differently from the code that wrote them. A
+label naming an input the function ignores. Defaults that are not in the list
+of choices. None of them crash, none of them typecheck wrong, and every one
+makes the app quietly lie. `npm run verify` cannot catch these — reading the
+two halves side by side is what catches them.
