@@ -308,3 +308,82 @@ Now: who she is logging for, then **What did you eat?**, then Your usual, then
 saved meals, then today's list. The box autofocuses.
 
 **Today → tap the meal → type.** One tap, no scroll.
+
+---
+
+## 12. Phase 1 — the personal state layer (14 Sept)
+
+`lib/personal-state.ts` (pure) + `lib/personal-state-db.ts` (rows) +
+`components/state-reading.tsx` (surface).
+
+**Adopts `transformation_state`.** No new table. The four score columns that
+were already there now have a writer; `state_json` holds the full reading,
+reasons included, so a later phase can ask why the app said what it said on a
+given day. Per §1's rule — Phases 1, 2 and 4 start by adopting this schema,
+not beside it.
+
+### The split
+
+The maths knows nothing about Supabase, which is why every threshold in it can
+be argued with in a 40-line node script. The db file knows nothing about
+thresholds. That split is the reason the four bugs below were findable.
+
+### Four things testing found that reading would not have
+
+1. **Depletion needed a busy calendar to count.** `lowState && score >= 12`
+   meant a woman reporting flat energy, broken sleep and high strain for a
+   fortnight read `available` if she had not filled the app with commitments.
+   Backwards: an empty plate is not room, and the emptiness is often the
+   symptom. Two low signals now reach `stretched` on their own.
+2. **`abundant` could print over the top of a named load.** "You have room
+   right now" above "you are carrying 4 seasons at once" — the app arguing
+   with itself, and she'd be right to trust the second line. `abundant` is now
+   blocked whenever the load half named anything.
+3. **Recent meant recent *rows*, not recent days.** `checkins.slice(-7)`. Her
+   five check-ins span 7 Aug → 13 Sept, and all five were being averaged and
+   described as "this week". `RECENT_DAYS = 14` now windows by date.
+4. **The headline would have become furniture.** Her account reads `stretched`
+   off load alone, and load barely moves week to week — so the strongest
+   sentence the app can say would have appeared every morning until she
+   dropped a season. Now dismissable, quiet for 14 days, and back only if the
+   reading itself changes.
+
+### Where it shows
+
+- **Today** — `StateHeadline`, and it *replaces* `NoticeLine` on the days it
+  fires. Both are "one true sentence about you"; stacked they cancel out.
+- **You** (`/app/profile`) — `StateReading`, above the Honey profile card. The
+  card is what she told the app once; this is what the app has noticed since.
+  Renders nothing while `evidence === 'none'`.
+
+### Where it writes
+
+`recordPersonalState()` runs from `saveCheckin` and `saveEveningReflection` —
+never on page render. Otherwise the series would record the days she opened
+the app rather than the days she told it something. Never throws; a failed
+write costs one point on a trend line.
+
+Both writers merge into `state_json` rather than overwriting, because two
+writers on one jsonb column is exactly how a dismissed message comes back.
+
+### Her account as it stands
+
+4 seasons · 2 programmes · 1 commitment · 1 experiment · 3 habits · 1 block
+→ load 26.5 → `stretched`, confidence **low**, because only one check-in falls
+inside the recent window. The headline fires on load alone, which is the case
+the directive wanted, and every line under "why this?" is a fact she can check.
+
+### Verification note
+
+`npx tsc --noEmit` does **not** catch a wrong column name — the Supabase client
+is untyped here, so `completed_on` (which does not exist; it is `completed_at`)
+typechecked cleanly and would have failed silently at runtime behind `?? []`.
+All 21 column references in `personal-state-db.ts` were checked against
+`information_schema` by hand. Do this for any new query file.
+
+### Still open
+
+Phase 2 (Honey Traps) and Phase 4 (Leverage) have their tables and now have a
+state layer to read from — but the audit's conclusion stands: they cannot
+honestly ship until there is more evidence than six check-ins. Phase 1 is what
+makes that evidence worth having.
