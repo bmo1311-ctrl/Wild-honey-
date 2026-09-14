@@ -475,3 +475,75 @@ hand-tagged `recipes.cycle_phase` — **a column with no migration**, so it may
 be matching nothing. There is no per-phase food, herb, training or skincare
 content anywhere in `lib/`. Her expectation was that it would *recommend*
 differently. That is a content build and a decision she has not made yet.
+
+---
+
+## 14. The schema sweep (14 Sept)
+
+Prompted by finding `last_period_start`, `cycle_length_days` and
+`cycle_adjustments` being written by application code with no migration behind
+them (§13), and by `completed_on` typechecking cleanly in §12.
+
+### Finding 1 — the code is clean
+
+**1,306 column references across 83 tables, every one of them real.** The
+`completed_on` bug was the only instance, and it was caught before shipping.
+Five apparent failures were all parser artifacts, each confirmed by hand:
+
+| looked wrong | actually |
+|---|---|
+| `profiles.circle`, `profiles.program` | keys inside the `child_permissions` jsonb |
+| `saved_meals.food_item_id`, `.quantity` | keys inside the `items` jsonb array |
+| `kid_rewards.note` | a function parameter |
+| `studio_items.today` | a local variable |
+| `transformation_state.headline` | a key inside `state_json` |
+
+### Finding 2 — the columns are all migrated
+
+Every column in the live schema appears somewhere in
+`supabase_migrations.schema_migrations`. The §13 worry was wrong in its
+specifics: those three columns *do* have migrations, just not in the repo.
+
+### Finding 3 — but the repo cannot rebuild the database
+
+This is the real one, and it is bigger than the thing that prompted the sweep.
+
+| | in `supabase/*.sql` | live |
+|---|---|---|
+| tables | 44 | 84 |
+| migrations | ~11 | **77** |
+
+Forty tables — courses, wardrobe, studio, money, household, every
+`transformation_*` table — exist only in the remote project, because every
+migration since 8 August has been applied through the MCP, which records into
+the remote `schema_migrations` and never touches the repo.
+
+Nothing is lost while the Supabase project exists. But a `supabase/` folder
+that looks like a schema and is a quarter of one is worse than no folder at
+all. Closing it properly needs the database password, which lives in Vercel and
+should stay there, so it is documented rather than done: `supabase/README.md`
+carries the three `db pull` commands. **Worth doing once.**
+
+### What was built instead
+
+- **`supabase/schema-snapshot.txt`** — all 84 tables, every column, names only.
+  Checked in so the guard runs offline and so the repo holds *some* record of
+  the schema.
+- **`scripts/check-columns.mjs`** — walks every `.from('table')` chain,
+  extracts columns from `.select`, the filter methods and
+  `.insert`/`.update`/`.upsert` object keys, checks each against the snapshot.
+  Verified by reintroducing the `completed_on` bug: it fails, naming the file
+  and line. Known false positives live in an `ALLOW` set, each with a note
+  saying what the thing actually is.
+- **`npm run verify`** = `tsc --noEmit && npm run check:columns`. One command
+  before pushing.
+- **`supabase/legacy/`** — the eleven old files, moved out of the top level
+  with a README saying they are history, because at the top level they read as
+  current.
+
+### The rule this leaves behind
+
+`tsc` is not a schema check and never was. Any new query file gets
+`npm run check:columns` run against it, and **any migration that adds, renames
+or drops a column is followed by refreshing the snapshot** — `npm run
+db:snapshot` prints the query and the steps.

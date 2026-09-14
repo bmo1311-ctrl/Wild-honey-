@@ -1,0 +1,103 @@
+# Every table and column in the public schema, as the remote database has them.
+#
+# Why this file exists
+# --------------------
+# The Supabase client used in this app is untyped, so a wrong column name
+# typechecks perfectly and fails silently at runtime behind `?? []`. A real
+# instance of that: `course_day_progress.completed_on` (the column is
+# completed_at) compiled clean and would simply have returned nothing for ever.
+#
+# `npm run check:columns` diffs every column this codebase references against
+# this file and fails on anything that does not exist. Nothing here is secret —
+# it is names only, no data.
+#
+# Regenerate after any migration:
+#   npm run db:snapshot     (prints the SQL to run, then paste the result here)
+# or, with the Supabase CLI linked:
+#   npx supabase db pull
+#
+# Format: table|col,col,col
+# Generated: 2026-09-14
+beauty_products|id,barcode,name,brand,domain,category,actives,ingredients_raw,image_url,source,verified,created_by,created_at
+body_measurements|id,user_id,member_id,date,weight_kg,waist_cm,hips_cm,chest_cm,arm_cm,thigh_cm,photo_url,note,created_at
+challenge_checkins|id,challenge_id,user_id,date,created_at
+challenge_participants|id,challenge_id,user_id,joined_at
+challenges|id,title,description,pillar,length_days,is_active,created_at
+checkins|id,user_id,date,energy,mood,stress,sleep_quality,hydration_oz,protein_g,sunlight_minutes,movement_minutes,cycle_phase,symptoms,created_at
+comments|id,entry_id,user_id,text,created_at,pinned
+commitments|id,user_id,text,status,replaced_by_id,created_at,last_reviewed_at
+community_comments|id,post_id,user_id,text,pinned,created_at
+community_posts|id,user_id,text,image_url,pillar,pinned,created_at
+community_reactions|id,post_id,user_id,created_at
+companion_messages|id,user_id,role,content,created_at
+content_events|id,user_id,kind,item_type,item_id,pillar,created_at
+content_reports|id,reporter_id,content_type,content_id,reason,status,reviewed_by,reviewed_at,created_at
+course_day_pillars|course_slug,day_number,pillar
+course_day_progress|id,user_id,course_slug,day_number,completed_at
+course_days|slug,day_number,week_number,title,kind,minutes,blocks,updated_at
+course_enrollments|id,user_id,course_slug,started_on,is_active,completed_at,created_at,paused_on
+course_writings|id,user_id,course_slug,day_number,prompt_index,prompt,body,updated_at,kind
+courses|slug,title,subtitle,length_days,weeks,week_list,published,sort_order,updated_at
+evening_reflections|id,user_id,date,q1,q2,q3,created_at
+experiment_checkins|id,experiment_id,user_id,date,created_at
+expert_questions|id,user_id,pillar,question,answer,answered_at,is_public,created_at
+food_items|id,user_id,name,brand,serving_size,serving_unit,calories,protein_g,carbs_g,fat_g,created_at,nutrients,category
+grocery_builder_items|id,user_id,name,category,quantity,checked,created_at
+grocery_lists|id,title,items,meal_plan_id,is_premium,created_at
+group_members|id,group_id,user_id,role,joined_at
+group_post_comments|id,post_id,user_id,text,created_at
+group_post_reactions|id,post_id,user_id,created_at
+group_posts|id,group_id,user_id,text,created_at
+groups|id,name,description,invite_code,pillar,retreat_id,created_by,created_at
+habit_logs|id,habit_id,user_id,date,completed_at
+habits|id,user_id,title,anchor,pillar,archived,created_at
+household_members|id,owner_id,name,birth_year,color,is_self,position,created_at,sex,activity_level,child_user_id,family_code
+journal_entries|id,user_id,prompt_id,text,visibility,created_at,pinned
+journey_tasks|id,level,member_id,title,link_url,position,created_at
+kid_earnings|id,owner_id,member_id,reward_id,title,amount,date,status,created_at,note,decided_at
+kid_rewards|id,owner_id,member_id,title,amount,cadence,learning_item_id,active,created_at
+learning_completions|id,owner_id,item_id,date,created_at
+learning_items|id,owner_id,member_id,subject,title,notes,cadence,due_date,archived,position,created_at
+meal_logs|id,user_id,recipe_id,servings,date,created_at,food_item_id,custom_name,quantity,unit,calories,protein_g,carbs_g,fat_g,meal_slot,nutrients,member_id,group_id,meal_name
+meal_plans|id,title,description,content,file_url,is_premium,created_at
+member_products|id,user_id,product_id,custom_name,domain,category,actives,time_of_day,frequency_per_week,in_use,notes,created_at,domains
+member_task_completions|id,user_id,task_id,completed_at
+memberships|id,user_id,tier,stripe_subscription_id,status,current_period_end,created_at
+money_accounts|id,user_id,name,kind,balance,apr,min_payment,archived,created_at
+money_entries|id,user_id,date,kind,category,amount,note,created_at
+money_goals|id,user_id,kind,title,target,due_date,created_at
+morning_resets|id,user_id,date,intention,gratitude,completed_at
+pantry_items|id,user_id,name,category,quantity,running_low,created_at
+personal_experiments|id,user_id,title,description,length_days,start_date,status,helped,reflection_text,reflected_at,created_at
+products|id,title,description,price_cents,stripe_price_id,file_url,cover_image,is_published,created_at
+profiles|id,name,email,avatar_color,membership_tier,is_admin,streak_count,last_active_date,created_at,birthday,age_range,timezone,faith_preference,communication_style,wake_time,bedtime,movement_preference,hydration_goal_oz,caffeine,foods_avoided,allergies,onboarding_completed_at,notification_prefs,quiet_hours_start,quiet_hours_end,data_consent_at,avatar_url,daily_calorie_goal,daily_protein_goal_g,journey_level,said_yes_on,weight_kg,height_cm,birth_year,activity_level,body_goal,weight_unit,nutrient_targets,cycle_adjustments,cycle_length_days,last_period_start,bio,profile_show,color_season,is_child,guardian_id,child_permissions,life_stage,body_shape,vertical_proportion,body_scale,style_season,seasons,skin_concerns,period_length_days,luteal_length_days,cycle_is_regular
+prompts|id,pillar,text,date_scheduled,is_premium,created_at
+protocol_day_completions|id,enrollment_id,user_id,day_number,completed_at
+protocol_enrollments|id,user_id,protocol_slug,is_active,started_at,ended_at
+public_profiles|id,name,avatar_color,avatar_url,membership_tier,bio,profile_show,color_season,is_child,created_at
+purchases|id,user_id,product_id,stripe_payment_id,purchased_at
+reactions|id,entry_id,user_id,created_at
+recipes|id,title,description,ingredients,instructions,pillar,prep_minutes,image_url,is_premium,created_at,season,cycle_phase,budget_tier,protein_g,nutrition_highlights,meal_type,video_url,calories,carbs_g,fat_g,kid_friendly,user_id,is_public,source_url,source_name
+resources|id,title,description,url,resource_type,pillar,created_at,image_url,collection
+retreat_signups|id,retreat_id,user_id,status,created_at
+retreats|id,title,location,dates,description,price_cents,spots_total,spots_taken,cover_image,created_at,group_id
+routine_log|id,user_id,member_product_id,ritual_slug,domain,slot,date,created_at
+saved_meals|id,user_id,member_id,name,items,created_at
+saved_recipes|id,user_id,recipe_id,created_at
+saved_resources|id,user_id,resource_id,created_at
+studio_blocks|id,user_id,label,channel,weekday,start_minute,minutes,is_active,created_at,every_n_weeks,anchor_on
+studio_items|id,user_id,title,channel,stage,notes,posted_on,archived,created_at,updated_at,cadence,last_done_on
+studio_sessions|id,user_id,block_id,item_id,date,moved_to,created_at
+transformation_diagnoses|id,user_id,diagnosis_type,status,evidence,confidence,impact,first_detected_at,last_evaluated_at,resolved_at,metadata,diagnostic_type
+transformation_leverage|id,user_id,diagnosis_type,move_type,title,rationale,action_label,action_href,priority,confidence,status,source_diagnosis_id,created_at,updated_at,expires_at
+transformation_reflections|id,user_id,milestone,q_changed,q_proud,q_different,q_becoming,created_at,q_learned,q_overcame,q_patterns,q_release,q_carrying_forward,q_intention,wild_honey_year,q_need_today,q_next_step
+transformation_state|user_id,state_version,current_season,capacity_score,vitality_score,awareness_score,alignment_score,becoming_goal,state_json,created_at,updated_at
+user_blocks|id,blocker_id,blocked_id,created_at
+user_goals|id,user_id,goal,created_at
+user_mutes|id,muter_id,muted_id,created_at
+vitality_checkins|id,user_id,energy,mood,stress,sleep,confidence,motivation,mental_clarity,physical_strength,label,note,taken_at
+wardrobe_items|id,member_id,name,layer,hex,hex2,effects,occasions,warmth,image_url,price,loved,notes,archived,created_at
+wardrobe_outfits|id,member_id,name,item_ids,occasion,notes,pinned,planned_for,created_at
+wardrobe_wears|id,member_id,item_id,outfit_id,date,created_at
+wins|id,user_id,date,kind,text,created_at
+workouts|id,title,description,pillar,video_url,instructions,image_url,pdf_url,is_premium,created_at,body_group,workout_type
