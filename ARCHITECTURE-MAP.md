@@ -1776,3 +1776,64 @@ in scope. Both failure modes tested:
 
 `npm run verify` is now six checks: `tsc`, columns, kid routes, access, gated
 actions, service role.
+
+---
+
+## 34. Walking the real accounts through the new guards (14 Sept)
+
+Thirty-two guards went in over four commits. The guards are the easy half; the
+half that goes wrong is locking out somebody who should be let in, and that
+failure is silent — she just meets a button that says no.
+
+So: the four account shapes that actually exist, plus the one nobody has ever
+tested as, run against every gated action.
+
+| | resolves to | paid | inner |
+|---|---|---|---|
+| Brooke | founder | ✓ | ✓ |
+| Alesia (beta) | inner-circle | ✓ | ✓ |
+| Zaylee (child of founder) | **founder** | ✓ | ✓ |
+| a new free member | free | ✗ | ✗ |
+| child of a free parent | free | ✗ | ✗ |
+
+### Which found the bug in my own fix
+
+Look at Zaylee's row. A child inherits her guardian's tier, so she resolves to
+founder and **passes every tier check I had just written** — including
+Protocols, Wardrobe, Studio, Freedom and Ask an Expert, all five of whose
+pages call `adultsOnly()`.
+
+Which is this same bug a fifth time, inside the fix for the fourth. The tier
+question and the "is this hers to use" question are different questions, and
+answering one does not answer the other.
+
+`tierWriteAllowed` takes `adultOnly` now, defaulting to true, and calls
+`adultsOnlyWrite()`. Three actions opt out — the learning board is a child's
+own page, gated on tier because her parent pays for it rather than because she
+is too young for it — and so does `courseWriteAllowed`, where the program
+allow-list is what decides.
+
+### The first version of this test was worth nothing
+
+It checked what each person could reach and derived the expected answer from
+her own tier. So changing Ask an Expert from inner-circle to circle in
+`lib/gate.ts` **still passed** — the check and the thing being checked moved
+together. A test that reads its expectations from the code under test is a
+very convincing way to prove nothing.
+
+It now asserts the map separately: Ask an Expert requires inner-circle and is
+adults-only, nothing else requires inner-circle, and exactly three actions are
+open to a child and all three are the learning board. Both mutations now fail
+it:
+
+```
+✗ downgrade Ask an Expert to circle    → 2 failures
+✗ open Wardrobe to children            → 2 failures
+```
+
+(I also nearly shipped the first mutation test as a pass because the sandbox
+could not delete the previous build's output and `node` ran stale JavaScript.
+A green test from a compiler that silently did nothing.)
+
+`npm run verify` is seven checks now: `tsc`, columns, kid routes, access,
+gated actions, service role, accounts.

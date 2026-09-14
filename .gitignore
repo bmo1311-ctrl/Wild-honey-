@@ -36,3 +36,4 @@ supabase/.branches/
 
 # Next 16 uses proxy.ts, not middleware.ts — having both is a build error.
 /middleware.ts
+.sim

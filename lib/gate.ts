@@ -70,8 +70,30 @@ const WHY: Record<Requirement, (area: string) => string> = {
 export async function tierWriteAllowed(
   required: Requirement,
   area: string,
+  adultOnly = true,
 ): Promise<{ error: string } | null> {
+  /*
+   * A child inherits her guardian's tier, so she passes every tier check in
+   * here — which meant these guards let her write to Protocols, Wardrobe,
+   * Studio, Freedom and Ask an Expert, all five of whose pages call
+   * `adultsOnly()`. Found by walking the real accounts through the guards
+   * after writing them: Zaylee resolves to founder, and founder passes
+   * everything.
+   *
+   * Which is this same bug a fifth time, in the fix for the fourth. The tier
+   * question and the "is this hers to use" question are different questions,
+   * and answering one does not answer the other.
+   *
+   * `learning` is the exception and the reason this is a parameter: the
+   * learning board is a child's own page, and it is gated on tier because her
+   * parent pays for it, not because she is too young for it.
+   */
   const access = await getAccess()
+  if (adultOnly) {
+    const { adultsOnlyWrite } = await import('@/lib/kid-guard')
+    const notHers = await adultsOnlyWrite(area)
+    if (notHers) return notHers
+  }
   if (meets(access.tier, required)) return null
   return { error: WHY[required](area) }
 }
@@ -90,7 +112,7 @@ export async function tierWriteAllowed(
  *     which is free to log in
  *   - `setLifeStage` — currently has no caller anywhere in the app
  */
-export const GATED_ACTIONS: Record<string, { required: Requirement; area: string }> = {
+export const GATED_ACTIONS: Record<string, { required: Requirement; area: string; adultOnly?: false }> = {
   submitExpertQuestion: { required: 'inner-circle', area: 'Ask an Expert' },
 
   startProtocol: { required: 'circle', area: 'Protocols' },
@@ -121,9 +143,9 @@ export const GATED_ACTIONS: Record<string, { required: Requirement; area: string
   addMoneyEntry: { required: 'circle', area: 'Freedom' },
   deleteMoneyEntry: { required: 'circle', area: 'Freedom' },
 
-  addLearningItem: { required: 'circle', area: 'Learning boards' },
-  archiveLearningItem: { required: 'circle', area: 'Learning boards' },
-  toggleLearningItem: { required: 'circle', area: 'Learning boards' },
+  addLearningItem: { required: 'circle', area: 'Learning boards', adultOnly: false },
+  archiveLearningItem: { required: 'circle', area: 'Learning boards', adultOnly: false },
+  toggleLearningItem: { required: 'circle', area: 'Learning boards', adultOnly: false },
 }
 
 /**
@@ -153,7 +175,9 @@ export async function courseWriteAllowed(slug: string): Promise<{ error: string 
   if (allowed && !allowed.includes(slug)) {
     return { error: 'That program is not turned on for you yet.' }
   }
-  return tierWriteAllowed('circle', 'Programs')
+  // Not adult-only: a child works through the courses her mother switched on,
+  // and the allow-list above is what decides which. That is the whole design.
+  return tierWriteAllowed('circle', 'Programs', false)
 }
 
 /**

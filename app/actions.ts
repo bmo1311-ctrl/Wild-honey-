@@ -2618,7 +2618,7 @@ export async function removeHouseholdMember(id: string) {
 }
 
 export async function addLearningItem(input: { memberId: string | null; subject: string; title: string; cadence?: string; notes?: string }): Promise<GatedResult> {
-  const locked = await tierWriteAllowed('circle', 'Learning boards')
+  const locked = await tierWriteAllowed('circle', 'Learning boards', false)
   if (locked) return locked
   const { supabase, ownerId, childMemberId } = await requireOwner()
   const user = { id: ownerId }
@@ -2639,7 +2639,7 @@ export async function addLearningItem(input: { memberId: string | null; subject:
 }
 
 export async function toggleLearningItem(itemId: string): Promise<GatedResult> {
-  const locked = await tierWriteAllowed('circle', 'Learning boards')
+  const locked = await tierWriteAllowed('circle', 'Learning boards', false)
   if (locked) return locked
   const { supabase, ownerId } = await requireOwner()
   const user = { id: ownerId }
@@ -2673,7 +2673,7 @@ export async function toggleLearningItem(itemId: string): Promise<GatedResult> {
 }
 
 export async function archiveLearningItem(itemId: string): Promise<GatedResult> {
-  const locked = await tierWriteAllowed('circle', 'Learning boards')
+  const locked = await tierWriteAllowed('circle', 'Learning boards', false)
   if (locked) return locked
   /*
    * `requireOwner`, like the add and toggle beside it.

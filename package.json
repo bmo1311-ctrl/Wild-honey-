@@ -9,10 +9,11 @@
     "lint": "eslint .",
     "check:columns": "node scripts/check-columns.mjs",
     "db:snapshot": "node scripts/db-snapshot-sql.mjs",
-    "verify": "tsc --noEmit && npm run check:columns && npm run check:kid && npm run check:access && npm run check:service",
+    "verify": "tsc --noEmit && npm run check:columns && npm run check:kid && npm run check:access && npm run check:service && npm run check:accounts",
     "check:kid": "node scripts/check-kid-routes.mjs",
     "check:access": "node scripts/check-access.mjs",
-    "check:service": "node scripts/check-service-client.mjs"
+    "check:service": "node scripts/check-service-client.mjs",
+    "check:accounts": "tsc scripts/sim-accounts.ts --outDir .sim --target es2020 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck && node .sim/scripts/sim-accounts.js"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

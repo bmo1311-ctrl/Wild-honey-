@@ -62,3 +62,17 @@ export async function circleWriteAllowed(): Promise<{ error: string } | null> {
   if (me.child_permissions?.circle) return null
   return { error: 'The Circle is not switched on for this account.' }
 }
+
+/**
+ * Not for children — the action, not the page.
+ *
+ * Five of the gated areas call `adultsOnly()` on their pages, and a child
+ * inherits her guardian's paid tier, so a tier check alone waves her straight
+ * through to all of them. Same shape as `circleWriteAllowed`, and the same
+ * reason it returns rather than redirects.
+ */
+export async function adultsOnlyWrite(area: string): Promise<{ error: string } | null> {
+  const me = await getSessionProfile()
+  if (!me?.is_child) return null
+  return { error: `${area} is not part of your account.` }
+}
