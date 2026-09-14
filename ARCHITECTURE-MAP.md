@@ -1282,3 +1282,68 @@ Three cases needed care, and each is recorded rather than silently skipped:
   `FREE_ON_PURPOSE` with its reason, rather than being absent and ambiguous.
 
 `npm run verify` is now four checks: `tsc`, columns, kid routes, access.
+
+---
+
+## 26. What a new member actually sees (14 Sept)
+
+The first outside tester joined two days ago: 2 check-ins and nothing else —
+no meals, habits, products, garments, course, measurements, goals or cycle
+dates. So the question stopped being hypothetical.
+
+**The app does not collapse.** Almost every surface has a guarded empty state,
+and the two engines most at risk — `buildMoment` and `NutrientRings` — degrade
+cleanly. `/app/wardrobe` has the best empty state in the app ("start with five
+things you actually wear") and is the model for the rest. The damage was
+narrower and more specific.
+
+### Fixed
+
+**Money ticked off a step she had not done.** `freedomPath`'s "Kill
+high-interest debt" was `done: !highInterest` — true when there are no
+accounts at all — so an empty account rendered step 3 **struck through with a
+green tick**. Step 6 already guarded with `accounts.length > 0`; this one was
+missing the same clause.
+
+**Today offered a reset to someone two days old.** `ResetPanel` had no silent
+branch: with no gap it fell through to a permanent dashed "I'm resetting"
+button. Worse, the threshold was 2 days, and `getCheckinGap` measures from her
+last check-in — so checking in Monday and Tuesday and opening on Thursday said
+*"it's been a few days — no need to explain"* on her third visit. Two days is
+a weekend. Seven is a lapse. It now returns null when there is nothing to say.
+
+**Becoming was a wall of zeroes against a course she never started.**
+`getActiveCourseState` falls back to Strong and Surrendered's slug with no
+enrolment, so the page measured her against it: run 0, "0 of 56 days", "0 of 8
+weeks", "Not yet asked", and every milestone rendered as a padlock — reached
+from a permanent card on Today. Evidence of change is the right idea and the
+wrong page for day one; it now shows what fills it in, and a way to start.
+
+**The nutrition note asserted numbers that did not exist.** "Your calorie and
+protein targets come from your own weight and goal" and "micronutrient figures
+are general adult reference intakes" — both false without a weight or a birth
+year. The one line that could have explained thirty rows of zeroes instead
+insisted they were personalised, which makes an un-filled-in app look broken.
+Three states now, matching what she actually has.
+
+**Onboarding never asked for height.** `heightCm: null`, hardcoded. Without it
+`calculateTargets` cannot use Mifflin-St Jeor and falls back to a per-kilo
+multiplier — then appends *"add height and year of birth for a closer
+estimate"* to someone who has just given her year of birth. It is one field on
+the step that already asks for weight. 7 tests on the feet-and-inches
+conversion.
+
+### Left standing, deliberately
+
+`StateReading` renders at 2 check-ins showing noticing 14 and alignment 20 —
+real numbers against a 14-day denominator she has existed for 2 days of. The
+capacity line correctly says "still getting to know you", and the confidence
+disclaimer is there. Lowering it further would mean showing nothing at all on
+a page she just opened.
+
+### The wider lesson
+
+Every one of these reads correctly with data and wrongly without it. An empty
+account is not an edge case — it is the state **every** member is in on the
+day they arrive, and it is the only state the app cannot A/B its way out of.
+Worth walking again whenever a surface is added.

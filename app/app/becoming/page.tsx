@@ -93,6 +93,54 @@ export default async function BecomingPage({ searchParams }: { searchParams: Pro
     course: shape,
   })
 
+  /*
+   * Nothing to show yet, so show an invitation instead of a scoreboard.
+   *
+   * `getActiveCourseState` falls back to Strong and Surrendered's slug when
+   * she has no enrolment, so this page happily measured a woman who had never
+   * started anything against a 56-day course: current run 0, "0 of 56 days",
+   * "0 of 8 weeks", "Not yet asked", and the full milestone list rendered as
+   * padlocks. Linked from a permanent card on Today, which made it one of the
+   * first things a new member would open.
+   *
+   * Evidence of change is the right idea and the wrong page for day one.
+   * There is no evidence yet, and a wall of zeroes is not a neutral way to
+   * say so.
+   */
+  const nothingYet = !active.enrollment && progress.length === 0 && writingCount === 0
+  if (nothingYet) {
+    return (
+      <div className="flex flex-col gap-6">
+        <header className="honey-glow -mx-5 -mt-6 px-5 pb-4 pt-6">
+          <h1 className="font-serif text-[29px] font-semibold leading-[1.1]">Your becoming</h1>
+          <p className="mt-1.5 text-[15px] leading-[1.5] text-pretty text-muted-foreground">
+            what you&rsquo;ve actually done, in your own words and numbers.
+          </p>
+        </header>
+
+        <BecomingTabs active="becoming" />
+
+        <div className="flex flex-col items-start gap-3 rounded-3xl border border-dashed border-border bg-card p-6">
+          <p className="font-serif text-lg font-semibold">this page fills itself in</p>
+          <p className="text-[14.5px] leading-[1.6] text-pretty text-muted-foreground">
+            Everything here is drawn from what you have already done — days finished, pages written,
+            how you rated yourself early on against how you rate yourself later. None of it is a score
+            and none of it is set by us, which is why there is nothing on it yet.
+          </p>
+          <p className="text-[14.5px] leading-[1.6] text-pretty text-muted-foreground">
+            A program is the quickest way to start it. One day is enough.
+          </p>
+          <Link
+            href="/app/program"
+            className="mt-1 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background"
+          >
+            choose a program
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <header className="honey-glow -mx-5 -mt-6 px-5 pb-4 pt-6">

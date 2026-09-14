@@ -218,7 +218,13 @@ export function freedomPath(
   return [
     { key: 'know', title: 'Know your numbers', blurb: 'every account listed, income and spending logged for a month', done: accounts.length > 0 && entriesLast30 >= 5 },
     { key: 'starter', title: 'A starter cushion', blurb: 'one month of expenses in cash or savings', done: runway !== null && runway >= 1 },
-    { key: 'high', title: 'Kill high-interest debt', blurb: 'anything at 10% or more goes first', done: !highInterest },
+    /*
+     * `!highInterest` alone is true when she has entered nothing at all, so
+     * this rendered as done — green tick, title struck through — on an empty
+     * account. Step 6 already guards with `accounts.length > 0`; this one was
+     * missing the same clause. Nothing is finished before it is started.
+     */
+    { key: 'high', title: 'Kill high-interest debt', blurb: 'anything at 10% or more goes first', done: accounts.length > 0 && !highInterest },
     { key: 'fund', title: 'A real emergency fund', blurb: 'three to six months of expenses', done: runway !== null && runway >= 3 },
     { key: 'rate', title: 'Pay yourself first', blurb: 'save or repay 15% of what comes in, automatically', done: (month.savingsRate ?? 0) >= 15 },
     { key: 'free', title: 'Debt free', blurb: 'the last balance gone', done: !hasDebt && accounts.length > 0 },

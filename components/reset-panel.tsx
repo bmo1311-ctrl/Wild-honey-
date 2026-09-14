@@ -48,7 +48,29 @@ export function ResetPanel() {
     )
   }
 
-  const showBanner = gap !== undefined && gap !== null && gap >= 2 && !dismissed && !open
+  /*
+   * How long a gap counts as a gap.
+   *
+   * This was 2, and `getCheckinGap` measures from her most recent check-in —
+   * so someone who checked in on Monday and Tuesday and opened the app on
+   * Thursday was told "it's been a few days — no need to explain" on her
+   * third ever visit. Two days is a weekend, not a lapse. A week is.
+   */
+  const AWAY_DAYS = 7
+  const showBanner = gap !== undefined && gap !== null && gap >= AWAY_DAYS && !dismissed && !open
+
+  /*
+   * And if there is no gap, say nothing.
+   *
+   * There was no silent branch: with `gap` 0 or null this fell through to a
+   * permanent dashed "I'm resetting" button, so a woman two days into the app
+   * was offered a way to recover from an absence she had not had. A card
+   * about coming back should not be the first thing a new member sees.
+   *
+   * She can still open it deliberately once she has been away — the banner
+   * above is that door. `open` keeps it rendered once she has.
+   */
+  if (!open && !showBanner && (gap === undefined || gap === null || gap < AWAY_DAYS)) return null
 
   if (showBanner) {
     return (

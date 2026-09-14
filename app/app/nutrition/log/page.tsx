@@ -45,9 +45,25 @@ export default async function LogFoodPage({ searchParams }: { searchParams: Prom
       : driForStage(selectedAge, selectedSex, profile?.life_stage as never)) ?? {}
   const panelTargets = memberId ? reference : { ...reference, ...cycled.targets }
 
+  /*
+   * Say which of these numbers she actually has.
+   *
+   * This asserted "your calorie and protein targets come from your own weight
+   * and goal" and "micronutrient figures are general adult reference intakes"
+   * — both untrue for a new member. Without a weight `calculateTargets`
+   * returns nulls; without a birth year `driFor` returns null. So the one
+   * line that could explain thirty rows of zeroes instead insisted the
+   * numbers were personalised, which makes the app look broken rather than
+   * un-filled-in.
+   */
+  const hasReference = Object.keys(reference).length > 0
   const note = memberId
     ? `General reference intakes for ${selectedAge ? `age ${selectedAge}` : 'this age'}, not a prescription. Children's needs vary with growth and activity — anything specific belongs with their doctor.`
-    : 'Micronutrient figures are general adult reference intakes. Your calorie and protein targets come from your own weight and goal.'
+    : !hasGoals && !hasReference
+      ? 'No targets yet — these are counts of what you logged, with nothing to compare them against. Add your weight, height and year of birth under Your targets and every figure here fills in.'
+      : !hasGoals
+        ? 'Micronutrient figures are general adult reference intakes. Add your weight and what you\u2019re working toward under Your targets for calorie and protein figures of your own.'
+        : 'Micronutrient figures are general adult reference intakes. Your calorie and protein targets come from your own weight and goal.'
 
   const logged = nutrition.loggedMeals.map((m) => {
     const row = m as typeof m & {

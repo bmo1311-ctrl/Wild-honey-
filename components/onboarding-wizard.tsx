@@ -75,6 +75,18 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
   const [bodyGoal, setBodyGoal] = useState<string | null>(null)
   const [weight, setWeight] = useState('')
   const [weightUnit, setWeightUnit] = useState<'lb' | 'kg'>('lb')
+  /*
+   * Height was never asked here and was hardcoded to null on save.
+   *
+   * Without it `calculateTargets` cannot use Mifflin-St Jeor and falls back
+   * to a crude per-kilo multiplier — then appends "add height and year of
+   * birth for a closer estimate", which reads oddly to someone who has just
+   * given her year of birth. It is one number, on the step that already asks
+   * for weight, and it is the difference between an estimate and an estimate
+   * worth showing.
+   */
+  const [heightFt, setHeightFt] = useState('')
+  const [heightIn, setHeightIn] = useState('')
   const [activityLevel, setActivityLevel] = useState<string | null>(null)
   const [wakeTime, setWakeTime] = useState('')
   const [bedtime, setBedtime] = useState('')
@@ -144,11 +156,15 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
         return
       }
       // Saved separately, so leaving the body step blank costs nothing.
-      if (weight.trim() || bodyGoal || birthYear.trim() || activityLevel) {
+      const heightCm =
+        heightFt.trim() || heightIn.trim()
+          ? Math.round((Number(heightFt) || 0) * 30.48 + (Number(heightIn) || 0) * 2.54) || null
+          : null
+      if (weight.trim() || bodyGoal || birthYear.trim() || activityLevel || heightCm) {
         await saveBodyGoals({
           weight: Number(weight) || null,
           weightUnit,
-          heightCm: null,
+          heightCm,
           birthYear: Number(birthYear) || null,
           activityLevel,
           bodyGoal,
@@ -283,6 +299,32 @@ export function OnboardingWizard({ initialName }: { initialName: string }) {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">never shown to anyone else. change it any time.</p>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>your height</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  value={heightFt}
+                  onChange={(e) => setHeightFt(e.target.value)}
+                  inputMode="numeric"
+                  placeholder="5"
+                  className="h-12 text-base"
+                />
+                <span className="shrink-0 text-sm text-muted-foreground">ft</span>
+                <Input
+                  value={heightIn}
+                  onChange={(e) => setHeightIn(e.target.value)}
+                  inputMode="numeric"
+                  placeholder="6"
+                  className="h-12 text-base"
+                />
+                <span className="shrink-0 text-sm text-muted-foreground">in</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                with your weight and year of birth, this is what turns the calorie figure from a rough
+                multiplier into a real estimate.
+              </p>
             </div>
 
             <div className="flex flex-col gap-1.5">
