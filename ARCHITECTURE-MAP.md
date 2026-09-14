@@ -1100,3 +1100,66 @@ Studio's `verbFor` is channel-blind; advancing a recurring Studio item nulls
 `last_done_on`; `foods_avoided` is collected twice and read nowhere;
 `updateNutritionGoals` has no caller, so Today's protein tile never shows a
 target.
+
+---
+
+## 23. Studio, streaks and the wrong verb (14 Sept)
+
+### Advancing a recurring item destroyed its history
+
+`advanceStudioItem` wrote `posted_on: finished ? today : null` and the same
+for `last_done_on` — so **every advance that was not the final step actively
+nulled both columns**. For a weekly newsletter that had been finished once and
+cycled back to the start, the first tap of the next cycle wiped
+`last_done_on`; `isDue` returns true unconditionally when that is null, so
+"done for now" and the whole interval stopped working for that item, for good.
+The posted history went with it.
+
+Now the dates are only written when there is a date to write. A column you are
+not setting should be left alone, not overwritten with null — nothing about
+moving from idea to drafted says anything about when the thing was published.
+
+### The button named the wrong action on three pipelines
+
+`verbFor` was keyed on the stage she was *leaving*, but the stage that follows
+depends on the channel:
+
+| channel · stage | button said | actually leads to |
+|---|---|---|
+| tiktok · filmed | "edit it" | posted |
+| blog · drafted | "send it" | published |
+| youtube · idea | "make it" | scripted |
+
+Keyed on the stage being *arrived at* now, which is a property of the pipeline
+rather than of the stage. `NEXT_VERB` was dead code that existed to patch
+exactly this and was unreachable — `VERB[stage] ?? NEXT_VERB[stage]` always
+found the first. Without a channel it returns "move it on" rather than
+guessing: vague beats confidently wrong. 30 tests cover every stage of every
+known pipeline.
+
+### Streaks were counted in UTC
+
+`computeStreaks` sliced `completed_at` to a UTC date while everything else
+dates rows with `localToday()`. Seven hours west of UTC that is wrong twice
+over: work done Monday evening and Tuesday morning both land on the UTC
+Tuesday and **collapse into one day**, so two days of work count as one; and
+Monday morning then Tuesday evening becomes UTC Monday and Wednesday, which
+reads as a **broken run**. Both verified in tests against `America/Phoenix`.
+
+It buckets by her timezone now, and an unrecognised zone falls back rather
+than costing her a streak.
+
+### Milestone dates assumed she worked in order
+
+`earnedOn` read `byDay[m.at - 1]`, indexed by day number. Anyone who did day 4
+before day 3 got the wrong date on every milestone after it. The nth milestone
+is earned on the nth *completion*, whichever day that was.
+
+### Left on the list
+
+`foods_avoided` is collected in two places and read nowhere — the copy says
+"nothing suggests them at you" and nothing filters on it.
+`updateNutritionGoals` is the only writer of the manual calorie and protein
+overrides and has no caller, so Today's protein tile always reads "g today"
+with no target while Nutrition shows a calculated one. Both are drift between
+copy and behaviour rather than anything breaking.

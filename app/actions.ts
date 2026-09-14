@@ -3307,13 +3307,30 @@ export async function advanceStudioItem(itemId: string, blockId?: string | null)
    * fifty-two times.
    */
   const recurring = cadence !== 'once'
+
+  /*
+   * Only write the dates when there is a date to write.
+   *
+   * These were `finished ? today : null`, so every advance that was *not* the
+   * final step actively nulled both columns. For a recurring item that is
+   * destructive: a weekly newsletter that had been finished once and cycled
+   * back to the start lost its `last_done_on` on the very first tap of the
+   * next cycle — and `isDue` in lib/studio.ts returns true unconditionally
+   * when that is null, so "done for now" and the whole interval stopped
+   * working for that item, permanently. The posted history went with it.
+   *
+   * A column you are not setting should be left alone, not overwritten with
+   * null. Nothing about moving from idea to drafted says anything about when
+   * the thing was last published.
+   */
+  const dates = finished ? { posted_on: today, last_done_on: today } : {}
+
   const { error } = await supabase
     .from('studio_items')
     .update({
       stage: finished && recurring ? stages[0] : next,
       updated_at: new Date().toISOString(),
-      posted_on: finished ? today : null,
-      last_done_on: finished ? today : null,
+      ...dates,
     })
     .eq('id', itemId)
     .eq('user_id', user.id)

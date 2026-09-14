@@ -67,26 +67,48 @@ export function channelLabel(channel: string): string {
 }
 
 /** What the work of moving from one stage to the next actually is. */
-const VERB: Record<string, string> = {
-  idea: 'make it',
-  scripted: 'film it',
-  shot: 'write the caption',
-  captioned: 'post it',
-  filmed: 'edit it',
-  edited: 'post it',
-  recorded: 'edit it',
-  drafted: 'send it',
-  designed: 'pin it',
-  doing: 'finish it',
+/**
+ * What each stage is called once you get there.
+ *
+ * Keyed on the stage being moved *to*, which is the fix. It used to be keyed
+ * on the stage she was leaving, and the stage that follows depends on the
+ * channel — so the button lied on three of the eight pipelines: a TikTok at
+ * `filmed` goes straight to `posted` but the button said "edit it"; a blog at
+ * `drafted` goes to `published` but it said "send it", which is only true for
+ * a newsletter; a YouTube video at `idea` goes to `scripted` but it said
+ * "make it".
+ *
+ * `NEXT_VERB` was dead code that existed to patch exactly this — unreachable,
+ * because `VERB[stage] ?? NEXT_VERB[stage]` always found the first.
+ */
+const ARRIVING: Record<string, string> = {
+  filmed: 'film it',
+  scripted: 'write the script',
+  shot: 'shoot it',
+  captioned: 'write the caption',
+  edited: 'edit it',
+  recorded: 'record it',
+  drafted: 'draft it',
+  designed: 'design it',
+  posted: 'post it',
+  published: 'publish it',
+  sent: 'send it',
+  pinned: 'pin it',
+  doing: 'start it',
+  done: 'finish it',
 }
 
-const NEXT_VERB: Record<string, string> = {
-  idea: 'write the script',
-}
-
-/** What moving on from this stage actually asks of her. */
-export function verbFor(stage: string): string {
-  return VERB[stage] ?? NEXT_VERB[stage] ?? 'move it on'
+/**
+ * What moving on from this stage actually asks of her.
+ *
+ * Needs the channel, because the answer is a property of the pipeline and not
+ * of the stage. Without one it can only fall back to something vague, which
+ * is better than being confidently wrong.
+ */
+export function verbFor(stage: string, channel?: string): string {
+  if (!channel) return 'move it on'
+  const next = nextStage(channel, stage)
+  return next ? (ARRIVING[next] ?? 'move it on') : 'move it on'
 }
 
 /** How often a block comes round. Weeks, so the weekday model still holds. */
@@ -251,7 +273,7 @@ export function planBlock(block: StudioBlock, items: StudioItem[], today?: strin
   }
 
   const next = nextStage(block.channel, item.stage)
-  const action = verbFor(item.stage)
+  const action = verbFor(item.stage, item.channel)
   const nearlyThere = next !== null && stages.indexOf(next) === stages.length - 1
 
   return {

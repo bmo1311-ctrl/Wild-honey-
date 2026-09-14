@@ -15,12 +15,38 @@ export interface Milestone {
  * the longest one she has already done. Nothing here is ever framed as
  * something she is about to lose.
  */
-export function computeStreaks(days: { day_number: number; completed_at: string }[]): {
+/**
+ * Her run of days, counted in her own days.
+ *
+ * `completed_at` is a timestamp, and this sliced it to a UTC date — while
+ * everything else in the app dates rows with `localToday()`. Seven hours west
+ * of UTC that is wrong twice over: work done Monday evening and Tuesday
+ * morning both land on the UTC Tuesday and collapse into one day, so two days
+ * of work count as one; and the mirror case, Monday morning then Tuesday
+ * evening, becomes UTC Monday and Wednesday, which reads as a broken run.
+ *
+ * Bucketing by her timezone is the only thing that makes a streak mean what
+ * she thinks it means. `en-CA` because it formats as YYYY-MM-DD.
+ */
+export function computeStreaks(
+  days: { day_number: number; completed_at: string }[],
+  opts?: { today?: string; timeZone?: string },
+): {
   current: number
   longest: number
   lastDate: string | null
 } {
-  const dates = Array.from(new Set(days.map((d) => d.completed_at.slice(0, 10)))).sort()
+  const inHerDay = (iso: string): string => {
+    if (!opts?.timeZone) return iso.slice(0, 10)
+    try {
+      return new Date(iso).toLocaleDateString('en-CA', { timeZone: opts.timeZone })
+    } catch {
+      // An unknown zone should not lose her a streak.
+      return iso.slice(0, 10)
+    }
+  }
+
+  const dates = Array.from(new Set(days.map((d) => inHerDay(d.completed_at)))).sort()
   if (dates.length === 0) return { current: 0, longest: 0, lastDate: null }
 
   let longest = 1
@@ -31,7 +57,7 @@ export function computeStreaks(days: { day_number: number; completed_at: string 
   }
 
   const last = dates[dates.length - 1]
-  const today = new Date().toISOString().slice(0, 10)
+  const today = opts?.today ?? new Date().toISOString().slice(0, 10)
   // A run counts as current if it reaches today or yesterday — she has not
   // broken anything simply by not having opened the app yet this morning.
   const current = last === today || isNextDay(last, today) ? run : 0
@@ -100,6 +126,14 @@ export function computeMilestones(
   course: CourseShape = FALLBACK,
 ): { earned: Milestone[]; next: Milestone | null; all: Milestone[] } {
   const byDay = [...progress].sort((a, b) => a.day_number - b.day_number)
+  /*
+   * Which day she *actually* earned the nth milestone on.
+   *
+   * `byDay[m.at - 1]` assumed she completed days in order, so anyone who did
+   * day 4 before day 3 got the wrong date on every milestone after it. The
+   * nth milestone is earned on the nth *completion*, whichever day that was.
+   */
+  const byWhen = [...progress].sort((a, b) => a.completed_at.localeCompare(b.completed_at))
   const doneCount = byDay.length
 
   const all: Milestone[] = [
@@ -109,7 +143,7 @@ export function computeMilestones(
       label: m.label,
       detail: m.detail,
       earned: doneCount >= m.at,
-      earnedOn: doneCount >= m.at ? (byDay[m.at - 1]?.completed_at ?? null) : null,
+      earnedOn: doneCount >= m.at ? (byWhen[m.at - 1]?.completed_at ?? null) : null,
     })),
     ...WRITING_MILESTONES.map((m) => ({
       key: `write-${m.at}`,

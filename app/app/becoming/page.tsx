@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Check, Flame, Lock } from 'lucide-react'
 import { currentDayFrom, weekOfDay } from '@/lib/courses'
 import { loadCourse } from '@/lib/courses-db'
-import { localToday } from '@/lib/today'
+import { localToday, localTimeZone } from '@/lib/today'
 import { computeBecoming, computeMilestones, computeStreaks } from '@/lib/rewards'
 import { getActiveCourseState, getBaselineVitality, getDayProgress, getLatestVitalityCheckin, getWritings } from '@/lib/data'
 import { VITALITY_DIMENSIONS } from '@/lib/honey-profile'
@@ -81,7 +81,9 @@ export default async function BecomingPage({ searchParams }: { searchParams: Pro
     ? { title: course.title, lengthDays: course.length_days, weeks: course.weeks }
     : undefined
 
-  const streaks = computeStreaks(progress)
+  // Her days, not the server's — see computeStreaks.
+  const [streakToday, timeZone] = await Promise.all([localToday(), localTimeZone()])
+  const streaks = computeStreaks(progress, { today: streakToday, timeZone })
   const { earned, next, all } = computeMilestones(progress, writingCount, shape)
   const pillars = computeBecoming({
     completedDays: progress.map((p) => p.day_number),

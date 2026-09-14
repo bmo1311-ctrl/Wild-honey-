@@ -272,7 +272,7 @@ export function StudioBoard({
                           disabled={pending}
                           className="shrink-0 rounded-full bg-muted px-3 py-1.5 text-[12px] font-semibold"
                         >
-                          {verbFor(item.stage)}
+                          {verbFor(item.stage, item.channel)}
                         </button>
                       ) : (
                         <button
