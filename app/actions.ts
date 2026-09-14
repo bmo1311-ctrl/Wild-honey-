@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { getHiddenAuthorIds } from '@/lib/data'
 import { CONTENT_TABLE } from '@/lib/moderation'
+import { tierWriteAllowed, type GatedResult } from '@/lib/gate'
 import { circleWriteAllowed } from '@/lib/kid-guard'
 import { oneSignalConfigured, sendPushToUsers } from '@/lib/onesignal'
 import type { Comment, NotificationPrefs, Visibility } from '@/lib/types'
@@ -581,7 +582,9 @@ export async function toggleHabitLog(habitId: string) {
   return { ok: true, completed: true }
 }
 
-export async function startProtocol(slug: string) {
+export async function startProtocol(slug: string): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Protocols')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   // end any other active enrollment first — one protocol at a time keeps it focused
   await supabase.from('protocol_enrollments').update({ is_active: false, ended_at: new Date().toISOString() }).eq('user_id', user.id).eq('is_active', true)
@@ -591,7 +594,9 @@ export async function startProtocol(slug: string) {
   return { ok: true }
 }
 
-export async function endProtocol(enrollmentId: string) {
+export async function endProtocol(enrollmentId: string): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Protocols')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const { error } = await supabase
     .from('protocol_enrollments')
@@ -603,7 +608,9 @@ export async function endProtocol(enrollmentId: string) {
   return { ok: true }
 }
 
-export async function completeProtocolDay(enrollmentId: string, dayNumber: number) {
+export async function completeProtocolDay(enrollmentId: string, dayNumber: number): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Protocols')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const { data: existing } = await supabase
     .from('protocol_day_completions')
@@ -1187,7 +1194,9 @@ export async function adminCreateGroupForRetreat(retreatId: string) {
   return { ok: true, groupId: group.id as string, memberCount: rows.length + 1 }
 }
 
-export async function submitExpertQuestion(input: { question: string; pillar?: string }) {
+export async function submitExpertQuestion(input: { question: string; pillar?: string }): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('inner-circle', 'Ask an Expert')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const question = input.question.trim()
   if (!question) return { error: 'Write your question first.' }
@@ -2602,7 +2611,9 @@ export async function removeHouseholdMember(id: string) {
   return { ok: true }
 }
 
-export async function addLearningItem(input: { memberId: string | null; subject: string; title: string; cadence?: string; notes?: string }) {
+export async function addLearningItem(input: { memberId: string | null; subject: string; title: string; cadence?: string; notes?: string }): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Learning boards')
+  if (locked) return locked
   const { supabase, ownerId, childMemberId } = await requireOwner()
   const user = { id: ownerId }
   if (childMemberId) input.memberId = childMemberId
@@ -2621,7 +2632,9 @@ export async function addLearningItem(input: { memberId: string | null; subject:
   return { ok: true }
 }
 
-export async function toggleLearningItem(itemId: string) {
+export async function toggleLearningItem(itemId: string): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Learning boards')
+  if (locked) return locked
   const { supabase, ownerId } = await requireOwner()
   const user = { id: ownerId }
   const today = (await localToday())
@@ -2653,7 +2666,9 @@ export async function toggleLearningItem(itemId: string) {
   return { ok: true, done: true }
 }
 
-export async function archiveLearningItem(itemId: string) {
+export async function archiveLearningItem(itemId: string): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Learning boards')
+  if (locked) return locked
   /*
    * `requireOwner`, like the add and toggle beside it.
    *
@@ -2862,7 +2877,9 @@ export async function logMeasurement(input: {
 
 // ---- Money ----
 
-export async function upsertMoneyAccount(input: { id?: string; name: string; kind: string; balance: number; apr?: number | null; minPayment?: number | null }) {
+export async function upsertMoneyAccount(input: { id?: string; name: string; kind: string; balance: number; apr?: number | null; minPayment?: number | null }): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Freedom')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   if (!input.name.trim()) return { error: 'Name the account.' }
   const row = { user_id: user.id, name: input.name.trim(), kind: input.kind, balance: input.balance, apr: input.apr ?? null, min_payment: input.minPayment ?? null }
@@ -2875,7 +2892,9 @@ export async function upsertMoneyAccount(input: { id?: string; name: string; kin
   return { ok: true }
 }
 
-export async function archiveMoneyAccount(id: string) {
+export async function archiveMoneyAccount(id: string): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Freedom')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from('money_accounts').update({ archived: true }).eq('id', id).eq('user_id', user.id)
   if (error) return { error: error.message }
@@ -2883,7 +2902,9 @@ export async function archiveMoneyAccount(id: string) {
   return { ok: true }
 }
 
-export async function addMoneyEntry(input: { kind: string; amount: number; category?: string; note?: string; date?: string }) {
+export async function addMoneyEntry(input: { kind: string; amount: number; category?: string; note?: string; date?: string }): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Freedom')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   if (!(input.amount > 0)) return { error: 'How much?' }
   const { error } = await supabase.from('money_entries').insert({
@@ -2901,7 +2922,9 @@ export async function addMoneyEntry(input: { kind: string; amount: number; categ
   return { ok: true }
 }
 
-export async function deleteMoneyEntry(id: string) {
+export async function deleteMoneyEntry(id: string): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Freedom')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from('money_entries').delete().eq('id', id).eq('user_id', user.id)
   if (error) return { error: error.message }
@@ -3250,7 +3273,9 @@ export async function addBeautyProduct(input: {
   barcode?: string
   timeOfDay?: 'am' | 'pm' | 'both'
   frequencyPerWeek?: number
-}) {
+}): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Protocols')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const name = input.name.trim()
   if (!name) return { error: 'What is it called?' }
@@ -3314,7 +3339,9 @@ export async function addBeautyProduct(input: {
 }
 
 /** Take something off the shelf without losing the history of it. */
-export async function removeBeautyProduct(memberProductId: string) {
+export async function removeBeautyProduct(memberProductId: string): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Protocols')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const { error } = await supabase
     .from('member_products')
@@ -3350,7 +3377,9 @@ export async function setLifeStage(stage: 'pregnant' | 'trying' | 'breastfeeding
  * happened, "the right night" is guesswork. One row per thing per night, so
  * tapping twice is harmless.
  */
-export async function logRoutineDone(input: { memberProductId?: string; ritualSlug?: string; slot?: 'am' | 'pm' }) {
+export async function logRoutineDone(input: { memberProductId?: string; ritualSlug?: string; slot?: 'am' | 'pm' }): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Protocols')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   if (!input.memberProductId && !input.ritualSlug) return { error: 'Nothing to log.' }
   const { error } = await supabase.from('routine_log').upsert(
@@ -3377,7 +3406,9 @@ export async function logRoutineDone(input: { memberProductId?: string; ritualSl
  * and asking her to choose is the friction that stopped this happening in the
  * first place.
  */
-export async function advanceStudioItem(itemId: string, blockId?: string | null) {
+export async function advanceStudioItem(itemId: string, blockId?: string | null): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Studio')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
 
   const { data: row } = await supabase
@@ -3447,7 +3478,9 @@ export async function advanceStudioItem(itemId: string, blockId?: string | null)
   return { ok: true, stage: next }
 }
 
-export async function addStudioItem(input: { title: string; channel: string; cadence?: string }) {
+export async function addStudioItem(input: { title: string; channel: string; cadence?: string }): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Studio')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const title = input.title.trim()
   if (!title) return { error: 'Give it a name — even a rough one.' }
@@ -3459,7 +3492,9 @@ export async function addStudioItem(input: { title: string; channel: string; cad
   return { ok: true }
 }
 
-export async function archiveStudioItem(itemId: string) {
+export async function archiveStudioItem(itemId: string): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Studio')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from('studio_items').update({ archived: true }).eq('id', itemId).eq('user_id', user.id)
   if (error) return { error: error.message }
@@ -3467,7 +3502,9 @@ export async function archiveStudioItem(itemId: string) {
   return { ok: true }
 }
 
-export async function addStudioBlock(input: { label: string; channel: string; weekday: number; startMinute: number; minutes: number; everyNWeeks?: number }) {
+export async function addStudioBlock(input: { label: string; channel: string; weekday: number; startMinute: number; minutes: number; everyNWeeks?: number }): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Studio')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const label = input.label.trim()
   if (!label) return { error: 'What is this block for?' }
@@ -3486,7 +3523,9 @@ export async function addStudioBlock(input: { label: string; channel: string; we
   return { ok: true }
 }
 
-export async function removeStudioBlock(blockId: string) {
+export async function removeStudioBlock(blockId: string): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Studio')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from('studio_blocks').update({ is_active: false }).eq('id', blockId).eq('user_id', user.id)
   if (error) return { error: error.message }
@@ -3536,7 +3575,9 @@ export async function saveStyleProfile(input: {
   shape?: string | null
   vertical?: string | null
   scale?: string | null
-}) {
+}): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Wardrobe')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const patch: Record<string, string | null> = {}
   if ('season' in input) patch.style_season = input.season || null
@@ -3560,7 +3601,9 @@ export async function addGarment(input: {
   imageUrl?: string | null
   price?: number | null
   notes?: string | null
-}) {
+}): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Wardrobe')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const name = input.name.trim()
   if (!name) return { error: 'It needs a name.' }
@@ -3581,7 +3624,9 @@ export async function addGarment(input: {
   return { ok: true }
 }
 
-export async function updateGarment(id: string, patch: Record<string, unknown>) {
+export async function updateGarment(id: string, patch: Record<string, unknown>): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Wardrobe')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from('wardrobe_items').update(patch).eq('id', id).eq('member_id', user.id)
   if (error) return { error: error.message }
@@ -3600,7 +3645,9 @@ export async function archiveGarment(id: string) {
  * no-op rather than a double count — she should never have to be careful
  * with a button.
  */
-export async function logWear(itemIds: string[], date: string, outfitId?: string | null) {
+export async function logWear(itemIds: string[], date: string, outfitId?: string | null): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Wardrobe')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   if (itemIds.length === 0) return { ok: true }
 
@@ -3625,7 +3672,9 @@ export async function logWear(itemIds: string[], date: string, outfitId?: string
   return { ok: true }
 }
 
-export async function undoWear(itemIds: string[], date: string) {
+export async function undoWear(itemIds: string[], date: string): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Wardrobe')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const { error } = await supabase
     .from('wardrobe_wears')
@@ -3644,7 +3693,9 @@ export async function saveOutfit(input: {
   occasion?: string | null
   notes?: string | null
   plannedFor?: string | null
-}) {
+}): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Wardrobe')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   if (input.itemIds.length === 0) return { error: 'Pick at least one piece.' }
   const { error } = await supabase.from('wardrobe_outfits').insert({
@@ -3660,7 +3711,9 @@ export async function saveOutfit(input: {
   return { ok: true }
 }
 
-export async function deleteOutfit(id: string) {
+export async function deleteOutfit(id: string): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Wardrobe')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from('wardrobe_outfits').delete().eq('id', id).eq('member_id', user.id)
   if (error) return { error: error.message }
@@ -3668,7 +3721,9 @@ export async function deleteOutfit(id: string) {
   return { ok: true }
 }
 
-export async function pinOutfit(id: string, pinned: boolean) {
+export async function pinOutfit(id: string, pinned: boolean): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Wardrobe')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from('wardrobe_outfits').update({ pinned }).eq('id', id).eq('member_id', user.id)
   if (error) return { error: error.message }
@@ -3721,7 +3776,9 @@ export async function saveTimeZone(zone: string | null) {
  * which actives and acids get recommended and an unknown one would silently
  * render nothing.
  */
-export async function saveSkinConcerns(keys: string[]) {
+export async function saveSkinConcerns(keys: string[]): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Protocols')
+  if (locked) return locked
   const { supabase, user } = await requireUser()
   const valid = new Set(CONCERNS.map((c) => c.key))
   const clean = [...new Set(keys)].filter((k) => valid.has(k as never))

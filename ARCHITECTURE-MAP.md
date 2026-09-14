@@ -1529,3 +1529,73 @@ lines that `redirect('/app/circle')` — the feed has been unified for a while.
 So posting, reacting, commenting and pinning in the community feed refreshed a
 page nobody is ever on, and the feed she was looking at kept its old copy.
 All 8 now point at `/app/circle`.
+
+---
+
+## 30. The paywall was a rendering decision (14 Sept)
+
+The child gate finding, one level up, and it generalised exactly as it should
+have: **a page guard closes the door, not the action.**
+
+`LockedArea` decides what renders. A server action is a plain POST whose id
+ships in the client bundle, and a free member's session is valid app-wide. So
+every gated area's *writes* were open. A free account could add garments,
+start protocols, log money, move studio items along, and submit a question to
+Ask an Expert — which is Inner Circle, the most expensive tier, and which
+lands in Brooke's queue asking for a personal answer.
+
+### The database was not closing it either
+
+Checked all sixteen tables behind the gated areas. Every one has an ownership
+policy and **only** an ownership policy:
+
+| table | INSERT / ALL check |
+|---|---|
+| `expert_questions` | `auth.uid() = user_id` |
+| `wardrobe_items`, `wardrobe_outfits`, `wardrobe_wears` | `member_id = auth.uid()` |
+| `studio_items`, `studio_blocks`, `studio_sessions` | `auth.uid() = user_id` |
+| `money_accounts`, `money_entries` | `user_id = auth.uid()` |
+| `protocol_enrollments`, `protocol_day_completions` | `auth.uid() = user_id` |
+| `member_products`, `routine_log`, `learning_items` | `auth.uid() = user_id` |
+
+`community_posts` requires `is_paid()`. Not one of these does.
+
+### Fixed in the app, deliberately not in RLS
+
+`lib/gate.ts` adds `tierWriteAllowed(required, area)`, now the first two lines
+of 28 actions. Two reasons it is not a policy:
+
+- `is_paid()` is a boolean, and `ask` needs Inner Circle rather than
+  paid-at-all — half of these want a rule the database does not express.
+- Tier changes the moment Square says so. A policy that silently starts
+  rejecting a woman's own rows mid-session is a worse failure than a sentence
+  telling her why.
+
+### Three that look gated and are not, on purpose
+
+- `saveBodyPreferences` — its form is on `/app/settings`, which is free
+- `toggleSavedResource` — its shelf is on `/app/nutrition`, free to log in
+- `setLifeStage` — **has no caller anywhere in the app.** Dead since it was
+  written. Left in place and named here rather than guarded, because guarding
+  dead code makes it look load-bearing.
+
+### The union problem again
+
+Adding an error branch to 28 actions widened 28 return types and broke
+`res?.error` at every call site — the same breakage as when the child guard
+went into the social actions. One exported `GatedResult` fixes it once, and
+means the *next* guard added to any of them costs nothing.
+
+### And `check:access` now enforces the map
+
+`GATED_ACTIONS` lives in `lib/gate.ts` so a script can read it. The thing that
+will go wrong next is a new write action added to a gated area, silently, so
+the check verifies every name in the map still exists and still calls the
+guard. Both failure modes were tested by breaking them on purpose:
+
+```
+✗ `saveStyleProfile` is listed in GATED_ACTIONS but does not call tierWriteAllowed().
+✗ GATED_ACTIONS names `addGarmentXX`, which no longer exists in app/actions.ts.
+```
+
+Five checks now: `tsc`, columns, kid routes, access, and gated actions.
