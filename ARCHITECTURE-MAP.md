@@ -1645,3 +1645,77 @@ allow-list logic — two copies of a rule is how they drift.
 Four times now, in four different subsystems, always the same shape: **the
 check is on the way in, and the way in is not the only way.** Worth assuming
 it is true of anything else built the same way until checked.
+
+---
+
+## 32. A child's password was the family code and four digits (14 Sept)
+
+Started as a routine sweep of household scoping. **That part came back
+clean** — the `member_id` policies are genuinely good, and several actions
+that looked unguarded are covered by RLS rather than by code:
+
+- `meal_logs`, `saved_meals`: `auth.uid() = user_id`, plus a child branch
+  requiring `is_my_member(member_id) AND user_id = my_guardian()`
+- `kid_rewards`, `kid_earnings`: parent writes need `owner_id = auth.uid()`;
+  a child's own claim needs `is_my_member` *and* `status = 'pending'`
+- `learning_items`, `learning_completions`: the same pair
+- `wardrobe_*`: `member_id = auth.uid()`, so member and user are the same thing
+
+The one gap is integrity rather than privacy: nothing stops an adult writing
+her *own* row with a `member_id` from another household. She would see it
+filed under a stranger's member id in her own list. Noted, not urgent.
+
+### The actual finding
+
+`childPassword(familyCode, pin)` returned `` `${familyCode}-${pin}` ``.
+
+Put next to the rest of that flow:
+
+- `lookupFamily(code)` is unauthenticated and returns **every child's id and
+  name** for a family code
+- the sign-in email is `<memberId>@kid.wildhoney.app`
+- so a six-character family code yielded the email for each child in that
+  family, and the password was that code plus 10,000 possible PINs
+
+And the guessing happens against Supabase's auth endpoint directly — nothing
+of ours is in the path, so nothing of ours could count it. A family code is
+not treated as a secret by anyone; it is designed to be typed in front of a
+classroom.
+
+`childCredentials` also took `memberId` straight from the browser without
+checking it against the code, so one valid code plus any member id in the app
+minted credentials for a child in a **different household**.
+
+### What changed
+
+- The password is now an HMAC-SHA256 under a 32-byte secret in
+  `kid_auth_secret` — RLS on, **no policies at all**, so service role only and
+  unreadable even to Brooke's admin session. Knowing the code and the PIN is
+  no longer enough; you have to come through our action.
+- The PIN is never stored. It goes into the HMAC; Supabase holds the result,
+  hashed, like any password.
+- `childCredentials` verifies the member actually belongs to that family code.
+- `throttleChildSignin`: ten requests per fifteen minutes, then a fifteen
+  minute wait. It counts *requests*, not failures, because the sign-in happens
+  in the browser and someone working through PINs would simply not report
+  back. Turns 10,000 guesses into roughly six weeks.
+- If the secret is ever missing it **throws** rather than falling back. A
+  fallback would silently recreate the scheme this replaced.
+
+Tested the throttle's arithmetic against a fake clock on five scenarios:
+ten allowed then blocked, still blocked a minute later, open again after the
+lock expires, thirty days of ordinary twice-a-day use never blocked, and a
+nine–gap–nine sequence resetting rather than summing.
+
+### One thing she has to do
+
+**This changes every existing child password.** There is one child account,
+Zaylee's, and it has never been signed into. Her PIN needs setting once more
+from the household settings — the same screen as before, no new steps.
+
+### What is still true and is a design choice, not a bug
+
+`lookupFamily` still shows children's first names to anyone who guesses a
+six-character code. That is what makes the "who are you?" screen work for a
+child who cannot type an email. Worth her knowing it is a deliberate trade
+rather than an oversight.

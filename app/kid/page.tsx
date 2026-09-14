@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { childCredentials, lookupFamily } from '@/app/actions'
+import { childCredentials, childSignedIn, lookupFamily } from '@/app/actions'
 import { createClient } from '@/lib/supabase/client'
 import { HoneycombMark } from '@/components/logo'
 import { cn } from '@/lib/utils'
@@ -31,6 +31,14 @@ export default function KidSignIn() {
     if (!who || pin.length !== 4) return
     startTransition(async () => {
       const creds = await childCredentials(who, code, pin)
+      // The server refuses after too many tries in a row, and says so in
+      // words a child can read. Showing "that PIN is not right" for a
+      // lock-out would have her keep trying the thing that is not the problem.
+      if ('error' in creds) {
+        toast.error(creds.error)
+        setPin('')
+        return
+      }
       const supabase = createClient()
       const { error } = await supabase.auth.signInWithPassword(creds)
       if (error) {
@@ -38,6 +46,7 @@ export default function KidSignIn() {
         setPin('')
         return
       }
+      await childSignedIn(who)
       router.push('/app')
       router.refresh()
     })

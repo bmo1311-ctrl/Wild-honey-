@@ -9,6 +9,7 @@ import { createServiceClient } from '@/lib/supabase/service'
 import { getHiddenAuthorIds } from '@/lib/data'
 import { CONTENT_TABLE } from '@/lib/moderation'
 import { courseWriteAllowed, tierWriteAllowed, type GatedResult } from '@/lib/gate'
+import { childEmail, childPassword, clearChildSigninAttempts, throttleChildSignin } from '@/lib/kid-auth'
 import { circleWriteAllowed } from '@/lib/kid-guard'
 import { oneSignalConfigured, sendPushToUsers } from '@/lib/onesignal'
 import type { Comment, NotificationPrefs, Visibility } from '@/lib/types'
@@ -2978,12 +2979,6 @@ export async function deleteMealGroup(groupId: string) {
 
 // ---- A child's own access ----
 
-function childEmail(memberId: string) {
-  return `${memberId}@kid.wildhoney.app`
-}
-function childPassword(familyCode: string, pin: string) {
-  return `${familyCode}-${pin}`
-}
 
 /**
  * Give a household member her own sign-in: her name plus a four-digit PIN.
@@ -3006,14 +3001,14 @@ export async function createChildAccess(memberId: string, pin: string) {
   if (!childUserId) {
     const { data: created, error } = await admin.auth.admin.createUser({
       email: childEmail(memberId),
-      password: childPassword(familyCode, pin),
+      password: await childPassword(memberId, familyCode, pin),
       email_confirm: true,
       user_metadata: { name: m.name, is_child: true },
     })
     if (error || !created.user) return { error: error?.message ?? 'Could not create her sign-in.' }
     childUserId = created.user.id
   } else {
-    const { error } = await admin.auth.admin.updateUserById(childUserId, { password: childPassword(familyCode, pin) })
+    const { error } = await admin.auth.admin.updateUserById(childUserId, { password: await childPassword(memberId, familyCode, pin) })
     if (error) return { error: error.message }
   }
 
@@ -3055,8 +3050,44 @@ export async function lookupFamily(familyCode: string) {
 }
 
 /** The credentials the sign-in screen uses. The PIN never leaves the device except to sign in. */
+/**
+ * Hand a child her sign-in, if she is not guessing.
+ *
+ * Deliberately unauthenticated — a child typing her family code has no
+ * session yet, and that is the whole point of the screen. What makes that
+ * safe is that the password is no longer computable from the two things she
+ * knows (see lib/kid-auth.ts), so this action is the only way through, and an
+ * action we own is an action we can count.
+ *
+ * `memberId` is checked against the code rather than trusted. It arrives from
+ * the browser, and without this, one valid family code plus any member id in
+ * the app would mint credentials for a child in a different household.
+ */
 export async function childCredentials(memberId: string, familyCode: string, pin: string) {
-  return { email: childEmail(memberId), password: childPassword(familyCode.trim().toUpperCase(), pin) }
+  const code = familyCode.trim().toUpperCase()
+  if (!/^[A-Z0-9]{6}$/.test(code)) return { error: 'That code is six letters or numbers.' }
+  if (!/^\d{4}$/.test(pin)) return { error: 'The PIN is four numbers.' }
+
+  const admin = createServiceClient()
+  const { data: m } = await admin
+    .from('household_members')
+    .select('id')
+    .eq('id', memberId)
+    .eq('family_code', code)
+    .not('child_user_id', 'is', null)
+    .maybeSingle()
+  if (!m) return { error: 'That is not right. Check the code and try again.' }
+
+  const tooMany = await throttleChildSignin(memberId)
+  if (tooMany) return tooMany
+
+  return { email: childEmail(memberId), password: await childPassword(memberId, code, pin) }
+}
+
+/** Called once she is actually in, so an honest child stops accruing tries. */
+export async function childSignedIn(memberId: string) {
+  await clearChildSigninAttempts(memberId)
+  return { ok: true }
 }
 
 /** What a parent has opened for a child. Circle and specific courses; off by default. */
