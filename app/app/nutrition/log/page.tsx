@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { ChevronLeft, Settings2 } from 'lucide-react'
 import { FoodLogScreen } from '@/components/food-log-screen'
-import { getCurrentCyclePhase, getFoodItems, getHouseholdMembers, getOwnerScope, getSavedMeals, getSessionProfile, getTodayNutrition, getUsualFoods } from '@/lib/data'
-import { phaseLabel } from '@/lib/cycle'
+import { getCyclePhase, getFoodItems, getHouseholdMembers, getOwnerScope, getSavedMeals, getSessionProfile, getTodayNutrition, getUsualFoods } from '@/lib/data'
+import { CyclePhaseSwitch } from '@/components/cycle-phase-switch'
 import { ownerTargets } from '@/lib/targets'
 import { NutrientRings } from '@/components/nutrient-rings'
 import { NutrientPanel } from '@/components/nutrient-panel'
@@ -19,16 +19,16 @@ export default async function LogFoodPage({ searchParams }: { searchParams: Prom
   const self = members.find((m) => m.is_self)
   // null means the account holder; anyone else is logged against their id.
   const memberId = scope?.childMemberId ?? (member && member !== self?.id && members.some((m) => m.id === member) ? member : null)
-  const [foods, nutrition, usual, profile, loggedPhase, savedMeals] = await Promise.all([
+  const [foods, nutrition, usual, profile, cycle, savedMeals] = await Promise.all([
     getFoodItems(),
     getTodayNutrition(memberId),
     getUsualFoods(8, memberId),
     getSessionProfile(),
-    getCurrentCyclePhase(),
+    getCyclePhase(),
     getSavedMeals(memberId),
   ])
 
-  const { cycled, phase, hasGoals, birthYear } = ownerTargets(profile, loggedPhase)
+  const { cycled, phase, hasGoals, birthYear } = ownerTargets(profile, cycle.phase, cycle.phase)
 
   // Whoever is selected gets their own reference intakes. For her, the
   // calculated macro targets override the generic adult figures.
@@ -81,18 +81,22 @@ export default async function LogFoodPage({ searchParams }: { searchParams: Prom
       </div>
 
       {phase && !memberId && (
-        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3">
-          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-faith-pillar" aria-hidden="true" />
-          <span className="min-w-0 flex-1">
-            <span className="block text-[15px] font-semibold">{phaseLabel(phase)} phase</span>
-            <span className="block text-[13px] text-muted-foreground">
-              {cycled.pct === 0
-                ? 'targets unchanged this week'
-                : `${cycled.pct > 0 ? '+' : ''}${cycled.pct}% on calories and carbs today`}
-            </span>
+        <div className="flex flex-col gap-2 rounded-2xl border border-border bg-card px-4 py-3">
+          {/*
+            The banner quotes the phase at her, so the way to correct it
+            belongs here rather than two pages away. It also says where the
+            phase came from — the day it was wrong there was no way to tell
+            whether the app was reading her check-in or her dates, and so no
+            way to know which one to go and fix.
+          */}
+          <CyclePhaseSwitch phase={phase} source={cycle.source} because={cycle.because} />
+          <span className="block text-[13px] text-muted-foreground">
+            {cycled.pct === 0
+              ? 'targets unchanged this week'
+              : `${cycled.pct > 0 ? '+' : ''}${cycled.pct}% on calories and carbs today`}
           </span>
-          <Link href="/app/nutrition/goals" className="shrink-0 text-[13px] font-medium text-mindset-pillar underline underline-offset-[3px]">
-            adjust
+          <Link href="/app/nutrition/goals" className="self-start text-[13px] font-medium text-mindset-pillar underline underline-offset-[3px]">
+            adjust how much each phase shifts
           </Link>
         </div>
       )}

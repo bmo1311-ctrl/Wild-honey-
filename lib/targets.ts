@@ -1,4 +1,4 @@
-import { applyCycle, phaseFromDates, type CyclePhaseKey } from '@/lib/cycle'
+import { applyCycle, resolvePhase, type CyclePhaseKey } from '@/lib/cycle'
 import { calculateTargets, effectiveTargets, type ActivityLevel, type BodyGoal } from '@/lib/goals'
 import type { Profile } from '@/lib/types'
 
@@ -18,7 +18,12 @@ type BodyProfile = Profile & {
  * where she is in her cycle. One place, so the Nutrition hub, the log screen
  * and Today all show the same numbers.
  */
-export function ownerTargets(profile: Profile | null, loggedPhase: string | null) {
+export function ownerTargets(
+  profile: Profile | null,
+  loggedPhase: string | null,
+  /** Already worked out by `getCyclePhase`. Pass it whenever you have it. */
+  resolved?: CyclePhaseKey | null,
+) {
   const p = profile as BodyProfile | null
   const calculated = calculateTargets({
     weightKg: p?.weight_kg ?? null,
@@ -31,11 +36,28 @@ export function ownerTargets(profile: Profile | null, loggedPhase: string | null
     ...(p?.daily_calorie_goal ? { calories: p.daily_calorie_goal } : {}),
     ...(p?.daily_protein_goal_g ? { protein_g: p.daily_protein_goal_g } : {}),
   })
-  // A phase she logged on a check-in wins; otherwise work it out from her dates.
+  /*
+   * Deciding the phase used to happen here, and the rule was "logged wins".
+   * That is how the day her period started came out as luteal: she had
+   * tapped luteal on a check-in that morning, then set the period start, and
+   * this line preferred the earlier guess — then quietly added luteal's 7% to
+   * her calories on day one of bleeding.
+   *
+   * The decision now belongs to `resolvePhase`, in one place, weighing both
+   * things she said by how recently she said them. This function just applies
+   * the adjustment to whatever it is handed.
+   */
   const phase =
-    loggedPhase && loggedPhase !== 'not_tracked'
-      ? (loggedPhase as CyclePhaseKey)
-      : phaseFromDates(p?.last_period_start ?? null, p?.cycle_length_days ?? 28)
+    resolved !== undefined
+      ? resolved
+      : resolvePhase({
+          loggedPhase: loggedPhase ?? null,
+          // No check-in date to compare against, so this is the conservative
+          // reading: only callers that pass a resolved phase get the full rule.
+          loggedOn: null,
+          lastPeriodStart: p?.last_period_start ?? null,
+          cycleLength: p?.cycle_length_days ?? null,
+        }).phase
   const cycled = applyCycle(targets, phase, (p?.cycle_adjustments ?? {}) as Record<string, number>)
   return { cycled, phase, hasGoals: Boolean(p?.weight_kg), birthYear: p?.birth_year ?? null }
 }

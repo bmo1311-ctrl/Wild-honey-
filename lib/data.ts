@@ -46,6 +46,7 @@ import type {
 import { suggestProtocol } from '@/lib/protocols'
 import { COURSE_SLUG, currentDayFrom, getCourse } from '@/lib/courses'
 import { localToday } from '@/lib/today'
+import { resolvePhase, type ResolvedPhase } from '@/lib/cycle'
 import type { CourseEnrollment, CourseWriting } from '@/lib/courses'
 import type { FoodItem, HouseholdMember, LearningItem, PublicProfile } from '@/lib/types'
 import { sumNutrients, type NutrientMap } from '@/lib/nutrients'
@@ -794,23 +795,57 @@ export function getCurrentSeason(): 'spring' | 'summer' | 'fall' | 'winter' {
   return 'winter'
 }
 
-/** Most recent cycle phase the member has logged in a check-in, if any. */
-export async function getCurrentCyclePhase(): Promise<CyclePhase | null> {
+/**
+ * Where she is in her cycle, weighing everything she has told the app.
+ *
+ * This used to return the most recent logged phase and nothing else, and
+ * every surface that wanted the dates taken into account had to redo that
+ * work itself — which meant Nutrition, the recipe picks and the symptom
+ * reader could all disagree with each other on the same afternoon. There is
+ * one answer now, and `resolvePhase` holds the reasoning.
+ */
+export async function getCyclePhase(): Promise<ResolvedPhase> {
+  const none: ResolvedPhase = { phase: null, source: null, because: null }
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) return null
-  const { data } = await supabase
-    .from('checkins')
-    .select('cycle_phase')
-    .eq('user_id', user.id)
-    .not('cycle_phase', 'is', null)
-    .neq('cycle_phase', 'not_tracked')
-    .order('date', { ascending: false })
-    .limit(1)
-    .maybeSingle()
-  return (data?.cycle_phase as CyclePhase) ?? null
+  if (!user) return none
+
+  const [checkin, profile] = await Promise.all([
+    supabase
+      .from('checkins')
+      .select('cycle_phase, date')
+      .eq('user_id', user.id)
+      .not('cycle_phase', 'is', null)
+      .neq('cycle_phase', 'not_tracked')
+      .order('date', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from('profiles')
+      .select('last_period_start, cycle_length_days')
+      .eq('id', user.id)
+      .maybeSingle(),
+  ])
+
+  return resolvePhase({
+    loggedPhase: (checkin.data?.cycle_phase as string | null) ?? null,
+    loggedOn: (checkin.data?.date as string | null) ?? null,
+    lastPeriodStart: (profile.data?.last_period_start as string | null) ?? null,
+    cycleLength: (profile.data?.cycle_length_days as number | null) ?? null,
+    today: await localToday(),
+  })
+}
+
+/**
+ * The phase on its own.
+ *
+ * Kept because plenty of callers only need the word. Anything that shows the
+ * phase to her should use `getCyclePhase` instead and say where it came from.
+ */
+export async function getCurrentCyclePhase(): Promise<CyclePhase | null> {
+  return ((await getCyclePhase()).phase as CyclePhase) ?? null
 }
 
 /** Recipes matching this week's season and, if tracked, the member's current cycle phase. */

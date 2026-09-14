@@ -457,6 +457,9 @@ export async function saveCheckin(input: {
   revalidatePath('/app')
   revalidatePath('/app/energy')
   revalidatePath('/app/profile')
+  // The cycle phase chip lives on this form, and Nutrition reads it.
+  revalidatePath('/app/nutrition')
+  revalidatePath('/app/nutrition/log')
   return { ok: true }
 }
 
@@ -2436,8 +2439,18 @@ export async function saveCycleSettings(input: {
     })
     .eq('id', user.id)
   if (error) return { error: error.message }
+  /*
+   * Everything that reads the phase, not just the two pages this form sits
+   * near. Setting a period start changes her targets, which recipes are
+   * picked, and what Today says — and before this it changed none of them
+   * until the cache happened to expire.
+   */
   revalidatePath('/app/nutrition/log')
   revalidatePath('/app/nutrition/goals')
+  revalidatePath('/app/nutrition')
+  revalidatePath('/app/recipes')
+  revalidatePath('/app/energy')
+  revalidatePath('/app')
   return { ok: true }
 }
 
@@ -3618,5 +3631,55 @@ export async function dismissStateHeadline(text: string) {
   await requireUser()
   await dismissHeadline(text)
   revalidatePath('/app')
+  return { ok: true }
+}
+
+/**
+ * Set the phase from wherever she is standing.
+ *
+ * Two different statements behind one control. Tapping a phase records it on
+ * today's check-in — a correction for today. "My period started today" writes
+ * the start date, which is the stronger thing to say: it is a fact the app can
+ * count forward from, so it keeps being right for the rest of the month
+ * instead of going stale the moment she stops tapping.
+ *
+ * When she says day one, today's check-in is set to menstrual too. Leaving a
+ * contradicting chip in the row is how this went wrong in the first place.
+ */
+export async function setCyclePhaseToday(phase: string, periodStartedToday: boolean) {
+  const { supabase, user } = await requireUser()
+  const allowed = ['menstrual', 'follicular', 'ovulation', 'luteal', 'not_tracked']
+  if (!allowed.includes(phase)) return { error: 'Unknown phase.' }
+
+  const today = await localToday()
+
+  const { data: prev } = await supabase
+    .from('checkins')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('date', today)
+    .maybeSingle()
+
+  const { error } = await supabase.from('checkins').upsert(
+    { ...(prev ?? {}), user_id: user.id, date: today, cycle_phase: periodStartedToday ? 'menstrual' : phase },
+    { onConflict: 'user_id,date' },
+  )
+  if (error) return { error: error.message }
+
+  if (periodStartedToday) {
+    const { error: pErr } = await supabase
+      .from('profiles')
+      .update({ last_period_start: today })
+      .eq('id', user.id)
+    if (pErr) return { error: pErr.message }
+  }
+
+  revalidatePath('/app')
+  revalidatePath('/app/energy')
+  revalidatePath('/app/checkin')
+  revalidatePath('/app/nutrition')
+  revalidatePath('/app/nutrition/log')
+  revalidatePath('/app/nutrition/goals')
+  revalidatePath('/app/recipes')
   return { ok: true }
 }

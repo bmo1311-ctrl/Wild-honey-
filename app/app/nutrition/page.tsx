@@ -11,7 +11,7 @@ import { GroceryBuilder } from '@/components/grocery-builder'
 import { PantryList } from '@/components/pantry-list'
 import { MealPlanList } from '@/components/meal-plan-list'
 import {
-  getCurrentCyclePhase,
+  getCyclePhase,
   getCurrentSeason,
   getGroceryBuilderItems,
   getFoodItems,
@@ -32,11 +32,11 @@ import { FEATURES } from '@/lib/features'
 export default async function NutritionPage() {
   if (!FEATURES.recipes) return <FeatureOff />
 
-  const [recipes, recommended, season, cyclePhase, nutrition, plans, grocery, foods, pantry, profile, allResources] = await Promise.all([
+  const [recipes, recommended, season, cycle, nutrition, plans, grocery, foods, pantry, profile, allResources] = await Promise.all([
     getRecipes(),
     getRecommendedRecipes(),
     Promise.resolve(getCurrentSeason()),
-    getCurrentCyclePhase(),
+    getCyclePhase(),
     getTodayNutrition(),
     getMealPlans(),
     getGroceryBuilderItems(),
@@ -50,7 +50,7 @@ export default async function NutritionPage() {
   const foodNames = foods.map((f) => f.name)
   const cookVideos = allResources.filter((r) => r.collection === 'nourish')
   const unlocked = (await getAccess()).paid
-  const own = ownerTargets(profile, cyclePhase)
+  const own = ownerTargets(profile, cycle.phase, cycle.phase)
   const panelTargets = { ...(driFor(ageFromBirthYear(own.birthYear), 'female') ?? {}), ...own.cycled.targets }
 
   return (
@@ -82,7 +82,7 @@ export default async function NutritionPage() {
           unlocked ? (
             <div className="flex flex-col gap-6">
               <RecipeImport />
-              <RecommendedRecipesRow recipes={recommended} season={season} cyclePhase={cyclePhase} />
+              <RecommendedRecipesRow recipes={recommended} season={season} cyclePhase={cycle.phase} />
               <RecipeSources recipes={recipes} userId={profile?.id ?? null} />
             </div>
           ) : (
