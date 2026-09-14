@@ -47,6 +47,7 @@ import type {
 import { suggestProtocol } from '@/lib/protocols'
 import { COURSE_SLUG, currentDayFrom, getCourse } from '@/lib/courses'
 import { localToday } from '@/lib/today'
+import { calculateTargets, type ActivityLevel, type BodyGoal } from '@/lib/goals'
 import { resolvePhase, type ResolvedPhase } from '@/lib/cycle'
 import type { CourseEnrollment, CourseWriting } from '@/lib/courses'
 import type { FoodItem, HouseholdMember, LearningItem, PublicProfile } from '@/lib/types'
@@ -875,12 +876,50 @@ export async function getCurrentCyclePhase(): Promise<CyclePhase | null> {
 }
 
 /** Recipes matching this week's season and, if tracked, the member's current cycle phase. */
+/**
+ * Recipes for her season and phase, minus the things she does not eat.
+ *
+ * `foods_avoided` and `allergies` are asked for in onboarding *and* in
+ * settings, under the line "By choice or by necessity — either way, nothing
+ * suggests them at you." Nothing read either field. This is the surface that
+ * does the suggesting, so this is where the promise gets kept.
+ *
+ * Deliberately a plain word match against the ingredient text, and
+ * deliberately only used to *remove* suggestions. It will miss things — an
+ * allergen under another name, an ingredient the text does not spell out — so
+ * it is a convenience filter and nothing more. Nothing in the app tells her a
+ * recipe is safe, and this does not either; it only stops the app putting
+ * something in front of her that she has already said she does not eat.
+ */
+function mentions(recipe: Recipe, terms: string[]): boolean {
+  if (terms.length === 0) return false
+  const hay = `${recipe.title} ${recipe.ingredients ?? ''}`.toLowerCase()
+  return terms.some((t) => hay.includes(t))
+}
+
+/** Free text she typed — "dairy, shellfish" — split into usable words. */
+export function avoidTerms(...fields: (string | null | undefined)[]): string[] {
+  return fields
+    .flatMap((f) => (f ?? '').toLowerCase().split(/[,;\n]+/))
+    .map((t) => t.trim())
+    // One- and two-letter fragments match half the dictionary.
+    .filter((t) => t.length >= 3)
+}
+
 export async function getRecommendedRecipes(): Promise<Recipe[]> {
-  const [recipes, season, cyclePhase] = await Promise.all([getRecipes(), Promise.resolve(getCurrentSeason()), getCurrentCyclePhase()])
+  const [recipes, season, cyclePhase, profile] = await Promise.all([
+    getRecipes(),
+    Promise.resolve(getCurrentSeason()),
+    getCurrentCyclePhase(),
+    getSessionProfile(),
+  ])
+  const p = profile as (typeof profile & { foods_avoided?: string | null; allergies?: string | null }) | null
+  const avoid = avoidTerms(p?.foods_avoided, p?.allergies)
+
   return recipes.filter((r) => {
     const seasonMatch = r.season === 'any' || r.season === season
     const cycleMatch = !cyclePhase || r.cycle_phase === 'any' || r.cycle_phase === cyclePhase
-    return seasonMatch && cycleMatch
+    return seasonMatch && cycleMatch && !mentions(r, avoid)
   })
 }
 
@@ -1583,7 +1622,11 @@ export async function getTodayNutrition(memberId?: string | null): Promise<{
   logQuery = memberId ? logQuery.eq('member_id', memberId) : logQuery.is('member_id', null)
   const [{ data: logs }, { data: profile }] = await Promise.all([
     logQuery.order('created_at', { ascending: true }),
-    supabase.from('profiles').select('daily_calorie_goal, daily_protein_goal_g').eq('id', user.id).maybeSingle(),
+    supabase
+      .from('profiles')
+      .select('daily_calorie_goal, daily_protein_goal_g, weight_kg, height_cm, birth_year, activity_level, body_goal')
+      .eq('id', user.id)
+      .maybeSingle(),
   ])
 
   const loggedMeals = (logs as MealLog[]) ?? []
@@ -1615,6 +1658,21 @@ export async function getTodayNutrition(memberId?: string | null): Promise<{
     loggedMeals.map((log) => ((log as typeof log & { nutrients?: NutrientMap }).nutrients ?? {}) as NutrientMap),
   )
   nutrients.calories = Math.round(totals.calories * 10) / 10
+  const p = profile as (typeof profile & {
+    weight_kg?: number | null
+    height_cm?: number | null
+    birth_year?: number | null
+    activity_level?: string | null
+    body_goal?: string | null
+  }) | null
+  const calculated = calculateTargets({
+    weightKg: p?.weight_kg ?? null,
+    heightCm: p?.height_cm ?? null,
+    birthYear: p?.birth_year ?? null,
+    activity: (p?.activity_level as ActivityLevel) ?? null,
+    goal: (p?.body_goal as BodyGoal) ?? null,
+  })
+
   nutrients.protein_g = Math.round(totals.protein * 10) / 10
   nutrients.carbs_g = Math.round(totals.carbs * 10) / 10
   nutrients.fat_g = Math.round(totals.fat * 10) / 10
@@ -1622,8 +1680,21 @@ export async function getTodayNutrition(memberId?: string | null): Promise<{
   return {
     ...totals,
     nutrients,
-    calorieGoal: profile?.daily_calorie_goal ?? null,
-    proteinGoal: profile?.daily_protein_goal_g ?? null,
+    /*
+     * Fall back to the calculated targets, not just the manual overrides.
+     *
+     * These read only `daily_calorie_goal` / `daily_protein_goal_g`, whose
+     * sole writer — `updateNutritionGoals` — has no caller anywhere in the
+     * app. So they were always null, and Today's protein tile always read
+     * "g today" with no target while Nutrition and the log screen showed a
+     * calculated one from the same profile. Three surfaces, one number, two
+     * answers.
+     *
+     * No extra query: the profile is already being fetched here, it just was
+     * not being asked for enough columns.
+     */
+    calorieGoal: profile?.daily_calorie_goal ?? calculated.calories,
+    proteinGoal: profile?.daily_protein_goal_g ?? calculated.protein_g,
     loggedMeals,
   }
 }

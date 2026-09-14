@@ -1163,3 +1163,62 @@ is earned on the nth *completion*, whichever day that was.
 overrides and has no caller, so Today's protein tile always reads "g today"
 with no target while Nutrition shows a calculated one. Both are drift between
 copy and behaviour rather than anything breaking.
+
+---
+
+## 24. The last two, and what the audits amount to (14 Sept)
+
+### The protein target that could never appear
+
+`getTodayNutrition` read `daily_calorie_goal` and `daily_protein_goal_g` only.
+Their sole writer, `updateNutritionGoals`, has no caller anywhere in the app —
+so both were always null, and Today's protein tile always read "g today" with
+no target, while Nutrition and the log screen showed a calculated one from the
+same profile. Three surfaces, one number, two answers.
+
+It falls back to `calculateTargets` now. No extra query: the profile was
+already being fetched, it just was not being asked for enough columns.
+
+### `foods_avoided` finally does something
+
+Asked for in onboarding *and* in settings, under "By choice or by necessity —
+either way, nothing suggests them at you." Nothing read it. Nor `allergies`,
+outside the skincare rituals.
+
+`getRecommendedRecipes` now filters on both. Three deliberate constraints:
+
+- **It only ever removes.** It never marks anything as fine to eat.
+- **Plain word matching**, and the copy says so. It catches "coconuts" when
+  she typed "nuts", and misses casein when she typed "dairy" — both are in the
+  tests, as expected results rather than bugs.
+- **The allergy copy no longer over-promises.** It now reads: *"Word-matching
+  only, so read the label yourself too — this app never tells you something is
+  safe."* An allergy filter that someone trusts is more dangerous than none.
+
+### What four rounds of auditing actually found
+
+Roughly forty real problems. **Almost none were crashes.** The recurring shape:
+
+1. **State that drifted from what it describes** — a form holding values the
+   page had since changed; a tick map from the previous child; a card showing
+   a ritual she never did as done.
+2. **Copy that promised what the code did not do** — "nothing suggests them at
+   you"; "needs a goal in your words"; "read its ingredients"; cautions "on the
+   apothecary shelf", a page that does not exist.
+3. **One value computed two ways** — outfits counted differently in two files;
+   iron at 18 above a card saying 27; a debt-free date paired with a different
+   plan's payment.
+4. **Constants pretending to be settings** — a five-day period; ovulation on
+   day 14; a 56-day course for everyone; defaults absent from their own list
+   of choices.
+5. **Time counted in the wrong place** — UTC against rows dated in hers, over
+   and over.
+
+None of these fail a typecheck, and a build passing says nothing about any of
+them. What does catch them: reading the two halves side by side, and the three
+scripted checks that now encode the ones worth never rediscovering —
+`check:columns`, `check:kid`, and the unit tests around each engine.
+
+The honest limit: `npm run verify` cannot see how long a page takes, cannot
+see a claim in prose, and cannot see a value that two files compute
+differently. Those still need someone to look.

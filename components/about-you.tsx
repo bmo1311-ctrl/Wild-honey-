@@ -84,7 +84,9 @@ export function AboutYou({
         <div>
           <p className="text-sm font-medium">Allergies</p>
           <p className="mt-0.5 mb-2 text-[12px] text-muted-foreground text-pretty">
-            Anything that has ever reacted — foods, plants, ingredients. Kitchen rituals with these in them are skipped.
+            Anything that has ever reacted — foods, plants, ingredients. Kitchen rituals and recipe
+            suggestions with these in them are skipped. Word-matching only, so read the label yourself
+            too — this app never tells you something is safe.
           </p>
           <input
             value={allergies}
@@ -98,7 +100,7 @@ export function AboutYou({
         <div>
           <p className="text-sm font-medium">Foods you avoid</p>
           <p className="mt-0.5 mb-2 text-[12px] text-muted-foreground text-pretty">
-            By choice or by necessity — either way, nothing suggests them at you.
+            By choice or by necessity — either way, recipe suggestions leave them out.
           </p>
           <input
             value={avoided}
