@@ -824,16 +824,28 @@ export async function getCyclePhase(): Promise<ResolvedPhase> {
       .maybeSingle(),
     supabase
       .from('profiles')
-      .select('last_period_start, cycle_length_days')
+      .select('last_period_start, cycle_length_days, period_length_days, luteal_length_days, cycle_is_regular')
       .eq('id', user.id)
       .maybeSingle(),
   ])
 
+  const p = profile.data as {
+    last_period_start?: string | null
+    cycle_length_days?: number | null
+    period_length_days?: number | null
+    luteal_length_days?: number | null
+    cycle_is_regular?: boolean | null
+  } | null
+
   return resolvePhase({
     loggedPhase: (checkin.data?.cycle_phase as string | null) ?? null,
     loggedOn: (checkin.data?.date as string | null) ?? null,
-    lastPeriodStart: (profile.data?.last_period_start as string | null) ?? null,
-    cycleLength: (profile.data?.cycle_length_days as number | null) ?? null,
+    lastPeriodStart: p?.last_period_start ?? null,
+    // Her cycle, not the average one.
+    cycleLength: p?.cycle_length_days ?? null,
+    periodLength: p?.period_length_days ?? null,
+    lutealLength: p?.luteal_length_days ?? null,
+    isRegular: p?.cycle_is_regular ?? null,
     today: await localToday(),
   })
 }

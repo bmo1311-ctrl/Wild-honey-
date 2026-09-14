@@ -3,11 +3,12 @@ import { ChevronLeft } from 'lucide-react'
 import { BodyGoalsForm } from '@/components/body-goals-form'
 import { CycleSettingsForm } from '@/components/cycle-settings-form'
 import type { CyclePhaseKey } from '@/lib/cycle'
-import { getSessionProfile } from '@/lib/data'
+import { getCyclePhase, getSessionProfile } from '@/lib/data'
 import { calculateTargets, kgToLb, type ActivityLevel, type BodyGoal } from '@/lib/goals'
 
 export default async function GoalsPage() {
-  const profile = (await getSessionProfile()) as (Awaited<ReturnType<typeof getSessionProfile>> & {
+  const [rawProfile, cycle] = await Promise.all([getSessionProfile(), getCyclePhase()])
+  const profile = rawProfile as (Awaited<ReturnType<typeof getSessionProfile>> & {
     weight_kg?: number | null
     weight_unit?: 'lb' | 'kg' | null
     height_cm?: number | null
@@ -17,6 +18,9 @@ export default async function GoalsPage() {
     last_period_start?: string | null
     cycle_length_days?: number | null
     cycle_adjustments?: Partial<Record<CyclePhaseKey, number>> | null
+    period_length_days?: number | null
+    luteal_length_days?: number | null
+    cycle_is_regular?: boolean | null
   }) | null
 
   const unit = (profile?.weight_unit as 'lb' | 'kg') ?? 'lb'
@@ -55,9 +59,15 @@ export default async function GoalsPage() {
             goal: (profile?.body_goal as BodyGoal) ?? null,
           }).calories
         }
+        current={cycle}
         initial={{
           lastPeriodStart: profile?.last_period_start?.slice(0, 10) ?? '',
+          // Blank rather than pre-filled with the average, so an untouched
+          // field reads as "not said" instead of as her answer.
           cycleLength: profile?.cycle_length_days ? String(profile.cycle_length_days) : '',
+          periodLength: profile?.period_length_days ? String(profile.period_length_days) : '',
+          lutealLength: profile?.luteal_length_days ? String(profile.luteal_length_days) : '',
+          isRegular: profile?.cycle_is_regular ?? null,
           adjustments: profile?.cycle_adjustments ?? {},
         }}
       />

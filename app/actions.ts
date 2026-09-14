@@ -2417,10 +2417,27 @@ export async function saveBodyGoals(input: {
   return { ok: true }
 }
 
+/**
+ * Keep a number inside the range the database will accept.
+ *
+ * The check constraints are deliberately wide — they are there to catch a
+ * typed digit, not to tell a woman her cycle is invalid — but a rejected write
+ * would surface as a raw Postgres error on a settings form, so clamp here and
+ * let the constraint be the backstop it is meant to be.
+ */
+function bounded(v: number | null | undefined, lo: number, hi: number): number | null {
+  if (typeof v !== 'number' || !Number.isFinite(v)) return null
+  return Math.min(Math.max(Math.round(v), lo), hi)
+}
+
 /** Per-phase percentage shifts, and the dates the phase is worked out from. */
 export async function saveCycleSettings(input: {
   lastPeriodStart: string | null
   cycleLengthDays: number | null
+  /* The three that used to be constants inside phaseFromDates. */
+  periodLengthDays?: number | null
+  lutealLengthDays?: number | null
+  isRegular?: boolean | null
   adjustments: Record<string, number>
 }) {
   const { supabase, user } = await requireUser()
@@ -2434,7 +2451,10 @@ export async function saveCycleSettings(input: {
     .from('profiles')
     .update({
       last_period_start: input.lastPeriodStart,
-      cycle_length_days: input.cycleLengthDays,
+      cycle_length_days: bounded(input.cycleLengthDays, 15, 60),
+      period_length_days: bounded(input.periodLengthDays, 1, 14),
+      luteal_length_days: bounded(input.lutealLengthDays, 7, 20),
+      cycle_is_regular: typeof input.isRegular === 'boolean' ? input.isRegular : null,
       cycle_adjustments: clean,
     })
     .eq('id', user.id)

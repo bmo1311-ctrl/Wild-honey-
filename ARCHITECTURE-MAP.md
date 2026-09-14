@@ -387,3 +387,91 @@ Phase 2 (Honey Traps) and Phase 4 (Leverage) have their tables and now have a
 state layer to read from — but the audit's conclusion stands: they cannot
 honestly ship until there is more evidence than six check-ins. Phase 1 is what
 makes that evidence worth having.
+
+---
+
+## 13. The cycle (14 Sept)
+
+### What she hit
+
+Her period started. She logged it where she found it — `/app/nutrition/goals`,
+reached from **You → Targets & your cycle** — by setting the start date. The
+app went on saying luteal, and went on adding luteal's +7% to her calories and
+carbs on day one of bleeding.
+
+Three separate failures behind one symptom.
+
+**1. Precedence.** `ownerTargets` had one rule: a logged phase always wins. She
+had tapped `luteal` on a check-in that morning, before it started. A guess made
+a few hours earlier outranked the event itself. Fixed by `resolvePhase` in
+`lib/cycle.ts` — recency, not source, in one place instead of re-derived per
+page. Period start on or after the last logged phase ⇒ dates win.
+
+**2. Nothing told Nutrition.** `saveCycleSettings` revalidated the two pages the
+form sits beside and not the hub, the recipe picks, Today or Energy.
+
+**3. Nowhere to say the phase.** The only phase control in the app was a row of
+chips inside a check-in form on a different page — which is exactly why she went
+looking and found the settings instead. Her words: *"it shows targets and your
+cycle, but then when I click into it, it doesn't have like what you would think,
+like a spot to put what cycle I'm in."*
+
+### Every cycle is different
+
+Migration `every_cycle_is_different`. The app stored a start date and a cycle
+length, then hardcoded the rest inside `phaseFromDates`: a five-day period,
+ovulation at `len - 14`. Population averages wearing the costume of a personal
+setting.
+
+New on `profiles`: `period_length_days`, `luteal_length_days`,
+`cycle_is_regular`. The migration also documents `last_period_start`,
+`cycle_length_days` and `cycle_adjustments`, which application code had been
+writing **with no migration at all** — see §12's verification note; this is the
+same class of problem.
+
+Why luteal length rather than an ovulation day: the luteal phase is the stable
+half (usually 12–14 days, much the same month to month) and the follicular
+phase is what stretches. Counting back from the next period is more reliable
+than counting forward from the last.
+
+What it changes, same start date:
+
+| | ovulation | notes |
+|---|---|---|
+| average, all blank | day 14 | unchanged |
+| 28d, bleeds 7 | day 14 | menstrual through day 7, was follicular from day 6 |
+| 24d, luteal 12 | day 12 | old rule said day 10 |
+| 33d, luteal 13, bleeds 3 | day 20 | old rule said day 19 |
+
+`cycle_is_regular = false` switches date derivation off entirely — irregular,
+perimenopausal, post-partum, PCOS, hormonal IUD. The app then uses only what
+she logs rather than pretending arithmetic applies.
+
+`cycleShape()` clamps everything, and a period can never run past ovulation.
+Check constraints are the backstop, deliberately wide: they exist to catch a
+typo, not to tell a woman her cycle is invalid.
+
+### Where the switch lives now
+
+`components/cycle-phase-switch.tsx`, mounted in two places:
+
+- the phase banner on `/app/nutrition/log` — where the phase is being *used*
+- the top of `/app/nutrition/goals`, above all the arithmetic — where she looked
+
+"My period started today" is its own button, because that writes a date the app
+counts forward from rather than a chip that goes stale tomorrow. It also writes
+today's check-in to menstrual — leaving a contradicting chip in the row is how
+this went wrong in the first place.
+
+Every surface says *where* the phase came from (`ResolvedPhase.because`). There
+was no way to tell whether the app was reading her check-in or her dates, and
+so no way to know which one to go and fix.
+
+### Still open
+
+The phase barely does anything. Its entire effect on nutrition is a percentage
+on calories and carbs, plus a recipe filter that depends on an admin having
+hand-tagged `recipes.cycle_phase` — **a column with no migration**, so it may
+be matching nothing. There is no per-phase food, herb, training or skincare
+content anywhere in `lib/`. Her expectation was that it would *recommend*
+differently. That is a content build and a decision she has not made yet.
