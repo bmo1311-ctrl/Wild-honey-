@@ -158,6 +158,16 @@ export function CommunityPostCard({ post, canPin }: { post: CommunityPost; canPi
                 </div>
                 <p className="text-sm leading-snug text-pretty">{c.text}</p>
               </div>
+              {/*
+                Reporting a *comment* had no way in.
+                `content_reports` has accepted circle_comment,
+                community_comment and group_post_comment since the day the
+                table was written, and the removal path knows all three — but
+                the menu only ever appeared on posts. So the one place people
+                are actually unkind to each other, the replies, was the one
+                place with no way to say so.
+              */}
+              <SafetyMenu authorId={c.user_id} contentType="community_comment" contentId={c.id} />
               {canPin && (
                 <button type="button" onClick={() => handlePinComment(c.id)} className="text-muted-foreground">
                   <Pin className="h-3.5 w-3.5" />

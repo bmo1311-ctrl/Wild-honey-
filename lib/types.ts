@@ -259,6 +259,16 @@ export interface ContentReport {
   reviewed_at: string | null
   created_at: string
   reporter_profile?: Pick<Profile, 'name' | 'avatar_color' | 'avatar_url'> | null
+  /**
+   * The reported content itself, filled in by `getReportsForAdmin`.
+   *
+   * Undefined means the row was not found — the post was already deleted, by
+   * its author or by an earlier removal. That is a different thing from an
+   * empty string and the card says so.
+   */
+  content_text?: string
+  content_author_name?: string
+  content_author_id?: string
 }
 
 export type CircleFeedItem =

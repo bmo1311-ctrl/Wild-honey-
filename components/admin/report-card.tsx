@@ -64,6 +64,33 @@ export function ReportCard({ report }: { report: ContentReport }) {
       <p className="text-xs text-muted-foreground">
         reported by {report.reporter_profile?.name ?? 'a member'} · {relativeTime(report.created_at)}
       </p>
+
+      {/*
+        The reported content, which this card did not show at all.
+
+        "remove content" deleted something permanently on one member's
+        description of it. The reason above is the accusation; this is the
+        thing itself, and deciding between the two without it is not really
+        deciding.
+
+        A gone row is said plainly rather than rendered as an empty box —
+        "already gone" is the answer to why the remove button is missing.
+      */}
+      {report.content_text === undefined ? (
+        <p className="rounded-lg bg-secondary/60 px-3 py-2 text-xs text-muted-foreground">
+          this content is already gone — deleted by its author, or removed earlier.
+        </p>
+      ) : (
+        <div className="rounded-lg bg-secondary/60 px-3 py-2">
+          <p className="text-[0.65rem] font-medium uppercase tracking-wide text-muted-foreground">
+            {report.content_author_name ?? 'a member'} wrote
+          </p>
+          <p className="mt-1 whitespace-pre-wrap text-sm text-pretty">
+            {report.content_text.trim() ? report.content_text : '(no text — an image or an empty post)'}
+          </p>
+        </div>
+      )}
+
       {status === 'pending' && (
         <div className="flex gap-2 pt-1">
           <button type="button" onClick={handleDismiss} disabled={pending} className="rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground">
@@ -72,9 +99,11 @@ export function ReportCard({ report }: { report: ContentReport }) {
           <button type="button" onClick={handleReviewed} disabled={pending} className="rounded-full bg-honey/15 px-3 py-1.5 text-xs font-medium text-honey">
             mark reviewed
           </button>
-          <button type="button" onClick={handleRemove} disabled={pending} className="rounded-full bg-destructive/10 px-3 py-1.5 text-xs font-medium text-destructive">
-            remove content
-          </button>
+          {report.content_text !== undefined && (
+            <button type="button" onClick={handleRemove} disabled={pending} className="rounded-full bg-destructive/10 px-3 py-1.5 text-xs font-medium text-destructive">
+              remove content
+            </button>
+          )}
         </div>
       )}
     </div>

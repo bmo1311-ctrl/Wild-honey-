@@ -8,12 +8,17 @@ import { KidGate } from '@/components/kid-gate'
 import { TzCookie } from '@/components/tz-cookie'
 import { BloomAvatar } from '@/components/bloom-avatar'
 import { OneSignalInit } from '@/components/onesignal-init'
-import { getSessionProfile } from '@/lib/data'
+import { getPendingReportCount, getSessionProfile } from '@/lib/data'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const profile = await getSessionProfile()
   if (!profile) redirect('/auth/login')
   if (!profile.onboarding_completed_at) redirect('/onboarding')
+
+  // Only for her, and only when there is something waiting. A report is the
+  // one thing in the app with a member on the other end of it, and until now
+  // it announced itself nowhere at all.
+  const pendingReports = profile.is_admin ? await getPendingReportCount() : 0
 
   return (
     <div className="min-h-dvh bg-background pb-24" data-palette={profile?.color_season ?? undefined}>
@@ -26,10 +31,19 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <div className="flex items-center gap-3">
             {profile.is_admin && (
               <Link
-                href="/admin"
-                className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground"
+                href={pendingReports > 0 ? '/admin/reports' : '/admin'}
+                className={
+                  pendingReports > 0
+                    ? 'flex items-center gap-1.5 rounded-full bg-destructive/10 px-3 py-1 text-xs font-medium text-destructive'
+                    : 'rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground'
+                }
               >
                 Admin
+                {pendingReports > 0 && (
+                  <span className="rounded-full bg-destructive px-1.5 text-[0.65rem] font-semibold leading-[1.4] text-background">
+                    {pendingReports}
+                  </span>
+                )}
               </Link>
             )}
             <Link href="/app/profile" aria-label="Your profile">

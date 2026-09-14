@@ -107,6 +107,16 @@ export function GroupPostCard({ post }: { post: GroupPost }) {
                 <p className="text-xs font-medium">{c.profile?.name ?? 'A member'}</p>
                 <p className="text-sm leading-snug text-pretty">{c.text}</p>
               </div>
+              {/*
+                Reporting a *comment* had no way in.
+                `content_reports` has accepted circle_comment,
+                community_comment and group_post_comment since the day the
+                table was written, and the removal path knows all three — but
+                the menu only ever appeared on posts. So the one place people
+                are actually unkind to each other, the replies, was the one
+                place with no way to say so.
+              */}
+              <SafetyMenu authorId={c.user_id} contentType="group_post_comment" contentId={c.id} />
             </div>
           ))}
           <div className="flex items-center gap-2">

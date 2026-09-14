@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import { accessFor, asTier, meets, type Access, type Requirement } from '@/lib/access'
 import { courseAllowList } from '@/lib/kid'
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
+import { CONTENT_TABLE } from '@/lib/moderation'
 import type {
   BeautyDomain,
   BeautyProduct,
@@ -239,16 +241,28 @@ export async function getCircleFeed(): Promise<JournalEntry[]> {
   const ids = list.map((e) => e.id)
   const [{ data: reactions }, { data: comments }] = await Promise.all([
     supabase.from('reactions').select('entry_id, user_id').in('entry_id', ids),
-    supabase.from('comments').select('entry_id').in('entry_id', ids),
+    supabase.from('comments').select('entry_id, user_id').in('entry_id', ids),
   ])
 
+  /*
+   * The counts have to be filtered too, not just the posts.
+   *
+   * Hiding her posts and then counting her hearts means the number under
+   * every post includes someone the reader has blocked — and "4 comments"
+   * that opens to show three is the block leaking as a discrepancy. The
+   * comment bodies are filtered in `getComments`; this is the count above
+   * them, which was computed from a different query and so was missed.
+   */
+  const rxVisible = (reactions ?? []).filter((r) => !hidden.has(r.user_id))
+  const cVisible = (comments ?? []).filter((c) => !hidden.has(c.user_id))
+
   return list.map((e) => {
-    const rx = (reactions ?? []).filter((r) => r.entry_id === e.id)
+    const rx = rxVisible.filter((r) => r.entry_id === e.id)
     return {
       ...e,
       reaction_count: rx.length,
       reacted_by_me: user ? rx.some((r) => r.user_id === user.id) : false,
-      comment_count: (comments ?? []).filter((c) => c.entry_id === e.id).length,
+      comment_count: cVisible.filter((c) => c.entry_id === e.id).length,
     }
   })
 }
@@ -295,16 +309,21 @@ export async function getCommunityFeed(): Promise<CommunityPost[]> {
   const ids = list.map((p) => p.id)
   const [{ data: reactions }, { data: comments }] = await Promise.all([
     supabase.from('community_reactions').select('post_id, user_id').in('post_id', ids),
-    supabase.from('community_comments').select('post_id').in('post_id', ids),
+    supabase.from('community_comments').select('post_id, user_id').in('post_id', ids),
   ])
 
+  // Same as the circle feed above: the counts are computed from their own
+  // queries, so filtering the posts left blocked people inside the numbers.
+  const rxVisible = (reactions ?? []).filter((r) => !hidden.has(r.user_id))
+  const cVisible = (comments ?? []).filter((c) => !hidden.has(c.user_id))
+
   return list.map((p) => {
-    const rx = (reactions ?? []).filter((r) => r.post_id === p.id)
+    const rx = rxVisible.filter((r) => r.post_id === p.id)
     return {
       ...p,
       reaction_count: rx.length,
       reacted_by_me: user ? rx.some((r) => r.user_id === user.id) : false,
-      comment_count: (comments ?? []).filter((c) => c.post_id === p.id).length,
+      comment_count: cVisible.filter((c) => c.post_id === p.id).length,
     }
   })
 }
@@ -656,16 +675,20 @@ export async function getGroupPosts(groupId: string): Promise<GroupPost[]> {
   const ids = list.map((p) => p.id)
   const [reactions, comments] = await Promise.all([
     supabase.from('group_post_reactions').select('post_id, user_id').in('post_id', ids).then(ok),
-    supabase.from('group_post_comments').select('post_id').in('post_id', ids).then(ok),
+    supabase.from('group_post_comments').select('post_id, user_id').in('post_id', ids).then(ok),
   ])
 
+  // Same as the two feeds above.
+  const rxVisible = (reactions ?? []).filter((r: { user_id: string }) => !hidden.has(r.user_id))
+  const cVisible = (comments ?? []).filter((c: { user_id: string }) => !hidden.has(c.user_id))
+
   return list.map((p) => {
-    const rx = (reactions ?? []).filter((r) => r.post_id === p.id)
+    const rx = rxVisible.filter((r: { post_id: string }) => r.post_id === p.id)
     return {
       ...p,
       reaction_count: rx.length,
-      reacted_by_me: user ? rx.some((r) => r.user_id === user.id) : false,
-      comment_count: (comments ?? []).filter((c) => c.post_id === p.id).length,
+      reacted_by_me: user ? rx.some((r: { user_id: string }) => r.user_id === user.id) : false,
+      comment_count: cVisible.filter((c: { post_id: string }) => c.post_id === p.id).length,
     }
   })
 }
@@ -773,6 +796,27 @@ export async function getMutedUsers() {
   return data ?? []
 }
 
+/**
+ * How many reports are waiting.
+ *
+ * Reporting content wrote a row and told nobody. The Reports screen is
+ * thirteenth in a nav bar that scrolls sideways, so the only way she found out
+ * a member had reported something was by going looking for it — which is to
+ * say, by already suspecting. A report is the one thing in this app with
+ * someone waiting on the other end of it.
+ *
+ * `head: true` means no rows come back, just the number, so this is cheap
+ * enough to run in the layout on every admin page and in the app header.
+ */
+export const getPendingReportCount = cache(async function getPendingReportCount(): Promise<number> {
+  const supabase = await createClient()
+  const { count } = await supabase
+    .from('content_reports')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'pending')
+  return count ?? 0
+})
+
 export async function getReportsForAdmin(): Promise<ContentReport[]> {
   const supabase = await createClient()
   const { data } = await supabase
@@ -780,7 +824,64 @@ export async function getReportsForAdmin(): Promise<ContentReport[]> {
     .select('*, reporter_profile:public_profiles(name, avatar_color, avatar_url)')
     .order('status', { ascending: true })
     .order('created_at', { ascending: false })
-  return (data as ContentReport[]) ?? []
+  const reports = (data as ContentReport[]) ?? []
+  if (reports.length === 0) return reports
+
+  /*
+   * Show the thing being reported.
+   *
+   * The card showed the reporter's *reason* and nothing else — so "remove
+   * content" was a permanent deletion of something she had never read, on
+   * one member's word about another. The reason is the accusation; this is
+   * the evidence, and one of those was missing from a screen whose whole job
+   * is deciding between them.
+   *
+   * The service client is right here for the same reason it is right in
+   * `adminRemoveReportedContent`: a report is frequently about a group she is
+   * not in or a circle post that is not hers, so under ordinary RLS the
+   * lookup returns nothing — which reads identically to "already deleted".
+   * This function is only ever called from the admin area, and the removal
+   * path already reaches the row anyway.
+   *
+   * `content_text` stays undefined when the row is genuinely gone, which is
+   * what lets the card say so rather than showing a silent blank.
+   */
+  const admin = createServiceClient()
+  const byType = new Map<string, string[]>()
+  for (const r of reports) {
+    const table = CONTENT_TABLE[r.content_type]
+    if (!table) continue
+    byType.set(table, [...(byType.get(table) ?? []), r.content_id])
+  }
+
+  const found = new Map<string, { text: string; user_id: string }>()
+  const authorIds = new Set<string>()
+  await Promise.all(
+    [...byType].map(async ([table, ids]) => {
+      const { data: rows } = await admin.from(table).select('id, text, user_id').in('id', ids)
+      for (const row of (rows ?? []) as { id: string; text: string | null; user_id: string }[]) {
+        found.set(`${table}:${row.id}`, { text: row.text ?? '', user_id: row.user_id })
+        authorIds.add(row.user_id)
+      }
+    }),
+  )
+
+  const names = new Map<string, string>()
+  if (authorIds.size > 0) {
+    const { data: profiles } = await admin.from('profiles').select('id, name').in('id', [...authorIds])
+    for (const p of (profiles ?? []) as { id: string; name: string | null }[]) names.set(p.id, p.name ?? 'a member')
+  }
+
+  return reports.map((r) => {
+    const table = CONTENT_TABLE[r.content_type]
+    const hit = table ? found.get(`${table}:${r.content_id}`) : undefined
+    return {
+      ...r,
+      content_text: hit?.text,
+      content_author_name: hit ? (names.get(hit.user_id) ?? 'a member') : undefined,
+      content_author_id: hit?.user_id,
+    }
+  })
 }
 
 // ---- Recipes ----

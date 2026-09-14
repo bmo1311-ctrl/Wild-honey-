@@ -8,6 +8,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { getHiddenAuthorIds } from '@/lib/data'
+import { CONTENT_TABLE } from '@/lib/moderation'
 import { circleWriteAllowed } from '@/lib/kid-guard'
 import { oneSignalConfigured, sendPushToUsers } from '@/lib/onesignal'
 import type { Comment, NotificationPrefs, Visibility } from '@/lib/types'
@@ -215,7 +216,7 @@ export async function createCommunityPost(input: { text: string; imageUrl?: stri
     pillar: input.pillar || null,
   })
   if (error) return { error: error.message }
-  revalidatePath('/app/community')
+  revalidatePath('/app/circle')
   return { ok: true }
 }
 
@@ -236,7 +237,7 @@ export async function toggleCommunityReaction(postId: string): Promise<SocialRes
     const { error } = await supabase.from('community_reactions').insert({ post_id: postId, user_id: user.id })
     if (error) return { error: error.message }
   }
-  revalidatePath('/app/community')
+  revalidatePath('/app/circle')
   return { ok: true, reacted: !existing }
 }
 
@@ -249,7 +250,7 @@ export async function addCommunityComment(postId: string, text: string): Promise
   if (!trimmed) return { error: 'Comment cannot be empty.' }
   const { error } = await supabase.from('community_comments').insert({ post_id: postId, user_id: user.id, text: trimmed })
   if (error) return { error: error.message }
-  revalidatePath('/app/community')
+  revalidatePath('/app/circle')
   return { ok: true }
 }
 
@@ -280,7 +281,7 @@ export async function togglePinPost(postId: string) {
   const { data: post } = await supabase.from('community_posts').select('pinned').eq('id', postId).single()
   const { error } = await supabase.from('community_posts').update({ pinned: !post?.pinned }).eq('id', postId)
   if (error) return { error: error.message }
-  revalidatePath('/app/community')
+  revalidatePath('/app/circle')
   return { ok: true }
 }
 
@@ -290,7 +291,7 @@ export async function togglePinComment(commentId: string) {
   const { data: comment } = await supabase.from('community_comments').select('pinned').eq('id', commentId).single()
   const { error } = await supabase.from('community_comments').update({ pinned: !comment?.pinned }).eq('id', commentId)
   if (error) return { error: error.message }
-  revalidatePath('/app/community')
+  revalidatePath('/app/circle')
   return { ok: true }
 }
 
@@ -1526,7 +1527,6 @@ export async function toggleBlockUser(userId: string) {
   const { error } = await supabase.from('user_blocks').insert({ blocker_id: user.id, blocked_id: userId })
   if (error) return { error: error.message }
   revalidatePath('/app/circle')
-  revalidatePath('/app/community')
   return { ok: true, blocked: true }
 }
 
@@ -1542,7 +1542,6 @@ export async function toggleMuteUser(userId: string) {
   const { error } = await supabase.from('user_mutes').insert({ muter_id: user.id, muted_id: userId })
   if (error) return { error: error.message }
   revalidatePath('/app/circle')
-  revalidatePath('/app/community')
   return { ok: true, muted: true }
 }
 
@@ -1573,6 +1572,11 @@ export async function reportContent(input: { contentType: string; contentId: str
     reason,
   })
   if (error) return { error: error.message }
+  // So the pending badge in the admin nav and the app header appears without
+  // waiting for a cache to expire. Reporting used to write a row and tell
+  // nobody at all; a count that lags by an hour is most of that problem back.
+  revalidatePath('/admin', 'layout')
+  revalidatePath('/app', 'layout')
   return { ok: true }
 }
 
@@ -1586,20 +1590,12 @@ export async function reportContent(input: { contentType: string; contentId: str
  */
 type SocialResult = { error?: string; ok?: boolean; reacted?: boolean; groupId?: string }
 
-const CONTENT_TABLE: Record<string, string> = {
-  journal_entry: 'journal_entries',
-  community_post: 'community_posts',
-  community_comment: 'community_comments',
-  group_post: 'group_posts',
-  group_post_comment: 'group_post_comments',
-  circle_comment: 'comments',
-}
-
 export async function adminReviewReport(reportId: string, status: 'reviewed' | 'dismissed') {
   const { supabase, user } = await requireAdmin()
   const { error } = await supabase.from('content_reports').update({ status, reviewed_at: new Date().toISOString(), reviewed_by: user.id }).eq('id', reportId)
   if (error) return { error: error.message }
-  revalidatePath('/admin/reports')
+  revalidatePath('/admin', 'layout')
+  revalidatePath('/app', 'layout')
   return { ok: true }
 }
 
@@ -1637,9 +1633,9 @@ export async function adminRemoveReportedContent(reportId: string) {
 
   const { error } = await supabase.from('content_reports').update({ status: 'removed', reviewed_at: new Date().toISOString(), reviewed_by: user.id }).eq('id', reportId)
   if (error) return { error: error.message }
-  revalidatePath('/admin/reports')
+  revalidatePath('/admin', 'layout')
+  revalidatePath('/app', 'layout')
   revalidatePath('/app/circle')
-  revalidatePath('/app/community')
   return { ok: true }
 }
 

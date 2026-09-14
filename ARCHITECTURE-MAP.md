@@ -1474,3 +1474,58 @@ a guard on the page she actually needs.
 what its coverage is. This one had been green for a day while two adult pages
 sat open, because of an assumption in the walker rather than anything in the
 app. Worth asking of each of the four: what would it *not* see?
+
+---
+
+## 29. Moderation: the part with a person waiting on it (14 Sept)
+
+Four things, all of them the same shape — a pathway that existed in the
+database and stopped short of anything a woman could actually reach.
+
+### The counts were not filtered, only the posts
+
+Blocking filtered the post list and left the numbers above it alone, because
+`reaction_count` and `comment_count` are computed from their own queries. So
+"4 replies" opened to show three, and the heart count included someone she had
+blocked. A block that leaks as an off-by-one is worse than none — it invites
+her to go and check. Filtered in all three feeds; the comment selects now take
+`user_id` so they can be.
+
+### She was removing content she had never read
+
+The admin report card showed the *reason* and nothing else. So "remove
+content" permanently deleted a post on one member's description of it, with
+the accusation on screen and the evidence nowhere. It now shows the text and
+the author, fetched with the service client — a report is usually about a
+group she is not in, where ordinary RLS returns nothing, which reads exactly
+like "already deleted". When the row is genuinely gone the card says so and
+the remove button is not offered.
+
+`CONTENT_TABLE` moved to `lib/moderation.ts` so the screen that shows the
+content and the action that deletes it use the same map. Two copies of that
+lookup is the same species as everything else in this file.
+
+### Reporting told nobody
+
+It wrote a row. Reports is thirteenth in a nav bar that scrolls sideways off
+the screen, so the only way she learned a member had reported something was by
+going to look — which means by already suspecting. There is now a count on the
+admin nav and on the Admin button in the app header, and when it is non-zero
+that button goes straight to the reports rather than the overview. Reporting
+and reviewing both revalidate the two layouts so it appears immediately.
+
+### The safety menu was never on comments
+
+`content_reports` has accepted `circle_comment`, `community_comment` and
+`group_post_comment` since the table was written, and the removal path handles
+all three. Nothing in the app could produce one — the menu was on posts only.
+The replies are where people are actually unkind to each other, and it was the
+one place with no way to say so.
+
+### And the community feed revalidated a redirect
+
+Five writers called `revalidatePath('/app/community')`. That route is four
+lines that `redirect('/app/circle')` — the feed has been unified for a while.
+So posting, reacting, commenting and pinning in the community feed refreshed a
+page nobody is ever on, and the feed she was looking at kept its old copy.
+All 8 now point at `/app/circle`.
