@@ -1,5 +1,6 @@
 import { StyleSetup } from '@/components/style-setup'
 import { getStyleProfile } from '@/lib/data'
+import { adultsOnly } from '@/lib/kid-guard'
 
 /**
  * Her colouring and her frame.
@@ -10,6 +11,7 @@ import { getStyleProfile } from '@/lib/data'
  * Protocols.
  */
 export default async function StylePage() {
+  await adultsOnly()
   const style = await getStyleProfile()
   return (
     <div className="flex flex-col gap-6">

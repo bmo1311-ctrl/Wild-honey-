@@ -5,8 +5,10 @@ import { CycleSettingsForm } from '@/components/cycle-settings-form'
 import type { CyclePhaseKey } from '@/lib/cycle'
 import { getCyclePhase, getSessionProfile } from '@/lib/data'
 import { calculateTargets, kgToLb, type ActivityLevel, type BodyGoal } from '@/lib/goals'
+import { adultsOnly } from '@/lib/kid-guard'
 
 export default async function GoalsPage() {
+  await adultsOnly()
   const [rawProfile, cycle] = await Promise.all([getSessionProfile(), getCyclePhase()])
   const profile = rawProfile as (Awaited<ReturnType<typeof getSessionProfile>> & {
     weight_kg?: number | null

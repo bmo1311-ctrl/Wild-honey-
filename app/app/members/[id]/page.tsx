@@ -3,7 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import { ChevronLeft } from 'lucide-react'
 import { BloomAvatar } from '@/components/bloom-avatar'
 import { RecipeCard } from '@/components/recipe-card'
-import { getMemberProgressCount, getMemberSharedRecipes, getMemberWins, getPublicProfile, getSessionProfile } from '@/lib/data'
+import { getHiddenAuthorIds, getMemberProgressCount, getMemberSharedRecipes, getMemberWins, getPublicProfile, getSessionProfile } from '@/lib/data'
 import { circleOrRedirect } from '@/lib/kid-guard'
 
 /** What a member chose to show. Everything here is opt-in; the default is name and photo. */
@@ -14,6 +14,20 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   if (me?.id === id) redirect('/app/profile')
   const member = await getPublicProfile(id)
   if (!member || member.is_child) notFound()
+
+  /*
+   * A block reaches the profile too.
+   *
+   * Blocking filtered the feeds and nothing else, so a blocked woman could
+   * still open the person who blocked her and read her bio, her wins and her
+   * shared recipes. `getHiddenAuthorIds` is bidirectional, which is the point:
+   * it closes this in both directions from one check.
+   *
+   * `notFound()` rather than a message, because "you are blocked" tells the
+   * blocked person something about the other woman's choices that she is not
+   * owed.
+   */
+  if ((await getHiddenAuthorIds()).has(id)) notFound()
 
   const show = member.profile_show ?? {}
   const [recipes, days, wins] = await Promise.all([

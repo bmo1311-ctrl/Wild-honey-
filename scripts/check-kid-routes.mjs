@@ -73,6 +73,26 @@ function isGuarded(route) {
   return /adultsOnly\(\)|circleOrRedirect\(\)/.test(readFileSync(page, 'utf8'))
 }
 
+/*
+ * Nested pages count too.
+ *
+ * This walked only the top level, so `/app/groups` was checked and
+ * `/app/groups/[groupId]` was not — and the nested one had no guard at all. A
+ * route one directory deeper is exactly as reachable as one at the top.
+ *
+ * The route a nested page belongs to is its top-level ancestor: whatever
+ * `kidAllowed` says about `/app/groups` is what its children inherit.
+ */
+function pagesUnder(dir) {
+  const out = []
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const full = `${dir}/${e.name}`
+    if (e.isDirectory()) out.push(...pagesUnder(full))
+    else if (e.name === 'page.tsx') out.push(full)
+  }
+  return out
+}
+
 const problems = []
 for (const entry of readdirSync(ROOT, { withFileTypes: true })) {
   if (!entry.isDirectory()) continue
@@ -102,6 +122,42 @@ for (const entry of readdirSync(ROOT, { withFileTypes: true })) {
       continue
     }
     problems.push(`${route} — a child can reach this and nothing stops her. Add \`await adultsOnly()\` at the top of the page, or add it to EXEMPT in this file with a reason.`)
+  }
+}
+
+/*
+ * And every page beneath an adult-only route needs its own guard.
+ *
+ * A guard on `/app/groups/page.tsx` says nothing about
+ * `/app/groups/[groupId]/page.tsx` — they are separate server components and
+ * only the one being rendered runs.
+ */
+for (const entry of readdirSync(ROOT, { withFileTypes: true })) {
+  if (!entry.isDirectory()) continue
+  const route = `/app/${entry.name}`
+  if (kidAllowed(route, {})) continue
+  if (EXEMPT[route]) continue
+
+  for (const page of pagesUnder(`${ROOT}/${entry.name}`)) {
+    if (page === `${ROOT}/${entry.name}/page.tsx`) continue
+
+    /*
+     * Ask about the nested route itself, not its parent.
+     *
+     * `/app/nutrition` is adult-only but `/app/nutrition/log` is one of her
+     * own pages — a child logs her food there. Inheriting the parent's answer
+     * would demand a guard on the very page she needs.
+     */
+    const nested = page.replace(ROOT, '/app').replace(/\/page\.tsx$/, '')
+    if (kidAllowed(nested, {})) continue
+
+    const src = readFileSync(page, 'utf8')
+    if (/adultsOnly\(\)|circleOrRedirect\(\)|requireTier\(/.test(src)) continue
+    if (redirectTarget(src)) continue
+    problems.push(
+      `${page.replace(ROOT, '/app')} — nested under an adult-only route but has no guard of its own. ` +
+        `A guard on the parent page does not cover it; add \`await adultsOnly()\` here too.`,
+    )
   }
 }
 

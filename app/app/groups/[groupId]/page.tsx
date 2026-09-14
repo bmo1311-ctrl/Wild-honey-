@@ -3,8 +3,15 @@ import { GroupHeader } from '@/components/group-header'
 import { GroupPostComposer } from '@/components/group-post-composer'
 import { GroupPostCard } from '@/components/group-post-card'
 import { getGroupById, getGroupMembers, getGroupPosts, getSessionProfile } from '@/lib/data'
+import { adultsOnly } from '@/lib/kid-guard'
 
 export default async function GroupDetailPage({ params }: { params: Promise<{ groupId: string }> }) {
+  /*
+   * `/app/groups` was guarded and this was not — and `check:kid` did not
+   * notice, because it only walked the top level of `app/app/*`. A nested
+   * route is exactly as reachable as a top-level one.
+   */
+  await adultsOnly()
   const { groupId } = await params
   const [group, members, profile] = await Promise.all([getGroupById(groupId), getGroupMembers(groupId), getSessionProfile()])
 

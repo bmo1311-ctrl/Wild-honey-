@@ -7,6 +7,7 @@ import { detectActives } from '@/lib/actives'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
+import { getHiddenAuthorIds } from '@/lib/data'
 import { circleWriteAllowed } from '@/lib/kid-guard'
 import { oneSignalConfigured, sendPushToUsers } from '@/lib/onesignal'
 import type { Comment, NotificationPrefs, Visibility } from '@/lib/types'
@@ -149,6 +150,16 @@ export async function addComment(entryId: string, text: string): Promise<SocialR
 }
 
 export async function getComments(entryId: string): Promise<Comment[]> {
+  /*
+   * Blocking has to reach the replies too.
+   *
+   * `getHiddenAuthorIds` was applied to the three feeds and nowhere else, so
+   * blocking someone removed her posts and left every one of her comments in
+   * place — with her name and photo — one tap below. The confirmation said
+   * "you won't see each other's posts", which was narrowly true and read as a
+   * much bigger promise than it kept.
+   */
+  const hidden = await getHiddenAuthorIds()
   const supabase = await createClient()
   const { data } = await supabase
     .from('comments')
@@ -156,7 +167,8 @@ export async function getComments(entryId: string): Promise<Comment[]> {
     .eq('entry_id', entryId)
     .order('pinned', { ascending: false })
     .order('created_at', { ascending: true })
-  return (data as Comment[]) ?? []
+  const visible = (data ?? []).filter((c) => !hidden.has((c as { user_id: string }).user_id))
+  return (visible as Comment[]) ?? []
 }
 
 export async function updateProfile(input: { name: string; avatarColor: string; avatarUrl?: string | null }) {
@@ -242,6 +254,16 @@ export async function addCommunityComment(postId: string, text: string): Promise
 }
 
 export async function getCommunityComments(postId: string) {
+  /*
+   * Blocking has to reach the replies too.
+   *
+   * `getHiddenAuthorIds` was applied to the three feeds and nowhere else, so
+   * blocking someone removed her posts and left every one of her comments in
+   * place — with her name and photo — one tap below. The confirmation said
+   * "you won't see each other's posts", which was narrowly true and read as a
+   * much bigger promise than it kept.
+   */
+  const hidden = await getHiddenAuthorIds()
   const supabase = await createClient()
   const { data } = await supabase
     .from('community_comments')
@@ -1043,7 +1065,24 @@ export async function joinGroupByCode(code: string): Promise<SocialResult> {
   const { supabase, user } = await requireUser()
   const trimmed = code.trim().toUpperCase()
   if (!trimmed) return { error: 'Enter an invite code first.' }
-  const { data: group } = await supabase.from('groups').select('id').eq('invite_code', trimmed).maybeSingle()
+  /*
+   * Look the code up with the service client, not hers.
+   *
+   * The `groups` SELECT policy now requires membership — because
+   * `invite_code` is the join credential and it was readable by every signed
+   * -in member. That makes this lookup a chicken and egg: she cannot read the
+   * row until she is in the group, and she cannot join until the row is read.
+   *
+   * Presenting a correct code *is* the authorisation, so this one query runs
+   * privileged — matched on the exact code, selecting only the id, and
+   * returning the same message whether the code is wrong or the group is
+   * gone. The insert immediately below is still hers, under RLS.
+   */
+  const { data: group } = await createServiceClient()
+    .from('groups')
+    .select('id')
+    .eq('invite_code', trimmed)
+    .maybeSingle()
   if (!group) return { error: "That code doesn't match a group." }
   const { error } = await supabase.from('group_members').insert({ group_id: group.id, user_id: user.id, role: 'member' })
   if (error) {
@@ -1100,6 +1139,16 @@ export async function addGroupPostComment(postId: string, text: string): Promise
 }
 
 export async function getGroupPostComments(postId: string) {
+  /*
+   * Blocking has to reach the replies too.
+   *
+   * `getHiddenAuthorIds` was applied to the three feeds and nowhere else, so
+   * blocking someone removed her posts and left every one of her comments in
+   * place — with her name and photo — one tap below. The confirmation said
+   * "you won't see each other's posts", which was narrowly true and read as a
+   * much bigger promise than it kept.
+   */
+  const hidden = await getHiddenAuthorIds()
   const supabase = await createClient()
   const { data } = await supabase
     .from('group_post_comments')

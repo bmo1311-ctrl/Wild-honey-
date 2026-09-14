@@ -1415,3 +1415,62 @@ that fails loudly.
   reported text — a remove button for something never read.
 - **`revalidatePath('/app/community')`** appears 8 times for a route that is
   now a redirect, and three Circle writers never revalidate `/app/circle`.
+
+---
+
+## 28. Blocking, invite codes, and a gap in my own check (14 Sept)
+
+The rest of §27's list.
+
+### Blocking now reaches past the feed
+
+`getHiddenAuthorIds` is correct and bidirectional, and was applied to three
+feeds and nothing else. So blocking someone removed her posts and left every
+one of her **comments** in place — name, photo and all — one tap below, while
+the confirmation said *"you won't see each other's posts"*.
+
+Now applied in `getComments`, `getCommunityComments`, `getGroupPostComments`,
+and on `/app/members/[id]`, which a blocked woman could previously open and
+read. That last one uses `notFound()` rather than a message, because "you are
+blocked" tells the blocked person something about the other woman's choices
+that she is not owed.
+
+### An invite code is a credential
+
+The `groups` SELECT policy was `auth.role() = 'authenticated'` — every
+signed-in member could read every group row, **including `invite_code`**. That
+code is the whole of the join check in `joinGroupByCode`, so reading it was
+equivalent to being able to join. Migration `invite_code_is_a_credential`
+narrows it to members, the owner, and retreat groups.
+
+**And that immediately broke joining by code** — she cannot read the row until
+she is a member, and cannot become one until it is read. `joinGroupByCode`
+does that one lookup with the service client now: presenting a correct code
+*is* the authorisation, the query matches the exact code and selects only the
+id, and the insert after it is still hers under RLS. Worth naming because the
+migration looked complete on its own and was not.
+
+Checked the other four `from('groups')` call sites against the new policy:
+`getMyGroups` reads only her own; `getGroupById` now returns null to a
+non-member, which turns a render-time check into a data-fetch one; both create
+paths set `created_by = auth.uid()` so their `.select('id')` still passes.
+
+### `check:kid` was only looking at the top level
+
+`/app/groups` was guarded. `/app/groups/[groupId]` was not — and the check did
+not notice, because it walked only the first level of `app/app/*`. A route one
+directory deeper is exactly as reachable as one at the top.
+
+It now walks every `page.tsx` beneath an adult-only route. That immediately
+found two more genuinely unguarded pages: **`/app/nutrition/goals`** (her cycle
+dates and body figures) and **`/app/wardrobe/you`** (the colour analysis).
+
+One refinement it needed: ask `kidAllowed` about the **nested route itself**,
+not its parent. `/app/nutrition` is adult-only but `/app/nutrition/log` is one
+of a child's own pages, and inheriting the parent's answer would have demanded
+a guard on the page she actually needs.
+
+**The lesson about the checks themselves:** a check that passes is only worth
+what its coverage is. This one had been green for a day while two adult pages
+sat open, because of an assumption in the walker rather than anything in the
+app. Worth asking of each of the four: what would it *not* see?
