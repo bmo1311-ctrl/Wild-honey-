@@ -27,6 +27,8 @@ import { HoneyProfileCard } from '@/components/honey-profile-card'
 import { BloomAvatar } from '@/components/bloom-avatar'
 import { TierBadge } from '@/components/tier-badge'
 import { ClosetShelf } from '@/components/closet'
+import { StateReading } from '@/components/state-reading'
+import { getPersonalState } from '@/lib/personal-state-db'
 import { getMyGoals, getSessionProfile, getVitalityHistory } from '@/lib/data'
 import { SQUARE_LINKS } from '@/lib/payment-links'
 import { relativeTime } from '@/lib/pillars'
@@ -47,10 +49,11 @@ import { FEATURES } from '@/lib/features'
  * third copy of the same writing.
  */
 export default async function ProfilePage() {
-  const [profile, goals, vitalityHistory] = await Promise.all([
+  const [profile, goals, vitalityHistory, personal] = await Promise.all([
     getSessionProfile(),
     getMyGoals(),
     getVitalityHistory(),
+    getPersonalState(),
   ])
   if (!profile) return null
 
@@ -88,6 +91,14 @@ export default async function ProfilePage() {
           </Link>
         </div>
       )}
+
+      {/*
+        Above the Honey profile on purpose. The profile card is what she told
+        the app about herself once; this is what the app has noticed since.
+        When there is nothing to notice yet, it renders nothing and the page
+        looks exactly as it did before.
+      */}
+      {personal && <StateReading state={personal.state} />}
 
       <HoneyProfileCard profile={profile} goals={goals.map((g) => g.goal)} baseline={baseline} latest={latest} />
 

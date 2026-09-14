@@ -9,6 +9,8 @@ import { localHour, localToday } from '@/lib/today'
 import { buildActivity, consistency, streaksFrom } from '@/lib/activity'
 import { QuickAddHabit } from '@/components/quick-add-habit'
 import { NoticeLine } from '@/components/notice-line'
+import { StateHeadline } from '@/components/state-reading'
+import { getPersonalState } from '@/lib/personal-state-db'
 import { MomentCard } from '@/components/moment-card'
 import { MorningResetCard } from '@/components/morning-reset-card'
 import { EveningReflectionCard } from '@/components/evening-reflection-card'
@@ -97,7 +99,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
   const pct = course ? Math.round((completedDays.length / course.length_days) * 100) : 0
   const loggedHabitIds = new Set(habitLogs.filter((l) => l.date === today).map((l) => l.habit_id))
 
-  const [baseline, goals, recentCheckins, measurements, money, commitments, wins] = await Promise.all([
+  const [baseline, goals, recentCheckins, measurements, money, commitments, wins, personal] = await Promise.all([
     getBaselineVitality(),
     getMyGoals(),
     getRecentCheckins(30),
@@ -105,6 +107,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     getMoney(),
     getMyCommitments(),
     getRecentWins(10),
+    getPersonalState(),
   ])
 
   // One true sentence, or nothing. Built from what she has actually done.
@@ -294,7 +297,21 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
         </h1>
       </header>
 
-      <NoticeLine notice={notice} />
+      {/*
+        The state headline, when there is one — and the notice steps aside
+        for it.
+
+        Both are "one true sentence about you", and stacked they cancel each
+        other out: an observation about her streak directly above "this looks
+        like a capacity problem" reads as an app talking to itself. The
+        headline fires rarely and says the bigger thing, so on the days it
+        speaks it speaks alone.
+      */}
+      {personal?.lead ? (
+        <StateHeadline text={personal.lead.text} because={personal.lead.because} />
+      ) : (
+        <NoticeLine notice={notice} />
+      )}
 
       {/*
         This moment, then everything behind it.

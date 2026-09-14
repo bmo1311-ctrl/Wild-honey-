@@ -24,3 +24,7 @@ catcheck.ts
 cat.tsconfig.json
 studiocheck.ts
 studio.tsconfig.json
+
+# Sandbox artifacts from editing a mounted folder.
+.fuse_hidden*
+**/.fuse_hidden*

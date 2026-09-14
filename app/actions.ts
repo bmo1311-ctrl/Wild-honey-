@@ -11,6 +11,7 @@ import { oneSignalConfigured, sendPushToUsers } from '@/lib/onesignal'
 import type { Comment, NotificationPrefs, Visibility } from '@/lib/types'
 import { COURSE_SLUG, getCourse, weekOfDay } from '@/lib/courses'
 import { localTimeZone, localToday } from '@/lib/today'
+import { dismissHeadline, recordPersonalState } from '@/lib/personal-state-db'
 import { scaleNutrients, type NutrientMap } from '@/lib/nutrients'
 import { fetchRecipe, safeUrl } from '@/lib/recipe-import'
 import type { WritingKind } from '@/lib/courses'
@@ -444,8 +445,18 @@ export async function saveCheckin(input: {
   )
   if (error) return { error: error.message }
   await bumpStreak(user.id)
+  /*
+   * Write down what the app now believes about her.
+   *
+   * Here rather than on page render, so the series in transformation_state
+   * reflects the days she actually told the app something — not the days she
+   * happened to open it. Never throws; a missed write costs one point on a
+   * trend line, not her check-in.
+   */
+  await recordPersonalState()
   revalidatePath('/app')
   revalidatePath('/app/energy')
+  revalidatePath('/app/profile')
   return { ok: true }
 }
 
@@ -469,7 +480,11 @@ export async function saveEveningReflection(input: { q1: string; q2: string; q3:
     .upsert({ user_id: user.id, date: today, q1: input.q1.trim(), q2: input.q2.trim(), q3: input.q3.trim() }, { onConflict: 'user_id,date' })
   if (error) return { error: error.message }
   await bumpStreak(user.id)
+  // Reflecting is the other thing that genuinely changes the reading — it is
+  // most of what 'noticing' is made of. See saveCheckin.
+  await recordPersonalState()
   revalidatePath('/app')
+  revalidatePath('/app/profile')
   return { ok: true }
 }
 
@@ -3587,6 +3602,21 @@ export async function saveCourseDay(
   revalidatePath(`/admin/course/${slug}/${dayNumber}`)
   revalidatePath(`/app/program/${slug}/day/${dayNumber}`)
   revalidatePath(`/app/program/${slug}`)
+  revalidatePath('/app')
+  return { ok: true }
+}
+
+/**
+ * Put the state headline away.
+ *
+ * It is the strongest single sentence the app says, and the readings behind
+ * it change slowly, so without a way to dismiss it the message would simply
+ * become part of the page. Fourteen days quiet, or until the reading itself
+ * changes — whichever comes first.
+ */
+export async function dismissStateHeadline(text: string) {
+  await requireUser()
+  await dismissHeadline(text)
   revalidatePath('/app')
   return { ok: true }
 }
