@@ -39,11 +39,22 @@ export function StyleSetup({
   const [hue, setHue] = useState<Hue | null>(null)
   const [value, setValue] = useState<Value | null>(null)
   const [chroma, setChroma] = useState<Chroma | null>(null)
+  /*
+   * Only asked when she answers "honestly, both" to the jewellery question.
+   * Neutral undertone is a real answer, and the engine used to read it as
+   * cool — so an honest answer could never produce a Spring or an Autumn.
+   */
+  const [lean, setLean] = useState<'warm' | 'cool' | null>(null)
   const [mode, setMode] = useState<'photo' | 'work-it-out' | 'i-know'>(
     initial.season ? 'i-know' : 'photo',
   )
 
-  const derived = hue && value && chroma ? seasonFrom(hue, value, chroma) : null
+  // Neutral needs the tiebreaker before there is enough to place her.
+  const needsLean = hue === 'neutral'
+  const derived =
+    hue && value && chroma && (!needsLean || lean)
+      ? seasonFrom(hue, value, chroma, undefined, lean ?? undefined)
+      : null
   const active = getSeason(season)
 
   function save(patch: Parameters<typeof saveStyleProfile>[0]) {
@@ -132,8 +143,32 @@ export function StyleSetup({
                 { key: 'neutral', label: 'honestly, both' },
               ]}
               value={hue}
-              onChange={(v) => setHue(v as Hue)}
+              onChange={(v) => {
+                setHue(v as Hue)
+                if (v !== 'neutral') setLean(null)
+              }}
             />
+            {/*
+              The second question, and only for the women who need it.
+
+              The jewellery test is the standard one and it genuinely fails
+              for neutral colouring — nothing disappears, which is why
+              "honestly, both" is on the list. Asking it again in other words
+              would not help, so this asks the other standard cue instead:
+              black drains warm colouring, orange overwhelms cool.
+            */}
+            {needsLean && (
+              <Question
+                label="Which one is worse on you — a black top, or a rust-orange one?"
+                help="Neither is anybody's best colour. The question is which one you can see doing something to your face. Black tends to drain warm colouring; orange tends to overwhelm cool colouring."
+                options={[
+                  { key: 'warm', label: 'black drains me' },
+                  { key: 'cool', label: 'orange overwhelms me' },
+                ]}
+                value={lean}
+                onChange={(v) => setLean(v as 'warm' | 'cool')}
+              />
+            )}
             <Question
               label="Light or deep, taking hair and eyes and skin together?"
               help="Not just your skin. Squint at a photo of yourself until the detail goes — what is left is either a light shape or a dark one."

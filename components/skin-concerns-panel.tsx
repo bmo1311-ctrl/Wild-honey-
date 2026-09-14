@@ -6,9 +6,10 @@ import { useRouter } from 'next/navigation'
 import { Apple, Leaf, FlaskConical, Clock, Stethoscope, AlertTriangle } from 'lucide-react'
 import { saveSkinConcerns } from '@/app/actions'
 import {
-  CONCERNS, EVIDENCE_LABEL, combine, tensions, acidsToShow, LESS_IS_THE_GOAL,
+  CONCERNS, EVIDENCE_LABEL, combine, tensions, acidsToShow, herbsFor, LESS_IS_THE_GOAL,
   HOLISTIC_NOTE, PREGNANCY_NOTE,
 } from '@/lib/skin-concerns'
+import { CONCERN_LABEL } from '@/lib/apothecary'
 import { getActive } from '@/lib/actives'
 import { ACID_LIBRARY } from '@/lib/acids'
 import { NUTRIENTS } from '@/lib/nutrients'
@@ -181,15 +182,41 @@ export function SkinConcernsPanel({
                     </p>
                   )}
 
-                  {c.inside.herbs.length > 0 && (
-                    <p className="mt-2 flex items-start gap-1.5 text-[12.5px] leading-[1.45] text-pretty">
+                  {/*
+                    The herbs, with the cautions actually attached.
+
+                    This printed the raw key strings and pointed at "the
+                    apothecary shelf" for the cautions — a page that does not
+                    exist. `herbsFor` was written precisely so those cautions
+                    could not be lost, and nothing had ever called it. Several
+                    of these carry a pregnancy or blood-thinner flag, so what
+                    shipped was a list of herb names with every warning
+                    stripped off and a pointer to nowhere.
+                  */}
+                  {herbsFor(c).length > 0 && (
+                    <div className="mt-2 flex items-start gap-1.5 text-[12.5px] leading-[1.45] text-pretty">
                       <Leaf className="mt-0.5 h-3.5 w-3.5 shrink-0 text-honey" />
-                      <span>
-                        <span className="font-medium">Teas and herbs:</span>{' '}
-                        {c.inside.herbs.join(', ').replace(/-/g, ' ')}. Each has its own cautions
-                        on the apothecary shelf — worth reading before making one a daily habit.
-                      </span>
-                    </p>
+                      <div className="flex flex-col gap-1">
+                        <span className="font-medium">Teas and herbs</span>
+                        {herbsFor(c).map((h) => (
+                          <span key={h.key}>
+                            <span className="font-medium">{h.name}.</span> {h.traditionally}
+                            {h.concerns.length > 0 && (
+                              <span className="text-honey">
+                                {' '}
+                                Ask first if you are{' '}
+                                {h.concerns.map((x) => CONCERN_LABEL[x]).join(', or ')}.
+                                {h.note ? ` ${h.note}` : ''}
+                              </span>
+                            )}
+                          </span>
+                        ))}
+                        <span className="text-muted-foreground">
+                          Traditional use, not treatment. A herb with no flag here has not been
+                          cleared for you — it has only not been flagged.
+                        </span>
+                      </div>
+                    </div>
                   )}
                 </div>
 

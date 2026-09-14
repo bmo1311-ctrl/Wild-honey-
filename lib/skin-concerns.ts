@@ -320,6 +320,25 @@ export function tensions(keys: string[]): string[] {
       'These usually travel together — most of the marks are the spots healing. Azelaic acid and niacinamide are worth knowing about because they work on both at once, which is one product rather than two.',
     )
   }
+  /*
+   * Two more pairs where the advice contradicts itself outright.
+   *
+   * Both were missing, and both are pairs a woman can obviously hold at once —
+   * so the accordion showed her one card saying stop the actives and another
+   * recommending a retinoid, with nothing between them saying which wins.
+   * A contradiction the app does not name is one she has to resolve alone,
+   * usually by doing both.
+   */
+  if (has('redness') && has('dark-spots')) {
+    out.push(
+      'Fading marks wants actives; calming redness wants a pause from them. The pause comes first — actives on unsettled skin tend to leave more marks than they fade. Azelaic acid is the one worth asking about, because it is the gentlest of the things that work on both.',
+    )
+  }
+  if (has('dryness') && has('breakouts')) {
+    out.push(
+      'The usual breakout advice — foaming cleansers, salicylic acid, hot water — is the same list dryness needs you to stop. Treat the dryness first and use the acid on the spots themselves rather than the whole face, or you end up with a stripped barrier that breaks out more.',
+    )
+  }
   return out
 }
 

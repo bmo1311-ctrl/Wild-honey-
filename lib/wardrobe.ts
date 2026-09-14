@@ -80,15 +80,25 @@ export const REQUIRED_LAYERS: Layer[] = ['shoes']
  */
 export function countOutfits(garments: Garment[]): number {
   const by = (l: Layer) => garments.filter((g) => g.layer === l)
-  const tops = by('top'), bottoms = by('bottom'), dresses = by('dress'), shoes = by('shoes')
+  const tops = by('top'), bottoms = by('bottom'), dresses = by('dress')
   const shares = (a: Garment, b: Garment) => a.occasions.some((o) => b.occasions.includes(o))
 
+  /*
+   * One outfit per top-and-bottom pairing. The shoe is a detail, not a look.
+   *
+   * This used to multiply by the number of matching shoes, so three pairs
+   * turned four outfits into twelve — and `lib/outfit.ts`, which builds the
+   * looks she actually sees, deliberately dedupes on exactly that basis:
+   * "the shoe is a detail, not a look". Two files counting the same word
+   * differently, with the page printing "outfits they can make" and the gap
+   * list promising "counted, not guessed".
+   *
+   * A pairing still needs *a* shoe to be wearable, which is what `wearable`
+   * checks — but one wearable pairing is one outfit however many shoes fit.
+   */
   let n = 0
-  for (const t of tops) for (const b of bottoms) {
-    if (!shares(t, b)) continue
-    n += shoes.filter((s) => shares(s, t) && shares(s, b)).length || 1
-  }
-  for (const d of dresses) n += shoes.filter((s) => shares(s, d)).length || 1
+  for (const t of tops) for (const b of bottoms) if (shares(t, b)) n += 1
+  n += dresses.length
   return n
 }
 
@@ -117,7 +127,17 @@ export function findGaps(garments: Garment[], limit = 3): Gap[] {
   const out: Gap[] = []
 
   const liveOccasions = [...new Set(garments.flatMap((g) => g.occasions))]
-  for (const layer of ['top', 'bottom', 'dress', 'shoes', 'outer'] as Layer[]) {
+  /*
+   * Only the layers that actually multiply.
+   *
+   * `shoes` and `outer` were in this list and neither could ever return a
+   * gap: `countOutfits` does not read `outer` at all, and shoes no longer
+   * multiply now that one pairing is one outfit. Simulating them just burned
+   * the loop and guaranteed `unlocks === 0`. Shoes and coats are real gaps in
+   * a wardrobe, but they are gaps of *wearability*, not of combinations, and
+   * a function that counts combinations is the wrong tool for saying so.
+   */
+  for (const layer of ['top', 'bottom', 'dress'] as Layer[]) {
     for (const occasion of liveOccasions) {
       const have = garments.filter((g) => g.layer === layer && g.occasions.includes(occasion)).length
       // Three of something is enough; this is about what is missing.

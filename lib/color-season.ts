@@ -346,8 +346,22 @@ export function seasonFrom(
    * conventional reading and is right more often than not.
    */
   dominant?: 'value' | 'chroma',
+  /**
+   * Which way a neutral undertone leans.
+   *
+   * Both pickers offer "honestly, both", and this function used to read the
+   * answer as `hue === 'warm'` — a single boolean, so neutral fell through to
+   * cool in every one of the four families and in the final hue-led branch.
+   * A woman who answered honestly was deterministically sorted into Summer or
+   * Winter and could never be placed in Spring or Autumn, and the season is
+   * what drives every colour sentence on her board.
+   *
+   * Neutral is a real answer, not a missing one, so it gets asked a second,
+   * genuinely different question rather than being quietly defaulted.
+   */
+  lean?: 'warm' | 'cool',
 ): SeasonKey {
-  const warm = hue === 'warm'
+  const warm = hue === 'warm' || (hue === 'neutral' && lean === 'warm')
   const brightSeason = (): SeasonKey => (warm ? 'bright-spring' : 'bright-winter')
   const softSeason = (): SeasonKey => (warm ? 'soft-autumn' : 'soft-summer')
   const lightSeason = (): SeasonKey => (warm ? 'light-spring' : 'light-summer')
@@ -369,7 +383,15 @@ export function seasonFrom(
   if (value === 'light') return lightSeason()
   if (value === 'deep') return deepSeason()
 
-  // Nothing extreme — hue leads, and chroma places it within the family.
+  /*
+   * Nothing extreme — hue leads, and chroma places it within the family.
+   *
+   * The `true-*` seasons are the four defined *by* their undertone, so they
+   * are the wrong home for someone who has just told us hers is ambiguous.
+   * A neutral answer with no lean goes to the blended families instead, which
+   * is where neutral colouring actually sits.
+   */
+  if (hue === 'neutral' && !lean) return chroma === 'bright' ? 'bright-winter' : 'soft-summer'
   if (warm) return chroma === 'bright' ? 'true-spring' : 'true-autumn'
   return chroma === 'bright' ? 'true-winter' : 'true-summer'
 }

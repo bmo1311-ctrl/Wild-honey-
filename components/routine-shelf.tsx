@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { Plus, Sun, Moon, X, AlertTriangle, Info, ScanLine, ClipboardPaste, Loader2, Search, Sparkles } from 'lucide-react'
 import { addBeautyProduct, removeBeautyProduct } from '@/app/actions'
-import { ACTIVES, detectActives, getActive, guessCategory } from '@/lib/actives'
+import { ACTIVES, LIFE_STAGE_FOOTER, detectActives, getActive, guessCategory } from '@/lib/actives'
 import { buildRoutines, findGaps, type ShelfItem } from '@/lib/routine'
 import type { LifeStage } from '@/lib/actives'
 import { Button } from '@/components/ui/button'
@@ -104,10 +104,23 @@ export function RoutineShelf({
     setBarcode(hit.barcode)
     setCategory(guessCategory(`${hit.brand ?? ''} ${hit.name}`, domain, categories) ?? category)
     setHits([])
+    /*
+     * Only claim to have read a label when there is a label to read.
+     *
+     * A saved product's `actives` can come from two places: an ingredient
+     * list, or another member ticking chips by hand when she added it. Both
+     * arrive here identically. Saying "read its ingredients" for the second
+     * turns one person's guess into everyone else's fact — and that fact then
+     * feeds the pregnancy cautions and tonight's plan.
+     *
+     * `ingredients_raw` is what tells them apart.
+     */
     setScanNote(
-      hit.actives?.length
-        ? `read its ingredients: ${hit.actives.map((a) => getActive(a)?.label ?? a).join(', ').toLowerCase()}.`
-        : 'no ingredient list on this one — tick anything you know.',
+      !hit.actives?.length
+        ? 'no ingredient list on this one — tick anything you know.'
+        : hit.ingredients_raw
+          ? `read its ingredients: ${hit.actives.map((a) => getActive(a)?.label ?? a).join(', ').toLowerCase()}.`
+          : `another member listed this as ${hit.actives.map((a) => getActive(a)?.label ?? a).join(', ').toLowerCase()} — worth checking against your own bottle.`,
     )
   }
 
@@ -129,10 +142,14 @@ export function RoutineShelf({
         setName([p.brand, p.name].filter(Boolean).join(' ').trim() || p.name || '')
         setPicked(p.actives ?? [])
         setIngredients(p.ingredients_raw ?? null)
+        // Same distinction as chooseHit: a stored row without an ingredient
+        // list was somebody's hand-ticked guess, not a label we read.
         setScanNote(
-          p.actives?.length
-            ? 'found it, and read the label. check the details before you add it.'
-            : 'found it, but the ingredients aren’t listed — tick anything you know.',
+          !p.actives?.length
+            ? 'found it, but the ingredients aren’t listed — tick anything you know.'
+            : p.ingredients_raw
+              ? 'found it, and read the label. check the details before you add it.'
+              : 'found it — the actives listed came from another member rather than an ingredient list, so check them against your bottle.',
         )
       } else {
         setScanNote(
@@ -244,6 +261,20 @@ export function RoutineShelf({
               <span>{c.message}</span>
             </div>
           ))}
+          {/*
+            Silence is not clearance.
+
+            Without this line, seeing three of six products flagged makes the
+            other three read as approved — and the app is never in a position
+            to tell anyone that. It only ever appears alongside a pregnancy
+            caution, so it is a qualifier on a warning rather than a
+            disclaimer bolted to the page.
+          */}
+          {cautions.some((c) => c.level === 'pregnancy') && (
+            <p className="px-1 text-[12.5px] leading-[1.5] text-pretty text-muted-foreground">
+              {LIFE_STAGE_FOOTER}
+            </p>
+          )}
         </div>
       )}
 

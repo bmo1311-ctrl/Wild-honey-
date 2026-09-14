@@ -11,7 +11,7 @@
  * finding something else strong to do.
  */
 
-import { getActive } from '@/lib/actives'
+import { findConflicts, getActive } from '@/lib/actives'
 import { getRitual, ritualFor, type Ritual } from '@/lib/rituals'
 import type { ShelfItem } from '@/lib/routine'
 
@@ -101,9 +101,25 @@ export function planTonight(input: {
   const due = strong.filter((s) => s.since === null || s.since >= s.gap)
   const notDue = strong.filter((s) => s.since !== null && s.since < s.gap)
 
-  const alongside = shelf
-    .filter((i) => !i.actives.some(isStrong) && i.category !== 'spf')
-    .map((i) => ({ id: i.id, name: i.name }))
+  /*
+   * What else belongs in tonight's routine.
+   *
+   * Three exclusions, and only the first was here. Strong actives are handled
+   * above. SPF is a morning step. And so is anything else marked `am` — which
+   * is the one that was actually broken: vitamin C is neither strong nor SPF,
+   * so it was being listed as an evening step, and on a benzoyl peroxide
+   * night the card cheerfully proposed the exact pairing `lib/actives.ts`
+   * warns about ("it breaks both down").
+   *
+   * Then, whatever survives that, checked against the conflict rules rather
+   * than assumed compatible — `planTonight` never asked.
+   */
+  const companionsFor = (chosenActives: string[]) =>
+    shelf
+      .filter((i) => !i.actives.some(isStrong) && i.category !== 'spf')
+      .filter((i) => !i.actives.some((k) => getActive(k)?.timeOfDay === 'am'))
+      .filter((i) => findConflicts([...chosenActives, ...i.actives]).length === 0)
+      .map((i) => ({ id: i.id, name: i.name }))
 
   // How hard the last week has already been on her skin.
   const strongIds = new Set(strong.map((s) => s.item.id))
@@ -135,7 +151,7 @@ export function planTonight(input: {
     return {
       kind: 'treatment',
       treatment: { id: pick.item.id, name: pick.item.name, active: pick.active, nightsSince: pick.since },
-      alongside,
+      alongside: companionsFor(pick.item.actives),
       reason,
       waiting,
     }
@@ -152,7 +168,7 @@ export function planTonight(input: {
   return {
     kind: 'nourish',
     ritual: ritual ?? undefined,
-    alongside,
+    alongside: companionsFor([]),
     reason,
     waiting,
   }

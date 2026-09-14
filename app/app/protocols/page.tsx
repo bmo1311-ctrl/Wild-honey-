@@ -178,9 +178,22 @@ function BeautyArea({
 
   return (
     <div className="flex flex-col gap-5">
-      {wash && <WashCard plan={wash} doneToday={washedToday} />}
+      {/*
+        Keyed on what the plan actually is, for the same reason as the shelf.
+        `done` is useState(doneToday); logging a step revalidates, the engine
+        recomputes to a different ritual, and the card kept showing the old
+        one labelled "done tonight" with the button disabled — so she could
+        not log the thing it was now telling her to do.
+      */}
+      {wash && <WashCard key={`${wash.reason}|${washedToday}`} plan={wash} doneToday={washedToday} />}
       {washDays.length > 0 && <WashStrip days={washDays} />}
-      {tonight && <TonightCard plan={tonight} doneToday={doneTonight} />}
+      {tonight && (
+        <TonightCard
+          key={`${tonight.kind}|${tonight.treatment?.id ?? tonight.reason}|${doneTonight}`}
+          plan={tonight}
+          doneToday={doneTonight}
+        />
+      )}
       {week.length > 0 && <WeekStrip nights={week} />}
 
       {/*
@@ -199,7 +212,20 @@ function BeautyArea({
         <TreatmentSuggestions suggestions={treatments} shelfIsEmpty={shelf.length === 0} />
       )}
 
+      {/*
+        Keyed on the area, so switching Skin → Hair remounts it.
+
+        The nav moves between areas with <Link>, which reconciles rather than
+        remounts — so `categories` changed to the hair list while the picker's
+        `category` state stayed on 'cleanser'. The select showed "shampoo"
+        while the state said "cleanser", and adding a product filed it under a
+        category that does not exist in Hair: `detectHairRole` then fell
+        through to 'condition', the product never counted as a wash, and the
+        shelf went on saying "no shampoo yet". `picked` and `alsoUsedIn`
+        leaked across the same switch.
+      */}
       <RoutineShelf
+        key={areaKey}
         shelf={shelf}
         lifeStage={profile?.life_stage ?? null}
         domain={areaKey}

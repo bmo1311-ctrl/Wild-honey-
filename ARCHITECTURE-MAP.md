@@ -677,3 +677,95 @@ label naming an input the function ignores. Defaults that are not in the list
 of choices. None of them crash, none of them typecheck wrong, and every one
 makes the app quietly lie. `npm run verify` cannot catch these — reading the
 two halves side by side is what catches them.
+
+---
+
+## 17. The wider audit (14 Sept)
+
+§16 audited two days of work. This audited the surfaces that had never been
+looked at this way: wardrobe, colour, protocols, beauty. The safety findings
+are the reason this section exists.
+
+### Safety
+
+**S1 — every herb caution was computed and then thrown away.** The panel
+rendered `c.inside.herbs` as raw key strings and told her the cautions were
+"on the apothecary shelf", a page that does not exist. `herbsFor()` exists
+precisely so those cautions cannot be lost — its own doc comment says so — and
+**nothing had ever called it**. Chamomile, ginger, nettle, hibiscus and
+raspberry leaf all carry a pregnancy flag; turmeric and chamomile carry a
+blood-thinner flag. What shipped was the herb names with every warning
+stripped and a pointer to nowhere. The panel now renders each herb with its
+concerns inline.
+
+**S2 — `pregnancyCaution: boolean` could not say the true thing.** Glycolic
+and azelaic were both `false` — no caution at all — while `lib/acids.ts` says
+of exactly those two: *"guidance differs by strength… ask, and ask
+specifically."* A pregnant member with a glycolic toner and an azelaic serum
+saw nothing. Replaced with `pregnancy: 'avoid' | 'ask' | 'quiet'`. Nothing
+that flagged before stopped flagging.
+
+**The rule this makes explicit:** `LIFE_STAGE_FOOTER`, rendered under any
+pregnancy caution — *"anything not flagged here has not been cleared, it has
+only not been flagged."* Without it, three flags out of six products makes the
+other three read as approved, and the app is never in a position to say that.
+The same sentence now closes the herb list.
+
+**S5 — the app claimed to have read a label it had not.** A saved product's
+`actives` can come from an ingredient list *or* from another member ticking
+chips by hand; both arrive identically, and the copy said "read its
+ingredients" for both. One woman's guess became every later woman's fact, and
+that fact feeds the pregnancy cautions. `ingredients_raw` is what tells them
+apart, and the copy now does too.
+
+**S6 — tonight could pair benzoyl peroxide with vitamin C.** `alongside`
+excluded strong actives and SPF but not other AM-only actives, so vitamin C
+was listed as an evening step — and on a benzoyl peroxide night the card
+proposed the exact pairing `lib/actives.ts` warns about. `planTonight` never
+called `findConflicts`. It does now, against the treatment actually chosen.
+
+**S7 — two more contradicting pairs had no tension entry.** redness +
+dark-spots (stop the actives / use a retinoid) and dryness + breakouts (avoid
+foaming cleansers and acids / use salicylic acid). Both render at once in the
+accordion. A contradiction the app does not name is one she resolves alone,
+usually by doing both.
+
+### Functional
+
+**"Honestly, both" was silently read as cool.** `seasonFrom` did
+`const warm = hue === 'warm'`, so `neutral` — an option both pickers offer
+explicitly — fell through to cool in all four families and in the final
+hue-led branch. A woman answering honestly could be sorted into Summer or
+Winter and **never** into Spring or Autumn, and the season drives every colour
+sentence on her board. Neutral now gets a second, genuinely different question
+(black drains warm colouring; orange overwhelms cool) rather than a default.
+With no lean it goes to the blended families, never to a `true-*` season —
+those are the four defined *by* undertone and the wrong home for an ambiguous
+one.
+
+**The outfit count overstated by up to 3×.** `countOutfits` multiplied each
+top-and-bottom pairing by the number of matching shoes; `lib/outfit.ts`, which
+builds the looks she actually sees, dedupes on exactly that basis — *"the shoe
+is a detail, not a look"*. Two files counting the same word differently, under
+a heading that says "outfits they can make" and a gap list promising "counted,
+not guessed". Shoes and `outer` also left `findGaps` unable to ever return
+them; they are gaps of wearability, not of combinations, and a function that
+counts combinations is the wrong tool for saying so.
+
+**Three components held state the server had already changed.** Same species
+as §16's first finding, three more instances: `RoutineShelf` kept
+`category: 'cleanser'` after switching Skin → Hair (the nav uses `<Link>`, so
+it reconciles rather than remounts) — which filed hair products under a
+category Hair does not have, so `detectHairRole` fell through to 'condition',
+the product never counted as a wash, and the shelf went on saying "no shampoo
+yet". `TonightCard` and `WashCard` kept `done: true` after the plan recomputed
+to a different ritual, showing something she never did as done, with the
+button disabled. All three keyed to remount.
+
+### The pattern, now three audits deep
+
+**State or copy drifting out of step with the thing it describes** accounts for
+most of what these audits find. The safety ones are the same shape with worse
+consequences: a function that computes cautions nobody calls, a boolean that
+cannot express "ask", copy that claims a provenance the data does not have.
+None crash. None fail `npm run verify`. Every one makes the app quietly lie.

@@ -24,8 +24,24 @@ export interface Active {
   timeOfDay: TimeOfDay
   /** Other active keys that should not be used in the same routine slot. */
   conflictsWith: string[]
-  /** Commonly avoided in pregnancy or while breastfeeding. */
-  pregnancyCaution: boolean
+  /**
+   * What to do about it in pregnancy or while breastfeeding.
+   *
+   * This was a boolean, and a boolean could not say the true thing about half
+   * this list. Glycolic and azelaic were both `false` — no caution at all —
+   * while `lib/acids.ts` says of exactly those two: "guidance differs by
+   * strength... ask, and ask specifically." A pregnant member with a glycolic
+   * toner and an azelaic serum was shown nothing, and nothing reads as
+   * clearance.
+   *
+   * Three states, and only one of them is silent:
+   *  - 'avoid' — commonly advised against. Say so, and send her to ask.
+   *  - 'ask'   — depends on strength or formulation. Say so, and send her to ask.
+   *  - 'quiet' — not commonly flagged. Renders nothing, which is silence and
+   *              not approval. `LIFE_STAGE_FOOTER` below exists so that the
+   *              silence can never be read as a clearance.
+   */
+  pregnancy: 'avoid' | 'ask' | 'quiet'
   /** Plain-language reason about timing or layering, shown in the routine. */
   note?: string
   /** Why it is cautioned in pregnancy. Kept separate — a timing note is not a safety note. */
@@ -42,7 +58,7 @@ export const ACTIVES: Active[] = [
     ],
     timeOfDay: 'pm',
     conflictsWith: ['aha', 'bha', 'benzoyl-peroxide'],
-    pregnancyCaution: true,
+    pregnancy: 'avoid',
     note: 'Evening only, and not on the same night as acids or benzoyl peroxide — together they tend to irritate rather than work harder.',
     pregnancyNote: 'Vitamin A derivatives are the ingredient class most consistently advised against.',
   },
@@ -52,7 +68,8 @@ export const ACTIVES: Active[] = [
     aliases: ['glycolic acid', 'lactic acid', 'mandelic acid', 'citric acid', 'malic acid', 'tartaric acid'],
     timeOfDay: 'pm',
     conflictsWith: ['retinoid', 'bha'],
-    pregnancyCaution: false,
+    pregnancy: 'ask',
+    pregnancyNote: 'Guidance differs by strength — a low-strength glycolic is treated very differently from a peel.',
     note: 'Its own night. Wear sunscreen the next morning — skin is more sun-sensitive after an acid.',
   },
   {
@@ -61,7 +78,7 @@ export const ACTIVES: Active[] = [
     aliases: ['salicylic acid', 'betaine salicylate', 'willow bark extract', 'salix alba'],
     timeOfDay: 'any',
     conflictsWith: ['retinoid', 'aha'],
-    pregnancyCaution: true,
+    pregnancy: 'ask',
     note: 'Fine morning or evening, but not on the same night as a retinoid or an AHA.',
     pregnancyNote: 'Low strengths on the face are usually considered fine; higher strengths and full-body use are the ones to ask about.',
   },
@@ -74,7 +91,7 @@ export const ACTIVES: Active[] = [
     ],
     timeOfDay: 'am',
     conflictsWith: ['benzoyl-peroxide'],
-    pregnancyCaution: false,
+    pregnancy: 'quiet',
     note: 'Mornings, under sunscreen — that is where it does the most good.',
   },
   {
@@ -83,7 +100,7 @@ export const ACTIVES: Active[] = [
     aliases: ['benzoyl peroxide'],
     timeOfDay: 'any',
     conflictsWith: ['retinoid', 'vitamin-c', 'hydroquinone'],
-    pregnancyCaution: false,
+    pregnancy: 'quiet',
     note: 'Keep it away from retinoids and vitamin C — it breaks both down.',
   },
   {
@@ -92,7 +109,7 @@ export const ACTIVES: Active[] = [
     aliases: ['niacinamide', 'nicotinamide'],
     timeOfDay: 'any',
     conflictsWith: [],
-    pregnancyCaution: false,
+    pregnancy: 'quiet',
     note: 'Gets on with almost everything. Safe to keep in both routines.',
   },
   {
@@ -101,7 +118,8 @@ export const ACTIVES: Active[] = [
     aliases: ['azelaic acid'],
     timeOfDay: 'any',
     conflictsWith: [],
-    pregnancyCaution: false,
+    pregnancy: 'ask',
+    pregnancyNote: 'Strength and formulation decide this one.',
     note: 'One of the few actives usually kept during pregnancy — still worth confirming with your provider.',
   },
   {
@@ -110,7 +128,7 @@ export const ACTIVES: Active[] = [
     aliases: ['hydroquinone'],
     timeOfDay: 'pm',
     conflictsWith: ['benzoyl-peroxide'],
-    pregnancyCaution: true,
+    pregnancy: 'avoid',
     note: 'Evening only.',
     pregnancyNote: 'Commonly stopped because far more of it is absorbed through the skin than most actives.',
   },
@@ -120,7 +138,7 @@ export const ACTIVES: Active[] = [
     aliases: ['palmitoyl', 'matrixyl', 'copper tripeptide', 'acetyl hexapeptide', 'peptide'],
     timeOfDay: 'any',
     conflictsWith: [],
-    pregnancyCaution: false,
+    pregnancy: 'quiet',
   },
   {
     key: 'hyaluronic-acid',
@@ -128,7 +146,7 @@ export const ACTIVES: Active[] = [
     aliases: ['hyaluronic acid', 'sodium hyaluronate', 'hydrolyzed hyaluronic acid'],
     timeOfDay: 'any',
     conflictsWith: [],
-    pregnancyCaution: false,
+    pregnancy: 'quiet',
   },
   {
     key: 'ceramides',
@@ -136,7 +154,7 @@ export const ACTIVES: Active[] = [
     aliases: ['ceramide', 'ceramide np', 'ceramide ap', 'ceramide eop'],
     timeOfDay: 'any',
     conflictsWith: [],
-    pregnancyCaution: false,
+    pregnancy: 'quiet',
   },
   {
     key: 'spf',
@@ -147,7 +165,7 @@ export const ACTIVES: Active[] = [
     ],
     timeOfDay: 'am',
     conflictsWith: [],
-    pregnancyCaution: false,
+    pregnancy: 'quiet',
     note: 'Last step every morning, over everything else.',
   },
 ]
@@ -218,13 +236,28 @@ export function findLifeStageCautions(activeKeys: string[], stage: LifeStage): C
 
   return activeKeys
     .map(getActive)
-    .filter((a): a is Active => Boolean(a?.pregnancyCaution))
+    .filter((a): a is Active => a?.pregnancy === 'avoid' || a?.pregnancy === 'ask')
     .map((a) => ({
       level: 'pregnancy' as const,
       actives: [a.key],
-      message: `${a.label} is commonly avoided ${when}.${a.pregnancyNote ? ` ${a.pregnancyNote}` : ''} Worth confirming with your doctor or midwife before you keep using it.`,
+      message:
+        a.pregnancy === 'avoid'
+          ? `${a.label} is commonly avoided ${when}.${a.pregnancyNote ? ` ${a.pregnancyNote}` : ''} Worth confirming with your doctor or midwife before you keep using it.`
+          : `${a.label} is one to ask about specifically ${when} — it depends on strength and formulation rather than on the ingredient alone.${a.pregnancyNote ? ` ${a.pregnancyNote}` : ''} Your doctor or midwife is the one to settle it.`,
     }))
 }
+
+/**
+ * The line that has to appear under any list of life-stage cautions.
+ *
+ * Without it, a member who sees three of her six products flagged reads the
+ * silence on the other three as "those are fine" — and this app is never in a
+ * position to tell anyone that. Flagging what is commonly flagged is not the
+ * same as clearing what is not, and only one of those two things is something
+ * software can honestly do.
+ */
+export const LIFE_STAGE_FOOTER =
+  'This flags what is commonly asked about. Anything not flagged here has not been cleared — it has only not been flagged, and your doctor or midwife is the one to go through the whole shelf with.'
 
 /**
  * Guess what kind of product it is from its name.

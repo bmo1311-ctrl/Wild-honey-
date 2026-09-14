@@ -28,7 +28,7 @@ export default async function WardrobePage() {
       : null
 
   const outfits = countOutfits(garments)
-  const gaps = garments.length >= 5 ? findGaps(garments, 2) : []
+  const gaps = garments.length >= 5 ? findGaps(garments, 1) : []
   const wear = wearStats(garments, today)
 
   return (
