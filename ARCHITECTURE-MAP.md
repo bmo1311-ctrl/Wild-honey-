@@ -1041,3 +1041,62 @@ rules, no personal data) and `/app/program` (filters its own list through
 `courseAllowList`).
 
 `npm run verify` is now `tsc --noEmit && check:columns && check:kid`.
+
+---
+
+## 22. Money arithmetic and the hardcoded course (14 Sept)
+
+Working through §18's "still open" list. All logic in `lib/`, no page
+restructuring — deliberately low-risk after the day Today had.
+
+### Money
+
+**A debt typed in as negative vanished.** Balances are stored positive — "I
+owe 5,000" is `5000` — but the field is a bare "Balance" and nothing said so.
+Entering `−5000`, which is the natural reading of owing money, pushed net
+worth **up** by 5,000, dropped the debt out of the payoff date entirely (it
+filtered on `balance > 0`), and rendered the row as `−-$5,000`. `netWorth` and
+`debtFreeDate` now take the absolute value: the sign carries nothing `kind`
+does not already carry, so there is nothing to lose by ignoring it, and a
+wrong sign was silent in every other direction.
+
+**Runway counted the part-month she was standing in.** The current month went
+into the divisor as a whole month however many days had elapsed, so on the
+2nd — with one complete month behind it — average monthly spend halved and the
+runway doubled, then drifted back down all month. The current month is
+excluded now; if it is the only month there is, the answer is null rather than
+a flattering guess.
+
+**"This month" read the server's month.** `monthSummary` defaulted to UTC
+while entries are dated with `localToday()`, so from late afternoon on the
+last day of the month in US timezones the card read empty while the entry she
+had just logged sat in the old one. `today` is passed in from the page now,
+and threaded through `freedomPath` — "a real emergency fund" could otherwise
+tick green on a two-day-old month.
+
+### `lib/rewards.ts` was hardcoded to one course
+
+Every figure read `COURSE` — `COURSES[0]`, Strong and Surrendered, 56 days and
+8 weeks — while `/app/becoming` has always run on her **active** course. The
+four are 56, 28, 30 and 40 days.
+
+So a woman finishing all 28 days of Daily Bread saw **"28 of 56 days"** and
+"4 of 8 weeks", never earned a final milestone, and was offered one titled
+*"Strong and Surrendered — Fifty-six days"* for a course she was not in.
+
+`CourseShape` is threaded through `computeMilestones` and `computeBecoming`,
+and the day milestones are now built per course: the intermediate marks are
+filtered to those the course is actually long enough to contain, and the final
+one carries her course's name and length. The Strong and Surrendered default
+remains for any caller that passes nothing.
+
+14 unit tests cover all of it, including that a negative debt still produces a
+payoff date and that finishing a 28-day course earns its own final milestone.
+
+### Still open from §18
+
+`computeStreaks` compares UTC dates; "stars this week" is a today-only count;
+Studio's `verbFor` is channel-blind; advancing a recurring Studio item nulls
+`last_done_on`; `foods_avoided` is collected twice and read nowhere;
+`updateNutritionGoals` has no caller, so Today's protein tile never shows a
+target.

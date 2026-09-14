@@ -70,13 +70,25 @@ export default async function BecomingPage({ searchParams }: { searchParams: Pro
   const currentDay = active.enrollment && course ? currentDayFrom(course, active.enrollment.started_on, await localToday()) : 0
   const weeksReached = currentDay && course ? weekOfDay(course, currentDay) : 0
 
+  /*
+   * The course she is actually on.
+   *
+   * `lib/rewards.ts` used to read Strong and Surrendered's 56 days and 8
+   * weeks for everyone, while this page has always loaded `active.slug`. On
+   * Daily Bread that read "28 of 56 days" at the finish line.
+   */
+  const shape = course
+    ? { title: course.title, lengthDays: course.length_days, weeks: course.weeks }
+    : undefined
+
   const streaks = computeStreaks(progress)
-  const { earned, next, all } = computeMilestones(progress, writingCount)
+  const { earned, next, all } = computeMilestones(progress, writingCount, shape)
   const pillars = computeBecoming({
     completedDays: progress.map((p) => p.day_number),
     writingCount,
     ratings,
     weeksReached,
+    course: shape,
   })
 
   return (

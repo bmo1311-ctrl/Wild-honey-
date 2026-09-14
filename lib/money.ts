@@ -30,13 +30,35 @@ export interface MoneyGoal {
   due_date: string | null
 }
 
+/**
+ * Assets, debts, and the difference.
+ *
+ * A debt's balance is stored as a positive number — "I owe 5,000" is 5000, not
+ * −5000. Nothing in the form said so, and the field is a bare "Balance", so
+ * typing −5000 was the natural reading of owing money. That put net worth
+ * *up* by 5,000, dropped the debt out of the payoff date entirely (it filters
+ * on `balance > 0`), and rendered the row as `−-$5,000`.
+ *
+ * Taking the absolute value here is the honest fix: the sign carries no
+ * information that `kind` does not already carry, so there is nothing to lose
+ * by ignoring it, and a wrong sign is silent in every other direction.
+ */
 export function netWorth(accounts: MoneyAccount[]) {
   const live = accounts.filter((a) => !a.archived)
   const assets = live.filter((a) => a.kind !== 'debt').reduce((s, a) => s + Number(a.balance), 0)
-  const debts = live.filter((a) => a.kind === 'debt').reduce((s, a) => s + Number(a.balance), 0)
+  const debts = live.filter((a) => a.kind === 'debt').reduce((s, a) => s + Math.abs(Number(a.balance)), 0)
   return { assets, debts, net: assets - debts }
 }
 
+/**
+ * This month's money.
+ *
+ * `month` must be passed by anything that cares about correctness. The default
+ * is the *server's* month — UTC on Vercel — while every entry is dated with
+ * `localToday()`. From late afternoon on the last day of the month in US
+ * timezones the two disagree, and the card reads an empty month while the
+ * entry she just logged sits in the old one.
+ */
 export function monthSummary(entries: MoneyEntry[], month = new Date().toISOString().slice(0, 7)) {
   const inMonth = entries.filter((e) => e.date.startsWith(month))
   const sum = (k: MoneyEntry['kind']) => inMonth.filter((e) => e.kind === k).reduce((s, e) => s + Number(e.amount), 0)
@@ -47,12 +69,36 @@ export function monthSummary(entries: MoneyEntry[], month = new Date().toISOStri
   return { income, expenses, saved, savingsRate, left: income - expenses - saved }
 }
 
-/** Months she could cover her usual expenses from cash and savings. */
-export function runwayMonths(accounts: MoneyAccount[], entries: MoneyEntry[]): number | null {
-  const liquid = accounts.filter((a) => !a.archived && (a.kind === 'cash' || a.kind === 'savings')).reduce((s, a) => s + Number(a.balance), 0)
-  const months = new Set(entries.filter((e) => e.kind === 'expense').map((e) => e.date.slice(0, 7)))
+/**
+ * Months she could cover her usual expenses from cash and savings.
+ *
+ * The current month is excluded, and that is the whole fix. It used to count
+ * as a full month in the divisor however many days had actually elapsed, so
+ * on the 2nd — with one complete month logged behind it — average monthly
+ * spend came out roughly halved and the runway roughly doubled. A number
+ * labelled "of expenses in cash and savings" that doubles on the 2nd and
+ * drifts back down all month is worse than no number.
+ *
+ * `today` is hers, passed in. Falling back to the server's month here would
+ * reintroduce the same drift `monthSummary` above describes.
+ */
+export function runwayMonths(
+  accounts: MoneyAccount[],
+  entries: MoneyEntry[],
+  today?: string,
+): number | null {
+  const liquid = accounts
+    .filter((a) => !a.archived && (a.kind === 'cash' || a.kind === 'savings'))
+    .reduce((s, a) => s + Number(a.balance), 0)
+
+  const thisMonth = (today ?? new Date().toISOString().slice(0, 10)).slice(0, 7)
+  const past = entries.filter((e) => e.kind === 'expense' && e.date.slice(0, 7) < thisMonth)
+
+  // Nothing but the part-month she is standing in — not enough to average.
+  const months = new Set(past.map((e) => e.date.slice(0, 7)))
   if (months.size === 0) return null
-  const monthly = entries.filter((e) => e.kind === 'expense').reduce((s, e) => s + Number(e.amount), 0) / months.size
+
+  const monthly = past.reduce((s, e) => s + Number(e.amount), 0) / months.size
   return monthly > 0 ? Math.round((liquid / monthly) * 10) / 10 : null
 }
 
@@ -94,7 +140,11 @@ export function debtFreeDate(accounts: MoneyAccount[]): {
   /** Debts whose payment does not cover their own monthly interest. */
   stalled: string[]
 } {
-  const debts = accounts.filter((a) => !a.archived && a.kind === 'debt' && Number(a.balance) > 0)
+  // Same absolute-value reading as `netWorth`: a debt typed in as negative is
+  // still a debt, and used to vanish from this calculation entirely.
+  const debts = accounts
+    .filter((a) => !a.archived && a.kind === 'debt' && Math.abs(Number(a.balance)) > 0)
+    .map((a) => ({ ...a, balance: Math.abs(Number(a.balance)) }))
   if (debts.length === 0) return { months: 0, date: null, totalMonthly: 0, stalled: [] }
 
   const totalMonthly = debts.reduce((s, d) => s + Number(d.min_payment ?? 0), 0)
@@ -147,12 +197,21 @@ export function debtFreeDate(accounts: MoneyAccount[]): {
  * The order that keeps her safe. Each step is a general principle, marked
  * done from her own numbers. Nothing here recommends a product.
  */
-export function freedomPath(accounts: MoneyAccount[], entries: MoneyEntry[], goals: MoneyGoal[]) {
+export function freedomPath(
+  accounts: MoneyAccount[],
+  entries: MoneyEntry[],
+  goals: MoneyGoal[],
+  today?: string,
+) {
   const nw = netWorth(accounts)
-  const month = monthSummary(entries)
-  const runway = runwayMonths(accounts, entries)
-  const hasDebt = accounts.some((a) => !a.archived && a.kind === 'debt' && Number(a.balance) > 0)
-  const highInterest = accounts.some((a) => !a.archived && a.kind === 'debt' && Number(a.balance) > 0 && (a.apr ?? 0) >= 10)
+  // Threaded through so the steps are judged against her month, not the
+  // server's — "a real emergency fund" ticking green on a two-day-old month
+  // was the same partial-month bug wearing a different hat.
+  const month = monthSummary(entries, (today ?? new Date().toISOString().slice(0, 10)).slice(0, 7))
+  const runway = runwayMonths(accounts, entries, today)
+  const owed = (a: MoneyAccount) => Math.abs(Number(a.balance))
+  const hasDebt = accounts.some((a) => !a.archived && a.kind === 'debt' && owed(a) > 0)
+  const highInterest = accounts.some((a) => !a.archived && a.kind === 'debt' && owed(a) > 0 && (a.apr ?? 0) >= 10)
   const investing = accounts.some((a) => !a.archived && a.kind === 'investment' && Number(a.balance) > 0)
   const entriesLast30 = entries.filter((e) => Date.parse(e.date) > Date.now() - 30 * 86_400_000).length
 

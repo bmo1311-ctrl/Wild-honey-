@@ -7,6 +7,7 @@ import { recentlyUsed } from '@/lib/suggestions'
 import { debtFreeDate, fmtMoney, freedomPath, monthSummary, netWorth, runwayMonths } from '@/lib/money'
 import { cn } from '@/lib/utils'
 import { adultsOnly } from '@/lib/kid-guard'
+import { localToday } from '@/lib/today'
 
 /**
  * The Freedom pillar. Her numbers, honest arithmetic on them, and the order
@@ -17,12 +18,17 @@ export default async function MoneyPage() {
   await adultsOnly()
   const access = await getAccess()
   if (!access.paid) return <LockedArea title="Freedom" subtitle="know your numbers, then move them." blurb="Accounts, the weekly log, net worth, runway, your debt-free date and the seven-step path. Private, always. Part of The Circle." from="money" />
-  const { accounts, entries, goals } = await getMoney()
+  const [{ accounts, entries, goals }, today] = await Promise.all([getMoney(), localToday()])
   const nw = netWorth(accounts)
-  const month = monthSummary(entries)
-  const runway = runwayMonths(accounts, entries)
+  /*
+   * Her month and her today, not the server's. Entries are dated with
+   * `localToday()`, so defaulting to UTC here made "this month" read empty
+   * from late afternoon on the last day of the month in US timezones.
+   */
+  const month = monthSummary(entries, today.slice(0, 7))
+  const runway = runwayMonths(accounts, entries, today)
   const debt = debtFreeDate(accounts)
-  const path = freedomPath(accounts, entries, goals)
+  const path = freedomPath(accounts, entries, goals, today)
   const started = accounts.length > 0 || entries.length > 0
   const recent = entries.slice(0, 6)
 

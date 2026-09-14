@@ -43,14 +43,49 @@ function isNextDay(a: string, b: string): boolean {
   return Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`) === 86_400_000
 }
 
-const DAY_MILESTONES: { at: number; label: string; detail: string }[] = [
+/**
+ * The shape of whichever course she is on.
+ *
+ * Everything here used to read `COURSE`, which is `COURSES[0]` — Strong and
+ * Surrendered, 56 days, 8 weeks. But `/app/becoming` runs on her *active*
+ * course, and the four are 56, 28, 30 and 40 days. So a woman on Daily Bread
+ * finishing all 28 days saw "28 of 56 days" and "4 of 8 weeks", never earned
+ * the final milestone, and was shown one titled "Strong and Surrendered —
+ * Fifty-six days" for a course she was not in.
+ */
+export interface CourseShape {
+  title: string
+  lengthDays: number
+  weeks: number
+  /** How many prompts the course asks. Was hardcoded to 28. */
+  writingPrompts?: number
+  /** How many times it asks her to rate herself. Was hardcoded to 8. */
+  ratings?: number
+}
+
+const FALLBACK: CourseShape = { title: COURSE.title, lengthDays: COURSE.length_days, weeks: COURSE.weeks }
+
+function dayMilestones(course: CourseShape): { at: number; label: string; detail: string }[] {
+  const spelled = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
+  const weeksWord = course.weeks <= 10 ? spelled[course.weeks] : String(course.weeks)
+  return [
+    // Only the marks the course is long enough to actually contain.
+    ...BASE_DAY_MILESTONES.filter((m) => m.at < course.lengthDays),
+    {
+      at: course.lengthDays,
+      label: course.title,
+      detail: `${course.lengthDays} days, ${weeksWord} weeks. You finished what you started.`,
+    },
+  ]
+}
+
+const BASE_DAY_MILESTONES: { at: number; label: string; detail: string }[] = [
   { at: 1, label: 'You started', detail: 'The hardest day is the one you begin on. That one is behind you.' },
   { at: 7, label: 'One week in', detail: 'Seven days logged. This is the point most people never reach.' },
   { at: 14, label: 'Two weeks', detail: 'Long enough that your body has noticed, not just your calendar.' },
   { at: 21, label: 'Three weeks', detail: 'The shapes are becoming yours instead of something you are copying.' },
   { at: 30, label: 'Thirty days', detail: 'A month of keeping your word to yourself.' },
   { at: 42, label: 'Six weeks', detail: 'Three quarters of the way. The end is closer than the start.' },
-  { at: COURSE.length_days, label: 'Strong and Surrendered', detail: 'Fifty-six days. You finished what you started.' },
 ]
 
 const WRITING_MILESTONES: { at: number; label: string; detail: string }[] = [
@@ -62,12 +97,13 @@ const WRITING_MILESTONES: { at: number; label: string; detail: string }[] = [
 export function computeMilestones(
   progress: { day_number: number; completed_at: string }[],
   writingCount: number,
+  course: CourseShape = FALLBACK,
 ): { earned: Milestone[]; next: Milestone | null; all: Milestone[] } {
   const byDay = [...progress].sort((a, b) => a.day_number - b.day_number)
   const doneCount = byDay.length
 
   const all: Milestone[] = [
-    ...DAY_MILESTONES.map((m) => ({
+    ...dayMilestones(course).map((m) => ({
       key: `day-${m.at}`,
       at: m.at,
       label: m.label,
@@ -107,8 +143,10 @@ export function computeBecoming(input: {
   writingCount: number
   ratings: { day_number: number; value: number }[]
   weeksReached: number
+  course?: CourseShape
 }): PillarEvidence[] {
   const { completedDays, writingCount, ratings, weeksReached } = input
+  const course = input.course ?? FALLBACK
   const sorted = [...ratings].sort((a, b) => a.day_number - b.day_number)
   const first = sorted[0]
   const last = sorted[sorted.length - 1]
@@ -116,12 +154,12 @@ export function computeBecoming(input: {
   return [
     {
       pillar: 'Body',
-      headline: `${completedDays.length} of ${COURSE.length_days} days`,
+      headline: `${completedDays.length} of ${course.lengthDays} days`,
       evidence: completedDays.length
         ? `You have trained on ${completedDays.length} ${completedDays.length === 1 ? 'day' : 'days'}. That is time your body spent under load, not time you meant to.`
         : 'Nothing logged yet. Day one is waiting.',
       value: completedDays.length,
-      total: COURSE.length_days,
+      total: course.lengthDays,
     },
     {
       pillar: 'Identity',
@@ -133,7 +171,7 @@ export function computeBecoming(input: {
             ? `On day ${first.day_number} you said ${first.value}. The course asks again later.`
             : 'The course asks you to rate yourself as you go. Nothing to compare yet.',
       value: sorted.length,
-      total: 8,
+      total: course.ratings ?? 8,
     },
     {
       pillar: 'Mindset',
@@ -142,16 +180,16 @@ export function computeBecoming(input: {
         ? `You have written ${writingCount} ${writingCount === 1 ? 'answer' : 'answers'} you can read back.`
         : 'Nothing written yet. Writing is offered, never required.',
       value: writingCount,
-      total: 28,
+      total: course.writingPrompts ?? 28,
     },
     {
       pillar: 'Faith',
-      headline: `${weeksReached} of ${COURSE.weeks} weeks`,
+      headline: `${weeksReached} of ${course.weeks} weeks`,
       evidence: weeksReached
         ? `You have reached week ${weeksReached}, and the verse that opens it.`
         : 'Each week opens with a verse. You will meet the first one on day one.',
       value: weeksReached,
-      total: COURSE.weeks,
+      total: course.weeks,
     },
   ]
 }
