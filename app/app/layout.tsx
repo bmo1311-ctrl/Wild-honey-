@@ -1,5 +1,4 @@
 import type React from 'react'
-import { headers } from 'next/headers'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Wordmark } from '@/components/logo'
@@ -10,28 +9,11 @@ import { TzCookie } from '@/components/tz-cookie'
 import { BloomAvatar } from '@/components/bloom-avatar'
 import { OneSignalInit } from '@/components/onesignal-init'
 import { getSessionProfile } from '@/lib/data'
-import { kidAllowed } from '@/lib/kid'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const profile = await getSessionProfile()
   if (!profile) redirect('/auth/login')
   if (!profile.onboarding_completed_at) redirect('/onboarding')
-
-  /*
-   * The child gate, on the server.
-   *
-   * `KidGate` below is a `useEffect` redirect, so by the time it runs the
-   * server component for a disallowed page has already rendered and its data
-   * has already been sent to the browser. For a page her parent switched off
-   * that is not a redirect, it is a flash of the thing itself.
-   *
-   * This runs before any child page does. `KidGate` stays for client-side
-   * navigations, where there is no new server render to catch.
-   */
-  if (profile.is_child) {
-    const path = (await headers()).get('x-pathname') ?? ''
-    if (path && !kidAllowed(path, profile.child_permissions ?? {})) redirect('/app')
-  }
 
   return (
     <div className="min-h-dvh bg-background pb-24" data-palette={profile?.color_season ?? undefined}>

@@ -2,23 +2,6 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function proxy(request: NextRequest) {
-  /*
-   * Tell server components which path they are rendering.
-   *
-   * Next.js does not hand a server component its own pathname, and the child
-   * gate in `app/app/layout.tsx` needs it: a child whose parent switched the
-   * Circle off should never have the Circle's server component run at all,
-   * and a `useEffect` redirect on the client is far too late — by then the
-   * page has rendered and its data has been sent.
-   *
-   * This lives here rather than in a `middleware.ts` of its own. Next 16
-   * renamed middleware to proxy, and having both files is a hard build error
-   * — which is exactly how the first attempt at this failed. Set before
-   * either `NextResponse.next({ request })` below, so both the plain and the
-   * cookie-refreshed response carry it.
-   */
-  request.headers.set('x-pathname', request.nextUrl.pathname)
-
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
