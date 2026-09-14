@@ -1719,3 +1719,60 @@ from the household settings — the same screen as before, no new steps.
 six-character code. That is what makes the "who are you?" screen work for a
 child who cannot type an email. Worth her knowing it is a deliberate trade
 rather than an oversight.
+
+---
+
+## 33. A fence around the one thing that ignores every fence (14 Sept)
+
+Checked the admin surface first, expecting the §30 pattern again — the layout
+redirects non-admins, so were the admin *actions* guarded? **All 34 are.**
+Every `admin*` action calls `requireAdmin()`. That one was built right.
+
+The risk is somewhere else, and it is structural rather than a bug.
+
+`createServiceClient()` bypasses Row Level Security completely. Every other
+protection in this app is a policy on a table — a woman's journal, another
+household's children, a group she is not in — and the service role ignores all
+of them. It is the most dangerous line in the codebase and it looks exactly
+like the ordinary client sitting next to it:
+
+```ts
+const supabase = await createClient()   // her, with every policy applied
+const admin = createServiceClient()     // everyone, with none
+```
+
+Nothing noticed a new one. `tsc` cannot tell them apart; the other four checks
+look elsewhere. Every hole found this week was found because somebody went
+looking that particular week.
+
+### All 16 current uses are legitimate
+
+Walked each one. Genuinely justified, and several for reasons that are not
+obvious — `joinGroupByCode` because the new invite-code policy creates a
+chicken-and-egg, `adminRemoveReportedContent` because no admin DELETE policy
+exists on any content table, the child sign-in ones because the caller has no
+session yet by definition, `getReportsForAdmin` because a report is usually
+about a group she is not in.
+
+`ensureCoursesSeeded` and both cron routes are fine; the Square webhook is
+signature-verified and has no user session by nature. `deleteMyAccount` uses
+it on `user.id` alone.
+
+### So the fix is the check, not a change
+
+`scripts/check-service-client.mjs` lists every call site with the sentence
+saying why RLS cannot do that job. **The count has to match too** — two uses
+in a file where one is justified means a second thing was added under cover of
+the first one's reason.
+
+The point is not that today's uses are wrong. It is that adding the
+seventeenth should cost a sentence rather than an import that happened to be
+in scope. Both failure modes tested:
+
+```
+✗ lib/goals.ts uses createServiceClient() and is not on the list.
+✗ lib/data.ts has 2 call(s) but 1 reason(s) listed.
+```
+
+`npm run verify` is now six checks: `tsc`, columns, kid routes, access, gated
+actions, service role.
