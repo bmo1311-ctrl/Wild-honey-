@@ -9,8 +9,9 @@
     "lint": "eslint .",
     "check:columns": "node scripts/check-columns.mjs",
     "db:snapshot": "node scripts/db-snapshot-sql.mjs",
-    "verify": "tsc --noEmit && npm run check:columns && npm run check:kid",
-    "check:kid": "node scripts/check-kid-routes.mjs"
+    "verify": "tsc --noEmit && npm run check:columns && npm run check:kid && npm run check:access",
+    "check:kid": "node scripts/check-kid-routes.mjs",
+    "check:access": "node scripts/check-access.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

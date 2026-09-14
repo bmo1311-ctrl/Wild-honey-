@@ -23,11 +23,24 @@ const FREE = [
  * which made the split feel arbitrary and gave people a reason to hesitate.
  * One price, one decision.
  */
+/*
+ * What The Circle opens.
+ *
+ * This is the second copy of this list — the marketing page has the other —
+ * and the two had already drifted: both promised "the routines that keep you
+ * well" while Protocols was not gated at all, and neither mentioned Wardrobe
+ * or Studio, which were also open to anyone. A claim that takes money is the
+ * last place two lists should disagree, so every line here corresponds to a
+ * page that calls `access.paid`, and `npm run check:access` fails if a paid
+ * page appears that nothing on this list covers.
+ */
 const INCLUDED = [
   'All four programs — Strong and Surrendered, Daily Bread, Still Waters, The Honest Room',
   'The whole teaching library, searchable across everything at once',
   'Nourish: recipes, meal plans, grocery, pantry and cooking videos',
-  'Every workout, and the routines that keep you well',
+  'Every workout, and Protocols for skin, hair and nails',
+  'Wardrobe: your colours, your line, and what to wear today',
+  'Studio: blocks for your work, and the pipeline that fills them',
   'Freedom: your money, tracked and taught',
   'Learning boards and a sign-in for your child',
   'Ask the experts, and read every answer',

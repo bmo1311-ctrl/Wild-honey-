@@ -1222,3 +1222,63 @@ scripted checks that now encode the ones worth never rediscovering —
 The honest limit: `npm run verify` cannot see how long a page takes, cannot
 see a claim in prose, and cannot see a value that two files compute
 differently. Those still need someone to look.
+
+---
+
+## 25. What we charge for, and what we actually gate (14 Sept)
+
+The same species as everything else these audits found — two sources of truth
+disagreeing — but this one is about money.
+
+### The gap
+
+Both the marketing page and the in-app membership page promised *"Every
+workout, and the routines that keep you well."* Workouts were gated.
+**Protocols — which is what "the routines that keep you well" names — had no
+gate at all.** Tonight's plan, the wash-day engine, the acids and actives
+libraries, the apothecary, skin concerns: roughly 2,060 lines, free to anyone
+with an account.
+
+Two more were open and appeared on neither list: **Wardrobe** (~1,500 lines,
+the colour analysis, the capsule, the outfit engine) and **Studio** (~350).
+So nobody paying knew they were included, and nobody free knew they were
+getting them.
+
+It cost nothing yet — one free account, one inner-circle, one founder. It
+would have cost the day someone joined free, used Protocols daily, and never
+found a reason to pay.
+
+### Decided
+
+Protocols, Wardrobe and Studio are all part of The Circle. Both lists name
+them now, in the same words.
+
+Today also stops offering what a free member cannot open: no "tonight is your
+retinal", no two o'clock Studio block, no outfit. The moment card is the one
+surface that promises she can act on what it says, and an invitation to a
+locked door breaks that.
+
+### `npm run check:access`
+
+Nothing catches a paywall disagreeing with a price list. It is not a type
+error, nothing crashes, and each half reads correctly on its own — it is only
+wrong side by side, which is exactly what a script can do every time.
+
+It checks both directions: every gated area is named on the membership list,
+and everything the list names is actually gated. Verified by removing the new
+Protocols gate — it failed and named the route.
+
+Three cases needed care, and each is recorded rather than silently skipped:
+
+- **Gates can be one level down or inside.** `/app/program` lets her browse
+  the list and gates the day; `/app/library` locks each door it lists with
+  `meets(access.tier, …)`; `/app/nutrition` keeps logging free and locks
+  recipes, grocery and pantry within the page. A per-page boolean calls all
+  three "free" and is wrong about all three, so the check recurses.
+- **Reading access is not gating.** `/app/membership` reads her tier to say
+  whether she is already a member.
+- **Free on purpose.** `/app/members/[id]` is someone's opt-in public profile,
+  and "a read-only view of the circle" is a free feature — so it sits in
+  `FREE_ON_PURPOSE` with its reason, rather than being absent and ambiguous.
+
+`npm run verify` is now four checks: `tsc`, columns, kid routes, access.

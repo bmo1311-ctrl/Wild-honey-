@@ -7,6 +7,8 @@ import type { Body, Scale, Shape, VerticalProportion } from '@/lib/silhouette'
 import { LAYERS, countOutfits, findGaps, wearStats } from '@/lib/wardrobe'
 import { localToday } from '@/lib/today'
 import { adultsOnly } from '@/lib/kid-guard'
+import { getAccess } from '@/lib/data'
+import { LockedArea } from '@/components/locked'
 
 /**
  * The capsule wardrobe.
@@ -17,6 +19,16 @@ import { adultsOnly } from '@/lib/kid-guard'
  */
 export default async function WardrobePage() {
   await adultsOnly()
+  const access = await getAccess()
+  if (!access.paid)
+    return (
+      <LockedArea
+        title="Wardrobe"
+        subtitle="your colours, your line, and what to wear today."
+        blurb="Your season from a photo or three questions, every piece you own in one place, outfits built from what actually goes together, and the one thing that would open your wardrobe up most. Part of The Circle."
+        from="wardrobe"
+      />
+    )
   const [garments, style, today] = await Promise.all([getWardrobe(), getStyleProfile(), localToday()])
 
   const season = getSeason(style?.season)

@@ -27,6 +27,8 @@ import { localToday } from '@/lib/today'
 import { FeatureOff } from '@/components/feature-off'
 import { FEATURES } from '@/lib/features'
 import { adultsOnly } from '@/lib/kid-guard'
+import { getAccess } from '@/lib/data'
+import { LockedArea } from '@/components/locked'
 
 /**
  * Protocols, one area at a time.
@@ -46,6 +48,16 @@ export default async function ProtocolsPage({
   searchParams: Promise<{ area?: string }>
 }) {
   await adultsOnly()
+  const access = await getAccess()
+  if (!access.paid)
+    return (
+      <LockedArea
+        title="Protocols"
+        subtitle="skin, hair and nails, on a rhythm rather than a whim."
+        blurb="Tonight’s step decided for you, wash days worked out from what you use, the acids and actives libraries, the apothecary, and resets for the weeks that go sideways. Part of The Circle."
+        from="protocols"
+      />
+    )
   if (!FEATURES.protocols) return <FeatureOff />
 
   const [{ area: requested }, enrollment, todayCheckin, allProducts, profile, log, today] = await Promise.all([

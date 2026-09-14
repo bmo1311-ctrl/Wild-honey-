@@ -39,7 +39,17 @@ const TIERS = [
     price: '$0',
     cadence: 'forever',
     tier: 'free',
-    features: ['The daily prompt', 'Your private journal', 'Food and body logging', 'A read-only view of the circle'],
+    /*
+     * What Free actually opens, checked against the code rather than written
+     * from memory. Today, the check-in, habits, food and body logging, Write
+     * and its archive, Becoming, Promises, and reading the Circle.
+     */
+    features: [
+      'The daily prompt and your private journal',
+      'Today, your check-in and your habits',
+      'Food and body logging, with your cycle',
+      'A read-only view of the circle',
+    ],
     cta: 'Start free',
     featured: false,
   },
@@ -52,7 +62,9 @@ const TIERS = [
       'All four programs, start to finish',
       'The whole teaching library',
       'Nourish — recipes, meal plans, grocery, pantry',
-      'Every workout, and the routines that keep you well',
+      'Every workout, and Protocols for skin, hair and nails',
+      'Wardrobe — your colours, your line, and what to wear',
+      'Studio — blocks for your work, and what fills them',
       'Freedom — your money, tracked and taught',
       'Learning boards and a sign-in for your child',
       'The Circle itself — post, comment, be known',

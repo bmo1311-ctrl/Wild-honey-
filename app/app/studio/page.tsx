@@ -4,6 +4,8 @@ import { getStudioBlocks, getStudioItems, getStudioSessionsThisWeek } from '@/li
 import { localToday } from '@/lib/today'
 import type { StudioBlock, StudioItem } from '@/lib/studio'
 import { adultsOnly } from '@/lib/kid-guard'
+import { getAccess } from '@/lib/data'
+import { LockedArea } from '@/components/locked'
 
 /**
  * Studio — the work that pays.
@@ -18,6 +20,16 @@ import { adultsOnly } from '@/lib/kid-guard'
  */
 export default async function StudioPage() {
   await adultsOnly()
+  const access = await getAccess()
+  if (!access.paid)
+    return (
+      <LockedArea
+        title="Studio"
+        subtitle="blocks for the work, and what fills them."
+        blurb="Recurring blocks in your week, a pipeline per channel, and one tap to move the nearest-finished piece along — so the block always has something in it. Part of The Circle."
+        from="studio"
+      />
+    )
   const [blocks, items, sessions, today] = await Promise.all([
     getStudioBlocks(),
     getStudioItems(),

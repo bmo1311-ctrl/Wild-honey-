@@ -300,12 +300,20 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       daysSinceWeighIn: since(lastWeigh),
       hasPrompt: Boolean(prompt),
       promptAnswered: Boolean(promptEntry),
-      tonight,
+      /*
+       * Nothing here that she cannot open.
+       *
+       * Protocols, Studio and Wardrobe are part of The Circle now, so
+       * offering "tonight is your retinal" or "two o'clock: edit the video"
+       * to a free member is an invitation to a locked door. The moment card
+       * is the one surface that promises she can act on what it says.
+       */
+      tonight: access.paid ? tonight : null,
       tonightDone,
-      wash,
+      wash: access.paid ? wash : null,
       washedToday,
-      studioToday,
-      outfit,
+      studioToday: access.paid ? studioToday : [],
+      outfit: access.paid ? outfit : null,
     }),
   })
 
