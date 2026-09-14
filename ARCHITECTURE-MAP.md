@@ -547,3 +547,62 @@ carries the three `db pull` commands. **Worth doing once.**
 `npm run check:columns` run against it, and **any migration that adds, renames
 or drops a column is followed by refreshing the snapshot** — `npm run
 db:snapshot` prints the query and the steps.
+
+---
+
+## 15. The JSON blocks get forms (14 Sept)
+
+§10 shipped the course editor with nine block types on proper fields and five —
+`steps`, `check`, `grid`, `versus`, `figure` — on a validated JSON textarea. The
+comment in the file called it a deliberate trade: *"a week of work to save her
+from something she does rarely."*
+
+Both halves were wrong, and the database says so:
+
+| block | blocks | in courses |
+|---|---|---|
+| log | 154 | 4 |
+| **steps** | **134** | **4** |
+| text | 129 | 4 |
+| write | 123 | 4 |
+| **check** | **76** | **4** |
+| scripture | 54 | 3 |
+| **figure** | **22** | **4** |
+| … | | |
+| **grid** | **4** | 1 |
+| **versus** | **1** | 1 |
+
+**237 of 750 blocks — 32% of every block in every course — were JSON-only**,
+and `steps` is the second most common block type in the app. Not rare: most of
+what a practical course day is made of.
+
+Nor a week. Four of the five are one shape underneath — a list of rows to add
+to, delete from and reorder. `components/admin/nested-blocks.tsx` builds that
+row editor once and `steps`, `check`, `grid` and `versus` all fall out of it.
+`figure` is three flat strings and should never have been in the JSON bucket at
+all.
+
+### Things worth knowing
+
+- **Step numbers are derived, not typed.** `n` is renumbered from position on
+  every change. The JSON let them drift the moment a step was inserted in the
+  middle, and a list that reads 1, 2, 4, 3 is worse than no numbers.
+- **A grid is squared on every edit.** Rows are rebuilt to the column count
+  whenever either changes, so adding a column cannot leave rows short. That
+  drift is the single easiest way to break the block.
+- **Up/down buttons, not drag handles.** This gets used on a phone, where a
+  small drag target is not a feature.
+- **Three types became addable** — `grid`, `versus` and `figure` existed in the
+  renderer and in real course days but were missing from the add menu, because
+  there was no form to add them into.
+- **The JSON stays**, behind "edit as JSON instead", so an oddly shaped block is
+  fixable rather than only deletable.
+
+### Verification
+
+- 15 unit tests on the two pure helpers (`moved`, `squareRows`) — reorder bounds
+  at both ends, single and empty lists, column add/remove/reorder keeping cells
+  with their headings, ragged input squared.
+- All 237 existing blocks checked against what the forms expect: no step
+  missing a head, no non-string checklist item, no ragged grid, no malformed
+  versus, no figure missing pose or label. Every one will render.

@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { ChevronDown, ChevronUp, ImageIcon, Loader2, Plus, Trash2, Video } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { Block } from '@/lib/courses'
+import { NESTED_TYPES, NestedBlockEditor, RawJson } from '@/components/admin/nested-blocks'
 import { cn } from '@/lib/utils'
 
 /**
@@ -15,14 +16,16 @@ import { cn } from '@/lib/utils'
  * common ones get proper fields and the structural ones fall back to editing
  * their JSON directly.
  *
- * That fallback is a deliberate trade and worth naming: `steps`, `grid`,
- * `versus`, `check` and `figure` hold nested arrays, and a form that edits
- * them safely is a week of work to save her from something she does rarely.
- * The JSON is validated before it can be saved, so the worst case is a
- * message telling her the brackets are wrong — not a broken day.
+ * That fallback used to cover `steps`, `grid`, `versus`, `check` and
+ * `figure` too, on the reasoning that a form for nested arrays was a week of
+ * work to save her from something she does rarely. Both halves were wrong.
+ * Steps and checklists are most of what a practical course day is made of,
+ * and four of the five are the same list-of-rows underneath — build the row
+ * editor once and they all fall out of it. They live in nested-blocks.tsx.
  *
- * The ones she will actually reach for daily — text, a heading, a photo, a
- * video, a prompt to write — are all plain fields.
+ * What still lands here is genuinely unusual shapes, and they keep the
+ * validated textarea: the worst case is a message about brackets, never a
+ * broken day.
  */
 
 const SIMPLE_FIELDS: Record<string, { key: string; label: string; long?: boolean }[]> = {
@@ -69,6 +72,11 @@ const ADDABLE: { t: string; label: string }[] = [
   { t: 'rate', label: 'Rating' },
   { t: 'steps', label: 'Steps' },
   { t: 'check', label: 'Checklist' },
+  // Three that existed in the renderer and in real course days but could not
+  // be added from here, because there was no form to add them into.
+  { t: 'grid', label: 'Table' },
+  { t: 'versus', label: 'This vs that' },
+  { t: 'figure', label: 'Pose' },
   { t: 'log', label: 'Log' },
 ]
 
@@ -95,6 +103,12 @@ function blankBlock(t: string): Record<string, unknown> {
       return { t, items: [{ n: 1, head: '', sub: '' }] }
     case 'check':
       return { t, items: [''] }
+    case 'grid':
+      return { t, cols: ['', ''], rows: [['', '']] }
+    case 'versus':
+      return { t, left: { head: '', items: [''] }, right: { head: '', items: [''] } }
+    case 'figure':
+      return { t, pose: '', label: '' }
     case 'log':
       return { t }
     default:
@@ -229,6 +243,14 @@ function OneBlock({
   const isMedia = t === 'image' || t === 'video'
 
   if (!fields) {
+    /*
+     * Five of these now have real forms; anything else still gets the JSON.
+     * The list lives in nested-blocks.tsx so adding a form there is the only
+     * change needed to promote a type out of the textarea.
+     */
+    if (NESTED_TYPES.has(t)) {
+      return <NestedBlockEditor block={block} onChange={onChange} />
+    }
     return <RawJson block={block} onChange={onChange} />
   }
 
@@ -360,58 +382,6 @@ function MediaField({
           if (f) void upload(f)
         }}
       />
-    </div>
-  )
-}
-
-/**
- * The structural blocks, edited as JSON.
- *
- * Validated on every keystroke so she cannot save something malformed — the
- * save button upstairs is disabled while this is red. Honest about what it
- * is rather than dressed up as a form.
- */
-function RawJson({
-  block,
-  onChange,
-}: {
-  block: Record<string, unknown>
-  onChange: (b: Record<string, unknown>) => void
-}) {
-  const [draft, setDraft] = useState(() => JSON.stringify(block, null, 2))
-  const [bad, setBad] = useState<string | null>(null)
-
-  return (
-    <div className="flex flex-col gap-1.5">
-      <p className="text-[11.5px] leading-[1.45] text-pretty text-muted-foreground">
-        This block holds a nested structure, so it is edited directly. Keep{' '}
-        <code className="rounded bg-muted px-1">&quot;t&quot;</code> as it is — that is what tells the
-        app how to draw it.
-      </p>
-      <textarea
-        value={draft}
-        onChange={(e) => {
-          setDraft(e.target.value)
-          try {
-            const parsed = JSON.parse(e.target.value)
-            if (!parsed || typeof parsed.t !== 'string') {
-              setBad('Needs a "t" saying what kind of block it is.')
-              return
-            }
-            setBad(null)
-            onChange(parsed)
-          } catch {
-            setBad('Not valid JSON yet — a bracket or comma is off.')
-          }
-        }}
-        rows={12}
-        spellCheck={false}
-        className={cn(
-          'w-full rounded-xl border bg-background p-2.5 font-mono text-[12px] leading-[1.5] outline-none',
-          bad ? 'border-destructive' : 'border-border',
-        )}
-      />
-      {bad && <p className="text-[12px] text-destructive">{bad}</p>}
     </div>
   )
 }
