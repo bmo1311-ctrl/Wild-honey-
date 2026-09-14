@@ -9,8 +9,6 @@ import { localHour, localToday } from '@/lib/today'
 import { buildActivity, consistency, streaksFrom } from '@/lib/activity'
 import { QuickAddHabit } from '@/components/quick-add-habit'
 import { NoticeLine } from '@/components/notice-line'
-import { StateHeadline } from '@/components/state-reading'
-import { getPersonalState } from '@/lib/personal-state-db'
 import { MomentCard } from '@/components/moment-card'
 import { CheckinInline } from '@/components/checkin-inline'
 import { MorningResetCard } from '@/components/morning-reset-card'
@@ -100,7 +98,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
   const pct = course ? Math.round((completedDays.length / course.length_days) * 100) : 0
   const loggedHabitIds = new Set(habitLogs.filter((l) => l.date === today).map((l) => l.habit_id))
 
-  const [baseline, goals, recentCheckins, measurements, money, commitments, wins, personal] = await Promise.all([
+  const [baseline, goals, recentCheckins, measurements, money, commitments, wins] = await Promise.all([
     getBaselineVitality(),
     getMyGoals(),
     getRecentCheckins(30),
@@ -108,7 +106,6 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     getMoney(),
     getMyCommitments(),
     getRecentWins(10),
-    getPersonalState(),
   ])
 
   // One true sentence, or nothing. Built from what she has actually done.
@@ -298,20 +295,20 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       </header>
 
       {/*
-        The state headline, when there is one — and the notice steps aside
-        for it.
+        The state headline is NOT on this page, and that is deliberate.
 
-        Both are "one true sentence about you", and stacked they cancel each
-        other out: an observation about her streak directly above "this looks
-        like a capacity problem" reads as an app talking to itself. The
-        headline fires rarely and says the bigger thing, so on the days it
-        speaks it speaks alone.
+        Today already makes more database round trips than any other page in
+        the app, and `getPersonalState` adds eighteen more — on a function
+        with a ten second ceiling. It tipped over: `/app` began returning Bad
+        Gateway while every other route stayed at 200, because every other
+        route does a fraction of this work.
+
+        It was the wrong trade regardless. The headline fires rarely by
+        design, so this was eighteen queries on every load of the most-visited
+        page in order to say nothing on almost all of them. The full reading
+        lives on You, where it is the point of the page rather than a garnish.
       */}
-      {personal?.lead ? (
-        <StateHeadline text={personal.lead.text} because={personal.lead.because} />
-      ) : (
-        <NoticeLine notice={notice} />
-      )}
+      <NoticeLine notice={notice} />
 
       {/*
         This moment, then everything behind it.
