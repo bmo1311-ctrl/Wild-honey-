@@ -1347,3 +1347,71 @@ Every one of these reads correctly with data and wrongly without it. An empty
 account is not an edge case — it is the state **every** member is in on the
 day they arrive, and it is the only state the app cannot A/B its way out of.
 Worth walking again whenever a surface is added.
+
+---
+
+## 27. The social layer, now that two people are in it (14 Sept)
+
+Until this week the Circle had one member, so none of it had ever been
+exercised. An audit of the whole social and privacy surface, checked against
+the **live RLS policies** rather than the repo — which matters, because the
+policies are not in git (§12) and several findings turned on them.
+
+### What RLS already covers — verified, not assumed
+
+- **`wins` and `course_day_progress`** both have a SELECT policy reading
+  `profiles.profile_show->>'wins' | 'progress' = 'true'`. The doc comment
+  claiming "readable only if she switched them on" was **accurate**; the
+  app-level check in `/app/members/[id]` is belt and braces, not the only
+  thing standing there.
+- **Group posts, comments and reactions** all require membership in both
+  directions — SELECT via `EXISTS (group_members …)`, INSERT via the same in
+  `WITH CHECK`. The four unguarded group server actions are not exploitable.
+- **Circle writes** require `auth.uid() = user_id AND is_paid()`, and comments
+  and reactions additionally require the entry to be `visibility = 'circle'`.
+- **Private journal entries, measurements, money, check-ins** — every read
+  path filters on the session user. Nothing cross-member.
+- **`public_profiles`** carries no email, birthday, life stage or body data.
+
+### What was actually open
+
+**A child could post, comment and react with the Circle switched off.** This
+is the one that mattered. `circleOrRedirect()` guards two *pages*, and server
+actions are plain POSTs whose ids sit in the client bundle — so the door was
+shut and the action was not. The database did not close it either, and that is
+the part worth naming: the INSERT policies require `is_paid()`, and `is_paid()`
+deliberately returns the **guardian's** tier. A paid household's child passed
+every check the app had, RLS included, while her parent had the toggle off.
+
+`circleWriteAllowed()` now guards nine writers — the three Circle actions, the
+two journal-sharing ones, and all four group actions. It returns an error
+rather than redirecting, because a server action should answer its caller.
+8 tests, including every case that must *not* be blocked.
+
+**"Content removed." was not true.** `adminRemoveReportedContent` deleted
+through the ordinary client, and the DELETE policy on every one of those six
+tables is `auth.uid() = user_id` — there is **no admin delete policy
+anywhere**, confirmed against `pg_policies`. So removing someone else's post
+matched zero rows, returned no error, and the report was marked `removed`
+while the content stayed live. The one record that would have prompted another
+look now said it had been handled.
+
+It uses the service client now — one of the few places that is the right tool,
+since `requireAdmin` has already established who is asking — and checks the
+count, because a moderation action that quietly does nothing is worse than one
+that fails loudly.
+
+### Known and not yet fixed
+
+- **Blocking only filters feeds.** `getHiddenAuthorIds` is correct and
+  bidirectional but is applied in three places. A blocked person's *comments*,
+  *reactions* and *profile page* are all still visible, while the toast says
+  "you won't see each other's posts". Narrowly true, broadly misleading.
+- **`groups` SELECT is `auth.role() = 'authenticated'`**, so any member can
+  read any group row — including `invite_code`, which is the join credential.
+- **No `SafetyMenu` on comments**, so harassment in a reply has no route to a
+  report.
+- **Reports notify nobody**, and the admin card shows the reason without the
+  reported text — a remove button for something never read.
+- **`revalidatePath('/app/community')`** appears 8 times for a route that is
+  now a redirect, and three Circle writers never revalidate `/app/circle`.

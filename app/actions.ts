@@ -7,6 +7,7 @@ import { detectActives } from '@/lib/actives'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
+import { circleWriteAllowed } from '@/lib/kid-guard'
 import { oneSignalConfigured, sendPushToUsers } from '@/lib/onesignal'
 import type { Comment, NotificationPrefs, Visibility } from '@/lib/types'
 import { COURSE_SLUG, getCourse, weekOfDay } from '@/lib/courses'
@@ -108,7 +109,9 @@ async function bumpStreak(userId: string) {
     .eq('id', userId)
 }
 
-export async function toggleReaction(entryId: string) {
+export async function toggleReaction(entryId: string): Promise<SocialResult> {
+  const denied = await circleWriteAllowed()
+  if (denied) return denied
   const { supabase, user } = await requireUser()
   if (!(await paidUser(supabase, user.id))) return { error: SHARE_LOCKED }
   const { data: existing } = await supabase
@@ -130,7 +133,9 @@ export async function toggleReaction(entryId: string) {
   return { ok: true, reacted: !existing }
 }
 
-export async function addComment(entryId: string, text: string) {
+export async function addComment(entryId: string, text: string): Promise<SocialResult> {
+  const denied = await circleWriteAllowed()
+  if (denied) return denied
   const { supabase, user } = await requireUser()
   if (!(await paidUser(supabase, user.id))) return { error: SHARE_LOCKED }
   const trimmed = text.trim()
@@ -184,7 +189,9 @@ async function isFounderOrAdmin(supabase: any, userId: string) {
   return !!data && (data.membership_tier === 'founder' || data.is_admin)
 }
 
-export async function createCommunityPost(input: { text: string; imageUrl?: string; pillar?: string }) {
+export async function createCommunityPost(input: { text: string; imageUrl?: string; pillar?: string }): Promise<SocialResult> {
+  const denied = await circleWriteAllowed()
+  if (denied) return denied
   const { supabase, user } = await requireUser()
   if (!(await paidUser(supabase, user.id))) return { error: SHARE_LOCKED }
   const text = input.text.trim()
@@ -200,7 +207,9 @@ export async function createCommunityPost(input: { text: string; imageUrl?: stri
   return { ok: true }
 }
 
-export async function toggleCommunityReaction(postId: string) {
+export async function toggleCommunityReaction(postId: string): Promise<SocialResult> {
+  const denied = await circleWriteAllowed()
+  if (denied) return denied
   const { supabase, user } = await requireUser()
   if (!(await paidUser(supabase, user.id))) return { error: SHARE_LOCKED }
   const { data: existing } = await supabase
@@ -219,7 +228,9 @@ export async function toggleCommunityReaction(postId: string) {
   return { ok: true, reacted: !existing }
 }
 
-export async function addCommunityComment(postId: string, text: string) {
+export async function addCommunityComment(postId: string, text: string): Promise<SocialResult> {
+  const denied = await circleWriteAllowed()
+  if (denied) return denied
   const { supabase, user } = await requireUser()
   if (!(await paidUser(supabase, user.id))) return { error: SHARE_LOCKED }
   const trimmed = text.trim()
@@ -1026,7 +1037,9 @@ export async function createGroup(input: { name: string; description?: string; p
   return { ok: true, groupId: group.id as string }
 }
 
-export async function joinGroupByCode(code: string) {
+export async function joinGroupByCode(code: string): Promise<SocialResult> {
+  const denied = await circleWriteAllowed()
+  if (denied) return denied
   const { supabase, user } = await requireUser()
   const trimmed = code.trim().toUpperCase()
   if (!trimmed) return { error: 'Enter an invite code first.' }
@@ -1049,7 +1062,9 @@ export async function leaveGroup(groupId: string) {
   return { ok: true }
 }
 
-export async function createGroupPost(groupId: string, text: string) {
+export async function createGroupPost(groupId: string, text: string): Promise<SocialResult> {
+  const denied = await circleWriteAllowed()
+  if (denied) return denied
   const { supabase, user } = await requireUser()
   const trimmed = text.trim()
   if (!trimmed) return { error: 'Write something first.' }
@@ -1059,7 +1074,9 @@ export async function createGroupPost(groupId: string, text: string) {
   return { ok: true }
 }
 
-export async function toggleGroupPostReaction(postId: string) {
+export async function toggleGroupPostReaction(postId: string): Promise<SocialResult> {
+  const denied = await circleWriteAllowed()
+  if (denied) return denied
   const { supabase, user } = await requireUser()
   const { data: existing } = await supabase.from('group_post_reactions').select('id').eq('post_id', postId).eq('user_id', user.id).maybeSingle()
   if (existing) {
@@ -1071,7 +1088,9 @@ export async function toggleGroupPostReaction(postId: string) {
   return { ok: true, reacted: !existing }
 }
 
-export async function addGroupPostComment(postId: string, text: string) {
+export async function addGroupPostComment(postId: string, text: string): Promise<SocialResult> {
+  const denied = await circleWriteAllowed()
+  if (denied) return denied
   const { supabase, user } = await requireUser()
   const trimmed = text.trim()
   if (!trimmed) return { error: 'Comment cannot be empty.' }
@@ -1508,6 +1527,16 @@ export async function reportContent(input: { contentType: string; contentId: str
   return { ok: true }
 }
 
+/**
+ * What a social action hands back.
+ *
+ * Every one of these gained an error branch when the child guard went in, and
+ * that turned each return type into a union — so `res?.error` at the call
+ * sites stopped compiling even though the shape at runtime was fine. One
+ * declared shape means the next guard added to any of them costs nothing.
+ */
+type SocialResult = { error?: string; ok?: boolean; reacted?: boolean; groupId?: string }
+
 const CONTENT_TABLE: Record<string, string> = {
   journal_entry: 'journal_entries',
   community_post: 'community_posts',
@@ -1531,7 +1560,32 @@ export async function adminRemoveReportedContent(reportId: string) {
   if (!report) return { error: 'Report not found.' }
   const table = CONTENT_TABLE[report.content_type]
   if (!table) return { error: 'Unknown content type.' }
-  await supabase.from(table).delete().eq('id', report.content_id)
+
+  /*
+   * The removal has to actually happen.
+   *
+   * This deleted through the ordinary client, whose DELETE policy on every
+   * one of these tables is `auth.uid() = user_id` — there is no admin delete
+   * policy anywhere. So removing someone else's post matched zero rows,
+   * returned no error, and the report was then marked 'removed' and the UI
+   * said "Content removed." The content was still live, and the one record
+   * that would have prompted another look now said it had been handled.
+   *
+   * The service client is the right tool here and one of the very few places
+   * it belongs: `requireAdmin` above has already established who is asking.
+   * The count is checked, because a moderation action that quietly does
+   * nothing is worse than one that fails loudly.
+   */
+  const admin = createServiceClient()
+  const { error: delError, count } = await admin
+    .from(table)
+    .delete({ count: 'exact' })
+    .eq('id', report.content_id)
+  if (delError) return { error: delError.message }
+  if (!count) {
+    return { error: 'That content is already gone — nothing was removed. Marking the report reviewed instead.' }
+  }
+
   const { error } = await supabase.from('content_reports').update({ status: 'removed', reviewed_at: new Date().toISOString(), reviewed_by: user.id }).eq('id', reportId)
   if (error) return { error: error.message }
   revalidatePath('/admin/reports')
