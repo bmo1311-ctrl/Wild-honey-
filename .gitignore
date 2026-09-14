@@ -28,3 +28,8 @@ studio.tsconfig.json
 # Sandbox artifacts from editing a mounted folder.
 .fuse_hidden*
 **/.fuse_hidden*
+
+# Supabase CLI working files. .temp holds the linked project's local state and
+# can contain connection details — it must never be committed.
+supabase/.temp/
+supabase/.branches/
