@@ -51,7 +51,23 @@ export default async function MoneyPage() {
           <div className="rounded-2xl border border-border bg-card px-3 py-3">
             <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted-foreground">Debt free</p>
             <p className="mt-1 font-serif text-[22px] font-semibold leading-none">{debt.months === 0 ? 'now' : debt.date ? debt.date.toLocaleDateString([], { month: 'short', year: 'numeric' }) : '—'}</p>
-            <p className="mt-1 text-[11px] text-muted-foreground">{debt.months === 0 ? 'no debt on the books' : debt.date ? `${debt.months} months at ${fmtMoney(debt.totalMonthly)}/mo` : 'add a payment to each debt'}</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {debt.months === 0
+                ? 'no debt on the books'
+                : debt.date
+                  ? `${debt.months} months at ${fmtMoney(debt.totalMonthly)}/mo, if nothing new is added`
+                  : debt.stalled.length > 0
+                    ? /*
+                        The distinction that was missing. This said "add a
+                        payment to each debt" whether she had set no payment
+                        at all or set one too small to cover the interest —
+                        so a woman who had done exactly what it asked was
+                        told to do it again, instead of being told the one
+                        thing that mattered.
+                      */
+                      `${debt.stalled.join(' and ')} — the payment is not covering the interest, so the balance grows`
+                    : 'add a payment to each debt'}
+            </p>
           </div>
         </div>
       )}

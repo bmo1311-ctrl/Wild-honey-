@@ -15,7 +15,20 @@ export default async function KidFoodPage() {
   const memberId = scope.childMemberId
   const [foods, usual, nutrition] = await Promise.all([getFoodItems(), getUsualFoods(8, memberId), getTodayNutrition(memberId)])
   const water = foods.find((f) => f.user_id === null && f.name.toLowerCase() === 'water') ?? null
-  const glasses = water ? Math.round((nutrition.nutrients.water_ml ?? 0) / water.serving_size) : 0
+  /*
+   * Glasses of water means glasses of water.
+   *
+   * This divided the day's total `water_ml` by a serving — but `saveFoodItem`
+   * defaults `water_ml` to the full serving size for anything measured in ml,
+   * so a 250ml juice added 250 to the total and earned her another droplet.
+   * Counting the water rows themselves is the only thing that answers the
+   * question the droplets are asking.
+   */
+  const glasses = water
+    ? nutrition.loggedMeals.filter(
+        (m) => (m as typeof m & { food_item_id?: string | null }).food_item_id === water.id,
+      ).length
+    : 0
   const today = nutrition.loggedMeals
     .map((m) => (m as typeof m & { custom_name?: string | null }).custom_name ?? m.recipe?.title ?? 'meal')
     .filter((n) => n.toLowerCase() !== 'water')

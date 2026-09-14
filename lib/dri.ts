@@ -78,5 +78,43 @@ export function ageFromBirthYear(birthYear: number | null, today = new Date()): 
   return age >= 0 && age <= 120 ? age : null
 }
 
-/** True where the figure is a ceiling to stay under rather than a goal to reach. */
-export const LIMIT_NUTRIENTS: NutrientKey[] = ['sodium_mg', 'sat_fat_g', 'sugar_g', 'caffeine_mg']
+/**
+ * True where the figure is a ceiling to stay under rather than a goal to reach.
+ *
+ * `vit_a_mcg` is here because preformed retinol has an upper limit that
+ * matters in pregnancy — without it, going over rendered as a filled bar, the
+ * same as hitting a goal. The rest of the app already takes vitamin A
+ * seriously (see PREGNANCY_NOTE in lib/skin-concerns.ts); the panel did not.
+ */
+export const LIMIT_NUTRIENTS: NutrientKey[] = ['sodium_mg', 'sat_fat_g', 'sugar_g', 'caffeine_mg', 'vit_a_mcg']
+
+/**
+ * The general reference band, with the stage-specific figures laid over it.
+ *
+ * `driFor` returns the adult female band, and the two nutrition pages rendered
+ * that straight — so a pregnant member saw "Caffeine X / 400 mg" as her
+ * figure, roughly double what is usually cited in pregnancy, and iron as
+ * "/ 18" directly above a card that said "of 27". Two code paths, two numbers,
+ * one nutrient, one screen.
+ *
+ * These are still general reference intakes and every surface that shows them
+ * says so. The point is only that they should be the ones for the stage she
+ * told the app she is in.
+ */
+const STAGE_REFERENCES: Record<'trying' | 'pregnant' | 'breastfeeding', Partial<Record<NutrientKey, number>>> = {
+  // Building stores beforehand; caffeine guidance already tightens here.
+  trying: { folate_mcg: 400, iron_mg: 18, caffeine_mg: 200, choline_mg: 425 },
+  pregnant: { folate_mcg: 600, iron_mg: 27, caffeine_mg: 200, choline_mg: 450, vit_b12_mcg: 2.6, vit_a_mcg: 770 },
+  breastfeeding: { folate_mcg: 500, iron_mg: 9, caffeine_mg: 300, choline_mg: 550, vit_b12_mcg: 2.8, vit_a_mcg: 1300 },
+}
+
+export function driForStage(
+  age: number | null,
+  sex: Sex | null,
+  stage: 'trying' | 'pregnant' | 'breastfeeding' | 'none' | null | undefined,
+): Partial<Record<NutrientKey, number>> | null {
+  const base = driFor(age, sex)
+  if (!base) return null
+  if (!stage || stage === 'none') return base
+  return { ...base, ...STAGE_REFERENCES[stage] }
+}

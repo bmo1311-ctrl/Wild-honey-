@@ -6,7 +6,7 @@ import { CyclePhaseSwitch } from '@/components/cycle-phase-switch'
 import { ownerTargets } from '@/lib/targets'
 import { NutrientRings } from '@/components/nutrient-rings'
 import { NutrientPanel } from '@/components/nutrient-panel'
-import { ageFromBirthYear, driFor, type Sex } from '@/lib/dri'
+import { ageFromBirthYear, driFor, driForStage, type Sex } from '@/lib/dri'
 
 /**
  * One job: log what she ate. No recipes, no browsing — she tapped "log what
@@ -37,7 +37,12 @@ export default async function LogFoodPage({ searchParams }: { searchParams: Prom
     ? ageFromBirthYear(selected?.birth_year ?? null)
     : ageFromBirthYear(birthYear)
   const selectedSex: Sex | null = memberId ? ((selected as { sex?: Sex | null })?.sex ?? null) : 'female'
-  const reference = driFor(selectedAge, selectedSex) ?? {}
+  // A household member has no life stage of her own; only the account holder
+  // has told the app about one, so it only applies when she is the one logging.
+  const reference =
+    (memberId
+      ? driFor(selectedAge, selectedSex)
+      : driForStage(selectedAge, selectedSex, profile?.life_stage as never)) ?? {}
   const panelTargets = memberId ? reference : { ...reference, ...cycled.targets }
 
   const note = memberId

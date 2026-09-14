@@ -67,16 +67,80 @@ export function monthsToPayOff(balance: number, apr: number | null, monthly: num
   return Math.ceil(-Math.log(1 - (balance * r) / monthly) / Math.log(1 + r))
 }
 
-export function debtFreeDate(accounts: MoneyAccount[]): { months: number | null; date: Date | null; totalMonthly: number } {
+/**
+ * When the debts are gone, if she keeps paying what she pays now.
+ *
+ * The old version took the *longest* single debt at its own minimum and
+ * paired that number with the *sum* of all the minimums — two different
+ * plans, printed as one sentence: "N months at £X/mo". Paying £X every month
+ * clears everything sooner than N, because each debt that finishes frees its
+ * payment up for the next one. The page overstated the date and understated
+ * her.
+ *
+ * So this simulates the plan the sentence actually describes: every debt gets
+ * its minimum, and when one clears, that money rolls onto whichever debt
+ * costs the most to carry. Month by month rather than closed-form, because
+ * rolling payments has no tidy formula and 600 iterations is nothing.
+ *
+ * `stalled` is the case that was being mislabelled: a payment that exists but
+ * does not cover the interest. The page showed the same "add a payment to
+ * each debt" line it uses when no payment is set at all — telling her to do
+ * the thing she had already done, instead of the one fact that mattered.
+ */
+export function debtFreeDate(accounts: MoneyAccount[]): {
+  months: number | null
+  date: Date | null
+  totalMonthly: number
+  /** Debts whose payment does not cover their own monthly interest. */
+  stalled: string[]
+} {
   const debts = accounts.filter((a) => !a.archived && a.kind === 'debt' && Number(a.balance) > 0)
-  if (debts.length === 0) return { months: 0, date: null, totalMonthly: 0 }
+  if (debts.length === 0) return { months: 0, date: null, totalMonthly: 0, stalled: [] }
+
   const totalMonthly = debts.reduce((s, d) => s + Number(d.min_payment ?? 0), 0)
-  const perDebt = debts.map((d) => monthsToPayOff(Number(d.balance), d.apr, Number(d.min_payment ?? 0)))
-  if (perDebt.some((m) => m === null)) return { months: null, date: null, totalMonthly }
-  const months = Math.max(...(perDebt as number[]))
+
+  const stalled = debts
+    .filter((d) => {
+      const monthly = Number(d.min_payment ?? 0)
+      const r = (d.apr ?? 0) / 100 / 12
+      return monthly <= 0 || monthly <= Number(d.balance) * r
+    })
+    .map((d) => d.name)
+
+  if (totalMonthly <= 0) return { months: null, date: null, totalMonthly, stalled }
+
+  // Balance and rate only; names are not needed for the arithmetic.
+  let live = debts.map((d) => ({ balance: Number(d.balance), r: (d.apr ?? 0) / 100 / 12 }))
+  const MAX_MONTHS = 600
+
+  let months = 0
+  while (live.length > 0 && months < MAX_MONTHS) {
+    months++
+    const before = live.reduce((s, d) => s + d.balance, 0)
+
+    // Interest first, then the whole budget against the costliest debt.
+    for (const d of live) d.balance += d.balance * d.r
+    let budget = totalMonthly
+    for (const d of [...live].sort((a, b) => b.r - a.r)) {
+      if (budget <= 0) break
+      const paid = Math.min(budget, d.balance)
+      d.balance -= paid
+      budget -= paid
+    }
+    live = live.filter((d) => d.balance > 0.005)
+
+    // Not moving, and never will at this payment.
+    const after = live.reduce((s, d) => s + d.balance, 0)
+    if (live.length > 0 && after >= before) return { months: null, date: null, totalMonthly, stalled }
+  }
+
+  if (live.length > 0) return { months: null, date: null, totalMonthly, stalled }
+
   const date = new Date()
+  // Set the day first: `setMonth` on the 31st overflows into the month after.
+  date.setDate(1)
   date.setMonth(date.getMonth() + months)
-  return { months, date, totalMonthly }
+  return { months, date, totalMonthly, stalled }
 }
 
 /**

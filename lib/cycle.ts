@@ -1,4 +1,5 @@
 import type { NutrientKey } from '@/lib/nutrients'
+import { MIN_CALORIES } from '@/lib/goals'
 
 /**
  * Cycle-aware targets.
@@ -64,7 +65,17 @@ export function applyCycle(
   if (!pct) return { targets, pct: 0 }
   const factor = 1 + pct / 100
   const out = { ...targets }
-  if (out.calories) out.calories = Math.round((out.calories * factor) / 10) * 10
+  /*
+   * The floor holds here too.
+   *
+   * `calculateTargets` clamps at MIN_CALORIES, and then this took up to
+   * another 7% off it — so the floor was only a floor until the menstrual
+   * week. A number the app has already refused to go below should not be
+   * quietly walked under one function later.
+   */
+  if (out.calories) {
+    out.calories = Math.max(MIN_CALORIES, Math.round((out.calories * factor) / 10) * 10)
+  }
   if (out.carbs_g) out.carbs_g = Math.round(out.carbs_g * factor)
   return { targets: out, pct }
 }

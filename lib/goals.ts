@@ -29,6 +29,15 @@ export const ACTIVITY_LEVELS: { key: ActivityLevel; label: string; factor: numbe
 const PROTEIN_PER_KG: Record<BodyGoal, number> = { lose_fat: 2.2, maintain: 1.6, gain_muscle: 1.8 }
 const CALORIE_SHIFT: Record<BodyGoal, number> = { lose_fat: -0.15, maintain: 0, gain_muscle: 0.1 }
 
+/**
+ * The lowest daily calorie figure this app will display.
+ *
+ * Exported so the cycle adjustment can respect it too — `applyCycle` takes a
+ * further percentage off, and a floor that something downstream can walk
+ * under is not a floor.
+ */
+export const MIN_CALORIES = 1200
+
 export interface BodyInput {
   weightKg: number | null
   heightCm: number | null
@@ -73,6 +82,28 @@ export function calculateTargets(input: BodyInput): CalculatedTargets {
     const perKg = g === 'gain_muscle' ? 35 : g === 'lose_fat' ? 26 : 31
     calories = Math.round((weightKg * perKg) / 10) * 10
     basis.push(`${perKg} cal per kg (add height and year of birth for a closer estimate)`)
+  }
+
+  /*
+   * A floor, because the arithmetic has no opinion about what is safe.
+   *
+   * Mifflin-St Jeor times a sedentary factor, minus 15% for "lose fat", and
+   * then `applyCycle` takes up to another 7% off in the menstrual phase.
+   * Worked through: 45kg, 150cm, 55, sedentary, losing fat lands on 970, and
+   * 902 in the menstrual week. The app was rendering that as "your daily
+   * target" beside a ring to fill.
+   *
+   * 1200 is the figure conventionally treated as the lowest an adult woman
+   * should be aiming at without supervision. It is a blunt number and it is
+   * not a recommendation — it is a refusal to print something lower. When it
+   * binds, `basis` says so, because a target that quietly stopped following
+   * her inputs should say that out loud rather than look calculated.
+   */
+  if (calories !== null && calories < MIN_CALORIES) {
+    calories = MIN_CALORIES
+    basis.push(
+      `held at ${MIN_CALORIES} — the arithmetic went lower than this app will show, and a deficit below it is something to set with a doctor or dietitian rather than an app`,
+    )
   }
 
   // Fat at 25% of calories, carbs take the remainder.

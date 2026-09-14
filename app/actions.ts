@@ -2555,9 +2555,24 @@ export async function toggleLearningItem(itemId: string) {
 }
 
 export async function archiveLearningItem(itemId: string) {
-  const { supabase, user } = await requireUser()
-  const { error } = await supabase.from('learning_items').update({ archived: true }).eq('id', itemId).eq('owner_id', user.id)
+  /*
+   * `requireOwner`, like the add and toggle beside it.
+   *
+   * This used `requireUser`, so for a child `user.id` is her own id and
+   * `owner_id` is her parent's — the update matched nothing, Supabase
+   * returned no error, and the action returned `{ ok: true }`. The item came
+   * straight back on the next render and nothing anywhere said why.
+   */
+  const { supabase, ownerId } = await requireOwner()
+  const { data, error } = await supabase
+    .from('learning_items')
+    .update({ archived: true })
+    .eq('id', itemId)
+    .eq('owner_id', ownerId)
+    .select('id')
   if (error) return { error: error.message }
+  // Matching no rows is a real failure, not a quiet success.
+  if (!data?.length) return { error: 'That one is not yours to remove.' }
   revalidatePath('/app/learning')
   return { ok: true }
 }
@@ -2975,9 +2990,49 @@ export async function archiveKidReward(id: string) {
 export async function claimKidReward(rewardId: string, note: string) {
   const { supabase, ownerId, childMemberId } = await requireOwner()
   if (note.trim().length < 3) return { error: 'Say what you did, in a few words.' }
-  const { data: r } = await supabase.from('kid_rewards').select('*').eq('id', rewardId).maybeSingle()
+  /*
+   * The reward has to be one of this household's, and hers.
+   *
+   * This looked the reward up by id alone. Nothing checked `owner_id`, and
+   * nothing checked that it belonged to the child claiming it — so a child
+   * holding any other reward's id, a sibling's included, got an earning
+   * credited to herself at that reward's amount. It is the one place in the
+   * app where a child can move a money figure, and it was unguarded.
+   */
+  const { data: r } = await supabase
+    .from('kid_rewards')
+    .select('*')
+    .eq('id', rewardId)
+    .eq('owner_id', ownerId)
+    .eq('active', true)
+    .maybeSingle()
   if (!r) return { error: 'That reward is gone.' }
   const memberId = childMemberId ?? (r.member_id as string)
+  if (r.member_id !== memberId) return { error: 'That one is not yours.' }
+
+  /*
+   * The cadence check, on the server.
+   *
+   * `claimed` was worked out at read time in `getKidRewards` and enforced
+   * nowhere — the only backstop was a unique-violation branch for a
+   * constraint that does not exist in any migration. Claiming twice was a
+   * second tap.
+   */
+  const since =
+    r.cadence === 'weekly'
+      ? new Date(Date.now() - 6 * 86_400_000).toISOString().slice(0, 10)
+      : r.cadence === 'monthly'
+        ? new Date(Date.now() - 29 * 86_400_000).toISOString().slice(0, 10)
+        : await localToday()
+  const { count: already } = await supabase
+    .from('kid_earnings')
+    .select('id', { count: 'exact', head: true })
+    .eq('owner_id', ownerId)
+    .eq('member_id', memberId)
+    .eq('reward_id', r.id)
+    .gte('date', since)
+  if ((already ?? 0) > 0) return { error: 'Already claimed for now.' }
+
   const { error } = await supabase.from('kid_earnings').insert({
     owner_id: ownerId,
     member_id: memberId,

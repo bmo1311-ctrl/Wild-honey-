@@ -4,7 +4,7 @@ import { RecommendedRecipesRow } from '@/components/recommended-recipes-row'
 import { TodayNutrition } from '@/components/today-nutrition'
 import { LifeStageFocus } from '@/components/life-stage-focus'
 import { ownerTargets } from '@/lib/targets'
-import { ageFromBirthYear, driFor } from '@/lib/dri'
+import { ageFromBirthYear, driFor, driForStage } from '@/lib/dri'
 import { NutritionTabs } from '@/components/nutrition-tabs'
 import { ResourceShelf } from '@/components/resource-vault'
 import { GroceryBuilder } from '@/components/grocery-builder'
@@ -51,7 +51,19 @@ export default async function NutritionPage() {
   const cookVideos = allResources.filter((r) => r.collection === 'nourish')
   const unlocked = (await getAccess()).paid
   const own = ownerTargets(profile, cycle.phase)
-  const panelTargets = { ...(driFor(ageFromBirthYear(own.birthYear), 'female') ?? {}), ...own.cycled.targets }
+  /*
+   * Her stage's reference figures, not the general adult ones.
+   *
+   * This read `driFor(...)` — the adult female band — while `life_stage` was
+   * read two lines below for the focus card. So a pregnant member saw iron
+   * "/ 18" here and "of 27" in the card directly underneath, and caffeine
+   * against 400mg, which is roughly double the figure usually cited in
+   * pregnancy. Same nutrient, same screen, two numbers.
+   */
+  const panelTargets = {
+    ...(driForStage(ageFromBirthYear(own.birthYear), 'female', profile?.life_stage as never) ?? {}),
+    ...own.cycled.targets,
+  }
 
   return (
     <div className="flex flex-col gap-5">

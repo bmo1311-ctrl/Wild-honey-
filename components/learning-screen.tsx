@@ -20,6 +20,18 @@ export function LearningScreen({
 
   return (
     <LearningBoard
+      /*
+       * Keyed on whose board this is.
+       *
+       * `LearningBoard` seeds `done` from `items` in a useState, and switching
+       * member is a `router.push` — same component, new props, no remount. So
+       * the tick map stayed on the previous child: every one of the new
+       * child's items rendered unticked, "n done today" read 0, and tapping
+       * an item that was already complete sent a toggle that *deleted* the
+       * completion. A parent checking on one child could silently un-finish
+       * another child's work.
+       */
+      key={activeId ?? 'self'}
       members={members}
       activeMemberId={activeId}
       items={items}

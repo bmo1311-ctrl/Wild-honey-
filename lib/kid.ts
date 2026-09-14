@@ -8,7 +8,19 @@ export interface ChildPermissions {
  * her parent has switched on: the Circle, and specific courses.
  */
 export function kidAllowed(path: string, perms: ChildPermissions = {}): boolean {
-  const always = ['/app', '/app/learning', '/app/kid-food', '/app/nutrition/log', '/app/kid-me', '/app/kid-money', '/app/checkin']
+  /*
+   * `/app` was in this list, and the check was
+   * `path === r || path.startsWith(r + '/')` — which for `/app` is
+   * `path.startsWith('/app/')`, and that is every route in the app. The gate
+   * returned true for `/app/circle`, `/app/money`, `/app/settings`,
+   * `/app/vault`, everything. It has been open since it was written.
+   *
+   * `/app` is her home and has to be allowed, but only exactly — never as a
+   * prefix. Everything else she may reach is named here in full.
+   */
+  if (path === '/app') return true
+
+  const always = ['/app/learning', '/app/kid-food', '/app/nutrition/log', '/app/kid-me', '/app/kid-money', '/app/checkin']
   if (always.some((r) => path === r || path.startsWith(r + '/'))) return true
   if (perms.circle && (path.startsWith('/app/circle') || path.startsWith('/app/members'))) return true
   if (perms.program?.length) {

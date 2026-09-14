@@ -769,3 +769,98 @@ most of what these audits find. The safety ones are the same shape with worse
 consequences: a function that computes cautions nobody calls, a boolean that
 cannot express "ask", copy that claims a provenance the data does not have.
 None crash. None fail `npm run verify`. Every one makes the app quietly lie.
+
+---
+
+## 18. Money, kid and nutrition (14 Sept)
+
+The last unaudited surfaces. Two of these are the most serious findings of the
+whole sweep.
+
+### The child gate had never worked
+
+`lib/kid.ts:11` — `always` contained `'/app'`, and the test was
+`path === r || path.startsWith(r + '/')`. For `'/app'` that is
+`path.startsWith('/app/')`, which is **every route in the app**. `/app/circle`,
+`/app/money`, `/app/settings`, `/app/vault`, `/app/members/*` all returned
+true. `perms.circle` has no other enforcement anywhere, so a child whose
+parent had switched the Circle **off** could open it and — because
+`getAccess()` grants her the guardian's paid tier — post in it.
+
+`/app` is now matched exactly, never as a prefix. And the gate moved to the
+server: `KidGate` is a `useEffect` redirect, so the disallowed page's server
+component had already run and sent its data before the redirect fired. That is
+not a redirect, it is a flash of the thing itself. `app/app/layout.tsx` now
+checks before any child page renders, using a new `middleware.ts` whose only
+job is to put the pathname in a header. `KidGate` stays for client-side
+navigation.
+
+### A child could claim any reward, including a sibling's
+
+`app/actions.ts` `claimKidReward` looked the reward up **by id alone** — no
+`owner_id`, no check that it belonged to the child claiming it. Any reward id
+credited an earning to herself at that reward's amount. It is the one place in
+the app where a child can move a money figure.
+
+The cadence check was read-time only (`getKidRewards`), with a
+unique-violation branch as its sole backstop — for a constraint that exists in
+no migration. Claiming twice was a second tap. Both now enforced server-side.
+
+### Calorie targets had no floor
+
+`lib/goals.ts` — Mifflin-St Jeor, times a sedentary factor, minus 15% for
+"lose fat", and then `applyCycle` took up to another 7% off. Worked through:
+45kg, 150cm, 55, sedentary, losing fat gives **970**, and **902** in the
+menstrual week. Rendered as "your daily targets" beside a ring to fill.
+
+`MIN_CALORIES = 1200`, applied in `calculateTargets` **and** in `applyCycle` —
+a floor something downstream can walk under is not a floor. When it binds,
+`basis` says so, because a target that quietly stopped following her inputs
+should not look calculated.
+
+### A pregnant member was shown the general adult figures
+
+`driFor` returns the adult female band: caffeine 400mg, iron 18mg, folate
+400mcg. `life_stage` was read two lines later for the focus card but never
+reached `panelTargets`. So the panel said iron "/ 18" directly above a card
+saying "of 27", and put her caffeine against 400mg — roughly double what is
+usually cited in pregnancy — as a *limit*. `vit_a_mcg` was not in
+`LIMIT_NUTRIENTS` at all, so exceeding it rendered as a filled bar.
+
+New `driForStage` layers the stage figures over the band. Still general
+reference intakes, still labelled as such; they are simply the ones for the
+stage she told the app she is in. Vitamin A is now a limit.
+
+### Money said 52 months for a plan that clears in 45
+
+`debtFreeDate` took the *longest single debt at its own minimum* and printed
+it beside the *sum of all the minimums* — two different plans in one sentence.
+Paying the total every month rolls each cleared payment onto the next debt and
+finishes sooner. It now simulates the plan the sentence describes.
+
+And "add a payment to each debt" was shown both when no payment was set and
+when a payment existed but did not cover the interest — telling a woman to do
+the thing she had already done, instead of the one fact that mattered. The
+stalled debts are named now.
+
+### Others fixed
+
+- The child's water droplets counted any ml-measured drink, so a juice earned
+  a glass of water.
+- `LearningBoard` kept the previous child's tick map across a member switch —
+  so tapping a completed item **deleted** the completion. A parent checking on
+  one child could silently un-finish another's work.
+- `archiveLearningItem` used `requireUser` where its neighbours use
+  `requireOwner`, so for a child it matched zero rows and returned `{ ok: true }`.
+
+### Still open from this audit
+
+Not yet fixed, in rough priority order: `runwayMonths` counts the partial
+current month as a full one (overstates runway); `monthSummary` reads the UTC
+month against locally-dated entries; debt balances have no sign convention;
+`lib/rewards.ts` hardcodes the 56-day course while the page runs the active
+one; `computeStreaks` compares UTC dates; "stars this week" is a today-only
+count; Studio `verbFor` is channel-blind; advancing a recurring Studio item
+nulls `last_done_on`; `foods_avoided` is collected twice and read nowhere;
+`updateNutritionGoals` is the only writer of the manual overrides and has no
+caller, so Today's protein tile never shows a target.
