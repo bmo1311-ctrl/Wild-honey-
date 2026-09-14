@@ -3,8 +3,10 @@ import { ChevronLeft } from 'lucide-react'
 import { HouseholdManager } from '@/components/household-manager'
 import { loadCourses } from '@/lib/courses-db'
 import { getHouseholdMembers, getKidRewards } from '@/lib/data'
+import { adultsOnly } from '@/lib/kid-guard'
 
 export default async function HouseholdPage() {
+  await adultsOnly()
   const [members, courses] = await Promise.all([getHouseholdMembers(), loadCourses()])
   const kids = members.filter((m) => !m.is_self)
   const rewards = Object.fromEntries(await Promise.all(kids.map(async (k) => [k.id, await getKidRewards(k.id)] as const)))

@@ -7,6 +7,7 @@ import { JournalComposer } from '@/components/journal-composer'
 import { cn } from '@/lib/utils'
 import { PageTabs } from '@/components/page-tabs'
 import ArchivePage from '@/app/app/archive/page'
+import { adultsOnly } from '@/lib/kid-guard'
 
 /**
  * Everything she has written, newest first. Nothing here is destructive.
@@ -16,6 +17,7 @@ import ArchivePage from '@/app/app/archive/page'
  * the writing belong in the same room.
  */
 export default async function WritePage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
+  await adultsOnly()
   const { tab } = await searchParams
   const active = tab === 'archive' ? 'archive' : 'write'
   const [courseWritings, entries, prompt, profile, today] = await Promise.all([

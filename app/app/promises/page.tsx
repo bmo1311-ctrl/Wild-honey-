@@ -11,6 +11,7 @@ import {
 } from '@/lib/data'
 import { commitmentSuggestions, experimentSuggestions } from '@/lib/suggestions'
 import { localToday } from '@/lib/today'
+import { adultsOnly } from '@/lib/kid-guard'
 
 /**
  * The promises she made to herself, and the things she is trying out.
@@ -26,6 +27,7 @@ import { localToday } from '@/lib/today'
  * lib/suggestions.ts for why that line matters.
  */
 export default async function PromisesPage() {
+  await adultsOnly()
   const [commitments, experiments, checkins, habits, goals, course, profile] = await Promise.all([
     getMyCommitments(),
     getMyExperiments(),

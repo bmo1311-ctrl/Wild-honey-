@@ -13,8 +13,10 @@ import { HabitStack } from '@/components/habit-stack'
 import { getHabits, getRecentCheckins, getRecentHabitLogs, getRecentWins, getTodayCheckin } from '@/lib/data'
 import { FeatureOff } from '@/components/feature-off'
 import { FEATURES } from '@/lib/features'
+import { adultsOnly } from '@/lib/kid-guard'
 
 export default async function EnergyPage() {
+  await adultsOnly()
   if (!FEATURES.energy) return <FeatureOff />
 
   const [today, recent, wins, habits, habitLogs, profile, todayDate, goals] = await Promise.all([

@@ -33,6 +33,7 @@ import { getMyGoals, getSessionProfile, getVitalityHistory } from '@/lib/data'
 import { SQUARE_LINKS } from '@/lib/payment-links'
 import { relativeTime } from '@/lib/pillars'
 import { FEATURES } from '@/lib/features'
+import { adultsOnly } from '@/lib/kid-guard'
 
 /**
  * Her page, as a closet rather than a filing cabinet.
@@ -49,6 +50,7 @@ import { FEATURES } from '@/lib/features'
  * third copy of the same writing.
  */
 export default async function ProfilePage() {
+  await adultsOnly()
   const [profile, goals, vitalityHistory, personal] = await Promise.all([
     getSessionProfile(),
     getMyGoals(),

@@ -5,8 +5,10 @@ import { ProfilePageEditor } from '@/components/profile-page-editor'
 import { PrivacySettings } from '@/components/privacy-settings'
 import { BlockedMutedList } from '@/components/blocked-muted-list'
 import { getBlockedUsers, getMutedUsers, getSessionProfile } from '@/lib/data'
+import { adultsOnly } from '@/lib/kid-guard'
 
 export default async function SettingsPage() {
+  await adultsOnly()
   const [profile, blocked, muted] = await Promise.all([getSessionProfile(), getBlockedUsers(), getMutedUsers()])
   if (!profile) return null
 

@@ -3,8 +3,10 @@ import { ActiveChallengeTracker } from '@/components/active-challenge-tracker'
 import { getChallenges } from '@/lib/data'
 import { FeatureOff } from '@/components/feature-off'
 import { FEATURES } from '@/lib/features'
+import { adultsOnly } from '@/lib/kid-guard'
 
 export default async function ChallengesPage() {
+  await adultsOnly()
   if (!FEATURES.challenges) return <FeatureOff />
 
   const challenges = await getChallenges()

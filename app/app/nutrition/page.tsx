@@ -27,9 +27,11 @@ import {
 import { FeatureOff } from '@/components/feature-off'
 import { Locked } from '@/components/locked'
 import { FEATURES } from '@/lib/features'
+import { adultsOnly } from '@/lib/kid-guard'
 
 /** One home for food: recipes, meal plans, grocery, pantry and short cooking videos. */
 export default async function NutritionPage() {
+  await adultsOnly()
   if (!FEATURES.recipes) return <FeatureOff />
 
   const [recipes, recommended, season, cycle, nutrition, plans, grocery, foods, pantry, profile, allResources] = await Promise.all([

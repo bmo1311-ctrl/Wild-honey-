@@ -10,6 +10,7 @@ import { PILLAR_META } from '@/lib/pillars'
 import { cn } from '@/lib/utils'
 import { PageTabs } from '@/components/page-tabs'
 import ProgressPage from '@/app/app/progress/page'
+import { adultsOnly } from '@/lib/kid-guard'
 
 /**
  * Evidence of change, drawn from what she has already done. Nothing here is a
@@ -29,6 +30,7 @@ function BecomingTabs({ active }: { active: string }) {
 }
 
 export default async function BecomingPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
+  await adultsOnly()
   const { tab } = await searchParams
   const activeTab = tab === 'evolution' ? 'evolution' : 'becoming'
   if (activeTab === 'evolution') {

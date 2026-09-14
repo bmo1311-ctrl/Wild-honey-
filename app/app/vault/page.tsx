@@ -6,9 +6,11 @@ import { getAccess, GOAL_PILLAR, getContentEvents, getMyGoals, getResources } fr
 import { FeatureOff } from '@/components/feature-off'
 import { LockedArea } from '@/components/locked'
 import { FEATURES } from '@/lib/features'
+import { adultsOnly } from '@/lib/kid-guard'
 
 /** Teaching videos only. Food lives in Nutrition, training lives in Fitness. */
 export default async function WatchPage() {
+  await adultsOnly()
   if (!FEATURES.vault) return <FeatureOff />
   const access = await getAccess()
   if (!access.paid) return <LockedArea title="Watch" subtitle="teaching videos on identity, mindset and faith." blurb="The whole library, on shelves by pillar and collection. Part of The Circle." from="watch" />

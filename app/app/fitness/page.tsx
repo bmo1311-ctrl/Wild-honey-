@@ -1,9 +1,11 @@
 import { WorkoutFilterBar } from '@/components/workout-filter-bar'
 import { Locked } from '@/components/locked'
 import { getAccess, getWorkouts } from '@/lib/data'
+import { adultsOnly } from '@/lib/kid-guard'
 
 /** Movement only. Meal plans and grocery lists moved to Nutrition. */
 export default async function FitnessPage() {
+  await adultsOnly()
   const [workouts, access] = await Promise.all([getWorkouts(), getAccess()])
   const unlocked = access.paid
 

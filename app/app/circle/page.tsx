@@ -5,8 +5,10 @@ import { PraiseReportCard } from '@/components/praise-report-card'
 import { HoneycombMark } from '@/components/logo'
 import { Locked } from '@/components/locked'
 import { getAccess, getUnifiedCircleFeed, getSessionProfile } from '@/lib/data'
+import { circleOrRedirect } from '@/lib/kid-guard'
 
 export default async function CirclePage() {
+  await circleOrRedirect()
   const [feed, profile, access] = await Promise.all([getUnifiedCircleFeed(), getSessionProfile(), getAccess()])
   const canPin = profile?.membership_tier === 'founder' || Boolean(profile?.is_admin)
 

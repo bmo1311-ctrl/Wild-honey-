@@ -5,6 +5,7 @@ import { SQUARE_LINKS } from '@/lib/payment-links'
 import { getAccess, getSessionProfile } from '@/lib/data'
 import { squareConfigured } from '@/lib/square'
 import { MODULES } from '@/lib/modules'
+import { adultsOnly } from '@/lib/kid-guard'
 
 
 const FREE = [
@@ -37,6 +38,7 @@ const PRICE_MONTHLY = '$29/mo'
 const PRICE_ANNUAL = '$290/yr'
 
 export default async function MembershipPage({ searchParams }: { searchParams: Promise<{ from?: string }> }) {
+  await adultsOnly()
   const { from } = await searchParams
   const [profile, access] = await Promise.all([getSessionProfile(), getAccess()])
   const fromTitle = from === 'ask' ? 'Ask the experts' : (MODULES.find((m) => m.key === from)?.title ?? null)

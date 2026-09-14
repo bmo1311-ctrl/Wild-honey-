@@ -7,9 +7,11 @@ import { VaultBrowser } from '@/components/vault-browser'
 import { buildVaultIndex } from '@/lib/vault'
 import { getAccess, getRecipes, getResources, getWorkouts } from '@/lib/data'
 import { youTubeId } from '@/lib/youtube'
+import { adultsOnly } from '@/lib/kid-guard'
 
 /** Doors come from the module registry, so a new area appears here on its own. */
 export default async function LibraryPage() {
+  await adultsOnly()
   const [resources, recipes, workouts] = await Promise.all([getResources(), getRecipes(), getWorkouts()])
   const counts = {
     videos: resources.filter((r) => youTubeId(r.url)).length,

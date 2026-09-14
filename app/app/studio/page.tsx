@@ -3,6 +3,7 @@ import { StudioBlockSetup } from '@/components/studio-block-setup'
 import { getStudioBlocks, getStudioItems, getStudioSessionsThisWeek } from '@/lib/data'
 import { localToday } from '@/lib/today'
 import type { StudioBlock, StudioItem } from '@/lib/studio'
+import { adultsOnly } from '@/lib/kid-guard'
 
 /**
  * Studio — the work that pays.
@@ -16,6 +17,7 @@ import type { StudioBlock, StudioItem } from '@/lib/studio'
  * setup, below the work. It is never in the way on the day.
  */
 export default async function StudioPage() {
+  await adultsOnly()
   const [blocks, items, sessions, today] = await Promise.all([
     getStudioBlocks(),
     getStudioItems(),

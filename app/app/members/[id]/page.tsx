@@ -4,9 +4,11 @@ import { ChevronLeft } from 'lucide-react'
 import { BloomAvatar } from '@/components/bloom-avatar'
 import { RecipeCard } from '@/components/recipe-card'
 import { getMemberProgressCount, getMemberSharedRecipes, getMemberWins, getPublicProfile, getSessionProfile } from '@/lib/data'
+import { circleOrRedirect } from '@/lib/kid-guard'
 
 /** What a member chose to show. Everything here is opt-in; the default is name and photo. */
 export default async function MemberPage({ params }: { params: Promise<{ id: string }> }) {
+  await circleOrRedirect()
   const { id } = await params
   const me = await getSessionProfile()
   if (me?.id === id) redirect('/app/profile')

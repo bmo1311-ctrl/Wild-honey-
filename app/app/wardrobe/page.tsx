@@ -6,6 +6,7 @@ import { getSeason } from '@/lib/color-season'
 import type { Body, Scale, Shape, VerticalProportion } from '@/lib/silhouette'
 import { LAYERS, countOutfits, findGaps, wearStats } from '@/lib/wardrobe'
 import { localToday } from '@/lib/today'
+import { adultsOnly } from '@/lib/kid-guard'
 
 /**
  * The capsule wardrobe.
@@ -15,6 +16,7 @@ import { localToday } from '@/lib/today'
  * why the gap analysis names one piece rather than a shopping list.
  */
 export default async function WardrobePage() {
+  await adultsOnly()
   const [garments, style, today] = await Promise.all([getWardrobe(), getStyleProfile(), localToday()])
 
   const season = getSeason(style?.season)

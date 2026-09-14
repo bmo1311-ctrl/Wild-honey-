@@ -26,6 +26,7 @@ import { planWash, planWashDays } from '@/lib/wash-day'
 import { localToday } from '@/lib/today'
 import { FeatureOff } from '@/components/feature-off'
 import { FEATURES } from '@/lib/features'
+import { adultsOnly } from '@/lib/kid-guard'
 
 /**
  * Protocols, one area at a time.
@@ -44,6 +45,7 @@ export default async function ProtocolsPage({
 }: {
   searchParams: Promise<{ area?: string }>
 }) {
+  await adultsOnly()
   if (!FEATURES.protocols) return <FeatureOff />
 
   const [{ area: requested }, enrollment, todayCheckin, allProducts, profile, log, today] = await Promise.all([

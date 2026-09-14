@@ -2,9 +2,11 @@ import { MeasurementLogger } from '@/components/measurement-logger'
 import { WeightChart } from '@/components/weight-chart'
 import { getMeasurements, getSessionProfile } from '@/lib/data'
 import { kgToLb } from '@/lib/goals'
+import { adultsOnly } from '@/lib/kid-guard'
 
 /** Watch yourself change. Weight trend, tape measurements, first against latest. */
 export default async function BodyPage() {
+  await adultsOnly()
   const [rows, profile] = await Promise.all([getMeasurements(), getSessionProfile()])
   const unit = ((profile as { weight_unit?: 'lb' | 'kg' | null })?.weight_unit ?? 'lb') as 'lb' | 'kg'
   const conv = (kg: number) => (unit === 'lb' ? kgToLb(kg) : kg)

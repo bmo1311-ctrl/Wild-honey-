@@ -3,8 +3,10 @@ import { CreateOrJoinGroup, GroupListCard } from '@/components/group-actions'
 import { getMyGroups } from '@/lib/data'
 import { FeatureOff } from '@/components/feature-off'
 import { FEATURES } from '@/lib/features'
+import { adultsOnly } from '@/lib/kid-guard'
 
 export default async function GroupsPage() {
+  await adultsOnly()
   if (!FEATURES.groups) return <FeatureOff />
 
   const groups = await getMyGroups()

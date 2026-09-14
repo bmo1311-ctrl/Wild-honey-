@@ -5,8 +5,10 @@ import { getAccess, getMyQuestions, getPublicAnsweredQuestions } from '@/lib/dat
 import { FeatureOff } from '@/components/feature-off'
 import { LockedArea } from '@/components/locked'
 import { FEATURES } from '@/lib/features'
+import { adultsOnly } from '@/lib/kid-guard'
 
 export default async function AskExpertPage() {
+  await adultsOnly()
   if (!FEATURES.expertQA) return <FeatureOff />
   const access = await getAccess()
   if (!access.paid) return <LockedArea title="Ask" subtitle="a question to the experts, and every public answer." blurb="Put your question to the experts and read everything they have answered. Part of The Circle." from="ask" />

@@ -3,8 +3,10 @@ import { getMyEntries } from '@/lib/data'
 import { PILLAR_META, relativeTime } from '@/lib/pillars'
 import { FeatureOff } from '@/components/feature-off'
 import { FEATURES } from '@/lib/features'
+import { adultsOnly } from '@/lib/kid-guard'
 
 export default async function ArchivePage() {
+  await adultsOnly()
   if (!FEATURES.archive) return <FeatureOff />
 
   const entries = await getMyEntries()

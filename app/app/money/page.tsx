@@ -6,6 +6,7 @@ import { getAccess, getMoney } from '@/lib/data'
 import { recentlyUsed } from '@/lib/suggestions'
 import { debtFreeDate, fmtMoney, freedomPath, monthSummary, netWorth, runwayMonths } from '@/lib/money'
 import { cn } from '@/lib/utils'
+import { adultsOnly } from '@/lib/kid-guard'
 
 /**
  * The Freedom pillar. Her numbers, honest arithmetic on them, and the order
@@ -13,6 +14,7 @@ import { cn } from '@/lib/utils'
  * does not tell her what to invest in.
  */
 export default async function MoneyPage() {
+  await adultsOnly()
   const access = await getAccess()
   if (!access.paid) return <LockedArea title="Freedom" subtitle="know your numbers, then move them." blurb="Accounts, the weekly log, net worth, runway, your debt-free date and the seven-step path. Private, always. Part of The Circle." from="money" />
   const { accounts, entries, goals } = await getMoney()

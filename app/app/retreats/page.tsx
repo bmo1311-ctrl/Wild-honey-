@@ -6,8 +6,10 @@ import { getRetreats } from '@/lib/data'
 import { formatPrice } from '@/lib/pillars'
 import { FeatureOff } from '@/components/feature-off'
 import { FEATURES } from '@/lib/features'
+import { adultsOnly } from '@/lib/kid-guard'
 
 export default async function RetreatsPage() {
+  await adultsOnly()
   if (!FEATURES.retreats) return <FeatureOff />
 
   const retreats = await getRetreats()

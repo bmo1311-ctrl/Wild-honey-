@@ -5,8 +5,10 @@ import { getProducts } from '@/lib/data'
 import { formatPrice } from '@/lib/pillars'
 import { FeatureOff } from '@/components/feature-off'
 import { FEATURES } from '@/lib/features'
+import { adultsOnly } from '@/lib/kid-guard'
 
 export default async function ShopPage() {
+  await adultsOnly()
   if (!FEATURES.shop) return <FeatureOff />
 
   const products = await getProducts()

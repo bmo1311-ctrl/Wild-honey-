@@ -9,6 +9,7 @@ import { relativeTime } from '@/lib/pillars'
 import { Sparkles } from 'lucide-react'
 import { FeatureOff } from '@/components/feature-off'
 import { FEATURES } from '@/lib/features'
+import { adultsOnly } from '@/lib/kid-guard'
 
 const MILESTONE_LABEL: Record<string, string> = {
   '30_day': '30 days in',
@@ -19,6 +20,7 @@ const MILESTONE_LABEL: Record<string, string> = {
 }
 
 export default async function ProgressPage() {
+  await adultsOnly()
   if (!FEATURES.progress) return <FeatureOff />
 
   const [profile, vitalityHistory, reflections, commitments, experiments, wins] = await Promise.all([

@@ -984,3 +984,60 @@ the page that will always be closest to the ceiling, because it is the one
 every engine wants a line on. Anything added to it should go in the existing
 `Promise.all`, never as a new `await` — and anything costing more than a query
 or two should ask whether Today is where it belongs at all.
+
+---
+
+## 21. The child gate, done properly (14 Sept)
+
+§18 found `kidAllowed` had been open since it was written — `'/app'` in the
+allow list, matched as a prefix, which is every route in the app. The logic
+fix shipped. The second half did not: the gate still ran in the browser, so a
+page her parent had switched off still executed on the server and sent its
+data before `KidGate` redirected. That is not a redirect, it is a flash of the
+thing itself.
+
+The first attempt to fix that put the pathname in a request header from
+`proxy.ts`. `proxy` runs in front of every request and owns the Supabase
+session refresh; the change took the site down and had to be reverted. **The
+lesson is not "be careful with proxy" — it is that a global mechanism was the
+wrong shape for a per-page rule.**
+
+### What is there now
+
+`lib/kid-guard.ts`, two functions, and each page says for itself:
+
+- `adultsOnly()` — 25 pages.
+- `circleOrRedirect()` — `/app/circle` and `/app/members/[id]`, which open only
+  when her parent has switched the Circle on. This is the one that mattered
+  most: `child_permissions.circle` had no enforcement beyond which tabs were
+  drawn, and a child inherits her guardian's paid tier.
+
+Both are free — `getSessionProfile` is memoised per request (§20) and every one
+of these pages already loads it. `KidGate` stays for client-side navigation,
+where there is no new server render to catch.
+
+### `npm run check:kid`
+
+A guard that depends on remembering to add a line is a silent hole the first
+time someone forgets. So the check walks `app/app/*`, works out what
+`kidAllowed` would say about each route, and fails on any route a child can
+reach that has no guard. Verified by deleting the guard from `/app/money`: it
+failed and named the route.
+
+Three things it does beyond the obvious:
+
+- **Follows redirects.** `/app/community`, `/app/pantry`, `/app/recipes`,
+  `/app/workouts` and `/app/calendar` are redirect stubs. Rather than exempt
+  them on trust, the check reads the destination and insists *it* is guarded —
+  "this redirects somewhere safe" is exactly the kind of claim that quietly
+  stops being true.
+- **Flags over-guarding.** A guard on one of her own pages fails too. The
+  check protects the child's access as well as from it.
+- **Rejects stale exemptions.** An exemption for a page that no longer exists
+  is an error.
+
+Two exemptions remain, both with reasons: `/app/guidelines` (static community
+rules, no personal data) and `/app/program` (filters its own list through
+`courseAllowList`).
+
+`npm run verify` is now `tsc --noEmit && check:columns && check:kid`.
