@@ -46,8 +46,17 @@ const FORBIDDEN = [
     why: 'a count of her activity divided by a number of days. That is a measure of how much she used the app, and it cannot be shown to her as a fact about her.',
   },
   {
-    // "3 of the last 14 days"
-    re: /of the last \$\{?[\w.]+\}?\s*days|\bof the last \d+ days\b/g,
+    /*
+     * "3 of the last 14 days" — and the spelled-out version.
+     *
+     * The first pass only matched digits, and `lib/noticing.ts` deliberately
+     * spells small numbers as words ("four days running" sounds noticed,
+     * "4 days running" sounds counted). So "four of the last seven days" sat
+     * there passing a check written to forbid exactly that shape. The
+     * engine's own comment said it counts what she did and never what she
+     * missed; a denominator smuggles the missing half in without naming it.
+     */
+    re: /of the last \$\{?[\w.]+\}?\s*days|\bof the last (\d+|one|two|three|four|five|six|seven|eight|nine|ten|fourteen|thirty) days\b/gi,
     why: '"X of the last N days" reports her absence back to her as a finding.',
   },
   {

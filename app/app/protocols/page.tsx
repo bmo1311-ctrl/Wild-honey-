@@ -51,10 +51,16 @@ export default async function ProtocolsPage({
   const access = await getAccess()
   if (!access.paid)
     return (
+      /*
+       * The old copy sold "on a rhythm rather than a whim" and "tonight's
+       * step decided for you". Both described the nightly register that is
+       * now gone, so both were the app charging for something it had stopped
+       * doing. Copy promising what the code does not do is its own bug.
+       */
       <LockedArea
         title="Protocols"
-        subtitle="skin, hair and nails, on a rhythm rather than a whim."
-        blurb="Tonight’s step decided for you, wash days worked out from what you use, the acids and actives libraries, the apothecary, and resets for the weeks that go sideways. Part of The Circle."
+        subtitle="skin, hair and nails — for the weeks something is off."
+        blurb="Tell it what your skin is doing and it answers from what you already own — topically and from the inside, with how good the evidence is for each. Wash days worked out from what you use, the acids and actives libraries, the apothecary, and resets for the weeks that go sideways. Part of The Circle."
         from="protocols"
       />
     )
@@ -87,7 +93,12 @@ export default async function ProtocolsPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="font-serif text-3xl font-semibold">Protocols</h1>
+      <div>
+        <h1 className="font-serif text-3xl font-semibold">Protocols</h1>
+        <p className="mt-1 text-sm text-muted-foreground text-pretty">
+          for when something&rsquo;s off — and what you already own that helps.
+        </p>
+      </div>
 
       {/* Nothing set up anywhere yet — ask before assuming. */}
       {!area ? (
@@ -204,6 +215,33 @@ function BeautyArea({
         one labelled "done tonight" with the button disabled — so she could
         not log the thing it was now telling her to do.
       */}
+      {/*
+        What is going on comes first now.
+
+        This panel sat below tonight's card and the week strip — so the page
+        opened by telling her what to do, and the question of what she
+        actually came in about was two scrolls down. That order is what a
+        nightly attendance register looks like: the app's ask first, her
+        reason for opening it somewhere underneath.
+
+        Ten products entered and zero routines ever logged says she is not
+        coming here every night for a step. Women come to this when something
+        is wrong — skin is angry this week, something is flaking, a spot will
+        not go. The panel already answers that well, topically and internally,
+        with the evidence strength on every internal claim and a line about
+        when to stop reading an app and go and see someone. It was simply in
+        the wrong place to be the answer to anything.
+
+        Skin only. Hair runs on washes, which is already episodic by nature —
+        nobody needs prompting to notice their hair needs washing.
+      */}
+      {areaKey === 'skin' && (
+        <SkinConcernsPanel
+          initial={profile?.skin_concerns ?? []}
+          lifeStage={profile?.life_stage ?? null}
+        />
+      )}
+
       {wash && <WashCard key={`${wash.reason}|${washedToday}`} plan={wash} doneToday={washedToday} />}
       {washDays.length > 0 && <WashStrip days={washDays} />}
       {/*
@@ -214,18 +252,6 @@ function BeautyArea({
       */}
       {tonight && <TonightCard key={`${tonight.kind}|${tonight.treatment?.id ?? tonight.reason}`} plan={tonight} />}
       {week.length > 0 && <WeekStrip nights={week} />}
-
-      {/*
-        What she is working on comes before the shelf, because it decides
-        what belongs on the shelf. Skin only — hair and nails have their own
-        engines and their own vocabulary.
-      */}
-      {areaKey === 'skin' && (
-        <SkinConcernsPanel
-          initial={profile?.skin_concerns ?? []}
-          lifeStage={profile?.life_stage ?? null}
-        />
-      )}
 
       {treatments.length > 0 && (
         <TreatmentSuggestions suggestions={treatments} shelfIsEmpty={shelf.length === 0} />

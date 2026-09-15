@@ -106,8 +106,21 @@ export function buildNotices(input: NoticeInput): Notice[] {
   for (const habit of habits.filter((h) => !h.archived)) {
     const hits = habitLogs.filter((l) => l.habit_id === habit.id && l.date >= weekAgoStr).length
     if (hits >= 4) {
+      /*
+       * "four times this week", not "four of the last seven days".
+       *
+       * The denominator was the problem. A habit log is something she ticks;
+       * if she did not tick it the app does not know she did not do it — so
+       * "four of the last seven" quietly presents three un-ticked days as
+       * three misses, in a line that is otherwise warm. Count what she did
+       * and stop there. Same warmth, no implied absences.
+       *
+       * Worth saying that this file's own rule one already said "count what
+       * she did, never what she missed", and this line broke it anyway. A
+       * denominator smuggles the missing half in without ever naming it.
+       */
       out.push({
-        text: `${habit.title.toLowerCase()} — ${spell(hits)} of the last seven days. it’s becoming yours.`,
+        text: `${habit.title.toLowerCase()} — ${spell(hits)} times this week. it’s becoming yours.`,
         href: '/app/becoming',
         kind: 'habit',
       })

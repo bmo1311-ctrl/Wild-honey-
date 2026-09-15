@@ -2164,3 +2164,58 @@ explicitly, including both boundaries of the score mapping.
   is not an assertion, so it is a floor now. The structural claims — Ask an
   Expert is inner-circle and adults-only, only the learning board is open to a
   child — are what actually matter, and those still catch every mutation.
+
+---
+
+## 40. Protocols asks before it tells, and a denominator hiding in words (15 Sept)
+
+### The concerns panel was in the wrong place to be an answer
+
+`SkinConcernsPanel` sat *below* tonight's card and the week strip. So the page
+opened by telling her what to do, and the question of what she actually came
+in about was two scrolls down. That order is what an attendance register looks
+like: the app's ask first, her reason for opening it somewhere underneath.
+
+It is first now. Ten products entered and zero routines ever logged says she is
+not arriving every night for a step — women open this when something is wrong,
+and the panel already answers that well in both directions, with the evidence
+strength on every internal claim and a line about when to stop reading an app
+and go and see someone. It was only ever in the wrong position.
+
+Skin only. Hair runs on washes and is already episodic — nobody needs
+prompting to notice their hair needs washing.
+
+**And the paywall copy was selling the thing that was removed.** "On a rhythm
+rather than a whim", "tonight's step decided for you" — both described the
+nightly register. Charging for something the code had stopped doing.
+
+### A denominator that got through because it was spelled out
+
+`lib/noticing.ts` opens with three rules, and the first is *"count what she
+did, never what she missed."* Then:
+
+```
+yoga — four of the last seven days. it’s becoming yours.
+```
+
+A habit log is something she ticks. If she did not tick it, the app does not
+know she did not do it — so that line quietly presents three un-ticked days as
+three misses, inside a sentence that is otherwise warm. **A denominator
+smuggles the missing half in without ever naming it.** Now "four times this
+week": same warmth, no implied absences.
+
+`check:silence` did not catch it, and the reason is worth keeping. The pattern
+matched `of the last \d+ days` — digits. This file deliberately spells small
+numbers as words, because "four days running" sounds noticed and "4 days
+running" sounds counted. So the one file most careful about this was the one
+whose house style defeated the check. Widened to both forms and verified
+against each.
+
+### The rest of the engine holds up
+
+Audited every rule in it against rule one. The run counter, the sleep line,
+the win and the program line all read only what she typed. The "you're back,
+nothing expired" line triggers on an absence but does not *report* it back at
+her, which is the distinction that matters — and it is the friendliest thing
+in the app. The stale-commitment line re-offers her own words rather than
+noting that she has not reviewed them. All kept as they are.
