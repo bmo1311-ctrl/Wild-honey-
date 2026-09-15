@@ -1837,3 +1837,79 @@ A green test from a compiler that silently did nothing.)
 
 `npm run verify` is seven checks now: `tsc`, columns, kid routes, access,
 gated actions, service role, accounts.
+
+---
+
+## 35. The app may only say what she told it (15 Sept)
+
+A direction change, written down properly in **CONSCIOUSNESS.md** — what the
+app is for, ahead of what it does. Short version: not a tracker. A place to
+hold inspiration so she can filter through it and live her life, organised
+around her four pillars, sized to the day she actually had.
+
+This commit is the first half: taking out everything that measured her by her
+absence.
+
+### What was wrong
+
+Two of the four readings were built on silence.
+
+`computeAwareness` counted the days she wrote or checked in **inside the app**,
+divided by fourteen, and showed the result as how much she was noticing about
+herself. A woman who journals on paper, prays in the car and opens this twice
+a month scored 21% on self-awareness. That is not a measurement of her — it is
+the app mistaking its own silence for hers and reporting it back as a fact
+about her inner life.
+
+`computeAlignment` did the same with `active on 6 of the last 14 days`: not
+opening an app became evidence her life did not match her values. It also
+counted commitments she had *released* against her, when releasing one is
+usually the healthy act.
+
+Neither was a bug. Both were carefully written and well commented. They type
+checked, they rendered, the arithmetic was right. Wrong at the level of what
+the app believed it was entitled to say, which is the one kind of mistake none
+of the other six checks can see.
+
+`capacity` and `vitality` stay. Both only speak when she has spoken — vitality
+returns null rather than zero, capacity needs four check-ins before the state
+half counts at all.
+
+### And seven queries went with them
+
+`getPersonalState` ran fifteen queries; seven existed only to feed the two
+deleted readings. Removed rather than left computing something nothing reads —
+this runs behind a ten-second function ceiling, and a pile of unread queries is
+exactly how Today went down once already. Eight now.
+
+`awareness_score` and `alignment_score` are written as null from here on. The
+columns stay: what the app believed about her in September is a real thing it
+believed, and rewriting history is its own kind of dishonesty.
+
+### The check, and the two things it found
+
+`scripts/check-silence.mjs` looks for the *shape* — a count of her
+participation over a window of days, and copy that names what she did not do.
+
+It immediately found two I did not know about:
+
+- **`lib/nudges.ts`** — dead since the nudge strip came off Today, and its
+  surviving line counted her good days over the last seven and told her "that
+  is the habit forming". Kind in tone, still a scoreboard. Untracked now; the
+  sandbox cannot delete files, so an empty shell is left on disk.
+- **`components/today-focus-card.tsx`** — a **false positive**. My first regex
+  was `you (only|haven't|…)`, which fired on *"if you only do one thing
+  today"* — the good copy, the whole sized-to-the-day idea in one line. A
+  check that flags the thing it is meant to protect gets switched off within a
+  week, so "only" now counts only when followed by something she did.
+
+Verified by rebuilding `computeAwareness` verbatim (caught, 2 findings) and by
+adding "you haven't checked in this week" to a card (caught).
+
+`npm run verify` is eight checks.
+
+### Still to do
+
+The pillars — Body, Identity, Mindset, Faith — are her coaching plan and are
+currently four coloured chips on posts. Making them the structure that holds
+the inspiration is the next piece, and the bigger one.

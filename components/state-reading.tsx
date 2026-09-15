@@ -83,12 +83,7 @@ export function StateReading({ state }: { state: PersonalState }) {
 
   // Everything the engine used, in one list, so "why this?" answers the whole
   // card rather than one line of it.
-  const reasons = [
-    ...state.capacity.because,
-    ...state.vitality.because,
-    ...state.awareness.because,
-    ...state.alignment.because,
-  ]
+  const reasons = [...state.capacity.because, ...state.vitality.because]
 
   return (
     <section className="flex flex-col gap-4 rounded-3xl bg-card p-5 ring-1 ring-border">
@@ -106,20 +101,20 @@ export function StateReading({ state }: { state: PersonalState }) {
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      {/*
+        One measure, not three.
+
+        "noticing" and "alignment" were both computed from how often she used
+        this app — days she wrote here over fourteen, days she opened it over
+        fourteen — and then shown to her as scores about her self-awareness
+        and her integrity. A woman with a paper journal read 21% on noticing.
+        Both are deleted; see CONSCIOUSNESS.md.
+
+        Vitality stays because it is arithmetic on numbers she typed herself,
+        and says "not yet" rather than zero when she has not typed any.
+      */}
+      <div className="grid grid-cols-1 gap-3">
         <Measure label="vitality" value={state.vitality.value} note="check in and this appears" />
-        <Measure label="noticing" value={state.awareness.value} note="writing and reflecting build this" />
-        {/*
-          This said "needs a goal in your words", which was simply untrue —
-          `computeAlignment` reads commitments, experiments and active days,
-          and never touches her goals at all. Following that instruction moved
-          nothing. The note names what actually feeds it.
-        */}
-        <Measure
-          label="alignment"
-          value={state.alignment.value}
-          note="make a commitment or run an experiment"
-        />
       </div>
 
       {disclaimer && <p className="text-xs text-muted-foreground">{disclaimer}</p>}

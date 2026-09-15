@@ -53,10 +53,6 @@ export interface PersonalState {
   capacity: Reading<CapacityLevel>
   /** How alive she feels, 0–100. Null when she has not said. */
   vitality: Reading<number | null>
-  /** How much she is noticing about herself — writing, reflecting, checking in. */
-  awareness: Reading<number | null>
-  /** Whether what she does matches what she said matters. */
-  alignment: Reading<number | null>
   /** What she is carrying. Counts, not judgements. */
   load: Load
   /** Total weight of `load`, for ranking. */
@@ -78,12 +74,12 @@ export interface StateInput {
   habits: { id: string }[]
   habitLogs: { habit_id: string; date: string }[]
   studioBlocks: { id: string }[]
-  /** Dates she wrote anything — journal or course writing. */
-  writingDates: string[]
-  /** Goals in her own words. Used for alignment. */
-  goals: string[]
-  /** Dates anything at all was logged, from lib/activity. */
-  activeDays: string[]
+  /*
+   * `writingDates`, `goals` and `activeDays` used to live here, feeding
+   * `awareness` and `alignment`. Both are gone (see CONSCIOUSNESS.md) and so
+   * are they — keeping the inputs would leave the next person a loaded gun
+   * with a note on it.
+   */
 }
 
 /**
@@ -303,83 +299,39 @@ export function computeVitality(input: StateInput): Reading<number | null> {
   }
 }
 
-/**
- * How much she is noticing about herself.
+/*
+ * `computeAwareness` and `computeAlignment` stood here. Both are deleted, and
+ * the reason is the one rule this app now has above the others: it may only
+ * say what she told it.
  *
- * Counted from acts of attention over a fortnight — checking in, writing,
- * reflecting. Deliberately not a streak: this is a proportion of days on
- * which she looked at herself at all, and missing a Tuesday does not reset it
- * to zero.
- */
-export function computeAwareness(input: StateInput): Reading<number | null> {
-  const checkinDays = within(input.checkins.map((c) => c.date), input.today, 14)
-  const writeDays = within(input.writingDates, input.today, 14)
-  const days = new Set([
-    ...input.checkins.map((c) => c.date).filter((d) => daysBetween(input.today, d) < 14 && daysBetween(input.today, d) >= 0),
-    ...input.writingDates.filter((d) => daysBetween(input.today, d) < 14 && daysBetween(input.today, d) >= 0),
-  ]).size
-
-  if (checkinDays + writeDays === 0) return { value: null, confidence: 'none', because: [] }
-  return {
-    value: Math.round((days / 14) * 100),
-    confidence: confidenceFrom(days),
-    because: [`you looked at how you were on ${days} of the last 14 days`],
-  }
-}
-
-/**
- * Whether what she does matches what she said matters.
+ * `awareness` counted the days she wrote or checked in *inside the app*,
+ * divided by fourteen, and called the result how much she was noticing about
+ * herself. So a woman who journals on paper, prays in the car and opens this
+ * twice a month scored low on self-awareness. That is not a measurement of
+ * her. It is the app mistaking its own silence for hers, and then reporting
+ * it back to her as a fact about her inner life.
  *
- * The hardest of the four to do honestly, so it is kept crude: are the
- * promises she made being reviewed, are the experiments she started being
- * finished, is the programme she chose being opened. It does not attempt to
- * read her goals against her behaviour — that would be a guess dressed as a
- * measurement, and this file is supposed to be the opposite of that.
+ * `alignment` did the same with `active on 6 of the last 14 days` — not
+ * opening an app became evidence that her life did not match her values. It
+ * also counted commitments she had *released* against her, when releasing one
+ * is usually the healthy act.
+ *
+ * Both are the shape the check in scripts/check-silence.mjs now forbids: a
+ * percentage whose numerator is her participation and whose denominator is a
+ * number of days. Nothing may be rebuilt in that shape.
+ *
+ * `capacity` and `vitality` stay because both only speak when she has spoken.
  */
-export function computeAlignment(input: StateInput): Reading<number | null> {
-  const signals: number[] = []
-  const because: string[] = []
-
-  const liveCommitments = input.commitments.filter((c) => !c.status || c.status === 'active').length
-  if (input.commitments.length > 0) {
-    const kept = liveCommitments / input.commitments.length
-    signals.push(kept)
-    because.push(`${liveCommitments} of ${input.commitments.length} commitments still standing`)
-  }
-
-  const running = input.experiments.filter((e) => !e.status || e.status === 'active').length
-  const finished = input.experiments.filter((e) => e.status === 'completed').length
-  if (input.experiments.length > 0) {
-    signals.push(finished / input.experiments.length)
-    because.push(`${finished} of ${input.experiments.length} experiments seen through`)
-  }
-
-  const active = within(input.activeDays, input.today, 14)
-  if (active > 0) {
-    signals.push(Math.min(1, active / 10))
-    because.push(`active on ${active} of the last 14 days`)
-  }
-
-  if (signals.length === 0) return { value: null, confidence: 'none', because: [] }
-  const avg = signals.reduce((a, b) => a + b, 0) / signals.length
-  return {
-    value: Math.round(avg * 100),
-    confidence: signals.length >= 2 ? 'fair' : 'low',
-    because,
-  }
-}
 
 /** Everything, assembled. The one thing other surfaces should read. */
 export function computeState(input: StateInput): PersonalState {
   const load = computeLoad(input)
   const capacity = computeCapacity(input, load)
   const vitality = computeVitality(input)
-  const awareness = computeAwareness(input)
-  const alignment = computeAlignment(input)
 
-  const known = [vitality, awareness, alignment].filter((r) => r.confidence !== 'none').length
+  const known = [vitality].filter((r) => r.confidence !== 'none').length
   const evidence: Confidence =
-    input.checkins.length >= MIN_FOR_GOOD && known >= 2
+    input.checkins.length >= MIN_FOR_GOOD && known >= 1
       ? 'good'
       : input.checkins.length >= MIN_FOR_PATTERN
         ? 'fair'
@@ -390,8 +342,6 @@ export function computeState(input: StateInput): PersonalState {
   return {
     capacity,
     vitality,
-    awareness,
-    alignment,
     load,
     loadScore: loadScore(load),
     evidence,

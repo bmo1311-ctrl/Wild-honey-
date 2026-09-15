@@ -59,85 +59,50 @@ export const readStateInput = cache(async (): Promise<StateInput | null> => {
   const today = await localToday()
   const from = daysBefore(today, WINDOW_DAYS)
 
-  const [
-    profile,
-    checkins,
-    commitments,
-    experiments,
-    enrollments,
-    habits,
-    habitLogs,
-    studioBlocks,
-    journal,
-    courseWriting,
-    goals,
-    meals,
-    courseDays,
-    reflections,
-    resets,
-  ] = await Promise.all([
-    supabase.from('profiles').select('seasons').eq('id', user.id).maybeSingle(),
-    supabase
-      .from('checkins')
-      .select('date, energy, sleep_quality, stress')
-      .gte('date', from)
-      .order('date', { ascending: true }),
-    supabase.from('commitments').select('status'),
-    supabase.from('personal_experiments').select('status'),
-    supabase.from('course_enrollments').select('course_slug').eq('is_active', true),
-    supabase.from('habits').select('id').eq('archived', false),
-    supabase.from('habit_logs').select('habit_id, date').gte('date', from),
-    supabase.from('studio_blocks').select('id').eq('is_active', true),
-    supabase.from('journal_entries').select('created_at').gte('created_at', from),
-    supabase.from('course_writings').select('updated_at').gte('updated_at', from),
-    supabase.from('user_goals').select('goal'),
-    supabase.from('meal_logs').select('date').gte('date', from),
-    supabase.from('course_day_progress').select('completed_at').gte('completed_at', from),
-    /*
-     * The two the engine was quietly ignoring. `saveEveningReflection` called
-     * `recordPersonalState` with a comment saying reflecting is most of what
-     * noticing is made of — and then nothing here read the table, so an
-     * evening reflection moved the reading by zero. Same for morning resets.
-     */
-    supabase.from('evening_reflections').select('date').gte('date', from),
-    supabase.from('morning_resets').select('date').gte('date', from),
-  ])
-
   /*
-   * Timestamps become dates here rather than in the pure module, so that
-   * everything crossing into `computeState` is already a plain 'YYYY-MM-DD'.
-   * The alternative — letting it handle both — is how you end up with a
-   * streak that breaks at 5pm in one timezone and midnight in another.
+   * Eight queries, down from fifteen.
+   *
+   * Seven of them — journal entries, course writings, goals, meal logs,
+   * course day progress, evening reflections, morning resets — existed only
+   * to feed `awareness` and `alignment`, and both of those are deleted (see
+   * CONSCIOUSNESS.md). They are removed rather than left computing something
+   * nothing reads: this runs on a page with a ten-second function ceiling,
+   * and a pile of unread queries is exactly how Today went down once already.
+   *
+   * What remains is what capacity is actually made of: how she has been, and
+   * how much is on her.
    */
-  const day = (ts: string | null | undefined): string | null => (ts ? ts.slice(0, 10) : null)
-  const days = (rows: { [k: string]: unknown }[] | null, key: string): string[] =>
-    (rows ?? []).map((r) => day(r[key] as string)).filter((d): d is string => !!d)
+  const [profile, checkins, commitments, experiments, enrollments, habits, habitLogs, studioBlocks] =
+    await Promise.all([
+      supabase.from('profiles').select('seasons').eq('id', user.id).maybeSingle(),
+      supabase
+        .from('checkins')
+        .select('date, energy, sleep_quality, stress')
+        .gte('date', from)
+        .order('date', { ascending: true }),
+      supabase.from('commitments').select('status'),
+      supabase.from('personal_experiments').select('status'),
+      supabase.from('course_enrollments').select('course_slug').eq('is_active', true),
+      supabase.from('habits').select('id').eq('archived', false),
+      supabase.from('habit_logs').select('habit_id, date').gte('date', from),
+      supabase.from('studio_blocks').select('id').eq('is_active', true),
+    ])
 
   /*
    * Noticing is writing *and* reflecting. Both evening reflections and morning
    * resets are her putting words to her own state, which is the thing this
    * measure is supposed to be about.
    */
-  const writingDates = [
-    ...days(journal.data, 'created_at'),
-    ...days(courseWriting.data, 'updated_at'),
-    ...days(reflections.data, 'date'),
-    ...days(resets.data, 'date'),
-  ]
-
   /*
-   * An active day is any day she did *something*. Deliberately generous —
-   * this feeds awareness and alignment, where the question is whether she is
-   * in contact with her own life, not whether she performed well.
+   * `writingDates` and `activeDays` were built here and fed `awareness` and
+   * `alignment`. Both readings are deleted — they scored her on how often she
+   * used this app and reported it back as facts about her self-awareness and
+   * her integrity. See CONSCIOUSNESS.md.
+   *
+   * The queries behind them are gone too rather than left computing something
+   * nothing reads. A dozen unread queries on a page with a ten-second ceiling
+   * is how Today went down once already.
    */
-  const activeDays = [
-    ...days(checkins.data, 'date'),
-    ...days(habitLogs.data, 'date'),
-    ...days(meals.data, 'date'),
-    ...days(courseDays.data, 'completed_at'),
-    ...writingDates,
-  ]
-
   return {
     today,
     checkins: (checkins.data ?? []) as StateInput['checkins'],
@@ -150,9 +115,6 @@ export const readStateInput = cache(async (): Promise<StateInput | null> => {
     habits: (habits.data ?? []) as { id: string }[],
     habitLogs: (habitLogs.data ?? []) as { habit_id: string; date: string }[],
     studioBlocks: (studioBlocks.data ?? []) as { id: string }[],
-    writingDates,
-    goals: (goals.data ?? []).map((g) => g.goal as string).filter(Boolean),
-    activeDays,
   }
 })
 
@@ -289,8 +251,12 @@ export async function recordPersonalState(): Promise<void> {
         capacity_score:
           state.capacity.confidence === 'none' ? null : CAPACITY_SCORE[state.capacity.value],
         vitality_score: smallint(state.vitality.value),
-        awareness_score: smallint(state.awareness.value),
-        alignment_score: smallint(state.alignment.value),
+        // awareness_score and alignment_score are written as null from here
+        // on. The columns stay so the history is not rewritten — what the app
+        // believed about her in September is a real thing it believed — but
+        // nothing computes them any more.
+        awareness_score: null,
+        alignment_score: null,
         // The full reading, reasons included, so a later phase can ask why
         // the app said what it said on a given day rather than guessing.
         state_json: {
