@@ -1913,3 +1913,77 @@ adding "you haven't checked in this week" to a card (caught).
 The pillars — Body, Identity, Mindset, Faith — are her coaching plan and are
 currently four coloured chips on posts. Making them the structure that holds
 the inspiration is the next piece, and the bigger one.
+
+---
+
+## 36. The pillars stop being progress bars (15 Sept)
+
+Second half of the direction change. Body, Identity, Mindset and Faith are her
+coaching plan; in the app they were four coloured chips on posts and, on
+Becoming, four progress bars over one course:
+
+| pillar | what it actually showed |
+|---|---|
+| Body | days finished out of 56 |
+| Identity | how many self-ratings she had given |
+| Mindset | pages written out of 28 |
+| **Faith** | **"week 3 of 12"** |
+
+A woman's faith drawn as how far through a programme she had got, with the
+unfilled part of the bar standing in for the amount she was missing.
+
+### The material was already there
+
+Nothing new had to be written. **105 prompts, every one tagged with a pillar.
+58 tagged resources.** All hers, all already in the database — and reachable
+only through whichever feature owned the table. A prompt appeared if it
+happened to be scheduled for today and was otherwise invisible; a resource
+appeared if she went to the vault and scrolled.
+
+So the pillars did not need a content model. They needed an index. `getShelves`
+gathers everything by pillar instead of by feature, in two small cached
+queries.
+
+### A shelf has no total
+
+`lib/shelf.ts` replaces `computeBecoming`. A pillar is a place that holds
+things, offered one or two at a time. There is no denominator anywhere in that
+file and there is not supposed to be one.
+
+**The day decides how much, not whether she deserves it.** `OFFER_SIZE` is
+1 / 2 / 3 for stretched / available / abundant — the same shelf, sized to the
+woman who showed up. This is the first thing in the app that actually changes
+because of `computeCapacity`, which has been computing correctly and changing
+nothing since it was written.
+
+The pick is seeded on the date and the pillar, not `Math.random()`: she opens
+Today four times before lunch, and an offering that reshuffles each time
+teaches her none of it was chosen for her. Deliberately not seeded on her id —
+two women in the same circle meeting the same verse on the same morning is a
+feature of a circle.
+
+Tested as pure logic: steady within a day, different the next, different
+across the four pillars, no duplicates, no crash on an empty or one-item
+shelf, and **all 41 Identity prompts appear across a year** rather than it
+settling on a favourite.
+
+### Two things found while building
+
+**The question links went nowhere.** The shelf links a question to
+`/app/write?prompt=…`, and that page ignored the parameter — it would have
+opened today's scheduled prompt instead, so tapping a question about Faith
+could land her on an unrelated one about her body. Showing someone a question
+and quietly swapping it is worse than not linking it. `getPromptById` now
+exists, a chosen prompt beats the scheduled one, and the card says "From your
+pillars" rather than claiming the app picked it.
+
+**The empty state was backwards.** Becoming returned early for a woman with no
+history — "this page fills itself in", plus a button to choose a programme —
+because everything on it was evidence of her own activity. That was right when
+the pillars were progress bars and is wrong now: the shelves hold *Brooke's*
+work, and a woman who signed up an hour ago is exactly who should be handed
+something to read. Streaks, milestones and then-and-now wait until there is
+something in them. The pillars wait for nothing.
+
+Milestones also rendered as "0 of 9" above nine padlocks on a first visit.
+Gated on the same condition.

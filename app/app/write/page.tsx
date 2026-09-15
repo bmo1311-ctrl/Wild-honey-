@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
-import { getAllWritings, getMyEntries, getMyEntryForPrompt, getTodayPrompt, getSessionProfile } from '@/lib/data'
+import { getAllWritings, getMyEntries, getMyEntryForPrompt, getPromptById, getTodayPrompt, getSessionProfile } from '@/lib/data'
 import { journalStarters } from '@/lib/suggestions'
 import { localToday } from '@/lib/today'
 import { JournalComposer } from '@/components/journal-composer'
@@ -16,17 +16,25 @@ import { adultsOnly } from '@/lib/kid-guard'
  * page already held. It is a tab here instead — the writing and the record of
  * the writing belong in the same room.
  */
-export default async function WritePage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
+export default async function WritePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string; prompt?: string }>
+}) {
   await adultsOnly()
-  const { tab } = await searchParams
+  const { tab, prompt: askedFor } = await searchParams
   const active = tab === 'archive' ? 'archive' : 'write'
-  const [courseWritings, entries, prompt, profile, today] = await Promise.all([
+  const [courseWritings, entries, scheduled, chosen, profile, today] = await Promise.all([
     getAllWritings(),
     getMyEntries(),
     getTodayPrompt(),
+    // A question she picked off a pillar shelf wins over the one scheduled
+    // for today — she chose this one, and the scheduler did not.
+    askedFor ? getPromptById(askedFor) : Promise.resolve(null),
     getSessionProfile(),
     localToday(),
   ])
+  const prompt = chosen ?? scheduled
   const existing = prompt ? await getMyEntryForPrompt(prompt.id) : null
 
   // One notebook: course answers and free writing, newest first.
@@ -61,7 +69,14 @@ export default async function WritePage({ searchParams }: { searchParams: Promis
       ) : (
       <>
       <section className="rounded-2xl border border-border border-l-[3px] border-l-primary bg-card p-4">
-        <p className="text-xs font-bold uppercase tracking-[0.1em] text-primary">{prompt ? "Today's prompt" : 'Write'}</p>
+        {/*
+          Naming it honestly. A question she opened from a pillar is not
+          "today's prompt", and calling it that would make the app look like
+          it had chosen for her when she had just chosen for herself.
+        */}
+        <p className="text-xs font-bold uppercase tracking-[0.1em] text-primary">
+          {chosen ? 'From your pillars' : prompt ? "Today's prompt" : 'Write'}
+        </p>
         {prompt && <p className="mt-2 font-serif text-[17px] leading-snug text-pretty">{prompt.text}</p>}
         <div className="mt-3">
           <JournalComposer

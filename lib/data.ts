@@ -121,6 +121,22 @@ export const GOAL_PILLAR: Record<string, 'Body' | 'Identity' | 'Mindset' | 'Fait
  * faith preference (won't lead with Faith content if she opted out), and
  * skips anything she's already journaled on.
  */
+/**
+ * One specific prompt, by id.
+ *
+ * The pillar shelves hand her a question and link straight here with it. The
+ * link existed before this did — `/app/write?prompt=…` simply ignored the
+ * parameter and opened today's scheduled prompt instead, so tapping a
+ * question about Faith could land her on an unrelated one about her body.
+ * Showing someone a question and then quietly swapping it is worse than not
+ * linking it at all.
+ */
+export async function getPromptById(id: string): Promise<Prompt | null> {
+  const supabase = await createClient()
+  const { data } = await supabase.from('prompts').select('*').eq('id', id).maybeSingle()
+  return (data as Prompt | null) ?? null
+}
+
 export async function getTodayPrompt(): Promise<Prompt | null> {
   const supabase = await createClient()
   const {

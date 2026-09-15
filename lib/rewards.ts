@@ -160,70 +160,15 @@ export function computeMilestones(
   return { earned, next, all }
 }
 
-export interface PillarEvidence {
-  pillar: 'Body' | 'Identity' | 'Mindset' | 'Faith'
-  headline: string
-  evidence: string
-  value: number
-  total: number
-}
-
-/**
- * Evidence, not a score. Every line is something she actually did, and
- * nothing here is compared to another member.
+/*
+ * `PillarEvidence` and `computeBecoming` stood here and are deleted.
+ *
+ * They mapped the four pillars onto one course's completion: Body was days
+ * finished out of 56, Identity was how many self-ratings she had given,
+ * Mindset was pages written out of 28, and Faith was "week 3 of 12". A
+ * woman's faith rendered as how far through a programme she had got, with the
+ * unfilled part of the bar standing in for what she was missing.
+ *
+ * The pillars are Brooke's coaching plan, not a progress report. They are
+ * shelves now — see lib/shelf.ts. Nothing there has a total.
  */
-export function computeBecoming(input: {
-  completedDays: number[]
-  writingCount: number
-  ratings: { day_number: number; value: number }[]
-  weeksReached: number
-  course?: CourseShape
-}): PillarEvidence[] {
-  const { completedDays, writingCount, ratings, weeksReached } = input
-  const course = input.course ?? FALLBACK
-  const sorted = [...ratings].sort((a, b) => a.day_number - b.day_number)
-  const first = sorted[0]
-  const last = sorted[sorted.length - 1]
-
-  return [
-    {
-      pillar: 'Body',
-      headline: `${completedDays.length} of ${course.lengthDays} days`,
-      evidence: completedDays.length
-        ? `You have trained on ${completedDays.length} ${completedDays.length === 1 ? 'day' : 'days'}. That is time your body spent under load, not time you meant to.`
-        : 'Nothing logged yet. Day one is waiting.',
-      value: completedDays.length,
-      total: course.lengthDays,
-    },
-    {
-      pillar: 'Identity',
-      headline: sorted.length >= 2 ? `${first.value} → ${last.value}` : sorted.length === 1 ? `You said ${first.value}` : 'Not yet asked',
-      evidence:
-        sorted.length >= 2
-          ? `On day ${first.day_number} you said ${first.value}. On day ${last.day_number} you said ${last.value}.`
-          : sorted.length === 1
-            ? `On day ${first.day_number} you said ${first.value}. The course asks again later.`
-            : 'The course asks you to rate yourself as you go. Nothing to compare yet.',
-      value: sorted.length,
-      total: course.ratings ?? 8,
-    },
-    {
-      pillar: 'Mindset',
-      headline: `${writingCount} ${writingCount === 1 ? 'page' : 'pages'}`,
-      evidence: writingCount
-        ? `You have written ${writingCount} ${writingCount === 1 ? 'answer' : 'answers'} you can read back.`
-        : 'Nothing written yet. Writing is offered, never required.',
-      value: writingCount,
-      total: course.writingPrompts ?? 28,
-    },
-    {
-      pillar: 'Faith',
-      headline: `${weeksReached} of ${course.weeks} weeks`,
-      evidence: weeksReached
-        ? `You have reached week ${weeksReached}, and the verse that opens it.`
-        : 'Each week opens with a verse. You will meet the first one on day one.',
-      value: weeksReached,
-      total: course.weeks,
-    },
-  ]
-}

@@ -3,10 +3,14 @@ import { Check, Flame, Lock } from 'lucide-react'
 import { currentDayFrom, weekOfDay } from '@/lib/courses'
 import { loadCourse } from '@/lib/courses-db'
 import { localToday, localTimeZone } from '@/lib/today'
-import { computeBecoming, computeMilestones, computeStreaks } from '@/lib/rewards'
+import { computeMilestones, computeStreaks } from '@/lib/rewards'
 import { getActiveCourseState, getBaselineVitality, getDayProgress, getLatestVitalityCheckin, getWritings } from '@/lib/data'
 import { VITALITY_DIMENSIONS } from '@/lib/honey-profile'
-import { PILLAR_META } from '@/lib/pillars'
+import { PillarShelf } from '@/components/pillar-shelf'
+import { getShelves } from '@/lib/shelf-db'
+import { getPersonalState } from '@/lib/personal-state-db'
+import { DAY_NOTE } from '@/lib/shelf'
+import type { CapacityLevel } from '@/lib/personal-state'
 import { cn } from '@/lib/utils'
 import { PageTabs } from '@/components/page-tabs'
 import ProgressPage from '@/app/app/progress/page'
@@ -62,13 +66,13 @@ export default async function BecomingPage({ searchParams }: { searchParams: Pro
       : []
 
   const writingCount = writings.filter((w) => w.kind === 'write' && w.body.trim()).length
-  const ratings = writings
-    .filter((w) => w.kind === 'rate' && Number(w.body))
-    .map((w) => ({ day_number: w.day_number, value: Number(w.body) }))
-
   const course = await loadCourse(active.slug)
-  const currentDay = active.enrollment && course ? currentDayFrom(course, active.enrollment.started_on, await localToday()) : 0
-  const weeksReached = currentDay && course ? weekOfDay(course, currentDay) : 0
+
+  /*
+   * `ratings`, `currentDay` and `weeksReached` were computed here and handed
+   * to `computeBecoming`, which turned them into the Identity and Faith
+   * progress bars. Both are gone, so these are too rather than left running.
+   */
 
   /*
    * The course she is actually on.
@@ -85,73 +89,55 @@ export default async function BecomingPage({ searchParams }: { searchParams: Pro
   const [streakToday, timeZone] = await Promise.all([localToday(), localTimeZone()])
   const streaks = computeStreaks(progress, { today: streakToday, timeZone })
   const { earned, next, all } = computeMilestones(progress, writingCount, shape)
-  const pillars = computeBecoming({
-    completedDays: progress.map((p) => p.day_number),
-    writingCount,
-    ratings,
-    weeksReached,
-    course: shape,
-  })
 
   /*
-   * Nothing to show yet, so show an invitation instead of a scoreboard.
+   * The four pillars, as shelves rather than progress bars.
    *
-   * `getActiveCourseState` falls back to Strong and Surrendered's slug when
-   * she has no enrolment, so this page happily measured a woman who had never
-   * started anything against a 56-day course: current run 0, "0 of 56 days",
-   * "0 of 8 weeks", "Not yet asked", and the full milestone list rendered as
-   * padlocks. Linked from a permanent card on Today, which made it one of the
-   * first things a new member would open.
+   * `computeBecoming` used to turn them into course completion: Body was days
+   * finished out of 56, Faith was "week 3 of 12". The pillars are Brooke's
+   * coaching plan and they were being rendered as how far through a programme
+   * a woman had got — with the empty part of each bar standing in for the
+   * amount of Faith she was missing.
    *
-   * Evidence of change is the right idea and the wrong page for day one.
-   * There is no evidence yet, and a wall of zeroes is not a neutral way to
-   * say so.
+   * The day's capacity decides how much is offered, not whether she deserves
+   * it. See lib/shelf.ts.
+   */
+  const personal = await getPersonalState()
+  // 'available' when there is not enough to say otherwise — the middle size,
+  // which is the one that assumes least about her.
+  const capacity: CapacityLevel = personal?.state.capacity.value ?? 'available'
+  const shelves = await getShelves(capacity)
+
+  /*
+   * Nothing she has *done* yet — which is no longer a reason to show her an
+   * empty page.
+   *
+   * This used to return early with "this page fills itself in" and a button
+   * to choose a programme, because everything here was evidence of her own
+   * activity and a woman on day one has none. That was right when the pillars
+   * were progress bars.
+   *
+   * It is wrong now. The shelves hold Brooke's work, not hers: 105 questions
+   * and 58 readings that are there before she does anything at all. A woman
+   * who has just signed up is exactly who should be handed something to read
+   * rather than a scoreboard explaining why it is empty. So the streaks,
+   * milestones and then-and-now sections wait until there is something in
+   * them, and the pillars do not wait for anything.
    */
   const nothingYet = !active.enrollment && progress.length === 0 && writingCount === 0
-  if (nothingYet) {
-    return (
-      <div className="flex flex-col gap-6">
-        <header className="honey-glow -mx-5 -mt-6 px-5 pb-4 pt-6">
-          <h1 className="font-serif text-[29px] font-semibold leading-[1.1]">Your becoming</h1>
-          <p className="mt-1.5 text-[15px] leading-[1.5] text-pretty text-muted-foreground">
-            what you&rsquo;ve actually done, in your own words and numbers.
-          </p>
-        </header>
-
-        <BecomingTabs active="becoming" />
-
-        <div className="flex flex-col items-start gap-3 rounded-3xl border border-dashed border-border bg-card p-6">
-          <p className="font-serif text-lg font-semibold">this page fills itself in</p>
-          <p className="text-[14.5px] leading-[1.6] text-pretty text-muted-foreground">
-            Everything here is drawn from what you have already done — days finished, pages written,
-            how you rated yourself early on against how you rate yourself later. None of it is a score
-            and none of it is set by us, which is why there is nothing on it yet.
-          </p>
-          <p className="text-[14.5px] leading-[1.6] text-pretty text-muted-foreground">
-            A program is the quickest way to start it. One day is enough.
-          </p>
-          <Link
-            href="/app/program"
-            className="mt-1 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background"
-          >
-            choose a program
-          </Link>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="flex flex-col gap-6">
       <header className="honey-glow -mx-5 -mt-6 px-5 pb-4 pt-6">
         <h1 className="font-serif text-[29px] font-semibold leading-[1.1]">Your becoming</h1>
         <p className="mt-1.5 text-[15px] leading-[1.5] text-pretty text-muted-foreground">
-          what you&rsquo;ve actually done, in your own words and numbers.
+          your four pillars, and what&rsquo;s held in each.
         </p>
       </header>
 
       <BecomingTabs active="becoming" />
 
+      {!nothingYet && (
       <section className="grid grid-cols-2 gap-2.5">
         <div className="rounded-2xl border border-border bg-card p-4">
           <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">
@@ -166,32 +152,13 @@ export default async function BecomingPage({ searchParams }: { searchParams: Pro
           <p className="mt-1 text-xs text-muted-foreground">this one is yours to keep</p>
         </div>
       </section>
+      )}
 
       <section className="flex flex-col gap-2.5">
-        {pillars.map((p) => {
-          const meta = PILLAR_META[p.pillar]
-          const pct = p.total ? Math.round((p.value / p.total) * 100) : 0
-          return (
-            <div key={p.pillar} className="rounded-2xl border border-border bg-card p-4">
-              <div className="flex items-center gap-2">
-                <span
-                  className="h-2.5 w-2.5 shrink-0 rounded-full"
-                  style={{ backgroundColor: `var(--pillar-${p.pillar.toLowerCase()})` }}
-                  aria-hidden="true"
-                />
-                <p className="font-serif text-[17px] font-semibold">{meta.label}</p>
-                <p className="ml-auto text-sm font-medium text-muted-foreground">{p.headline}</p>
-              </div>
-              <div className="mt-3 h-[7px] w-full overflow-hidden rounded-full bg-muted">
-                <div
-                  className="h-full rounded-full"
-                  style={{ width: `${Math.min(pct, 100)}%`, backgroundColor: `var(--pillar-${p.pillar.toLowerCase()})` }}
-                />
-              </div>
-              <p className="mt-2.5 text-[14.5px] leading-[1.45] text-pretty text-muted-foreground">{p.evidence}</p>
-            </div>
-          )
-        })}
+        <p className="text-[14px] leading-[1.5] text-pretty text-muted-foreground">{DAY_NOTE[capacity]}</p>
+        {shelves.map((shelf) => (
+          <PillarShelf key={shelf.pillar} shelf={shelf} />
+        ))}
       </section>
 
       {compare.length > 0 && (
@@ -223,6 +190,14 @@ export default async function BecomingPage({ searchParams }: { searchParams: Pro
         </section>
       )}
 
+      {/*
+        Milestones wait until there is one.
+
+        For a new member this rendered as "Milestones · 0 of 9" above nine
+        padlocks — a list of everything she had not done yet, on her first
+        visit. It is a nice section once something is on it.
+      */}
+      {!nothingYet && (
       <section>
         <h2 className="mb-2 text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">
           Milestones · {earned.length} of {all.length}
@@ -254,9 +229,10 @@ export default async function BecomingPage({ searchParams }: { searchParams: Pro
           ))}
         </ul>
       </section>
+      )}
 
       <Link href="/app/program" className="text-center text-sm font-medium text-mindset-pillar underline underline-offset-[3px]">
-        Back to the program
+        {nothingYet ? 'Choose a program' : 'Back to the program'}
       </Link>
     </div>
   )
