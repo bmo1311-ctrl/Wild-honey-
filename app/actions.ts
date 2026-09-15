@@ -519,9 +519,15 @@ export async function saveEveningReflection(input: { q1: string; q2: string; q3:
     .upsert({ user_id: user.id, date: today, q1: input.q1.trim(), q2: input.q2.trim(), q3: input.q3.trim() }, { onConflict: 'user_id,date' })
   if (error) return { error: error.message }
   await bumpStreak(user.id)
-  // Reflecting is the other thing that genuinely changes the reading — it is
-  // most of what 'noticing' is made of. See saveCheckin.
-  await recordPersonalState()
+  /*
+   * No longer records the state here.
+   *
+   * The reason it did was that reflecting was "most of what noticing is made
+   * of" — and `awareness`, the reading that counted noticing, is deleted. The
+   * two readings left, capacity and vitality, are built from check-ins and
+   * from what she is carrying. An evening reflection moves neither, so this
+   * was a write that recomputed eight queries to store the same answer.
+   */
   revalidatePath('/app')
   revalidatePath('/app/profile')
   return { ok: true }

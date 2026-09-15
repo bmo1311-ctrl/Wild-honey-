@@ -24,6 +24,7 @@ import { getSeason } from '@/lib/color-season'
 import { outfitForToday } from '@/lib/outfit'
 import type { Body, Scale, Shape, VerticalProportion } from '@/lib/silhouette'
 import { pickNotice } from '@/lib/noticing'
+import { getRecordedCapacity } from '@/lib/personal-state-db'
 import { getAccess,
   getActiveCourseState,
   getActivityDates,
@@ -121,6 +122,7 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     morning,
     evening,
     access,
+    capacity,
   ] = await Promise.all([
     getActiveCourseState(preferred),
     getSessionProfile(),
@@ -151,6 +153,15 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
     // Reads her own profile, which is already cached — no reason for it to
     // have been its own await two hundred lines further down.
     getAccess(),
+    /*
+     * One row, not the engine.
+     *
+     * `getPersonalState` on this page is what returned Bad Gateway once —
+     * eighteen queries on a function with a ten second ceiling. The reading
+     * is already written down on every check-in, so this reads it: one row,
+     * one column. See getRecordedCapacity.
+     */
+    getRecordedCapacity(),
   ])
 
   // The only two that genuinely have to wait: the day needs the course, and
@@ -396,6 +407,31 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       {hour >= 5 && hour < 12 && <MorningResetCard existing={morning} />}
       {hour >= 19 && <EveningReflectionCard existing={evening} />}
 
+      {/*
+        Everything below here asks her to take something ON.
+        
+        Start a program, add a habit, set a baseline, and the counters and
+        progress bar that invite a comparison. All reasonable on a day with
+        room in it. On a stretched day they are a list of ways she is not
+        doing enough, handed to a woman who has already told the app she is
+        running on empty.
+        
+        `computeCapacity` exists precisely to tell "she does not want it
+        enough" apart from "her life has no room", and until now nothing in
+        the app changed when it answered. This is that answer being acted on:
+        the honest response to no room is subtraction. See rule 3 in
+        CONSCIOUSNESS.md.
+        
+        Null capacity means the app has not been told — which is not the same
+        as stretched, and gets the ordinary page.
+      */}
+      {capacity === 'stretched' ? (
+        <p className="rounded-2xl bg-secondary/60 px-4 py-3 text-[14px] leading-[1.5] text-pretty text-muted-foreground">
+          There is a lot on you this week, so the rest of today is put away.
+          It is all still here when you want it.
+        </p>
+      ) : (
+      <>
       {!hasCourse && (
         <Link
           href="/app/program"
@@ -441,10 +477,21 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       </section>
       )}
 
+      </>
+      )}
+
+      {/*
+        Her pillars stay on a stretched day, deliberately.
+        
+        Everything above asks something of her. This is the one link that
+        offers her something instead — what she said matters, and what is held
+        under it. That is the thing a woman with nothing left should still be
+        able to reach.
+      */}
       <Link href="/app/becoming" className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
         <span className="min-w-0 flex-1">
-          <span className="block text-[15px] font-semibold">Your becoming</span>
-          <span className="mt-0.5 block text-[13px] text-muted-foreground">what&rsquo;s changed since you started</span>
+          <span className="block text-[15px] font-semibold">Your pillars</span>
+          <span className="mt-0.5 block text-[13px] text-muted-foreground">what matters to you, and what&rsquo;s held there</span>
         </span>
         <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
       </Link>

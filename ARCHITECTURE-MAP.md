@@ -2103,3 +2103,64 @@ Twice today a test "passed" because `tsc` had failed and `node` ran the
 previous build — the sandbox cannot delete files, so stale output persists.
 Both times the green result was a compiler that had silently done nothing.
 Fresh output directory per run, and check the compile before trusting the run.
+
+---
+
+## 39. Today is finally sized to the day (15 Sept)
+
+Rule 3 of CONSCIOUSNESS.md, and the last big piece of the direction change.
+
+### Reading capacity without taking the page down
+
+`getPersonalState` on Today is what returned Bad Gateway once — eighteen
+queries on a function with a ten second ceiling. It is eight now, and still
+not free on the page that already makes more round trips than any other.
+
+But the reading is **already written down**. `recordPersonalState` stores it
+on every check-in, which is the event that actually moves it. So
+`getRecordedCapacity` is one row, one column, no engine.
+
+Stale by design, and the right kind of stale: capacity should change when she
+says how she is, not when she happens to open the app.
+
+### What sizing actually means
+
+Everything below the moment card asks her to take something **on** — start a
+program, add a habit, set a baseline, plus the four counters and the progress
+bar that invite a comparison. All reasonable on a day with room in it. On a
+stretched day it is a list of ways she is not doing enough, handed to a woman
+who has just told the app she is running on empty.
+
+On `stretched`, all of it is put away behind one line: *"There is a lot on you
+this week, so the rest of today is put away. It is all still here when you
+want it."*
+
+`computeCapacity` exists precisely to tell "she does not want it enough" apart
+from "her life has no room", and until now **nothing in the app changed when
+it answered**. This is the answer being acted on.
+
+**Her pillars stay.** That link is the one thing on the page that offers her
+something rather than asking for something, and it is exactly what a woman
+with nothing left should still be able to reach. It is now labelled "Your
+pillars" rather than "Your becoming".
+
+### Not knowing is not stretched
+
+`getRecordedCapacity` returns null when nothing is recorded, and null gets the
+ordinary page. This matters right now: **Alesia's `capacity_score` is null** —
+she has two check-ins and the engine needs four before it will say anything.
+If null read as stretched, half of Today would be hidden from every woman who
+had not yet checked in four times, which is every new member. Tested
+explicitly, including both boundaries of the score mapping.
+
+### Two bits of tidying that fell out
+
+- `saveEveningReflection` called `recordPersonalState()` because reflecting
+  was "most of what noticing is made of". `awareness` is deleted, and neither
+  surviving reading moves on a reflection — it was eight queries to store the
+  same answer. Removed.
+- **The account sim asserted exactly 28 gated actions and failed** the moment
+  `recordLastUsed` was deliberately added. A number you bump without reading
+  is not an assertion, so it is a floor now. The structural claims — Ask an
+  Expert is inner-circle and adults-only, only the learning board is open to a
+  child — are what actually matter, and those still catch every mutation.

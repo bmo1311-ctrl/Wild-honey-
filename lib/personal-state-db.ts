@@ -1,7 +1,7 @@
 import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { localToday } from '@/lib/today'
-import { computeState, headline, type PersonalState, type StateInput } from '@/lib/personal-state'
+import { computeState, headline, type CapacityLevel, type PersonalState, type StateInput } from '@/lib/personal-state'
 
 /**
  * Reading the woman, not the app.
@@ -271,3 +271,42 @@ export async function recordPersonalState(): Promise<void> {
     // Deliberately silent. See above.
   }
 }
+
+/**
+ * Today's capacity, read rather than recomputed.
+ *
+ * Today makes more database round trips than any page in the app, and
+ * `getPersonalState` once added eighteen more and tipped it over the ten
+ * second ceiling — `/app` returned Bad Gateway while every other route stayed
+ * at 200. It is eight queries now rather than fifteen, which is better and
+ * still not free.
+ *
+ * But the reading is already written down. `recordPersonalState` stores it on
+ * every check-in, which is the event that actually moves it. So this is one
+ * row, one column, and no engine.
+ *
+ * Stale by design: it is as fresh as the last time she told the app
+ * something. That is the right kind of stale — capacity should change when
+ * she says how she is, not when she happens to open the app.
+ *
+ * Null when there is nothing recorded, and the caller decides what to do with
+ * not knowing. It must not be read as 'stretched'.
+ */
+export const getRecordedCapacity = cache(async function getRecordedCapacity(): Promise<CapacityLevel | null> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return null
+  const { data } = await supabase
+    .from('transformation_state')
+    .select('capacity_score')
+    .eq('user_id', user.id)
+    .maybeSingle()
+  const score = (data as { capacity_score?: number | null } | null)?.capacity_score
+  if (score == null) return null
+  // The inverse of CAPACITY_SCORE above, by midpoint.
+  if (score <= 37) return 'stretched'
+  if (score <= 70) return 'available'
+  return 'abundant'
+})
