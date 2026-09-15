@@ -4003,3 +4003,44 @@ export async function savePillarIntention(pillar: string, text: string): Promise
   revalidatePath('/app/becoming')
   return { ok: true }
 }
+
+/**
+ * She tells the app when she last used something strong.
+ *
+ * The one question worth asking in Protocols, and it is asked once per
+ * product rather than every night. Without it the engine cannot space acids
+ * and retinoids at all — and the version of it that guessed instead, by
+ * treating "no record" as "never used", recommended the strongest thing on
+ * the shelf every night for ever.
+ *
+ * Writes a row dated when she says, not today. It is a record of what she
+ * did, not of when she typed it.
+ */
+export async function recordLastUsed(memberProductId: string, nightsAgo: number): Promise<GatedResult> {
+  const locked = await tierWriteAllowed('circle', 'Protocols')
+  if (locked) return locked
+  const { supabase, user } = await requireUser()
+  if (!Number.isInteger(nightsAgo) || nightsAgo < 0 || nightsAgo > 60) {
+    return { error: 'That is not a number of nights I can use.' }
+  }
+
+  const { data: mine } = await supabase
+    .from('member_products')
+    .select('id')
+    .eq('id', memberProductId)
+    .eq('user_id', user.id)
+    .maybeSingle()
+  if (!mine) return { error: 'That is not on your shelf.' }
+
+  const today = await localToday()
+  const date = new Date(Date.parse(`${today}T00:00:00Z`) - nightsAgo * 86_400_000)
+    .toISOString()
+    .slice(0, 10)
+
+  const { error } = await supabase
+    .from('routine_log')
+    .insert({ user_id: user.id, member_product_id: memberProductId, date })
+  if (error) return { error: error.message }
+  revalidatePath('/app/protocols')
+  return { ok: true }
+}

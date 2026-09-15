@@ -147,6 +147,9 @@ function BeautyArea({
       actives: p.actives?.length ? p.actives : (p.product?.actives ?? []),
       timeOfDay: p.time_of_day,
       frequencyPerWeek: p.frequency_per_week,
+      // So the engine can tell "she added this an hour ago" from "this has
+      // sat here for three weeks and she has not been logging".
+      addedOn: (p as { created_at?: string | null }).created_at ?? null,
     }))
 
   // Hair runs on washes, not nights — a different engine, not a tweak to the
@@ -159,13 +162,15 @@ function BeautyArea({
 
   const tonight = !isHair && shelf.length > 0 ? planTonight({ shelf, log, today, allergies: profile?.allergies }) : null
   const week = !isHair && shelf.length > 0 ? planWeek({ shelf, log, today, allergies: profile?.allergies }) : []
-  const doneTonight = log.some(
-    (l) =>
-      l.date === today &&
-      (tonight?.kind === 'treatment'
-        ? l.memberProductId === tonight.treatment?.id
-        : l.ritualSlug === tonight?.ritual?.slug),
-  )
+  /*
+   * `doneTonight` was computed here and is gone with the tick it fed.
+   *
+   * Hair keeps its log — `washedToday` below stays — and that is a deliberate
+   * distinction rather than an oversight. Washing your hair is one discrete
+   * event with a real rhythm, and `inferCadence` learns that rhythm from the
+   * log rather than asking her to set it. Nightly skincare is neither
+   * discrete nor rhythmic, and ticking it off bought her nothing.
+   */
 
   /*
    * Treatments she can do with nothing but a kitchen.
@@ -201,13 +206,13 @@ function BeautyArea({
       */}
       {wash && <WashCard key={`${wash.reason}|${washedToday}`} plan={wash} doneToday={washedToday} />}
       {washDays.length > 0 && <WashStrip days={washDays} />}
-      {tonight && (
-        <TonightCard
-          key={`${tonight.kind}|${tonight.treatment?.id ?? tonight.reason}|${doneTonight}`}
-          plan={tonight}
-          doneToday={doneTonight}
-        />
-      )}
+      {/*
+        No longer keyed on `doneTonight`, because there is no longer a done.
+        The key existed to force a remount when the tick flipped and the
+        engine recomputed underneath a stale `useState(doneToday)`. With the
+        attendance tick gone, the card holds nothing that can drift.
+      */}
+      {tonight && <TonightCard key={`${tonight.kind}|${tonight.treatment?.id ?? tonight.reason}`} plan={tonight} />}
       {week.length > 0 && <WeekStrip nights={week} />}
 
       {/*

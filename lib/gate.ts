@@ -121,6 +121,7 @@ export const GATED_ACTIONS: Record<string, { required: Requirement; area: string
   addBeautyProduct: { required: 'circle', area: 'Protocols' },
   removeBeautyProduct: { required: 'circle', area: 'Protocols' },
   logRoutineDone: { required: 'circle', area: 'Protocols' },
+  recordLastUsed: { required: 'circle', area: 'Protocols' },
   saveSkinConcerns: { required: 'circle', area: 'Protocols' },
 
   addGarment: { required: 'circle', area: 'Wardrobe' },

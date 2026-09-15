@@ -2035,3 +2035,71 @@ more matcher bugs:
   and without a digit; both caught.
 
 `components/pillar-shelf.tsx` is superseded by `pillar-plan.tsx` and untracked.
+
+---
+
+## 38. Protocols was recommending a retinoid every night (15 Sept)
+
+Went in to take the nightly attendance register out. Found something worse
+underneath it, and it is rule one of CONSCIOUSNESS.md in the place where that
+rule has actual consequences.
+
+### The bug
+
+`planTonight` decided which strong active was due like this:
+
+```ts
+// Never used counts as fully due, so a new product is not held back.
+const due = strong.filter((s) => s.since === null || s.since >= s.gap)
+```
+
+`s.since` is null when there is nothing in `routine_log`. So **with an empty
+log every acid and retinoid is due, every night, for ever.** `strongThisWeek`
+is 0 for the same reason, so `restEarned` never fires either. Both halves of
+the spacing logic are switched off by the absence of logs.
+
+**Brooke has ten products and has never logged a routine.** So this card has
+told her to use her strongest active every night since the day she set it up.
+Spacing acids and retinoids is the one genuinely protective thing this engine
+does, and it has never once done it.
+
+Not logging a retinoid is not evidence of not using one. It was the same
+mistake as `awareness` — silence read as data — except that one produced an
+insulting percentage and this one produces a skin barrier.
+
+### The fix
+
+"No record" and "never used" are different, and `member_products.created_at`
+tells them apart. A product added an hour ago really is new — that is a date,
+not an absence. A product that has sat on the shelf for three weeks with
+nothing logged is `unsure`: the app does not know, says so, and does not
+recommend a strong active on the strength of not knowing.
+
+The reason line changed too — "four nights since the last retinoid night **you
+told me about**" rather than "since your last retinoid night". The app knows
+what it was told. The other phrasing claims knowledge of her bathroom.
+
+Tested against her actual situation and five others: her shelf with no logs
+(gentle, and names what it cannot space), a product added today (treatment,
+"first night, thin layer"), the night after she says she used it (gentle),
+four nights later (treatment), four strong nights in a week (rest wins), and
+a shelf with no actives at all (gentle, nothing unsure).
+
+### And the register is gone
+
+"mark it done" was a nightly tick whose only reward was tomorrow's
+suggestion — which she would have had anyway. In its place, one question,
+asked once per product instead of every night, and only when the answer
+changes what the app says: *when did you last use this?* with four buttons,
+because nobody remembers the date they used a retinoid.
+
+**Hair keeps its log, deliberately.** Washing your hair is one discrete event
+with a real rhythm, and `inferCadence` learns that rhythm rather than asking
+her to set it. Nightly skincare is neither discrete nor rhythmic.
+
+### A note on my own tooling
+
+Twice today a test "passed" because `tsc` had failed and `node` ran the
+previous build — the sandbox cannot delete files, so stale output persists.
+Both times the green result was a compiler that had silently done nothing.
+Fresh output directory per run, and check the compile before trusting the run.

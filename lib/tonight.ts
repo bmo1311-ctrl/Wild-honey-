@@ -56,6 +56,14 @@ export interface Tonight {
   reason: string
   /** Strong products not chosen tonight, and when each is next due. */
   waiting: { name: string; nightsAway: number }[]
+  /**
+   * Strong products the app has no record of, and cannot safely space.
+   *
+   * Not a scolding and not a to-do list. It is the app admitting it does not
+   * know, and the one question worth asking her — asked once per product, not
+   * every night.
+   */
+  unsure: { id: string; name: string; active: string }[]
 }
 
 function nightsBetween(a: string, b: string): number {
@@ -93,13 +101,43 @@ export function planTonight(input: {
       if (!active) return null
       const last = lastDone.get(item.id) ?? null
       const since = last ? nightsBetween(today, last) : null
-      return { item, active, since, gap: MIN_GAP_NIGHTS[active] }
+      const gap = MIN_GAP_NIGHTS[active]
+      /*
+       * Is "no record" the same as "never used"?
+       *
+       * It was. The line here read `since === null || since >= gap`, with a
+       * comment saying "never used counts as fully due, so a new product is
+       * not held back" — which means that with an empty log **every strong
+       * active is due every single night, for ever**. `strongThisWeek` is
+       * also 0, so `restEarned` never fires either. Both halves of the
+       * spacing logic are switched off by the absence of logs.
+       *
+       * Brooke has ten products on her shelf and has never logged a routine.
+       * So this card has been telling her to use her strongest acid or
+       * retinoid every night since the day she set it up — and spacing those
+       * is the one genuinely protective thing this engine does.
+       *
+       * It is rule one of CONSCIOUSNESS.md in the place where it matters
+       * most: silence is not data. Not logging a retinoid is not evidence
+       * she did not use one.
+       *
+       * So a product she has *just added* is still treated as new, because
+       * that is a real fact with a date behind it. A product that has sat on
+       * the shelf with no record is `unsure` — the app does not know, says so,
+       * and does not recommend a strong active on the strength of not knowing.
+       */
+      const addedRecently =
+        item.addedOn != null && nightsBetween(today, item.addedOn.slice(0, 10)) <= gap
+      return { item, active, since, gap, unknown: since === null && !addedRecently }
     })
     .filter((x): x is NonNullable<typeof x> => x !== null)
 
-  // Never used counts as fully due, so a new product is not held back.
-  const due = strong.filter((s) => s.since === null || s.since >= s.gap)
-  const notDue = strong.filter((s) => s.since !== null && s.since < s.gap)
+  const known = strong.filter((s) => !s.unknown)
+  const due = known.filter((s) => s.since === null || s.since >= s.gap)
+  const notDue = known.filter((s) => s.since !== null && s.since < s.gap)
+  const unsure = strong
+    .filter((s) => s.unknown)
+    .map((s) => ({ id: s.item.id, name: s.item.name, active: s.active }))
 
   /*
    * What else belongs in tonight's routine.
@@ -146,7 +184,10 @@ export function planTonight(input: {
     const reason =
       pick.since === null
         ? `first night with ${pick.item.name.toLowerCase()}. start with a thin layer.`
-        : `${spell(pick.since)} nights since your last ${label.toLowerCase()} night. tonight is the night.`
+        : // "since the last one you told me about", not "since your last one".
+          // The app knows what it was told and nothing else, and saying it
+          // the other way claims knowledge of her bathroom.
+          `${spell(pick.since)} nights since the last ${label.toLowerCase()} night you told me about. tonight is the night.`
 
     return {
       kind: 'treatment',
@@ -154,6 +195,7 @@ export function planTonight(input: {
       alongside: companionsFor(pick.item.actives),
       reason,
       waiting,
+      unsure,
     }
   }
 
@@ -161,9 +203,13 @@ export function planTonight(input: {
   const ritual = ritualFor(today, allergies)
   const reason = restEarned
     ? `${spell(strongThisWeek)} strong nights already this week. tonight your skin gets one back.`
-    : soonest
-      ? `nothing strong is due tonight — ${soonest.name.toLowerCase()} comes back in ${spell(soonest.nightsAway)}. tonight is for putting back what the week took.`
-      : 'a gentle night. this is where the repair actually happens.'
+    : unsure.length > 0 && known.length === 0
+      ? // Honest about why. Not "you have not logged anything" — that is her
+        // absence read back at her — but what the app itself does not know.
+        `a gentle night. spacing ${unsure.length === 1 ? unsure[0].name.toLowerCase() : 'your stronger things'} properly needs to know when you last used ${unsure.length === 1 ? 'it' : 'them'}, and gentle is the safe answer meanwhile.`
+      : soonest
+        ? `nothing strong is due tonight — ${soonest.name.toLowerCase()} comes back in ${spell(soonest.nightsAway)}. tonight is for putting back what the week took.`
+        : 'a gentle night. this is where the repair actually happens.'
 
   return {
     kind: 'nourish',
@@ -171,6 +217,7 @@ export function planTonight(input: {
     alongside: companionsFor([]),
     reason,
     waiting,
+    unsure,
   }
 }
 

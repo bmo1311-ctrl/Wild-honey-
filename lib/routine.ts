@@ -38,6 +38,15 @@ export interface ShelfItem {
   actives: string[]
   timeOfDay: string | null
   frequencyPerWeek: number | null
+  /**
+   * When she put it on the shelf.
+   *
+   * Needed to tell two states apart that look identical in the log: a product
+   * she added an hour ago, which really has never been used, and one that has
+   * sat there for three weeks with nothing logged against it — which means
+   * only that she has not been logging. See `planTonight`.
+   */
+  addedOn?: string | null
 }
 
 export interface RoutineStep {
