@@ -110,14 +110,52 @@ function columnsInChain(tail) {
 }
 
 const schema = loadSchema()
+/**
+ * Names the code reads that are correctly not tables.
+ *
+ * `public_profiles` is a view over `profiles` exposing only what one member
+ * may see of another. Listed rather than skipped-by-silence, so the next
+ * unknown name is a failure instead of a shrug.
+ */
+const KNOWN_NOT_TABLES = new Set(['public_profiles'])
+
+/** Tables read by the code that the snapshot has never heard of. */
+const unknown = new Set()
+
 const problems = []
 let checked = 0
 
 for (const file of walk(ROOT)) {
   const src = readFileSync(file, 'utf8')
-  for (const m of src.matchAll(/\.from\(\s*['"]([a-z_]+)['"]\s*\)/g)) {
+  /*
+   * `supabase.storage.from('avatars')` is a bucket, not a table, and this
+   * matcher could not tell the two apart — which only surfaced once unknown
+   * names started failing instead of being skipped. The negative lookbehind
+   * keeps storage out of it.
+   */
+  // `[a-z_]+` missed any table with a digit in it — `pillar_intentions_v2`
+  // did not match at all, so it was invisible rather than unknown.
+  for (const m of src.matchAll(/(?<!storage)\.from\(\s*['"]([a-z0-9_]+)['"]\s*\)/g)) {
     const table = m[1]
-    if (!schema.has(table)) continue // a view, an rpc, or a table we do not track
+    /*
+     * An unknown table used to be skipped silently, and that hole is how a
+     * brand new one sails straight through.
+     *
+     * `pillar_intentions` was created by migration and read in two files, and
+     * this check reported "1332 column references, 83 tables — all present"
+     * without looking at one of them. Green because it had quietly decided
+     * the table was none of its business. Same lesson as the kid-route walker
+     * that only went one directory deep: a check that passes is worth exactly
+     * what its coverage is.
+     *
+     * Views and rpcs are real exceptions and are named. Anything else unknown
+     * means the snapshot has fallen behind the database, which is the thing
+     * this file exists to notice.
+     */
+    if (!schema.has(table)) {
+      if (!KNOWN_NOT_TABLES.has(table)) unknown.add(table)
+      continue
+    }
     let tail = src.slice(m.index + m[0].length, m.index + m[0].length + 900)
     const next = tail.indexOf('.from(')
     if (next > 0) tail = tail.slice(0, next)
@@ -135,6 +173,16 @@ for (const file of walk(ROOT)) {
 }
 
 const unique = [...new Map(problems.map((p) => [p.key + p.file, p])).values()]
+
+if (unknown.size > 0) {
+  console.error(`\n✗ ${unknown.size} table(s) the code reads that the snapshot has never heard of:\n`)
+  for (const t of unknown) {
+    console.error(`  ${t}`)
+    console.error(`      Refresh supabase/schema-snapshot.txt, or — if it is a view or an rpc —`)
+    console.error(`      add it to KNOWN_NOT_TABLES in this file.\n`)
+  }
+  process.exit(1)
+}
 
 if (unique.length === 0) {
   console.log(`✓ ${checked} column references, ${schema.size} tables — all present.`)

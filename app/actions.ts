@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { getHiddenAuthorIds } from '@/lib/data'
 import { CONTENT_TABLE } from '@/lib/moderation'
+import { PILLARS } from '@/lib/pillars'
 import { courseWriteAllowed, tierWriteAllowed, type GatedResult } from '@/lib/gate'
 import { childEmail, childPassword, clearChildSigninAttempts, throttleChildSignin } from '@/lib/kid-auth'
 import { circleWriteAllowed } from '@/lib/kid-guard'
@@ -3965,5 +3966,40 @@ export async function setCyclePhaseToday(phase: string, periodStartedToday: bool
   revalidatePath('/app/nutrition/log')
   revalidatePath('/app/nutrition/goals')
   revalidatePath('/app/recipes')
+  return { ok: true }
+}
+
+/**
+ * What she says matters, in one pillar, in her words.
+ *
+ * Empty clears it rather than storing a blank — she is allowed to take it
+ * back, and a pillar with nothing said is the normal state, not an unfinished
+ * form.
+ *
+ * Not gated on tier. A woman saying what matters to her is not a paid
+ * feature, and `/app/becoming` already decides who gets through the door.
+ */
+export async function savePillarIntention(pillar: string, text: string): Promise<GatedResult> {
+  const { supabase, user } = await requireUser()
+  if (!PILLARS.includes(pillar as never)) return { error: 'Not one of the four.' }
+
+  const trimmed = text.trim().slice(0, 280)
+  if (!trimmed) {
+    const { error } = await supabase
+      .from('pillar_intentions')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('pillar', pillar)
+    if (error) return { error: error.message }
+    revalidatePath('/app/becoming')
+    return { ok: true }
+  }
+
+  const { error } = await supabase.from('pillar_intentions').upsert(
+    { user_id: user.id, pillar, text: trimmed, updated_at: new Date().toISOString() },
+    { onConflict: 'user_id,pillar' },
+  )
+  if (error) return { error: error.message }
+  revalidatePath('/app/becoming')
   return { ok: true }
 }

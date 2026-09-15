@@ -6,8 +6,8 @@ import { localToday, localTimeZone } from '@/lib/today'
 import { computeMilestones, computeStreaks } from '@/lib/rewards'
 import { getActiveCourseState, getBaselineVitality, getDayProgress, getLatestVitalityCheckin, getWritings } from '@/lib/data'
 import { VITALITY_DIMENSIONS } from '@/lib/honey-profile'
-import { PillarShelf } from '@/components/pillar-shelf'
-import { getShelves } from '@/lib/shelf-db'
+import { PillarPlanCard } from '@/components/pillar-plan'
+import { getPillarPlans } from '@/lib/shelf-db'
 import { getPersonalState } from '@/lib/personal-state-db'
 import { DAY_NOTE } from '@/lib/shelf'
 import type { CapacityLevel } from '@/lib/personal-state'
@@ -106,7 +106,7 @@ export default async function BecomingPage({ searchParams }: { searchParams: Pro
   // 'available' when there is not enough to say otherwise — the middle size,
   // which is the one that assumes least about her.
   const capacity: CapacityLevel = personal?.state.capacity.value ?? 'available'
-  const shelves = await getShelves(capacity)
+  const plans = await getPillarPlans(capacity)
 
   /*
    * Nothing she has *done* yet — which is no longer a reason to show her an
@@ -131,7 +131,7 @@ export default async function BecomingPage({ searchParams }: { searchParams: Pro
       <header className="honey-glow -mx-5 -mt-6 px-5 pb-4 pt-6">
         <h1 className="font-serif text-[29px] font-semibold leading-[1.1]">Your becoming</h1>
         <p className="mt-1.5 text-[15px] leading-[1.5] text-pretty text-muted-foreground">
-          your four pillars, and what&rsquo;s held in each.
+your plan, one pillar at a time.
         </p>
       </header>
 
@@ -156,8 +156,8 @@ export default async function BecomingPage({ searchParams }: { searchParams: Pro
 
       <section className="flex flex-col gap-2.5">
         <p className="text-[14px] leading-[1.5] text-pretty text-muted-foreground">{DAY_NOTE[capacity]}</p>
-        {shelves.map((shelf) => (
-          <PillarShelf key={shelf.pillar} shelf={shelf} />
+        {plans.map((plan) => (
+          <PillarPlanCard key={plan.pillar} plan={plan} />
         ))}
       </section>
 

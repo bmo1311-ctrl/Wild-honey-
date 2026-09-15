@@ -40,3 +40,4 @@ supabase/.branches/
 
 # Removed — see the note inside. Sandbox cannot delete; safe to remove by hand.
 lib/nudges.ts
+components/pillar-shelf.tsx

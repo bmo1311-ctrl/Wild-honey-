@@ -129,7 +129,23 @@ entered ten products and logged zero routines. She paid the expensive setup
 cost and skipped the one-tap one, which means the return was missing, not that
 the price was too high.
 
-**The pillars** are how inspiration is held and found.
+**The pillars** are the dashboard, and the dashboard is her coaching plan.
+
+Each of the four has three parts, in the order a coach takes them:
+
+1. **What she said matters here**, in her own words. One line, hers, editable
+   forever, never required. The app had never once asked — it asked for goals
+   in onboarding as a flat list with no pillar attached, then read them back
+   nowhere. This is the only thing that makes a pillar *hers* rather than one
+   of four categories the app came with.
+2. **What is held here** — Brooke's work. Questions, readings, practices.
+   Offered one or two at a time, sized by the day.
+3. **Her own words back** — what she has already written under that pillar,
+   handed to her. This is the mirroring, and it infers nothing: it is
+   literally her sentences, joined to a pillar through the question she
+   answered. If she has written nothing under Faith, the app knows she has
+   written nothing *here*. That is not a fact about her faith and is never
+   shown as one.
 
 **The state layer** is read by everything and displayed as a score by nothing.
 

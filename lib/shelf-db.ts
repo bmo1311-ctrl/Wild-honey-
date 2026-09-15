@@ -2,7 +2,7 @@ import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { PILLARS } from '@/lib/pillars'
 import type { Pillar } from '@/lib/types'
-import { buildShelf, type Offering, type Shelf } from '@/lib/shelf'
+import { buildShelf, type HerWords, type Offering, type PillarPlan, type Shelf } from '@/lib/shelf'
 import type { CapacityLevel } from '@/lib/personal-state'
 import { localToday } from '@/lib/today'
 
@@ -74,4 +74,74 @@ export const getShelves = cache(async function getShelves(
   }
 
   return PILLARS.map((p) => buildShelf(p, byPillar.get(p) ?? [], capacity, today))
+})
+
+/**
+ * Her plan: the four pillars, each with what she said, what is held, and what
+ * she has already written.
+ *
+ * `hers` is the mirroring part and the one worth being careful about. It is
+ * her own sentences, joined to a pillar through the prompt she answered —
+ * nothing derived, nothing counted, nothing inferred from a gap. If she has
+ * written nothing under Faith, the app knows she has written nothing *here*,
+ * which is not a fact about her faith and is not presented as one.
+ *
+ * Capped at three per pillar. This is a plan, not an archive; the archive is
+ * a tab on Write and already holds everything.
+ */
+export const getPillarPlans = cache(async function getPillarPlans(
+  capacity: CapacityLevel,
+): Promise<PillarPlan[]> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const [shelves, { data: intentions }, { data: entries }] = await Promise.all([
+    getShelves(capacity),
+    user
+      ? supabase.from('pillar_intentions').select('pillar, text').eq('user_id', user.id)
+      : Promise.resolve({ data: null }),
+    user
+      ? supabase
+          .from('journal_entries')
+          .select('id, text, created_at, prompt:prompts(pillar, text)')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(60)
+      : Promise.resolve({ data: null }),
+  ])
+
+  const said = new Map<string, string>()
+  for (const row of (intentions ?? []) as { pillar: string; text: string }[]) {
+    said.set(row.pillar, row.text)
+  }
+
+  const written = new Map<Pillar, HerWords[]>(PILLARS.map((p) => [p, []]))
+  /*
+   * The join comes back typed as an array because Supabase cannot tell a
+   * one-to-one embed from a one-to-many at the type level. It is one row —
+   * `prompt_id` is a single foreign key — so it is normalised here rather
+   * than every read site having to remember.
+   */
+  for (const row of (entries ?? []) as unknown as {
+    id: string
+    text: string | null
+    created_at: string
+    prompt: { pillar: Pillar | null; text: string } | { pillar: Pillar | null; text: string }[] | null
+  }[]) {
+    const joined = Array.isArray(row.prompt) ? row.prompt[0] : row.prompt
+    const pillar = joined?.pillar
+    if (!pillar || !written.has(pillar) || !row.text?.trim()) continue
+    const list = written.get(pillar)!
+    if (list.length >= 3) continue
+    list.push({ id: row.id, when: row.created_at, prompt: joined?.text ?? '', body: row.text })
+  }
+
+  return shelves.map((shelf) => ({
+    pillar: shelf.pillar,
+    intention: said.get(shelf.pillar) ?? null,
+    shelf,
+    hers: written.get(shelf.pillar) ?? [],
+  }))
 })

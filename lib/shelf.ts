@@ -39,6 +39,34 @@ export interface Shelf {
   offered: Offering[]
 }
 
+/** Something she wrote herself, under this pillar. */
+export interface HerWords {
+  id: string
+  when: string
+  prompt: string
+  body: string
+}
+
+/**
+ * One pillar of her plan.
+ *
+ * Three parts, and only the middle one belongs to the app:
+ *
+ *   `intention` — what she said matters here, in her words
+ *   `shelf`     — what Brooke has put there
+ *   `hers`      — what she has already written under it, handed back
+ *
+ * The third is the mirroring, and it infers nothing: it is literally her own
+ * sentences returned to her. Nothing in this shape counts anything, and the
+ * absence of any part of it means only that it is absent.
+ */
+export interface PillarPlan {
+  pillar: Pillar
+  intention: string | null
+  shelf: Shelf
+  hers: HerWords[]
+}
+
 /**
  * How much to offer.
  *

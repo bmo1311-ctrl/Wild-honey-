@@ -24,6 +24,7 @@ challenge_checkins|id,challenge_id,user_id,date,created_at
 challenge_participants|id,challenge_id,user_id,joined_at
 challenges|id,title,description,pillar,length_days,is_active,created_at
 checkins|id,user_id,date,energy,mood,stress,sleep_quality,hydration_oz,protein_g,sunlight_minutes,movement_minutes,cycle_phase,symptoms,created_at
+child_signin_attempts|member_id,attempts,window_started_at,locked_until
 comments|id,entry_id,user_id,text,created_at,pinned
 commitments|id,user_id,text,status,replaced_by_id,created_at,last_reviewed_at
 community_comments|id,post_id,user_id,text,pinned,created_at
@@ -54,6 +55,7 @@ habits|id,user_id,title,anchor,pillar,archived,created_at
 household_members|id,owner_id,name,birth_year,color,is_self,position,created_at,sex,activity_level,child_user_id,family_code
 journal_entries|id,user_id,prompt_id,text,visibility,created_at,pinned
 journey_tasks|id,level,member_id,title,link_url,position,created_at
+kid_auth_secret|name,secret
 kid_earnings|id,owner_id,member_id,reward_id,title,amount,date,status,created_at,note,decided_at
 kid_rewards|id,owner_id,member_id,title,amount,cadence,learning_item_id,active,created_at
 learning_completions|id,owner_id,item_id,date,created_at
@@ -69,6 +71,7 @@ money_goals|id,user_id,kind,title,target,due_date,created_at
 morning_resets|id,user_id,date,intention,gratitude,completed_at
 pantry_items|id,user_id,name,category,quantity,running_low,created_at
 personal_experiments|id,user_id,title,description,length_days,start_date,status,helped,reflection_text,reflected_at,created_at
+pillar_intentions|id,user_id,pillar,text,created_at,updated_at
 products|id,title,description,price_cents,stripe_price_id,file_url,cover_image,is_published,created_at
 profiles|id,name,email,avatar_color,membership_tier,is_admin,streak_count,last_active_date,created_at,birthday,age_range,timezone,faith_preference,communication_style,wake_time,bedtime,movement_preference,hydration_goal_oz,caffeine,foods_avoided,allergies,onboarding_completed_at,notification_prefs,quiet_hours_start,quiet_hours_end,data_consent_at,avatar_url,daily_calorie_goal,daily_protein_goal_g,journey_level,said_yes_on,weight_kg,height_cm,birth_year,activity_level,body_goal,weight_unit,nutrient_targets,cycle_adjustments,cycle_length_days,last_period_start,bio,profile_show,color_season,is_child,guardian_id,child_permissions,life_stage,body_shape,vertical_proportion,body_scale,style_season,seasons,skin_concerns,period_length_days,luteal_length_days,cycle_is_regular
 prompts|id,pillar,text,date_scheduled,is_premium,created_at

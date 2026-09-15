@@ -1987,3 +1987,51 @@ something in them. The pillars wait for nothing.
 
 Milestones also rendered as "0 of 9" above nine padlocks on a first visit.
 Gated on the same condition.
+
+---
+
+## 37. The dashboard is her coaching plan (15 Sept)
+
+The shelves from §36 were a third of the picture. A pillar in a coaching plan
+has three parts, and the two missing ones are the two that make it *hers*.
+
+1. **What she said matters here**, in her own words — new table
+   `pillar_intentions`, one line per pillar, editable forever, never required,
+   and clearing it is allowed and not framed as giving up. The app had never
+   asked. It asked for goals once in onboarding, as a flat list with no pillar
+   attached, and `user_goals` was then loaded into the state engine and read
+   by nothing.
+2. **What is held here** — the shelf. §36.
+3. **Her own words back** — her journal entries joined to a pillar through the
+   question she answered. This is the mirroring, and it infers nothing: it is
+   her own sentences returned to her. Three per pillar; the archive already
+   holds everything.
+
+RLS on `pillar_intentions` is hers alone — not the circle, not a group, not an
+admin through the ordinary client. What a woman says matters to her is the
+most private thing in the database.
+
+### And `check:columns` was lying
+
+`pillar_intentions` was created by migration, read in two files, and the check
+reported **"1332 column references, 83 tables — all present"** without looking
+at one of them. `if (!schema.has(table)) continue` — an unknown table was
+silently none of its business. Green because it had decided not to look.
+
+Third time this exact thing has happened: the kid-route walker that only went
+one directory deep, the account sim that derived its expectations from the
+code under test, and now this.
+
+Unknown tables are a failure now, with `KNOWN_NOT_TABLES` naming the one real
+exception (`public_profiles`, a view). Turning it on immediately exposed two
+more matcher bugs:
+
+- **`supabase.storage.from('avatars')`** — buckets are not tables, and the
+  matcher could not tell. Fixed with a negative lookbehind.
+- **`[a-z_]+` missed any table with a digit in it.** My first attempt to prove
+  the new check worked used `pillar_intentions_v2`, which did not match the
+  pattern at all — so the mutation passed and *looked like* the check failing.
+  It was the check never seeing it. Widened to `[a-z0-9_]+` and re-tested with
+  and without a digit; both caught.
+
+`components/pillar-shelf.tsx` is superseded by `pillar-plan.tsx` and untracked.
