@@ -2219,3 +2219,63 @@ nothing expired" line triggers on an absence but does not *report* it back at
 her, which is the distinction that matters — and it is the friendliest thing
 in the app. The stale-commitment line re-offers her own words rather than
 noting that she has not reviewed them. All kept as they are.
+
+---
+
+## 41. Walking it as Alesia (15 Sept)
+
+The beta tester is a real account with a real shape, so this is her state
+rather than an imagined new member: **2 check-ins, 1 journal entry, enrolled in
+Strong and Surrendered on 13 Sept with 0 days done and 0 writings, nutrition
+fully set up, no products, no habits, no wins, no wardrobe, no pillar
+intentions, `capacity_score` null.**
+
+Three things found, and the first two are in work from earlier today.
+
+### Enrolling is not doing
+
+`nothingYet` on Becoming read `!active.enrollment && progress.length === 0 &&
+writingCount === 0` — so **signing up alone flipped it**. Alesia is enrolled
+and has done nothing, so she got "Milestones · 0 of 9" above nine padlocks and
+a current run of 0. Exactly what gating it was supposed to prevent, a day
+after adding the gate.
+
+Now it asks only whether she has *done* anything. The "choose a program" link
+at the bottom moved onto `active.enrollment`, which is the different question
+it was actually asking — otherwise the fix would have offered a programme to a
+woman already in one.
+
+### Three zeros and a flame
+
+Today's counters were gated on `hasCourse`, which means enrolled, not started.
+Alesia's Today reads:
+
+> **Best run** 0 days 🔥  ·  **Done** 0 days  ·  **Protein** 0
+
+Three zeros on the first screen of the app, with a flame next to one of them,
+for the one person testing it. The page's own note says the counters came out
+because they answer "how am I doing" when she opened it to ask "what now" —
+they came back for the enrolled case and brought the zeros with them. Both the
+grid and the 0% progress bar now wait for a finished day.
+
+### A running tally of a child's rejections, with a moral attached
+
+Found while sweeping for other `X of N` shapes. `kid-earn.tsx`:
+
+> 4 of 6 said yes · 2 said no. **Being honest keeps the yeses coming.**
+
+That sentence, sitting next to her declines, tells a child the noes happened
+because she was dishonest. A parent says no for twenty reasons that have
+nothing to do with honesty — the chore was half done, money is tight, she had
+already claimed it — and a child cannot tell those apart from being called a
+liar. Now it counts what she earned and says nothing about the rest. Each
+decision is still visible individually in the list below, which is where a
+specific no belongs: attached to the specific thing.
+
+### What was checked and is fine
+
+The other `X of N` sites are orientation inside something she chose ("day 3 of
+56"), live checklist feedback, or form progress — none of them measure her.
+Her nutrition note is correct because she really has filled everything in. Her
+cycle phase resolves from a date 23 days old, inside the staleness window. The
+pillar shelves have 25–58 items each, so none render empty.

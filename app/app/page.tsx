@@ -451,7 +451,20 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
 
       <QuickAddHabit suggestions={habitSuggestions} />
 
-      {hasCourse && (
+      {/*
+        Counters wait until there is something to count.
+        
+        These were gated on `hasCourse`, which means enrolled — not started.
+        Alesia enrolled two days ago and has done no days, so her Today read
+        "Best run 0 days" next to a flame, "Done 0 days", and "Protein 0".
+        Three zeros and a flame beside one of them, on the first screen of the
+        app, for the one person beta testing it.
+        
+        This page's own note says the counters came out because they answer
+        "how am I doing" when she opened it to ask "what now". They came back
+        for the enrolled case and brought the zeros with them.
+      */}
+      {hasCourse && completedDays.length > 0 && (
       <section className="grid grid-cols-4 gap-2">
         {stats.map((s) => (
           <div key={s.label} className="rounded-2xl border border-border bg-card px-2 py-3 text-center">
@@ -466,7 +479,8 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
       </section>
       )}
 
-      {hasCourse && course && (
+      {/* Same: a 0% bar is a picture of what she has not done. */}
+      {hasCourse && course && completedDays.length > 0 && (
       <section>
         <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
           <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />

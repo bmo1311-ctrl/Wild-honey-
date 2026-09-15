@@ -84,8 +84,24 @@ export function KidEarn({ rewards, earnings, balance }: { rewards: KidReward[]; 
         </div>
       )}
 
-      {decided > 0 && (
-        <p className="text-center text-[13px] text-muted-foreground">{decided - declined} of {decided} said yes{declined ? ` · ${declined} said no` : ''}. Being honest keeps the yeses coming.</p>
+      {/*
+        A running tally of a child's rejections, with a moral attached.
+
+        This read "4 of 6 said yes · 2 said no. Being honest keeps the yeses
+        coming." Putting that sentence next to her declines tells a child the
+        noes happened because she was dishonest — and a parent says no for
+        twenty reasons that have nothing to do with honesty: the chore was
+        half done, money is tight this week, she had already claimed it. She
+        cannot tell those apart from being called a liar.
+
+        So: her yeses, counted, and nothing about the noes. She already sees
+        each decision individually in the list below, which is where a
+        specific no belongs — attached to the specific thing.
+      */}
+      {decided - declined > 0 && (
+        <p className="text-center text-[13px] text-muted-foreground">
+          {decided - declined === 1 ? '1 thing' : `${decided - declined} things`} earned so far.
+        </p>
       )}
 
       {earnings.length > 0 && (

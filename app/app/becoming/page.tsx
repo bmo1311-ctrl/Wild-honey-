@@ -124,7 +124,20 @@ export default async function BecomingPage({ searchParams }: { searchParams: Pro
    * milestones and then-and-now sections wait until there is something in
    * them, and the pillars do not wait for anything.
    */
-  const nothingYet = !active.enrollment && progress.length === 0 && writingCount === 0
+  /*
+   * Has she *done* anything — not has she signed up for anything.
+   *
+   * This read `!active.enrollment && progress.length === 0 && ...`, so
+   * enrolling alone was enough to flip it. Alesia, the one person beta
+   * testing this, is enrolled in Strong and Surrendered with zero days done
+   * and zero writings — which meant she got "Milestones · 0 of 9" above nine
+   * padlocks and a current run of 0, which is precisely what gating this was
+   * supposed to prevent.
+   *
+   * Enrolling is not doing. The sections here are all evidence of what she
+   * has done, so they wait on that and nothing else.
+   */
+  const nothingYet = progress.length === 0 && writingCount === 0
 
   return (
     <div className="flex flex-col gap-6">
@@ -232,7 +245,12 @@ your plan, one pillar at a time.
       )}
 
       <Link href="/app/program" className="text-center text-sm font-medium text-mindset-pillar underline underline-offset-[3px]">
-        {nothingYet ? 'Choose a program' : 'Back to the program'}
+        {/*
+          And this asks about enrolment, which is a different question. It
+          previously rode on `nothingYet`, so after that fix it would have
+          offered "choose a program" to a woman already enrolled in one.
+        */}
+        {active.enrollment ? 'Back to the program' : 'Choose a program'}
       </Link>
     </div>
   )
